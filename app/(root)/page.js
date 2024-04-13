@@ -1,5 +1,6 @@
 import DonationPopup from "../components/DonationPopup";
 import FacebookNews from "../components/FacebookNews";
+import Footer from "../components/Footer";
 import Header from "../components/Header";
 import HomePagePodcast from "../components/HomePagePodcast";
 import HomePageRcheuli from "../components/HomePageRcheuli";
@@ -27,6 +28,7 @@ export default function Home() {
         <HomePagePodcast />
         <HomePageRcheuli />
         <DonationPopup />
+        <Footer />
       </main>
 
     </MenuProvider>
