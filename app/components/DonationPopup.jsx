@@ -2,8 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
-import Donation from "../donation/page";
-import { PayPalScriptProvider } from "@paypal/react-paypal-js";
+
 
 const DonationPopup = ({}) => {
   const [showCloseButton, setShowCloseButton] = useState(false);
