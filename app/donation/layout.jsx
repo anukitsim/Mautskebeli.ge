@@ -1,5 +1,5 @@
 "use client";
-import "../../styles/globals.css";
+import '../../style/globals.css'
 import React from "react";
 import Header from "../components/Header";
 import Navigation from "../components/Navigation";
