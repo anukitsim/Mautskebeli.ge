@@ -123,13 +123,16 @@ const MainNews = () => {
           onClick={handleImageClick}
           className={`absolute inset-0  transition-opacity duration-700 ease-in-out ${index === currentSlide ? 'opacity-100 z-10' : 'opacity-0'}`}
         >
-          <Image
-            src={slide.acf.image}
-            alt={slide.title.rendered}
-            layout='fill'
-            objectFit='cover'
-            priority={index === currentSlide}
-          />
+         <Image
+  src={slide.acf.image}
+  alt={slide.title.rendered}
+  layout='fill'
+  objectFit='cover'
+  priority={index === currentSlide}
+  loading={index === currentSlide ? 'eager' : 'lazy'} 
+  quality={100} 
+/>
+
           <div className="absolute top-40 left-5 text-white">
             <h2 className="bg-[#FECE27] text-[#474F7A] rounded-[4px] pl-[8px] pr-[8px] pt-[4px] pb-[4px] text-[12px] font-extrabold ">დღის მთავარი ამბები</h2>
             <p className="text-[#fff] lg:text-[72px] mt-5 sm:text-[30px]">{slide.title.rendered}</p>

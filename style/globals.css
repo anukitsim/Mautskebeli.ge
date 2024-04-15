@@ -2,6 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url("//cdn.web-fonts.ge/fonts/alk-tall-mtavruli/css/alk-tall-mtavruli.min.css");
+
 :root {
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 214, 219, 220;
@@ -607,7 +609,7 @@ input[type="range"]::-moz-focus-outer {
 @media (max-width: 768px) {
   .video-container {
     width: 100vw;
-    height: 400px;
+    height: 300px;
     padding-top: 0;
     background: none;
     position: absolute;
@@ -622,7 +624,7 @@ input[type="range"]::-moz-focus-outer {
   }
   
   .video-container .v-bigPlayButton {
-    width: 140px; /* Smaller play button for mobile */
+    width: 150px; /* Smaller play button for mobile */
     height: 100px;
     /* ... */
   }
@@ -644,3 +646,4 @@ input[type="range"]::-moz-focus-outer {
    height: 10px;
   }
 }
+

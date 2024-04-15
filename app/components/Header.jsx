@@ -3,14 +3,18 @@ import Link from "next/link";
 
 const Header = () => {
   return (
-    <header className="h-20 w-full flex flex-col items-start">
+    <header className="h-20 w-full flex bg-[#FBFAFC] flex-col items-start">
+      
       <div className="w-10/12 h-1/2 mx-auto mt-5 flex justify-between items-center">
-        <Image
+      <Link href='/'>
+      <Image
           src="/images/logo.png"
           alt="logo"
           width={116}
           height={32}
         />
+      </Link>
+       
         <div className="flex gap-8">
           <Link href="/live" className="flex gap-2.5 text-xs justify-center items-center">
             <Image

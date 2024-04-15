@@ -2,6 +2,9 @@
 const nextConfig = {
     images: {
         domains: ['mautskebeli.local', 'img.youtube.com'],
+        
+          formats: ['image/avif', 'image/webp']
+        
       },
 };
 

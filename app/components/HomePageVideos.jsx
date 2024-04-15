@@ -106,10 +106,10 @@ function HomePageVideos() {
     setSelectedVideoId(null);
   }, []);
 
-  const handleModalContentClick = useCallback((e) => {
-    e.stopPropagation(); // Prevent this click from closing the modal when clicking on the video
-    closeModal();
-  }, [closeModal]);
+  const handleVideoContainerClick = useCallback((e) => {
+    e.stopPropagation(); // Stop the click from propagating to the modal overlay
+  }, []);
+
 
   return (
     <>
@@ -149,20 +149,24 @@ function HomePageVideos() {
         ))}
       </section>
       {selectedVideoId && (
-         <Modal
-         isOpen={modalIsOpen}
-         onRequestClose={closeModal}
-         contentLabel="Video Modal"
-         className="bg-white bg-opacity-20 modalContent z-40"
-         style={{
-           overlay: {
-             zIndex: 1000, // Ensuring it's higher than any other content
-           },
-         }}
-       
-       >
-         <div className="modalContentArea"  onClick={handleModalContentClick}>
-            <CustomYoutubePlayer videoId={selectedVideoId}  />
+        <Modal
+          isOpen={modalIsOpen}
+          onRequestClose={closeModal} // Closes the modal when the overlay is clicked
+          contentLabel="Video Modal"
+          className="modalContent z-40"
+          style={{
+            overlay: {
+              zIndex: 1000,
+              backgroundColor: 'rgba(0, 0, 0, 0.75)', // Ensuring modal background is semi-transparent
+            },
+          }}
+        >
+          {/* This should correctly close the modal when clicked */}
+          <div className="modalContentArea" onClick={closeModal}>
+            {/* This div prevents modal close when clicking on the video */}
+            <div onClick={handleVideoContainerClick}>
+              <CustomYoutubePlayer videoId={selectedVideoId} />
+            </div>
           </div>
           <button onClick={closeModal} className="absolute top-0 left-10 z-50">
             <Image src="/images/cross.svg" alt="close" width={70} height={70} />

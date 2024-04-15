@@ -22,6 +22,7 @@ module.exports = {
         'lilac-20/20': 'rgba(224, 219, 232, 0.20)',
       }
     },
+    
   },
   plugins: [],
 };

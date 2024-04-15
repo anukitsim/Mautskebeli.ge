@@ -56,7 +56,7 @@ const Navigation = () => {
 
         {/* Desktop Menu */}
         <ul className="hidden sm:flex gap-10 items-center text-white text-xs sm:text-sm">
-          <Link href="#">მთავარი</Link>
+          <Link href="/">მთავარი</Link>
           <Link href="#">ტექსტი</Link>
           <Link href="#">პოდკასტი</Link>
           <Link href="#">სპორტი</Link>
