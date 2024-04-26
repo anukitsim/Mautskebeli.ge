@@ -41,31 +41,52 @@ export default function CustomYoutubePlayer({
 
   useEffect(() => {
     const loadPlayer = () => {
-      const newPlayer = new window.YT.Player(playerRef.current, {
-        videoId: videoId,
-        playerVars: {
-          controls: 0,
-          rel: 0,
-          origin: window.location.origin,
-        },
-        events: {
-          onStateChange: (event) => {
-            if (event.data === window.YT.PlayerState.PLAYING) {
-              setIsPlaying(true);
-            } else {
-              setIsPlaying(false);
-            }
+      if (player) {
+        // Cue the new video by ID and update duration
+        player.cueVideoById({videoId: videoId});
+        setTimeout(() => {
+          const newDuration = player.getDuration();
+          if (newDuration > 0) {
+            setDuration(newDuration);
+          } else {
+            console.log("Waiting for duration after cueing video...");
+            // Attempt to fetch duration again if not initially set
+            setTimeout(() => {
+              const retryDuration = player.getDuration();
+              if (retryDuration > 0) {
+                setDuration(retryDuration);
+              }
+            }, 1000);
+          }
+        }, 500); // Check half a second later to see if metadata is loaded
+      } else {
+        // Initialize the YouTube Player
+        const newPlayer = new window.YT.Player(playerRef.current, {
+          videoId: videoId,
+          playerVars: {
+            controls: 0,
+            rel: 0,
+            origin: window.location.origin,
           },
-          onReady: (event) => {
-            setPlayer(event.target);
-            setDuration(event.target.getDuration());
-            event.target.unMute();
+          events: {
+            onStateChange: (event) => {
+              if (event.data === window.YT.PlayerState.PLAYING) {
+                setIsPlaying(true);
+              } else if (event.data === window.YT.PlayerState.PAUSED || event.data === window.YT.PlayerState.CUED) {
+                setIsPlaying(false);
+              }
+            },
+            onReady: (event) => {
+              setPlayer(event.target);
+              event.target.unMute();
+              // Initially fetch duration if available
+              setDuration(event.target.getDuration());
+            },
           },
-        },
-        suggestedQuality: "hd720",
-      });
-
-      setPlayer(newPlayer);
+          suggestedQuality: "hd720",
+        });
+        setPlayer(newPlayer);
+      }
     };
 
     if (!window.YT) {
@@ -73,7 +94,6 @@ export default function CustomYoutubePlayer({
       tag.src = "https://www.youtube.com/iframe_api";
       const firstScriptTag = document.getElementsByTagName("script")[0];
       firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-
       window.onYouTubeIframeAPIReady = loadPlayer;
     } else {
       loadPlayer();
@@ -83,11 +103,10 @@ export default function CustomYoutubePlayer({
       if (player && typeof player.stopVideo === "function") {
         player.stopVideo();
       }
-      clearInterval(interval);
-      window.onYouTubeIframeAPIReady = null;
     };
-  }, [videoId]);
+  }, [videoId]); // This effect runs every time videoId changes
 
+  
   useEffect(() => {
     if (player && typeof player.getCurrentTime === "function") {
       const interval = setInterval(() => {
@@ -322,7 +341,7 @@ export default function CustomYoutubePlayer({
           style={customOverlayStyle}
         >
           <div className="flex flex-row justify-between pr-5 pt-5">
-            <Link href='https://www.youtube.com/@mautskebeli/podcasts' target='_blank' className="flex flex-col items-center">
+            <Link href='https://www.youtube.com/playlist?list=PL8wF1aEA4P8NJZUazilLH7ES-T-RQd3Cy' target='_blank' className="flex flex-col items-center">
               <img src="/images/test.png" className="" />
             </Link>
 

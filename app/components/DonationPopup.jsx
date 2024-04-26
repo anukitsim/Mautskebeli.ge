@@ -1,15 +1,21 @@
 "use client";
-// import the Image component only if you're using the Image from 'next/image'
-// Otherwise, you can directly use the img tag for the close button
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 
 const DonationPopup = () => {
   const [showCloseButton, setShowCloseButton] = useState(false);
-  const [showDonationPopup, setShowDonationPopup] = useState(true);
+  const [showDonationPopup, setShowDonationPopup] = useState(false);
   const donationModalRef = useRef(null);
 
   useEffect(() => {
+    // Check session storage to determine if the popup should be shown
+    const alreadyShown = sessionStorage.getItem('donationPopupShown');
+
+    if (!alreadyShown) {
+      setShowDonationPopup(true);
+      sessionStorage.setItem('donationPopupShown', 'true'); // Set the flag in session storage
+    }
+
     let timer = setTimeout(() => setShowCloseButton(true), 2000);
     return () => clearTimeout(timer);
   }, []);
@@ -32,12 +38,11 @@ const DonationPopup = () => {
   return (
     <div className="donation-modal-overlay">
       <div
-        className="donation-modal relative bg-[url('/images/donation-popup.svg')] w-[280px] h-[320px] bg-contain flex flex-col items-center justify-center gap-[32px]"
+        className="donation-modal relative bg-[url('/images/ილუსტრაცია.png')] w-[280px] h-[320px] bg-contain flex flex-col items-center justify-center gap-[32px]"
         ref={donationModalRef}
       >
         {showCloseButton && (
           <button className="absolute top-2 left-2" onClick={() => setShowDonationPopup(false)}>
-            {/* Add loading="lazy" if you are using next/image */}
             <img src="/images/donation-cross.png" alt="close" width={30} height={30} loading="lazy" />
           </button>
         )}

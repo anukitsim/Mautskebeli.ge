@@ -1,6 +1,7 @@
 "use client"
 
 import Image from "next/image";
+import Link from "next/link";
 
 const scrollToTop = () => {
     window.scrollTo({
@@ -32,11 +33,11 @@ const Footer = () => {
       </div>
       <div className="h-full w-1/3 flex flex-col gap-[18px]">
       <h1 className="text-[#AD88C6] text-[16px] font-bold">ნავიგაცია</h1>
-       <p>ჩვენს შესახებ</p>
-       <p>დონაცია</p>
-       <p>ვიდეოები</p>
-       <p>სტატიები</p>
-       <p>სპორტი</p>
+       <Link href='#'>ჩვენს შესახებ</Link>
+       <Link href='/donation'>დონაცია</Link>
+       <Link href='#'>ვიდეოები</Link>
+       <Link href='/text'>ტექსტი</Link>
+       <Link href='/#'>სპორტი</Link>
        <p>ამბები</p>
       </div>
       <div className="h-full w-1/3 flex flex-col gap-[16px]">
@@ -44,23 +45,23 @@ const Footer = () => {
       
         <div className="flex gap-[10px] text-[16px]">
             <Image src="/images/facebook.png" alt="mail" width={20} height={20} />
-            <span>Facebook</span>
+            <Link href='https://www.facebook.com/mautskebeli.ge'>Facebook</Link>
           </div>
           <div className="flex gap-[10px] text-[16px]">
             <Image src="/images/footer-youtube.png" alt="mail" width={20} height={20} />
-            <span>YouTube</span>
+            <Link href='https://www.youtube.com/@mautskebeli'>YouTube</Link>
           </div>
           <div className="flex gap-[10px] ">
             <Image src="/images/instagram.png" alt="mail" width={20} height={20} />
-            <span className="text-[16px] whitespace-nowrap">Instagram</span>
+            <Link href='https://www.instagram.com/mautskebeli.ge/' className="text-[16px] whitespace-nowrap">Instagram</Link>
           </div>
           <div className="flex gap-[10px] text-[16px]">
             <Image src="/images/tiktok.png" alt="mail" width={20} height={20} />
-            <span>TikTok</span>
+            <Link href='https://www.tiktok.com/@mautskebeli.ge'>TikTok</Link>
           </div>
           <div className="flex gap-[10px] text-[16px]">
             <Image src="/images/twitter.png" alt="mail" width={20} height={20} />
-            <span>X Twitter</span>
+            <Link href='https://x.com/mautskebeli?s=21'>X Twitter</Link>
           </div>
           <div className="flex gap-[10px] text-[16px]">
             <Image src="/images/telegram.png" alt="mail" width={20} height={20} />

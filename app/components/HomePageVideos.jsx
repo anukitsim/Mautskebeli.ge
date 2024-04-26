@@ -12,7 +12,7 @@ const PlayButton = ({ onClick }) => (
     width={42}
     height={42}
     onClick={onClick}
-    className="cursor-pointer"
+    className="cursor-pointer transform hover:scale-110"
   />
 );
 
@@ -164,7 +164,7 @@ function HomePageVideos() {
           {/* This should correctly close the modal when clicked */}
           <div className="modalContentArea" onClick={closeModal}>
             {/* This div prevents modal close when clicking on the video */}
-            <div onClick={handleVideoContainerClick}>
+            <div className="max-w-[900px] mx-auto " onClick={handleVideoContainerClick}>
               <CustomYoutubePlayer videoId={selectedVideoId} />
             </div>
           </div>

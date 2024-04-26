@@ -1,66 +1,64 @@
 "use client";
 
-import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 import VideoCardMore from './VideoCardMore';
 
 const MoreVideos = () => {
   const [randomVideos, setRandomVideos] = useState([]);
 
+  // Shuffle the array of videos
+  const shuffleArray = (array) => {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]]; // Swap elements
+    }
+  };
+
+  // Fetch random videos from the server
   const fetchRandomVideos = async () => {
     try {
       const postTypes = ['mecniereba', 'medicina', 'msoflio', 'saxli', 'kalaki', 'shroma', 'xelovneba'];
       const allVideos = [];
   
-      // Fetch videos for each post type
       for (const postType of postTypes) {
         const response = await fetch(
           `http://mautskebeli.local/wp-json/wp/v2/${postType}?per_page=4&orderby=date&order=desc`
         );
   
         if (!response.ok) {
-          console.error(`Error fetching videos for ${postType}:`, response.statusText);
-          continue; // Continue with the next post type on error
+          throw new Error(`Error fetching videos for ${postType}: ${response.statusText}`);
         }
   
         const data = await response.json();
         allVideos.push(...data);
       }
   
-      // Sort all videos by date in descending order
-      const sortedVideos = allVideos.sort((a, b) => new Date(b.date) - new Date(a.date));
-  
-      // Select the first 4 videos
-      const selectedRandomVideos = sortedVideos.slice(0, 4);
-  
+      shuffleArray(allVideos); // Shuffle the array to randomize
+      const selectedRandomVideos = allVideos.slice(0, 4); // Take first four videos
       setRandomVideos(selectedRandomVideos);
     } catch (error) {
       console.error('Error fetching videos:', error);
     }
   };
-  
-  
+
+  useEffect(() => {
+    fetchRandomVideos();
+  }, []); // Empty dependency array to run only once on mount
 
   const extractVideoId = (videoUrl) => {
     const match = videoUrl.match(/(?:youtube\.com\/(?:[^/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?/\s]{11})/);
     return match ? match[1] : null;
   };
 
-  useEffect(() => {
-    fetchRandomVideos();
-  }, []);
-
   return (
-    <div className='w-11/12 mx-auto '>
-      <div className="flex flex-wrap justify-center gap-10">
+    <div className='w-11/12 mx-auto lg:block hidden'>
+      <div className="flex flex-wrap justify-center gap-[6px]">
         {randomVideos.map((video, index) => (
-          <div key={index} className=" flex flex-row ">
-            <VideoCardMore
-              videoId={extractVideoId(video.acf.video_url)}
-              caption={video.title.rendered}
-            
-            />
-          </div>
+          <VideoCardMore
+            key={index}
+            videoId={extractVideoId(video.acf.video_url)}
+            caption={video.title.rendered}
+          />
         ))}
       </div>
     </div>

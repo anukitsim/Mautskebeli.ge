@@ -125,7 +125,8 @@ const FacebookNews = async () => {
       <div className="flex flex-col  md:flex-row gap-5  pb-6 items-start w-10/12 mx-auto lg:mt-10 mt-[350px]">
 
           {latestCaptions?.map((caption, index) => (
-            <div key={index} className="flex flex-col w-full md:w-1/4 border rounded-md p-5 lg:p-0 border-[#AD88C6] lg:border-none  gap-3 items-start">
+            <Link href={`/facebook-post/${index + 1}`}
+            key={index}  className="flex flex-col w-full md:w-1/4 border rounded-md p-5 lg:p-0 border-[#AD88C6] lg:border-none  gap-3 items-start">
 
               
               <div className="h-[80px]">
@@ -138,7 +139,7 @@ const FacebookNews = async () => {
               <button className="text-xs items-end font-medium text-white py-1 px-3 rounded bg-[#AD88C6]">
                 Button Text
               </button>
-            </div>
+            </Link>
           ))}
         </div>
       );

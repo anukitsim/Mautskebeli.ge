@@ -28,8 +28,9 @@ body {
 .video-container {
   position: relative;
   width: 100%; /* Adjust the width as needed */
-  max-width: 800px; /* Set a maximum width if necessary */
+  max-width: 1180px; /* Set a maximum width if necessary */
   margin: 0 auto; /* Center the container */
+ 
   
 }
 
@@ -494,7 +495,7 @@ margin-right: 10px;
 }
 
 .donation-modal {
-  background-color: #fff; /* Background color for the modal */
+ 
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); /* Optional: Add a box shadow */
@@ -541,17 +542,26 @@ input[type="range"]::-moz-focus-outer {
 
 
 .video-container .custom-overlay {
-  display: none;
   position: absolute;
-  top: 62%;
+  display: none;
+  top: 63%;
   width: 100%;
   height: 35%;
   cursor: pointer;
   background: linear-gradient(180deg, #8C74B2 0%, #FECE27 206.11%);
- border-top-right-radius: 6px;
- border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
+  border-top-left-radius: 6px;
   z-index: 100;
-  
+}
+
+@media (max-width: 1200px) {
+  .video-container .custom-overlay {
+    display: none !important;
+  }
+}
+
+.ytp-chrome-top .ytp-show-cards-title {
+  display: none !important;
 }
 
 .overlayActive {
@@ -647,3 +657,52 @@ input[type="range"]::-moz-focus-outer {
   }
 }
 
+.modal-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6); /* Dim the background */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000; /* Ensure it's above other content */
+}
+
+.modal {
+  background: #AD88C6;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  max-width: 500px;
+  width: 90%; /* Responsive width */
+  max-height: 80vh; /* Control height for overflow */
+  overflow-y: auto; /* Scroll if content is too tall */
+}
+
+.search-result {
+  display: block;
+  padding: 10px;
+  margin: 10px 0;
+  background: #AD88C6; /* Slightly off-white for each item */
+  border-radius: 4px;
+  color: #333;
+  text-decoration: none;
+  transition: background 0.3s ease; /* Smooth background color change on hover */
+}
+
+.search-result:hover {
+  background: #FECE27; /* Change background on hover */
+}
+
+.article-image-container {
+  position: relative;
+  width: 100%;
+  height: 220px; /* Maintain a consistent height for all images */
+  overflow: hidden; /* This will prevent any overflow if the image is too large */
+}
+
+.article-image {
+  object-fit: cover; /* This will cover the area, and might crop some parts of the image */
+}

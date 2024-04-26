@@ -23,7 +23,7 @@ const Sidebar = () => {
         />
         <span className="text-[#222] text-[15px]">მეცნიერება</span>
       </Link>
-      <Link href="#" className="flex flex-row gap-3">
+      <Link href="ekonomika" className="flex flex-row gap-3">
         <Image
           src="/images/ekonomika.png"
           alt="shroma"
@@ -50,7 +50,7 @@ const Sidebar = () => {
         <Image src="/images/qalaqi.png" alt="shroma" width={20} height={20} />
         <span className="text-[#222] text-[15px]">ქალაქი</span>
       </Link>
-      <Link href="#" className="flex flex-row gap-3">
+      <Link href="/resursebi" className="flex flex-row gap-3">
         <Image src="/images/msoplio.png" alt="shroma" width={20} height={20} />
         <span className="text-[#222] text-[15px]">რესურსები</span>
       </Link>
@@ -63,7 +63,7 @@ const Sidebar = () => {
         />
         <span className="text-[#222] text-[15px]">მსოფლიო</span>
       </Link>
-      <Link href="saxli-kvelas" className="flex flex-row gap-3">
+      <Link href="saxli-yvelas" className="flex flex-row gap-3">
         <Image src="/images/bechduri.png" alt="shroma" width={20} height={20} />
         <span className="text-[#222] text-[15px]">სახლი ყველას</span>
       </Link>
