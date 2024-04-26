@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useRef } from "react";
+import { useNavigate, useLocation } from 'react-router-dom';
 import CustomYoutubePlayer from "../components/CustomYoutube";
 import Header from "../components/Header";
 import Navigation from "../components/Navigation";
@@ -63,28 +64,37 @@ function ShromaVideos() {
 
   const videoPlayerRef = useRef(null);
 
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const videoIdFromUrl = params.get('video');
+    if (videoIdFromUrl && videos.length > 0) {
+      const video = videos.find(v => extractVideoId(v.acf.video_url) === videoIdFromUrl);
+      if (video) {
+        setActiveVideoId(videoIdFromUrl);
+        setActiveVideoAcf(video.acf);
+      }
+    }
+  }, [videos, location.search]);
+
   const handleVideoSelect = (videoId, acf) => {
     setActiveVideoId(videoId);
     setActiveVideoAcf(acf);
     videoPlayerRef.current?.scrollIntoView({ behavior: "smooth" });
+    navigate(`?video=${videoId}`, { replace: true });
   };
 
   useEffect(() => {
     const fetchVideos = async () => {
       try {
-        const response = await fetch(
-          `http://mautskebeli.local/wp-json/wp/v2/shroma?per_page=100`
-        );
-        if (!response.ok)
-          throw new Error(`HTTP error! status: ${response.status}`);
+        const response = await fetch(`http://mautskebeli.local/wp-json/wp/v2/shroma?per_page=100`);
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         const data = await response.json();
         setVideos(data);
         if (data.length > 0) {
-          const firstVideo = data[0];
-          handleVideoSelect(
-            extractVideoId(firstVideo.acf.video_url),
-            firstVideo.acf
-          );
+          handleVideoSelect(extractVideoId(data[0].acf.video_url), data[0].acf);
         }
       } catch (error) {
         console.error("Error fetching videos:", error);
@@ -92,7 +102,6 @@ function ShromaVideos() {
         setLoading(false);
       }
     };
-
     fetchVideos();
   }, []);
 
