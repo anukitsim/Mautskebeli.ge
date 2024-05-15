@@ -37,7 +37,7 @@ const Navigation = ({ onVideoSelect }) => {
     const postTypes = ['mecniereba', 'medicina', 'msoflio', 'saxli', 'kalaki', 'shroma', 'xelovneba'];
     try {
       const allFetchPromises = postTypes.map((postType) =>
-        fetch(`http://mautskebeli.local/wp-json/wp/v2/${postType}?search=${encodeURIComponent(searchQuery)}`, {
+        fetch(`https://mautskebeli.local/wp-json/wp/v2/${postType}?search=${encodeURIComponent(searchQuery)}`, {
           headers: { 'Content-Type': 'application/json' },
         }).then((response) => {
           if (!response.ok) {

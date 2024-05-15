@@ -73,7 +73,7 @@ function ShromaVideos() {
     const fetchVideos = async () => {
       try {
         const response = await fetch(
-          `http://mautskebeli.local/wp-json/wp/v2/mecniereba?per_page=100`
+          `https://mautskebeli.local/wp-json/wp/v2/mecniereba?per_page=100`
         );
         if (!response.ok)
           throw new Error(`HTTP error! status: ${response.status}`);

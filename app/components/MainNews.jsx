@@ -41,7 +41,7 @@ const MainNews = () => {
 
   useEffect(() => {
     const fetchSlides = async () => {
-      const response = await fetch('http://mautskebeli.local/wp-json/wp/v2/main?acf_format=standard&_fields=id,title,acf,date');
+      const response = await fetch('https://mautskebeli.local/wp-json/wp/v2/main?acf_format=standard&_fields=id,title,acf,date');
       const data = await response.json();
       // Assuming each item has a 'date' property
       

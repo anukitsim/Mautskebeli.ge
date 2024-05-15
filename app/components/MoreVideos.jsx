@@ -22,7 +22,7 @@ const MoreVideos = () => {
   
       for (const postType of postTypes) {
         const response = await fetch(
-          `http://mautskebeli.local/wp-json/wp/v2/${postType}?per_page=4&orderby=date&order=desc`
+          `https://mautskebeli.local/wp-json/wp/v2/${postType}?per_page=4&orderby=date&order=desc`
         );
   
         if (!response.ok) {

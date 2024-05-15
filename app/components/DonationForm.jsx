@@ -1,393 +1,96 @@
-"use client";
+"use client"
 
-import React, { useState } from "react";
-import Image from "next/image";
-import { PayPalButtons } from "@paypal/react-paypal-js";
+import React, { useState } from 'react';
 
-const OvalButton = ({ amount, setAmount }) => {
-  const handleIncrement = () => {
-    if (amount < 100) {
-      setAmount((prev) => ({
-        ...prev,
-        amount: amount + 1,
-      }));
+const DonationForm = () => {
+  const [formData, setFormData] = useState({
+    donationAmount: '',
+    donorName: '',
+    donorEmail: '',
+    isRecurring: false,
+    recId: ''
+  });
+
+  const handleInputChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    if (type === 'checkbox') {
+        setFormData({ ...formData, [name]: checked });
+    } else {
+        setFormData({ ...formData, [name]: value });
     }
-  };
+};
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const bodyData = {
+        ...formData,
+        isRecurring: formData.isRecurring ? 1 : 0,  // Ensure the backend receives a clear flag for recurring
+        recId: formData.recId  // This should be set when saving card data or from previous transactions
+    };
 
-  const handleDecrement = () => {
-    if (amount > 5) {
-      setAmount((prev) => ({
-        ...prev,
-        amount: amount - 1,
-      }));
+    try {
+        const response = await fetch('https://mautskebeli.local/wp-json/wp/v2/submit-donation/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(bodyData)
+        });
+
+        const responseData = await response.json();
+        if (!response.ok) {
+            throw new Error(responseData.message || "Failed to submit donation");
+        }
+
+        alert('Donation processed successfully.');
+        if (responseData.paymentUrl) {
+            window.location.href = responseData.paymentUrl;
+        }
+    } catch (error) {
+        console.error('Error submitting donation:', error);
+        alert('Error submitting donation: ' + error.message);
     }
-  };
+};
+
+
+
 
   return (
-    <div className="flex items-center relative">
-      <div
-        className="flex items-center justify-center cursor-pointer absolute left-3"
-        onClick={handleDecrement}
-      >
-        <Image src="/images/minus.png" alt="minus" width={24} height={24} />
-      </div>
+    <form onSubmit={handleSubmit}>
+      <input
+        type="number"
+        name="donationAmount"
+        value={formData.donationAmount}
+        onChange={handleInputChange}
+        placeholder="Donation Amount"
+      />
       <input
         type="text"
-        inputMode="numeric"
-        pattern="[0-9]*"
-        className="border border-[#CBCBCB] text-center w-full h-[40px] rounded-[6px]"
-        value={amount}
-        onChange={(e) => {
-          const newValue = parseInt(e.target.value, 10);
-          if (!isNaN(newValue) && newValue >= 5 && newValue <= 100) {
-            setAmount(newValue);
-          }
-        }}
+        name="donorName"
+        value={formData.donorName}
+        onChange={handleInputChange}
+        placeholder="Your Name"
       />
-      <div
-        className=" flex items-center justify-center cursor-pointer absolute right-3"
-        onClick={handleIncrement}
-      >
-        <Image src="/images/plus.png" alt="minus" width={24} height={24} />
-      </div>
-    </div>
+      <input
+        type="email"
+        name="donorEmail"
+        value={formData.donorEmail}
+        onChange={handleInputChange}
+        placeholder="Your Email"
+      />
+      <label>
+        <input
+          type="checkbox"
+          name="isRecurring"
+          checked={formData.isRecurring}
+          onChange={(e) =>
+            setFormData({ ...formData, isRecurring: e.target.checked })
+          }
+        />
+        Recurring Donation
+      </label>
+      <button type="submit">Submit Donation</button>
+    </form>
   );
 };
 
-const Buttons = ({ isAnonymous, state, setError, handleApprove }) => {
-  const { name, otherAmount, amount , email} = state
-  const total = Number(otherAmount) + amount
-  return (
-    <PayPalButtons
-      key={total}
-      className="h-[45px]"
-      createOrder={(_, actions) => {
-        return actions.order.create({
-          purchase_units: [
-            {
-              description: `${!isAnonymous ? name : "Anonymous"} ${
-                email
-              } Donation`,
-              amount: {
-                value: total,
-              },
-            },
-          ],
-        });
-      }}
-      onError={(err) => {
-        setError(err);
-        console.error("PayPal Checkout onError", err);
-      }}
-      fundingSource="paypal"
-      style={{ layout: "vertical" }}
-      disabled={false}
-      forceReRender={{ layout: "vertical" }}
-      onApprove={async (data, actions) => {
-        const order = await actions.order.capture();
-        console.log("order", order);
-        handleApprove(data.orderID);
-      }}
-    />
-  );
-};
-
-const Donation = () => {
-  const initialState = {
-    amount: 5,
-    otherAmount: 0,
-    name: "",
-    email: "",
-    totalAmount: 0,
-  }
-  const [state, setState] = useState(initialState);
-  const [isAnonymous, setIsAnonymous] = useState(false);
-  const [hasApproved, setHasApproved] = useState(false);
-  const [error, setError] = useState(null);
-
-  const handleAnonymousChange = () => {
-    setIsAnonymous(!isAnonymous);
-  };
-
-  const handleApprove = (orderId) => {
-    if (orderId) {
-      setState(initialState)
-      alert("Thank you for your purchase!");
-    } else {
-      alert("Something went wrong while processing the payments.")
-    }
-  }
-
-  if (error) {
-    // Display error message, modal or redirect user to error page
-    alert(error);
-  }
-
-  return (
-    <>
-    <div className="hidden w-[380px] lg:flex bg-[#FECE27] border border-[#CBCBCB] gap-[12px] mx-auto flex-col py-[18px] items-center rounded-[12px] ">
-      <form className="w-full pl-[18px]   pr-[18px] ">
-        <div className="flex flex-row w-full gap-2 items-start mb-4">
-          <div className="w-2/4">
-            <h2 className="text-[#767676] text-[14px] font-medium mb-3">
-              ოდენობა 
-            </h2>
-            <OvalButton amount={state.amount} setAmount={setState} />
-          </div>
-          <div className="w-2/4">
-            <h2 className="text-[#767676] text-[14px] font-medium">
-              სხვა თანხა
-            </h2>
-            <input
-              type="number"
-              className="border border-[#CBCBCB] w-full mt-3 h-[40px] rounded-[6px] pl-[24px] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-              placeholder="სხვა თანხა other amount"
-              value={state.otherAmount}
-              onChange={(e) =>
-                setState((prev) => ({
-                  ...prev,
-                  otherAmount: e.target.value,
-                }))
-              }
-            />
-          </div>
-        </div>
-        <h2 className="text-[#767676] text-[14px] font-medium">
-          სახელი
-        </h2>
-        <input
-          type="text"
-          disabled={isAnonymous}
-          className="w-[340px] border border-[#CBCBCB] text-[#000] text-[14px] rounded-[6px] pt-[12px] pb-[12px] pl-[24px] h-[44px] mt-[12px] flex justify-center"
-          placeholder="სახელი name"
-          value={isAnonymous ? "" : state.name}
-          onChange={(e) =>
-            setState((prev) => ({
-              ...prev,
-              name: e.target.value,
-            }))
-          }
-        />
-
-        {/* Custom radio button (styled checkbox) and text for "ანონიმურად" */}
-        <div className="flex items-center mt-4">
-          <input
-            type="checkbox"
-            id="anonymous"
-            checked={isAnonymous}
-            onChange={handleAnonymousChange}
-            style={{ cursor: "pointer" }}
-          />
-          <label
-            htmlFor="anonymous"
-            className="text-[#000] text-[14px] cursor-pointer ml-2"
-          >
-            ანონიმურად
-          </label>
-        </div>
-        <h2 className="text-[#767676] text-[14px] font-medium mt-[12px]">
-          ელ.ფოსტა
-        </h2>
-        <input
-          required
-          type="email"
-          className="w-[340px] border border-[#CBCBCB] text-[#000] text-[14px] rounded-[6px] pt-[12px] pb-[12px] pl-[24px] h-[44px] mt-[12px] flex justify-center"
-          placeholder="ელ. ფოსტა mail e-mail"
-          value={state.email}
-          onChange={(e) =>
-            setState((prev) => ({
-              ...prev,
-              email: e.target.value,
-            }))
-          }
-        />
-
-        {/* Custom radio button (styled checkbox) and text for "ანონიმურად" */}
-        <div className="flex items-center mt-4">
-          <input
-            type="checkbox"
-            id="approve"
-            onChange={() => setHasApproved(!hasApproved)}
-            style={{ cursor: "pointer" }}
-            required
-          />
-          <label
-            htmlFor="approve"
-            className="text-[#000] text-[14px] cursor-pointer ml-2"
-          >
-            ვეთანხმები წესებსა და პირობებს 
-          </label>
-        </div>
-
-        <h2 className="text-[#767676] text-[14px] font-medium mt-[24px] text-center">
-          გადახდის მეთოდი 
-        </h2>
-        <div className="flex flex-col gap-[8px] mt-[10px] relative">
-          <div className="flex-row flex items-center whitespace-nowrap gap-[8px] bg-[#FCBB32] py-2 justify-center w-full ">
-            <label className="flex items-center gap-[8px]">
-              <Image
-                src="/images/credit-card.png"
-                alt="paypal"
-                width={30}
-                height={30}
-              />
-              Credit/Debit card
-            </label>
-          </div>
-          <h2 className="text-[#767676] text-[14px] font-medium text-center">
-            ან 
-          </h2>
-          <div className="relative">
-            <Buttons
-              {...{
-                setError,
-                state,
-                isAnonymous,
-                handleApprove,
-              }}
-            />
-          </div>
-        </div>
-      </form>
-    </div>
-    {/* mobile screen */}
-    <div>
-      <form className="w-full bg-[#FECE27] lg:hidden  flex flex-col gap-[40px] items-center">
-        <div className="w-8/12 ">
-        <h1 className="text-[#474F7A] text-2xl mt-20 text-center">
-                <span className="text-[#AD88C6]">"მაუწყებელს"</span>
-                თქვენი მხარდაჭერა სჭირდება!
-              </h1>
-        </div>
-        <div className="w-2/4">
-            <h2 className="text-[#767676] text-[14px] font-medium mb-3">
-              ოდენობა 
-            </h2>
-            <OvalButton amount={state.amount} setAmount={setState} />
-          </div>
-          <div className="w-2/4">
-            <h2 className="text-[#767676] text-[14px] font-medium">
-              სხვა თანხა
-            </h2>
-            <input
-              type="number"
-              className="border border-[#CBCBCB] w-full mt-3 h-[40px] rounded-[6px] pl-[24px] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-              placeholder="სხვა თანხა other amount"
-              value={state.otherAmount}
-              onChange={(e) =>
-                setState((prev) => ({
-                  ...prev,
-                  otherAmount: e.target.value,
-                }))
-              }
-            />
-          </div>
-          <div className="flex flex-col">
-          <h2 className="text-[#767676] text-[14px] font-medium">
-          სახელი
-        </h2>
-        <input
-          type="text"
-          disabled={isAnonymous}
-          className="w-[340px] border border-[#CBCBCB] text-[#000] text-[14px] mt-2 rounded-[6px] pt-[12px] pb-[12px] pl-[24px] h-[44px] flex"
-          placeholder="სახელი name"
-          value={isAnonymous ? "" : state.name}
-          onChange={(e) =>
-            setState((prev) => ({
-              ...prev,
-              name: e.target.value,
-            }))
-          }
-        />
-         <div className="flex items-center mt-4">
-          <input
-            type="checkbox"
-            id="anonymous"
-            checked={isAnonymous}
-            onChange={handleAnonymousChange}
-            style={{ cursor: "pointer" }}
-          />
-          <label
-            htmlFor="anonymous"
-            className="text-[#000] text-[14px] cursor-pointer ml-2"
-          >
-            ანონიმურად
-          </label>
-        </div>
-          </div>
-        <div className="flex flex-col">
-        <h2 className="text-[#767676] text-[14px] font-medium mt-[12px]">
-          ელ.ფოსტა
-        </h2>
-        <input
-          required
-          type="email"
-          className="w-[340px] border border-[#CBCBCB] text-[#000] text-[14px] rounded-[6px] pt-[12px] pb-[12px] pl-[24px] h-[44px] mt-[12px] flex justify-center"
-          placeholder="ელ. ფოსტა mail e-mail"
-          value={state.email}
-          onChange={(e) =>
-            setState((prev) => ({
-              ...prev,
-              email: e.target.value,
-            }))
-          }
-        />
-         <div className="flex items-center mt-4">
-          <input
-            type="checkbox"
-            id="approve"
-            onChange={() => setHasApproved(!hasApproved)}
-            style={{ cursor: "pointer" }}
-            required
-          />
-          <label
-            htmlFor="approve"
-            className="text-[#000] text-[14px] cursor-pointer ml-2"
-          >
-            ვეთანხმები წესებსა და პირობებს 
-          </label>
-        </div>
-        </div>
-        
-        
-
-        {/* Custom radio button (styled checkbox) and text for "ანონიმურად" */}
-       
-
-        <h2 className="text-[#767676] text-[14px] font-medium mt-[24px]">
-          გადახდის მეთოდი 
-        </h2>
-        <div className="flex flex-col gap-[8px] mt-[10px] relative">
-          <div className="flex-row flex items-center whitespace-nowrap gap-[8px] bg-[#FCBB32] py-2 justify-center w-full ">
-            <label className="flex items-center gap-[8px]">
-              <Image
-                src="/images/credit-card.png"
-                alt="paypal"
-                width={30}
-                height={30}
-              />
-              Credit/Debit card
-            </label>
-          </div>
-          <h2 className="text-[#767676] text-[14px] font-medium text-center">
-            ან 
-          </h2>
-          <div className="relative z-0">
-            <Buttons
-              {...{
-                setError,
-                state,
-                isAnonymous,
-                handleApprove,
-              }}
-            />
-          </div>
-        </div>
-      </form>
-    </div>
-    </>
-    
-  );
-};
-
-export default Donation;
+export default DonationForm;

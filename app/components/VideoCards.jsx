@@ -9,7 +9,7 @@ const VideoCards = () => {
     try {
       const postTypes = ['mecniereba', 'medicina', 'msoflio', 'saxli', 'kalaki', 'shroma', 'xelovneba'];
       const requests = postTypes.map((postType) =>
-        fetch(`http://mautskebeli.local/wp-json/wp/v2/${postType}?per_page=4&orderby=date&order=desc`)
+        fetch(`https://mautskebeli.local/wp-json/wp/v2/${postType}?per_page=4&orderby=date&order=desc`)
       );
 
       const responses = await Promise.all(requests);

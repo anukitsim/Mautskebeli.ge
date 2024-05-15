@@ -16,7 +16,7 @@ const HomePageStatiebi = () => {
   };
 
   useEffect(() => {
-    fetch('http://mautskebeli.local/wp-json/wp/v2/mau-books?acf_format=standard&_fields=id,title,acf,date')
+    fetch('https://mautskebeli.local/wp-json/wp/v2/mau-books?acf_format=standard&_fields=id,title,acf,date')
       .then(response => response.json())
       .then(data => {
         // Sort the articles by date, newest first.

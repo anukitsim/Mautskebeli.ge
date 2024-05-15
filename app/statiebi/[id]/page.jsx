@@ -13,7 +13,7 @@ const ArticlePage = () => {
     const id = match ? match[1] : null;
 
     if (id) {
-      const endpoint = `http://mautskebeli.local/wp-json/wp/v2/article/${id}?acf_format=standard&_fields=id,title,acf,date`;
+      const endpoint = `https://mautskebeli.local/wp-json/wp/v2/article/${id}?acf_format=standard&_fields=id,title,acf,date`;
       fetch(endpoint)
         .then(response => {
           if (!response.ok) {
