@@ -37,7 +37,7 @@ const DonationForm = () => {
     setLoading(true);
     try {
       const response = await fetch(
-        "https://mautskebeli.local/wp-json/wp/v2/submit-donation/",
+        "https://mautskebeli.wpenginepowered.com/wp-json/wp/v2/submit-donation/",
         {
           method: "POST",
           headers: {
