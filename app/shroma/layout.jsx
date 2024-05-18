@@ -3,7 +3,7 @@ import "../../style/globals.css";
 import React from "react";
 
 import Footer from "../components/Footer";
-import { BrowserRouter } from 'react-router-dom';
+
 
 // export const metadata = {
 //   title: "Create Next App",
@@ -13,14 +13,14 @@ import { BrowserRouter } from 'react-router-dom';
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-       <BrowserRouter>
+       
        <body>
        
 
        {children}
        <Footer />
      </body>
-       </BrowserRouter>
+      
     
     </html>
   );

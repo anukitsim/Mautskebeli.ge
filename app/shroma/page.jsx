@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useState, useRef } from "react";
-import { useNavigate, useLocation } from 'react-router-dom';
 import CustomYoutubePlayer from "../components/CustomYoutube";
 import Header from "../components/Header";
 import Navigation from "../components/Navigation";
@@ -62,8 +61,7 @@ function ShromaVideos() {
 
   const videoPlayerRef = useRef(null);
 
-  const navigate = useNavigate();
-  const location = useLocation();
+
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -81,7 +79,7 @@ function ShromaVideos() {
     setActiveVideoId(videoId);
     setActiveVideoAcf(acf);
     videoPlayerRef.current?.scrollIntoView({ behavior: "smooth" });
-    navigate(`?video=${videoId}`, { replace: true });
+   
   };
 
   useEffect(() => {
