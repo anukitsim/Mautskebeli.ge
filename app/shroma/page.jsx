@@ -28,12 +28,11 @@ const extractVideoId = (videoUrl) => {
 
 const VideoCard = ({ videoId, acf, onSelect }) => {
   const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
-  
-  // Adjust card styles for uniformity
+
   return (
     <div
       className="relative flex flex-col items-center w-full max-w-[248px] p-2.5 gap-2 mx-auto my-2 bg-[#AD88C6] rounded-lg cursor-pointer"
-      style={{ height: '206px' }} // Fixed height for all cards
+      style={{ height: '206px' }}
       onClick={() => onSelect(videoId, acf)}
     >
       <div
@@ -45,12 +44,11 @@ const VideoCard = ({ videoId, acf, onSelect }) => {
         </div>
       </div>
       <p className="text-sm font-semibold text-center text-white truncate w-full px-2" style={{ height: '50px' }}>
-        {acf && acf.title ? acf.title : "No title available"} // Safe access to title with default
+        {acf && acf.title ? acf.title : "No title available"}
       </p>
     </div>
   );
 };
-
 
 function ShromaVideos() {
   const [videos, setVideos] = useState([]);
@@ -89,7 +87,7 @@ function ShromaVideos() {
   useEffect(() => {
     const fetchVideos = async () => {
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/shroma?per_page=100`);
+        const response = await fetch(`${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/wp/v2/shroma?per_page=100`);
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         const data = await response.json();
         setVideos(data);
@@ -184,7 +182,6 @@ function ShromaVideos() {
                   />
                 </button>
               </div>
-              
               <div className="w-10/12 mx-auto lg:grid hidden grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 px-2 my-4">
                 {paginatedVideos.map((video) => (
                   <VideoCard
@@ -196,19 +193,17 @@ function ShromaVideos() {
                 ))}
               </div>
               <div className="flex sm:hidden mt-10 overflow-x-auto hide-scroll-bar pl-2 pr-2">
-  <div className="flex gap-4">  
-    {paginatedVideos.map(video => (
-      <VideoCard
-        key={video.id}
-        videoId={extractVideoId(video.acf.video_url)}
-        acf={video.acf}
-        onSelect={handleVideoSelect}
-      />
-    ))}
-  </div>
-</div>
-
-
+                <div className="flex gap-4">
+                  {paginatedVideos.map((video) => (
+                    <VideoCard
+                      key={video.id}
+                      videoId={extractVideoId(video.acf.video_url)}
+                      acf={video.acf}
+                      onSelect={handleVideoSelect}
+                    />
+                  ))}
+                </div>
+              </div>
             </>
           )
         )}

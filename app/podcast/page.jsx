@@ -1,13 +1,14 @@
+import { Suspense } from 'react';
+import Podcast from "../components/Podcast";
 
-import Podcast from "../components/Podcast"
-
-const page = () => {
+const Page = () => {
   return (
-    <div>
-    
-      <Podcast />
-    </div>
-  )
+    <Suspense fallback={<div>Loading...</div>}>
+      <div>
+        <Podcast />
+      </div>
+    </Suspense>
+  );
 }
 
-export default page
+export default Page;

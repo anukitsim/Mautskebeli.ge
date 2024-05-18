@@ -5,7 +5,6 @@ import CustomYoutubePlayer from "./CustomYoutube";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 
-
 const PlayButton = ({ onClick }) => (
   <img
     src="/images/card-play-button.png"
@@ -48,7 +47,7 @@ const Podcast = () => {
   const searchParams = useSearchParams();
   const idInQueryParams = searchParams.get("chId");
   const [videos, setVideos] = useState([]);
-  const [loading,setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [selectedVideoId, setSelectedVideoId] = useState(null);
   const [isLive, setIsLive] = useState(false);
   const channelId = idInQueryParams
@@ -71,26 +70,26 @@ const Podcast = () => {
 
   useEffect(() => {
     const checkLiveStatus = async () => {
-      if(!isLive){
+      if (!isLive) {
         try {
           const myHeaders = new Headers();
           myHeaders.append("Content-Type", "application/json");
-  
+
           const raw = JSON.stringify({
             channelId,
           });
-  
+
           const response = await fetch(`/api/get-youtube-live-feed-id`, {
             method: "POST",
             headers: myHeaders,
             body: raw,
             redirect: "follow",
           });
-  
+
           const {
             data: { stream, isStreaming },
           } = await response.json();
-  
+
           setIsLive(isStreaming);
           setLiveStream(stream);
           setLoading(false);
@@ -98,7 +97,7 @@ const Podcast = () => {
           console.log(error);
           setIsLive(false);
           setLoading(false);
-        }  
+        }
       }
     };
 
@@ -143,7 +142,7 @@ const Podcast = () => {
           return dateB.getTime() - dateA.getTime();
         });
 
-        setVideos(sortedVideos.reverse());        
+        setVideos(sortedVideos.reverse());
       } catch (error) {
         console.error(error);
       }
@@ -152,37 +151,37 @@ const Podcast = () => {
     fetchVideos();
   }, [apiKey, playlistId]);
 
-  useEffect(()=>{
-    if(isLive){
-        setSelectedVideoId(liveStream?.id);
-        setCustomPlayerKey((prevKey) => prevKey + 1);
+  useEffect(() => {
+    if (isLive) {
+      setSelectedVideoId(liveStream?.id);
+      setCustomPlayerKey((prevKey) => prevKey + 1);
     }
-  },[isLive])
+  }, [isLive]);
 
-   if (loading) {
-      return (
-        <div>
-          <Image src="/images/loading.svg" alt="loading" width={120} height={120} />
-        </div>
-      );
-    }
+  if (loading) {
+    return (
+      <div>
+        <Image src="/images/loading.svg" alt="loading" width={120} height={120} />
+      </div>
+    );
+  }
 
   return (
     <div style={{ display: "flex" }}>
       <div style={{ flex: "3", paddingLeft: "20px" }}>
         {videos.length > 0 && (
           <>
-           {isLive && selectedVideoId === liveStream?.id && (
-  <h1 className="text-[#FECE27] text-[20px] font-extrabold mt-5 mb-4  animate-pulse">
-    პირდაპირი ეთერი
-  </h1>
-)}
+            {isLive && selectedVideoId === liveStream?.id && (
+              <h1 className="text-[#FECE27] text-[20px] font-extrabold mt-5 mb-4 animate-pulse">
+                პირდაპირი ეთერი
+              </h1>
+            )}
 
             <CustomYoutubePlayer
               ref={mainVideoRef}
               key={customPlayerKey}
               videoId={
-            selectedVideoId ? selectedVideoId : videos.slice(-1)[0].id
+                selectedVideoId ? selectedVideoId : videos.slice(-1)[0].id
               }
               onClose={() => setSelectedVideoId("")}
               videoData={videos.find((video) => video.id === selectedVideoId)}
@@ -201,10 +200,10 @@ const Podcast = () => {
           position: "sticky",
           top: "0",
         }}
-        className="mt-20 rounded-lg flex flex-col items-center mr-5 p-5  "
+        className="mt-20 rounded-lg flex flex-col items-center mr-5 p-5"
       >
         <div className="flex flex-col gap-5">
-          {Object.values(liveStream || {})?.length > 0 && isLive&&  (
+          {Object.values(liveStream || {})?.length > 0 && isLive && (
             <VideoCard
               isLive={isLive}
               videoId={liveStream?.id}
