@@ -27,7 +27,6 @@ export default function CustomYoutubePlayer({
   const [volume, setVolume] = useState(50);
 
   let interval;
-
   let customOverlayTimeout;
 
   function formatTime(timeInSeconds) {
@@ -42,15 +41,13 @@ export default function CustomYoutubePlayer({
   useEffect(() => {
     const loadPlayer = () => {
       if (player) {
-        // Cue the new video by ID and update duration
-        player.cueVideoById({videoId: videoId});
+        player.cueVideoById({ videoId: videoId });
         setTimeout(() => {
           const newDuration = player.getDuration();
           if (newDuration > 0) {
             setDuration(newDuration);
           } else {
             console.log("Waiting for duration after cueing video...");
-            // Attempt to fetch duration again if not initially set
             setTimeout(() => {
               const retryDuration = player.getDuration();
               if (retryDuration > 0) {
@@ -58,9 +55,8 @@ export default function CustomYoutubePlayer({
               }
             }, 1000);
           }
-        }, 500); // Check half a second later to see if metadata is loaded
+        }, 500);
       } else {
-        // Initialize the YouTube Player
         const newPlayer = new window.YT.Player(playerRef.current, {
           videoId: videoId,
           playerVars: {
@@ -72,14 +68,16 @@ export default function CustomYoutubePlayer({
             onStateChange: (event) => {
               if (event.data === window.YT.PlayerState.PLAYING) {
                 setIsPlaying(true);
-              } else if (event.data === window.YT.PlayerState.PAUSED || event.data === window.YT.PlayerState.CUED) {
+              } else if (
+                event.data === window.YT.PlayerState.PAUSED ||
+                event.data === window.YT.PlayerState.CUED
+              ) {
                 setIsPlaying(false);
               }
             },
             onReady: (event) => {
               setPlayer(event.target);
               event.target.unMute();
-              // Initially fetch duration if available
               setDuration(event.target.getDuration());
             },
           },
@@ -104,9 +102,8 @@ export default function CustomYoutubePlayer({
         player.stopVideo();
       }
     };
-  }, [videoId]); // This effect runs every time videoId changes
+  }, [videoId]);
 
-  
   useEffect(() => {
     if (player && typeof player.getCurrentTime === "function") {
       const interval = setInterval(() => {
@@ -191,10 +188,7 @@ export default function CustomYoutubePlayer({
       rangeInput && rangeInput.querySelector("::-webkit-slider-thumb");
 
     if (thumb) {
-      // Calculate the new width of the thumb
-      const thumbWidth = 50 + progress * 0.5; // Adjust the multiplier as needed
-
-      // Apply the new width to the thumb
+      const thumbWidth = 50 + progress * 0.5;
       thumb.style.width = `${thumbWidth}px`;
     }
   };
@@ -228,13 +222,11 @@ export default function CustomYoutubePlayer({
       typeof player.unMute === "function"
     ) {
       if (isMuted) {
-        // Unmute and set volume to the previous non-zero volume
         const previousVolume = volume === 0 ? 50 : volume;
         player.unMute();
         player.setVolume(previousVolume);
         setVolume(previousVolume);
       } else {
-        // Mute and set volume to 0
         player.mute();
         setVolume(0);
       }
@@ -261,19 +253,19 @@ export default function CustomYoutubePlayer({
   useEffect(() => {
     const handleKeyDown = (e) => {
       switch (e.key) {
-        case " ": // Space key for play/pause
-          e.preventDefault(); // Prevent default space key behavior (scrolling)
+        case " ":
+          e.preventDefault();
           togglePlayPause();
           break;
-        case "ArrowLeft": // Left arrow for rewinding
-          e.preventDefault(); // Prevent default arrow key behavior
-          rewind(5); // Rewind by 5 seconds (adjust as needed)
+        case "ArrowLeft":
+          e.preventDefault();
+          rewind(5);
           break;
-        case "ArrowRight": // Right arrow for forwarding
-          e.preventDefault(); // Prevent default arrow key behavior
-          forward(5); // Forward by 5 seconds (adjust as needed)
+        case "ArrowRight":
+          e.preventDefault();
+          forward(5);
           break;
-        case "f": // F key for full-screen toggle
+        case "f":
           handleFullscreenToggle();
           break;
         default:
@@ -292,34 +284,28 @@ export default function CustomYoutubePlayer({
     const handlePauseOverlay = (event) => {
       const playerState = event.data;
 
-      // Check if the player is ready
       if (player && playerState !== undefined) {
         if (playerState === window.YT.PlayerState.PAUSED) {
-          // Show your custom overlay immediately
           pauseOverlayRef.current.style.opacity = "0";
           pauseContainerRef.current.style.zIndex = "0";
           customOverlayRef.current.style.display = "block";
         } else {
-          // Hide your custom overlay after a delay when playing
           setTimeout(() => {
             pauseOverlayRef.current.style.opacity = "1";
             pauseContainerRef.current.style.zIndex = "41";
             customOverlayRef.current.style.display = "none";
-          }, 1000); // Adjust the delay time (in milliseconds) as needed
+          }, 1000);
         }
       }
     };
 
-    // Add an event listener only if the player is available
     if (player) {
       player.addEventListener("onStateChange", handlePauseOverlay);
     }
 
     return () => {
-      // Clear the timeout when the component is unmounted
       clearTimeout(customOverlayTimeout);
 
-      // Remove the event listener when the component is unmounted
       if (player && typeof player.removeEventListener === "function") {
         player.removeEventListener("onStateChange", handlePauseOverlay);
       }
@@ -341,7 +327,11 @@ export default function CustomYoutubePlayer({
           style={customOverlayStyle}
         >
           <div className="flex flex-row justify-between pr-5 pt-5">
-            <Link href='https://www.youtube.com/playlist?list=PL8wF1aEA4P8NJZUazilLH7ES-T-RQd3Cy' target='_blank' className="flex flex-col items-center">
+            <Link
+              href="https://www.youtube.com/playlist?list=PL8wF1aEA4P8NJZUazilLH7ES-T-RQd3Cy"
+              target="_blank"
+              className="flex flex-col items-center"
+            >
               <img src="/images/test.png" className="" />
             </Link>
 
@@ -461,7 +451,9 @@ export default function CustomYoutubePlayer({
                 )}
               </div>
               <div className="v-time">
-                <span className="v-currentTime">{formatTime(currentTime)}</span>
+                <span className="v-currentTime">
+                  {formatTime(currentTime)}
+                </span>
                 &nbsp;/&nbsp;
                 <span className="v-duration">{formatTime(duration)}</span>
               </div>
@@ -473,11 +465,17 @@ export default function CustomYoutubePlayer({
                   onClick={toggleMute}
                 >
                   {isMuted ? (
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 32 32"
+                    >
                       <path d="M13 30a1 1 0 0 1-.707-.293L4.586 22H1a1 1 0 0 1-1-1V11a1 1 0 0 1 1-1h3.586l7.707-7.707A1 1 0 0 1 14 3v26a1.002 1.002 0 0 1-1 1z"></path>
                     </svg>
                   ) : (
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 34 32">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 34 32"
+                    >
                       <path d="M27.814 28.814a1.5 1.5 0 0 1-1.061-2.56C29.492 23.515 31 19.874 31 16.001s-1.508-7.514-4.247-10.253a1.5 1.5 0 1 1 2.121-2.121C32.179 6.932 34 11.327 34 16.001s-1.82 9.069-5.126 12.374a1.495 1.495 0 0 1-1.061.439zm-5.329-2.829a1.5 1.5 0 0 1-1.061-2.56c4.094-4.094 4.094-10.755 0-14.849a1.5 1.5 0 1 1 2.121-2.121c2.55 2.55 3.954 5.94 3.954 9.546s-1.404 6.996-3.954 9.546a1.495 1.495 0 0 1-1.061.439zm-5.328-2.828a1.5 1.5 0 0 1-1.061-2.56 6.508 6.508 0 0 0 0-9.192 1.5 1.5 0 1 1 2.121-2.121c3.704 3.704 3.704 9.731 0 13.435a1.495 1.495 0 0 1-1.061.439zM13 30a1 1 0 0 1-.707-.293L4.586 22H1a1 1 0 0 1-1-1V11a1 1 0 0 1 1-1h3.586l7.707-7.707A1 1 0 0 1 14 3v26a1.002 1.002 0 0 1-1 1z"></path>
                     </svg>
                   )}

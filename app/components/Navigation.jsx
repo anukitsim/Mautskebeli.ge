@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useMenu } from '../context/MenuContext';
@@ -21,8 +21,15 @@ const Navigation = ({ onVideoSelect }) => {
   const toggleMenu = () => {
     if (!isMenuOpen) setIsSearchOpen(false);
     setIsMenuOpen(!isMenuOpen);
-    document.body.style.overflow = !isMenuOpen ? 'hidden' : 'initial';
   };
+
+  useEffect(() => {
+    if (isMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'initial';
+    }
+  }, [isMenuOpen]);
 
   const toggleSearch = () => {
     if (!isSearchOpen) setIsMenuOpen(false);
@@ -37,15 +44,15 @@ const Navigation = ({ onVideoSelect }) => {
     const postTypes = ['mecniereba', 'medicina', 'msoflio', 'saxli', 'kalaki', 'shroma', 'xelovneba'];
     try {
       const allFetchPromises = postTypes.map((postType) =>
-  fetch(`${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/wp/v2/${postType}?search=${encodeURIComponent(searchQuery)}`, {
-    headers: { 'Content-Type': 'application/json' },
-  }).then((response) => {
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    return response.json();
-  })
-);
+        fetch(`${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/wp/v2/${postType}?search=${encodeURIComponent(searchQuery)}`, {
+          headers: { 'Content-Type': 'application/json' },
+        }).then((response) => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          return response.json();
+        })
+      );
 
       const results = await Promise.allSettled(allFetchPromises);
       const successfulResults = results
