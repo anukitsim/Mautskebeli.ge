@@ -87,7 +87,7 @@ export default function CustomYoutubePlayer({
       }
     };
 
-    if (!window.YT) {
+    if (typeof window !== "undefined" && !window.YT) {
       const tag = document.createElement("script");
       tag.src = "https://www.youtube.com/iframe_api";
       const firstScriptTag = document.getElementsByTagName("script")[0];
@@ -106,18 +106,19 @@ export default function CustomYoutubePlayer({
 
   useEffect(() => {
     if (player && typeof player.getCurrentTime === "function") {
-      const interval = setInterval(() => {
+      interval = setInterval(() => {
         const currentTime = player.getCurrentTime();
         setCurrentTime(currentTime);
         const newProgress = (currentTime / duration) * 100;
         setProgress(newProgress);
 
-        const isPaused =
-          player.getPlayerState() === window.YT.PlayerState.PAUSED;
-        const posterElement = document.querySelector(".v-poster");
+        if (typeof document !== "undefined") {
+          const isPaused = player.getPlayerState() === window.YT.PlayerState.PAUSED;
+          const posterElement = document.querySelector(".v-poster");
 
-        if (posterElement) {
-          posterElement.style.display = isPaused ? "block" : "none";
+          if (posterElement) {
+            posterElement.style.display = isPaused ? "block" : "none";
+          }
         }
       }, 1000);
 
@@ -138,30 +139,84 @@ export default function CustomYoutubePlayer({
   };
 
   const handleFullscreenToggle = () => {
-    const videoContainer = document.querySelector(".video-container");
+    if (typeof document !== "undefined") {
+      const videoContainer = document.querySelector(".video-container");
 
-    if (document.fullscreenElement) {
-      if (document.exitFullscreen) {
-        document.exitFullscreen();
-      } else if (document.mozCancelFullScreen) {
-        document.mozCancelFullScreen();
-      } else if (document.webkitExitFullscreen) {
-        document.webkitExitFullscreen();
-      } else if (document.msExitFullscreen) {
-        document.msExitFullscreen();
-      }
-    } else {
-      if (videoContainer.requestFullscreen) {
-        videoContainer.requestFullscreen();
-      } else if (videoContainer.mozRequestFullScreen) {
-        videoContainer.mozRequestFullScreen();
-      } else if (videoContainer.webkitRequestFullscreen) {
-        videoContainer.webkitRequestFullscreen();
-      } else if (videoContainer.msRequestFullscreen) {
-        videoContainer.msRequestFullscreen();
+      if (document.fullscreenElement) {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        } else if (document.mozCancelFullScreen) {
+          document.mozCancelFullScreen();
+        } else if (document.webkitExitFullscreen) {
+          document.webkitExitFullscreen();
+        } else if (document.msExitFullscreen) {
+          document.msExitFullscreen();
+        }
+      } else {
+        if (videoContainer.requestFullscreen) {
+          videoContainer.requestFullscreen();
+        } else if (videoContainer.mozRequestFullScreen) {
+          videoContainer.mozRequestFullScreen();
+        } else if (videoContainer.webkitRequestFullscreen) {
+          videoContainer.webkitRequestFullscreen();
+        } else if (videoContainer.msRequestFullscreen) {
+          videoContainer.msRequestFullscreen();
+        }
       }
     }
   };
+
+  const forward = (seconds) => {
+    if (player && typeof player.seekTo === "function") {
+      const newTime = currentTime + seconds;
+      const seekToTime = newTime > duration ? duration : newTime;
+      player.seekTo(seekToTime, true);
+    }
+  };
+
+  const rewind = (seconds) => {
+    if (player && typeof player.seekTo === "function") {
+      const newTime = currentTime - seconds;
+      const seekToTime = newTime < 0 ? 0 : newTime;
+      player.seekTo(seekToTime, true);
+    }
+  };
+
+
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      switch (e.key) {
+        case " ":
+          e.preventDefault();
+          togglePlayPause();
+          break;
+        case "ArrowLeft":
+          e.preventDefault();
+          rewind(5);
+          break;
+        case "ArrowRight":
+          e.preventDefault();
+          forward(5);
+          break;
+        case "f":
+          handleFullscreenToggle();
+          break;
+        default:
+          break;
+      }
+    };
+
+    if (typeof document !== "undefined") {
+      document.addEventListener("keydown", handleKeyDown);
+    }
+
+    return () => {
+      if (typeof document !== "undefined") {
+        document.removeEventListener("keydown", handleKeyDown);
+      }
+    };
+  }, [togglePlayPause, rewind, forward, handleFullscreenToggle]);
 
   const handleVideoOverlayClick = () => {
     togglePlayPause();
@@ -179,17 +234,21 @@ export default function CustomYoutubePlayer({
     const newProgress = (seekToTime / duration) * 100;
     setProgress(newProgress);
 
-    updateSliderThumbWidth(newProgress);
+    if (typeof document !== "undefined") {
+      updateSliderThumbWidth(newProgress);
+    }
   };
 
   const updateSliderThumbWidth = (progress) => {
-    const rangeInput = volumeControlRef.current;
-    const thumb =
-      rangeInput && rangeInput.querySelector("::-webkit-slider-thumb");
+    if (typeof document !== "undefined") {
+      const rangeInput = volumeControlRef.current;
+      const thumb =
+        rangeInput && rangeInput.querySelector("::-webkit-slider-thumb");
 
-    if (thumb) {
-      const thumbWidth = 50 + progress * 0.5;
-      thumb.style.width = `${thumbWidth}px`;
+      if (thumb) {
+        const thumbWidth = 50 + progress * 0.5;
+        thumb.style.width = `${thumbWidth}px`;
+      }
     }
   };
 
@@ -234,51 +293,10 @@ export default function CustomYoutubePlayer({
     }
   };
 
-  const rewind = (seconds) => {
-    if (player && typeof player.seekTo === "function") {
-      const newTime = currentTime - seconds;
-      const seekToTime = newTime < 0 ? 0 : newTime;
-      player.seekTo(seekToTime, true);
-    }
-  };
 
-  const forward = (seconds) => {
-    if (player && typeof player.seekTo === "function") {
-      const newTime = currentTime + seconds;
-      const seekToTime = newTime > duration ? duration : newTime;
-      player.seekTo(seekToTime, true);
-    }
-  };
 
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      switch (e.key) {
-        case " ":
-          e.preventDefault();
-          togglePlayPause();
-          break;
-        case "ArrowLeft":
-          e.preventDefault();
-          rewind(5);
-          break;
-        case "ArrowRight":
-          e.preventDefault();
-          forward(5);
-          break;
-        case "f":
-          handleFullscreenToggle();
-          break;
-        default:
-          break;
-      }
-    };
 
-    document.addEventListener("keydown", handleKeyDown);
 
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [togglePlayPause, rewind, forward, handleFullscreenToggle]);
 
   useEffect(() => {
     const handlePauseOverlay = (event) => {
@@ -290,7 +308,7 @@ export default function CustomYoutubePlayer({
           pauseContainerRef.current.style.zIndex = "0";
           customOverlayRef.current.style.display = "block";
         } else {
-          setTimeout(() => {
+          customOverlayTimeout = setTimeout(() => {
             pauseOverlayRef.current.style.opacity = "1";
             pauseContainerRef.current.style.zIndex = "41";
             customOverlayRef.current.style.display = "none";
@@ -451,9 +469,7 @@ export default function CustomYoutubePlayer({
                 )}
               </div>
               <div className="v-time">
-                <span className="v-currentTime">
-                  {formatTime(currentTime)}
-                </span>
+                <span className="v-currentTime">{formatTime(currentTime)}</span>
                 &nbsp;/&nbsp;
                 <span className="v-duration">{formatTime(duration)}</span>
               </div>
@@ -465,10 +481,7 @@ export default function CustomYoutubePlayer({
                   onClick={toggleMute}
                 >
                   {isMuted ? (
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 32 32"
-                    >
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
                       <path d="M13 30a1 1 0 0 1-.707-.293L4.586 22H1a1 1 0 0 1-1-1V11a1 1 0 0 1 1-1h3.586l7.707-7.707A1 1 0 0 1 14 3v26a1.002 1.002 0 0 1-1 1z"></path>
                     </svg>
                   ) : (
