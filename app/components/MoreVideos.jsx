@@ -22,8 +22,9 @@ const MoreVideos = () => {
   
       for (const postType of postTypes) {
         const response = await fetch(
-          `https://mautskebeli.local/wp-json/wp/v2/${postType}?per_page=4&orderby=date&order=desc`
+          `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/wp/v2/${postType}?per_page=4&orderby=date&order=desc`
         );
+        
   
         if (!response.ok) {
           throw new Error(`Error fetching videos for ${postType}: ${response.statusText}`);

@@ -61,7 +61,7 @@ function HomePageVideos() {
 
 
   const fetchRandomVideos = async () => {
-    const endpoint = "http://mautskebeli.local/wp-json/wp/v2/";
+    const endpoint = "https://mautskebeli.local/wp-json/wp/v2/";
     try {
       const postTypes = [
         "mecniereba",

@@ -73,8 +73,9 @@ function ShromaVideos() {
     const fetchVideos = async () => {
       try {
         const response = await fetch(
-          `https://mautskebeli.local/wp-json/wp/v2/shroma?per_page=100`
+          `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/wp/v2/shroma?per_page=100`
         );
+        
         if (!response.ok)
           throw new Error(`HTTP error! status: ${response.status}`);
         const data = await response.json();

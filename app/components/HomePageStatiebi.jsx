@@ -1,8 +1,9 @@
 "use client"
 
 import React, { useState, useEffect } from 'react';
-import Image from 'next/image';
+
 import Link from 'next/link';
+import Image from 'next/image';
 
 const HomePageStatiebi = () => {
   const [articles, setArticles] = useState([]);
@@ -16,7 +17,8 @@ const HomePageStatiebi = () => {
   };
 
   useEffect(() => {
-    fetch('http://mautskebeli.local/wp-json/wp/v2/article?acf_format=standard&_fields=id,title,acf,date')
+    fetch(`${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/wp-json/wp/v2/article?acf_format=standard&_fields=id,title,acf,date`)
+
       .then(response => response.json())
       .then(data => {
         // Sort the articles by date, newest first.
