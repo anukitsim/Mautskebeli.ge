@@ -63,17 +63,7 @@ function ShromaVideos() {
 
 
 
-  useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    const videoIdFromUrl = params.get('video');
-    if (videoIdFromUrl && videos.length > 0) {
-      const video = videos.find(v => extractVideoId(v.acf.video_url) === videoIdFromUrl);
-      if (video) {
-        setActiveVideoId(videoIdFromUrl);
-        setActiveVideoAcf(video.acf);
-      }
-    }
-  }, [videos, location.search]);
+
 
   const handleVideoSelect = (videoId, acf) => {
     setActiveVideoId(videoId);
