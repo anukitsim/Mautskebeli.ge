@@ -91,8 +91,8 @@ function ShromaVideos() {
     fetchVideos();
   }, []);
 
-  const endIndex = currentPage * 4;
-  const startIndex = endIndex - 4;
+  const endIndex = currentPage * 16;
+  const startIndex = endIndex - 16;
   const paginatedVideos = videos.slice(startIndex, endIndex);
 
   return (
@@ -103,7 +103,7 @@ function ShromaVideos() {
       </MenuProvider>
       <div>
         {loading ? (
-          <p>Loading videos...</p>
+            <img src="/images/loader.svg" />
         ) : (
           videos.length > 0 && (
             <>

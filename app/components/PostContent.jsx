@@ -1,44 +1,154 @@
-// components/PostContent.jsx
-import React from 'react';
+"use client";
+
+import React, { useEffect, useState } from 'react';
+import Image from 'next/image';
 import AlbumSlider from './AlbumSlider';
 
 const PostContent = ({ post, error }) => {
+  const [showShareOptions, setShowShareOptions] = useState(false);
+
+  useEffect(() => {
+    if (!window.FB) {
+      window.fbAsyncInit = function() {
+        console.log('Initializing Facebook SDK with App ID:', process.env.NEXT_PUBLIC_FACEBOOK_APP_ID);
+        FB.init({
+          appId: process.env.NEXT_PUBLIC_FACEBOOK_APP_ID,
+          autoLogAppEvents: true,
+          xfbml: true,
+          version: 'v13.0'
+        });
+        console.log('Facebook SDK Initialized');
+      };
+
+      (function(d, s, id){
+        var js, fjs = d.getElementsByTagName(s)[0];
+        if (d.getElementById(id)) {
+          console.log('Facebook SDK already loaded');
+          return;
+        }
+        js = d.createElement(s); js.id = id;
+        js.src = "https://connect.facebook.net/en_US/sdk.js";
+        js.onload = function() {
+          console.log('Facebook SDK script loaded');
+        };
+        fjs.parentNode.insertBefore(js, fjs);
+      }(document, 'script', 'facebook-jssdk'));
+    }
+  }, []);
+
+  const generatePermalink = (postId) => {
+    return `https://www.facebook.com/${postId}`;
+  };
+
+  const shareOnFacebook = () => {
+    const permalink = generatePermalink(post.id);
+    const shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(permalink)}`;
+    window.open(shareUrl, '_blank');
+  };
+
+  const shareOnTwitter = () => {
+    const text = encodeURIComponent(post.message);
+    const pageUrl = encodeURIComponent(window.location.href);
+    const shareUrl = `https://twitter.com/intent/tweet?text=${text}&url=${pageUrl}`;
+    window.open(shareUrl, '_blank');
+  };
+
+  const shareOnInstagram = () => {
+    alert('Instagram sharing is not supported directly via web. Please use Instagram app.');
+  };
+
   if (error) {
     return <p>Error: {error}</p>;
   }
 
-  if (!post.attachments || !post.attachments.data || post.attachments.data.length === 0) {
-    return (
-      <div className="flex flex-col w-11/12 mx-auto mt-10 items-center gap-10">
-        <div className="w-6/12">
-          {post.message && <h1 className="">{post.message}</h1>}
+  return (
+    <div className="bg-[#FECE27] min-h-screen flex items-start justify-center">
+      <div className="bg-[#FECE27] mt-10 rounded-lg shadow-lg p-6 flex flex-col lg:flex-row w-11/12 lg:w-10/12">
+        <div className="lg:w-1/2">
+          {post.attachments && post.attachments.data && post.attachments.data[0].type === 'album' ? (
+            <AlbumSlider message={post.message} post={post} />
+          ) : (
+            post.attachments && post.attachments.data && post.attachments.data[0].media.image.src && (
+              <img
+                src={post.attachments.data[0].media.image.src}
+                alt="Post Image"
+                className="rounded-[6px] w-full h-auto"
+                style={{ minHeight: '600px', objectFit: 'cover' }}
+              />
+            )
+          )}
+        </div>
+        <div className="lg:w-1/2 p-6 flex flex-col justify-center">
+          <div className="flex gap-4">
+            <button
+              onClick={() => setShowShareOptions(true)}
+              className="bg-[#AD88C6] text-[#474F7A] pl-[18px] pr-[18px] pt-[4px] pb-[4px] text-[16px] font-semibold rounded flex gap-[12px] items-center justify-center"
+            >
+              <Image
+                src="/images/share.svg"
+                alt="share"
+                width={24}
+                height={24}
+              />
+              გაზიარება
+            </button>
+            <a
+              href={generatePermalink(post.id)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-[#AD88C6] text-[#474F7A] pl-[18px] pr-[18px] pt-[4px] pb-[4px] text-[16px] font-semibold rounded flex gap-[12px] items-center justify-center"
+            >
+              <Image
+                src="/images/facebook.svg"
+                alt="view on facebook"
+                width={24}
+                height={24}
+              />
+              იხილე პოსტი
+            </a>
+          </div>
+          {showShareOptions && (
+            <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
+              <div className="bg-[#FECE27] rounded-lg p-6 w-80">
+                <h2 className="text-xl text-[#474F7A] font-bold mb-4">გააზიარე</h2>
+                <button
+                  onClick={shareOnFacebook}
+                  className="w-full text-left px-4 py-2 mb-2 text-[#474F7A] bg-[#AD88C6] hover:bg-gray-200 rounded"
+                >
+                  <Image
+                    src="/images/facebook.svg"
+                    alt="facebook share"
+                    width={24}
+                    height={24}
+                  />
+                  Facebook
+                </button>
+                <button
+                  onClick={shareOnTwitter}
+                  className="w-full text-left px-4 py-2 mb-2 text-[#474F7A] bg-[#AD88C6] hover:bg-gray-200 rounded"
+                >
+                  <Image
+                    src="/images/twitter.svg"
+                    alt="twitter share"
+                    width={24}
+                    height={24}
+                  />
+                  Twitter
+                </button>
+                <button
+                  onClick={() => setShowShareOptions(false)}
+                  className="w-full text-left px-4 py-2 mt-4 text-[#474F7A] bg-red-100 hover:bg-red-200 rounded"
+                >
+                  გათიშვა
+                </button>
+              </div>
+            </div>
+          )}
+          {post.message && <p className="text-lg mb-4 mt-10">{post.message}</p>}
         </div>
       </div>
-    );
-  }
-
-  if (post.attachments.data[0].type === 'album') {
-    return <AlbumSlider message={post?.message} post={post} />;
-  }
-
-  if (post.attachments.data[0].type === 'photo') {
-    return (
-      <div className="flex flex-col w-11/12 mx-auto mt-10 items-center gap-10">
-        <div className="w-6/12">
-          <img
-            src={post.attachments.data[0].media.image.src}
-            alt="Post Image"
-            className="rounded-[6px] w-full"
-          />
-        </div>
-        <div className="w-6/12">
-          {post.message && <h1 className="">{post.message}</h1>}
-        </div>
-      </div>
-    );
-  }
-
-  return null;
+    </div>
+  );
 };
 
 export default PostContent;

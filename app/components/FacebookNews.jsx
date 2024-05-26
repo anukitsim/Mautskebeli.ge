@@ -34,11 +34,11 @@ const FacebookNews = async () => {
         >
           <div className="h-[80px]">
             <p className="text-sm font-light text-[#474F7A] self-stretch">
-              {truncate(post.caption, 9)}
+              {truncate(post.caption, 5)}
             </p>
           </div>
           <button className="text-xs items-end font-medium text-white py-1 px-3 rounded bg-[#AD88C6]">
-            Button Text
+           ვრცლად
           </button>
         </Link>
       ))}

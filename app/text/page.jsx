@@ -15,7 +15,7 @@ const page = () => {
             />
             <p>მაუწყებელი წიგნები</p>
         </Link>
-        <div className='lg:w-4/12 w-full hover:scale-105 h-[280px] flex-col rounded-[16px] border border-[#E0DBE8] flex justify-center items-center'>
+        <Link href='/translate' className='lg:w-4/12 w-full hover:scale-105 h-[280px] flex-col rounded-[16px] border border-[#E0DBE8] flex justify-center items-center'>
         <Image
               src="/images/mau-targmani.svg"
               alt="donation"
@@ -23,8 +23,8 @@ const page = () => {
               height={180}
             />
              <p>თარგმანი</p>
-        </div>
-        <div className='lg:w-4/12 hover:scale-105 w-full h-[280px] flex-col rounded-[16px] border border-[#E0DBE8] flex justify-center items-center'>
+        </Link>
+        <Link  href='all-articles' className='lg:w-4/12 hover:scale-105 w-full h-[280px] flex-col rounded-[16px] border border-[#E0DBE8] flex justify-center items-center'>
         <Image
               src="/images/mau-statiebi.svg"
               alt="donation"
@@ -32,7 +32,7 @@ const page = () => {
               height={180}
             />
              <p>სტატიები</p>
-        </div>
+        </Link>
     
     </section>
     <Footer />

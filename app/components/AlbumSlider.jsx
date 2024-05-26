@@ -1,9 +1,9 @@
 'use client'
 import Image from 'next/image';
-import React, { useState } from 'react'
+import React, { useState } from 'react';
 
-const AlbumSlider = ({message,post}) => {
-    const [currentImageIndex,setCurrentImageIndex] = useState(0);
+const AlbumSlider = ({ message, post }) => {
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const handleNextImage = () => {
     setCurrentImageIndex(
@@ -24,64 +24,48 @@ const AlbumSlider = ({message,post}) => {
     setCurrentImageIndex(index);
   };
 
-    return (
-    <div className="pb-10">
-    <div className="flex flex-row-reverse w-11/12 mx-auto mt-10 items-center gap-10">
-      <div className="w-6/12">
-        {message && <h1 className="">{message}</h1>}
-      </div>
-
-      {/* Render a gallery of images for "album" type */}
-      {post?.attachments && post?.attachments?.data[0]?.type === "album" && (
-        <div
-          className="w-6/12 h-[443px] border flex p-6 justify-center border-[#E0DBE8] rounded-[6px]"
-          style={{
-            backgroundImage: `url(${
-              post.attachments.data[0].subattachments.data[
-                currentImageIndex
-              ]?.media?.image?.src || ""
-            })`,
-            backgroundSize: "contain",
-            backgroundRepeat: "no-repeat",
-            backgroundPosition: "center",
-          }}
-        >
-          <div className="flex flex-row justify-between w-full items-center mb-4">
-            <Image
-              src="/images/arrow-left.png"
-              alt="left arrow"
-              width={56}
-              height={56}
-              onClick={handlePrevImage}
-              className="cursor-pointer"
-            />
-            <Image
-              src="/images/arrow-right.png"
-              alt="right arrow"
-              width={56}
-              height={56}
-              onClick={handleNextImage}
-              className="cursor-pointer ml-4"
-            />
-          </div>
+  return (
+    <div className="w-full h-auto flex flex-col items-center justify-center">
+      <div className="relative w-full h-full flex justify-center items-center overflow-hidden" style={{ minHeight: '600px' }}>
+        {post.attachments.data[0].subattachments.data.map((image, index) => (
+          <img
+            key={index}
+            src={image.media.image.src}
+            alt={`Slide ${index}`}
+            className={`absolute transition-opacity duration-1000 ${index === currentImageIndex ? 'opacity-100' : 'opacity-0'}`}
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+          />
+        ))}
+        <div className="absolute w-full flex justify-between items-center px-4">
+          <Image
+            src="/images/arrow-left.png"
+            alt="left arrow"
+            width={56}
+            height={56}
+            onClick={handlePrevImage}
+            className="cursor-pointer"
+          />
+          <Image
+            src="/images/arrow-right.png"
+            alt="right arrow"
+            width={56}
+            height={56}
+            onClick={handleNextImage}
+            className="cursor-pointer"
+          />
         </div>
-      )}
-
-      {/* Render additional content here */}
+      </div>
+      <div className="mt-4 flex space-x-2">
+        {post.attachments.data[0].subattachments.data.map((_, index) => (
+          <div
+            key={index}
+            className={`w-3 h-3 rounded-full cursor-pointer transition-all duration-300 ${index === currentImageIndex ? "bg-[#8C74B2]" : "bg-[#E0DBE8]"}`}
+            onClick={() => handleBulletClick(index)}
+          />
+        ))}
+      </div>
     </div>
-    <div className="flex space-x-2 mt-5 w-6/12 justify-center">
-      {post.attachments.data[0].subattachments.data.map((_, index) => (
-        <div
-          key={index}
-          className={`w-4 h-4 rounded-full cursor-pointer transition-all duration-300 ${
-            index === currentImageIndex ? "bg-[#8C74B2]" : "bg-[#E0DBE8]"
-          }`}
-          onClick={() => handleBulletClick(index)}
-        />
-      ))}
-    </div>
-  </div>
-  )
-}
+  );
+};
 
-export default AlbumSlider
+export default AlbumSlider;

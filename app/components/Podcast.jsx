@@ -5,6 +5,7 @@ import CustomYoutubePlayer from "./CustomYoutube";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 
+
 const PlayButton = ({ onClick }) => (
   <img
     src="/images/card-play-button.png"
@@ -16,7 +17,6 @@ const PlayButton = ({ onClick }) => (
   />
 );
 
-// Ensures the video ID is correctly extracted from the URL
 const extractVideoId = (videoUrl) => {
   const match = videoUrl.match(
     /(?:youtube\.com\/(?:[^/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?/\s]{11})/
@@ -32,13 +32,22 @@ const VideoCard = ({ videoId, caption, onSelect }) => {
   const thumbnailUrl = getThumbnailUrl(videoId);
 
   return (
-    <div className="relative flex flex-col items-center w-full max-w-sm p-2.5 gap-2 mx-auto my-2 bg-[#AD88C6] rounded-lg">
-      <div className="w-full h-40 bg-cover bg-center rounded-lg" style={{ backgroundImage: `url(${thumbnailUrl})` }}>
+    <div
+      className="relative flex flex-col items-center w-full max-w-[248px] p-2.5 gap-2 mx-auto my-2 bg-[#AD88C6] rounded-lg cursor-pointer"
+      style={{ height: '206px' }}
+      onClick={() => onSelect(videoId)}
+    >
+      <div
+        className="w-full h-40 bg-cover bg-center rounded-lg"
+        style={{ backgroundImage: `url(${thumbnailUrl})` }}
+      >
         <div className="absolute inset-0 flex items-center justify-center">
           <PlayButton onClick={() => onSelect(videoId)} />
         </div>
       </div>
-      <p className="text-sm font-semibold text-center text-white truncate w-full px-2">{caption}</p>
+      <p className="text-sm font-semibold text-center text-white truncate w-full px-2" style={{ height: '50px' }}>
+        {caption}
+      </p>
     </div>
   );
 };
@@ -50,11 +59,11 @@ const Podcast = () => {
   const [loading, setLoading] = useState(true);
   const [selectedVideoId, setSelectedVideoId] = useState(null);
   const [isLive, setIsLive] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const videosPerPage = 4;
   const channelId = idInQueryParams
     ? idInQueryParams
     : "UC6TjRdvXOknZBbtXiePp1HA";
-
-  // const channelId = "UCMmpLL2ucRHAXbNHiCPyIyg";
   const apiKey = "AIzaSyDd4yHryI5WLPLNjpKsiuU1bYHnBgcK_u8";
   const playlistId = "PL8wF1aEA4P8NJZUazilLH7ES-T-RQd3Cy";
   const [liveStream, setLiveStream] = useState({});
@@ -66,6 +75,7 @@ const Podcast = () => {
   const handleVideoCardClick = (videoId) => {
     setSelectedVideoId(videoId);
     setCustomPlayerKey((prevKey) => prevKey + 1);
+    mainVideoRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   useEffect(() => {
@@ -101,13 +111,11 @@ const Podcast = () => {
       }
     };
 
-    // Check live status every 60 seconds (adjust as needed).
     const intervalId = setInterval(checkLiveStatus, 60000);
 
-    // Perform initial check.
     checkLiveStatus();
 
-    return () => clearInterval(intervalId); // Clear interval on component unmount.
+    return () => clearInterval(intervalId);
   }, [channelId]);
 
   useEffect(() => {
@@ -142,7 +150,7 @@ const Podcast = () => {
           return dateB.getTime() - dateA.getTime();
         });
 
-        setVideos(sortedVideos.reverse());
+        setVideos(sortedVideos);
       } catch (error) {
         console.error(error);
       }
@@ -161,14 +169,31 @@ const Podcast = () => {
   if (loading) {
     return (
       <div>
-        <Image src="/images/loading.svg" alt="loading" width={120} height={120} />
+        <Image src="/images/loader.svg" alt="loading" width={120} height={120} />
       </div>
     );
   }
 
+  const handleNextPage = () => {
+    if (currentPage * videosPerPage < videos.length) {
+      setCurrentPage((prevPage) => prevPage + 1);
+    }
+  };
+
+  const handlePreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage((prevPage) => prevPage - 1);
+    }
+  };
+
+  const paginatedVideos = videos.slice(
+    (currentPage - 1) * videosPerPage,
+    currentPage * videosPerPage
+  );
+
   return (
-    <div style={{ display: "flex" }}>
-      <div style={{ flex: "3", paddingLeft: "20px" }}>
+  
+      <div>
         {videos.length > 0 && (
           <>
             {isLive && selectedVideoId === liveStream?.id && (
@@ -177,54 +202,113 @@ const Podcast = () => {
               </h1>
             )}
 
-            <CustomYoutubePlayer
-              ref={mainVideoRef}
-              key={customPlayerKey}
-              videoId={
-                selectedVideoId ? selectedVideoId : videos.slice(-1)[0].id
-              }
-              onClose={() => setSelectedVideoId("")}
-              videoData={videos.find((video) => video.id === selectedVideoId)}
-              style={{ width: "100%", height: "500px" }}
-              customOverlayStyle={{ height: "35%", top: "65%" }}
-            />
+            <div ref={mainVideoRef}>
+              <CustomYoutubePlayer
+                key={customPlayerKey}
+                videoId={
+                  selectedVideoId ? selectedVideoId : videos[0].id
+                }
+                onClose={() => setSelectedVideoId("")}
+                videoData={videos.find((video) => video.id === selectedVideoId)}
+                style={{ width: "100%", height: "500px" }}
+                customOverlayStyle={{ height: "35%", top: "65%" }}
+              />
+            </div>
+            <div className="mx-auto lg:mt-0 mt-[-50%] lg:w-10/12 sm:w-full flex flex-col gap-[23px] pl-5 pr-5">
+              <h2 className="text-[32px] text-[#474F7A] font-bold">
+                {videos.find((video) => video.id === selectedVideoId)?.snippet
+                  .title || ""}
+              </h2>
+              <p className="text-[16px] text-[#474F7A] font-light">
+                {videos.find((video) => video.id === selectedVideoId)?.snippet
+                  .description || ""}
+              </p>
+              <div className="flex lg:flex-row flex-col gap-2 mb-20 mt-2">
+                <a
+                  href={`https://www.youtube.com/watch?v=${selectedVideoId}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <button className="bg-[#FECE27] whitespace-nowrap text-[#474F7A] pl-[18px] pr-[18px] pt-[4px] pb-[4px] text-[16px] font-semibold rounded flex gap-[12px] items-center justify-center">
+                    <Image
+                      src="/images/youtube-share.png"
+                      alt="youtube share"
+                      width={24}
+                      height={24}
+                    />
+                    YouTube - ზე გადასვლა
+                  </button>
+                </a>
+                <a
+                  href={`https://www.facebook.com/sharer/sharer.php?u=https://www.youtube.com/watch?v=${selectedVideoId}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <button className="bg-[#FECE27] text-[#474F7A] pl-[18px] pr-[18px] pt-[4px] pb-[4px] text-[16px] font-semibold rounded flex gap-[12px] items-center justify-center">
+                    <Image
+                      src="/images/share.png"
+                      alt="facebook share"
+                      width={24}
+                      height={24}
+                    />
+                    გაზიარება
+                  </button>
+                </a>
+              </div>
+              <div className="flex justify-end mt-4">
+              <button
+                onClick={handlePreviousPage}
+                disabled={currentPage === 1}
+                className=" rounded-lg mx-2"
+              >
+                 <img
+                    src="/images/videos-left.png"
+                    alt="playbutton"
+                    width={32}
+                    height={32}
+                  />
+              </button>
+              <button
+                onClick={handleNextPage}
+                disabled={currentPage * videosPerPage >= videos.length}
+                className=" rounded-lg mx-2"
+              >
+                  <img
+                    src="/images/videos-right.png"
+                    alt="playbutton"
+                    width={32}
+                    height={32}
+                  />
+              </button>
+            </div>
+            </div>
+            <div className="w-10/12  mx-auto lg:grid hidden grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 px-2 my-4">
+              {paginatedVideos.map((video) => (
+                <VideoCard
+                  key={video.id}
+                  videoId={video.id}
+                  caption={video.snippet.title}
+                  onSelect={handleVideoCardClick}
+                />
+              ))}
+            </div>
+            <div className="flex sm:hidden mt-10 overflow-x-auto hide-scroll-bar pl-2 pr-2">
+              <div className="flex gap-4">
+                {paginatedVideos.map((video) => (
+                  <VideoCard
+                    key={video.id}
+                    videoId={video.id}
+                    caption={video.snippet.title}
+                    onSelect={handleVideoCardClick}
+                  />
+                ))}
+              </div>
+            </div>
+            
           </>
         )}
       </div>
-      <h1 className="pt-20 pr-5">არქივი</h1>
-      <div
-        style={{
-          flex: "1",
-          maxHeight: "640px",
-          overflowY: "auto",
-          position: "sticky",
-          top: "0",
-        }}
-        className="mt-20 rounded-lg flex flex-col items-center mr-5 p-5"
-      >
-        <div className="flex flex-col gap-5">
-          {Object.values(liveStream || {})?.length > 0 && isLive && (
-            <VideoCard
-              isLive={isLive}
-              videoId={liveStream?.id}
-              caption={liveStream?.caption}
-              onSelect={handleVideoCardClick}
-              isSelected={liveStream.id === selectedVideoId}
-            />
-          )}
 
-          {videos.map((video, index) => (
-            <VideoCard
-              key={video.id || index}
-              videoId={video.id}
-              caption={video.snippet.title}
-              onSelect={handleVideoCardClick}
-              isSelected={video.id === selectedVideoId}
-            />
-          ))}
-        </div>
-      </div>
-    </div>
   );
 };
 

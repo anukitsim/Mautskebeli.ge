@@ -706,3 +706,77 @@ input[type="range"]::-moz-focus-outer {
 .article-image {
   object-fit: cover; /* This will cover the area, and might crop some parts of the image */
 }
+
+/* Add this CSS to your global styles or component-specific styles */
+
+.hide-scroll-bar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+.hide-scroll-bar::-webkit-scrollbar {
+  display: none;  /* Chrome, Safari, and Opera */
+}
+
+.inline-block {
+  background-color: transparent; /* Ensure transparent background */
+}
+
+.rounded-lg, .rounded-t-lg {
+  border-radius: 8px;
+}
+
+.overflow-hidden {
+  overflow: hidden;
+}
+
+.relative {
+  position: relative;
+}
+
+.bg-transparent {
+  background-color: transparent; /* Ensure container background is transparent */
+}
+
+/* Aspect ratio helper classes */
+.aspect-w-16 {
+  width: 100%;
+}
+.aspect-h-9 {
+  padding-top: 56.25%; /* 16:9 Aspect Ratio */
+  position: relative;
+}
+.aspect-w-16.aspect-h-9 > * {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+}
+
+/* Media query for mobile view */
+@media (max-width: 768px) {
+  .mt-\[102px\] {
+    margin-top: 50px; /* Adjust as needed */
+  }
+
+  .text-\[24px\] {
+    font-size: 18px; /* Adjust as needed */
+  }
+
+  .h-10 {
+    height: 70px; /* Adjust as needed */
+  }
+
+  .p-2 {
+    padding: 4px; /* Adjust as needed */
+  }
+
+  .rounded-t-lg {
+    border-radius: 8px 8px 0 0; /* Round top corners */
+  }
+
+  .bg-\[#FBFAFC\] {
+    background-color: #FBFAFC; /* Ensure title section background matches */
+  }
+}
+

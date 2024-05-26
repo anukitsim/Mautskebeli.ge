@@ -1,3 +1,4 @@
+// utils/fetchFacebookData.js
 import { headers } from 'next/headers';
 
 export const fetchFacebookData = async () => {

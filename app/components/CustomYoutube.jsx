@@ -10,6 +10,7 @@ export default function CustomYoutubePlayer({
   onClose,
   style,
   customOverlayStyle,
+  numVideos = 4
 }) {
   const playerRef = useRef(null);
   const volumeControlRef = useRef(null);
@@ -182,8 +183,6 @@ export default function CustomYoutubePlayer({
     }
   };
 
-
-
   useEffect(() => {
     const handleKeyDown = (e) => {
       switch (e.key) {
@@ -293,11 +292,6 @@ export default function CustomYoutubePlayer({
     }
   };
 
-
-
-
-
-
   useEffect(() => {
     const handlePauseOverlay = (event) => {
       const playerState = event.data;
@@ -342,9 +336,13 @@ export default function CustomYoutubePlayer({
         <div
           className="custom-overlay"
           ref={customOverlayRef}
-          style={customOverlayStyle}
+          style={{ 
+            ...customOverlayStyle, 
+            bottom: '100%', // Adjust the bottom position to move it higher
+            paddingBottom: '1rem' 
+          }}
         >
-          <div className="flex flex-row justify-between pr-5 pt-5">
+          <div className="flex flex-row justify-between pr-5 pt-2">
             <Link
               href="https://www.youtube.com/playlist?list=PL8wF1aEA4P8NJZUazilLH7ES-T-RQd3Cy"
               target="_blank"
@@ -352,8 +350,7 @@ export default function CustomYoutubePlayer({
             >
               <img src="/images/test.png" className="" />
             </Link>
-
-            <MoreVideos />
+            <MoreVideos numVideos={numVideos} />
           </div>
         </div>
         <div className="v-pause-overlay" ref={pauseOverlayRef}></div>

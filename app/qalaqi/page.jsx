@@ -109,7 +109,7 @@ function ShromaVideos() {
       </MenuProvider>
       <div>
         {loading ? (
-          <p>Loading videos...</p>
+            <img src="/images/loader.svg" />
         ) : (
           videos.length > 0 && (
             <>

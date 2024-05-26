@@ -3,10 +3,9 @@
 import React, { useEffect, useState } from 'react';
 import VideoCardMore from './VideoCardMore';
 
-const MoreVideos = () => {
+const MoreVideos = ({ numVideos = 4 }) => {
   const [randomVideos, setRandomVideos] = useState([]);
 
-  // Shuffle the array of videos
   const shuffleArray = (array) => {
     for (let i = array.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
@@ -14,7 +13,6 @@ const MoreVideos = () => {
     }
   };
 
-  // Fetch random videos from the server
   const fetchRandomVideos = async () => {
     try {
       const postTypes = ['mecniereba', 'medicina', 'msoflio', 'saxli', 'kalaki', 'shroma', 'xelovneba'];
@@ -34,8 +32,8 @@ const MoreVideos = () => {
         allVideos.push(...data);
       }
   
-      shuffleArray(allVideos); // Shuffle the array to randomize
-      const selectedRandomVideos = allVideos.slice(0, 4); // Take first four videos
+      shuffleArray(allVideos);
+      const selectedRandomVideos = allVideos.slice(0, numVideos);
       setRandomVideos(selectedRandomVideos);
     } catch (error) {
       console.error('Error fetching videos:', error);
@@ -44,7 +42,7 @@ const MoreVideos = () => {
 
   useEffect(() => {
     fetchRandomVideos();
-  }, []); // Empty dependency array to run only once on mount
+  }, []);
 
   const extractVideoId = (videoUrl) => {
     const match = videoUrl.match(/(?:youtube\.com\/(?:[^/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?/\s]{11})/);

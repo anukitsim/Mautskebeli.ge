@@ -4,6 +4,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import Modal from "react-modal";
 import Image from "next/image";
 import CustomYoutubePlayer from "./CustomYoutube";
+import Link from "next/link";
 
 const PlayButton = ({ onClick }) => (
   <img
@@ -61,7 +62,7 @@ function HomePageVideos() {
 
 
   const fetchRandomVideos = async () => {
-    const endpoint = "https://mautskebeli.local/wp-json/wp/v2/";
+    const endpoint = "https://mautskebeli.wpenginepowered.com/wp-json/wp/v2/";
     try {
       const postTypes = [
         "mecniereba",
@@ -113,9 +114,9 @@ function HomePageVideos() {
 
   return (
     <>
-      <div className="w-full sm:w-10/12 flex justify-between lg:mt-20 mt-[42px] mx-auto pl-4 pr-4 lg:pl-2 lg:pr-2">
-        <p className="section-title">ვიდეო</p>
-        <p className="see-all">ნახე ყველა</p>
+       <div className="w-full sm:w-10/12 flex items-center justify-between lg:mt-20 mt-[42px] mx-auto pl-4 pr-4 lg:pl-2 lg:pr-2">
+        <p className="text-[#474F7A] text-[24px] font-bold">ვიდეო</p>
+        <Link href='/all-videos' className="text-[#474F7A] text-[14px] font-semibold">ნახე ყველა</Link>
       </div>
       {/* Mobile View: Horizontal scroll container */}
       <div className="flex sm:hidden overflow-x-auto hide-scroll-bar pl-2 mt-5">
@@ -165,11 +166,12 @@ function HomePageVideos() {
           <div className="modalContentArea" onClick={closeModal}>
             {/* This div prevents modal close when clicking on the video */}
             <div className="max-w-[900px] mx-auto " onClick={handleVideoContainerClick}>
-              <CustomYoutubePlayer videoId={selectedVideoId} />
+            <CustomYoutubePlayer videoId={selectedVideoId} numVideos={2} />
+
             </div>
           </div>
           <button onClick={closeModal} className="absolute top-0 left-10 z-50">
-            <Image src="/images/cross.svg" alt="close" width={70} height={70} />
+            <Image src="/images/cross.svg" alt="close" width={70} height={70} priority/>
           </button>
         </Modal>
       )}

@@ -53,7 +53,7 @@ const SingleFacebookPost = async ({ postId }) => {
       error = "no access token generated";
     }
     if (isloading) {
-      return <p>Loading...</p>;
+      return <img src="/images/loader.svg" />;
     }
     if (error) {
       return <p>Error: {error}</p>;

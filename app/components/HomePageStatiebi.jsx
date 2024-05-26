@@ -1,4 +1,5 @@
-"use client";
+// app/home/HomePageStatiebi.jsx
+'use client';
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -6,6 +7,11 @@ import Image from 'next/image';
 
 const HomePageStatiebi = () => {
   const [articles, setArticles] = useState([]);
+
+  const stripHtml = (html) => {
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    return doc.body.textContent || "";
+  };
 
   const truncateText = (text, limit) => {
     const words = text.split(' ');
@@ -55,22 +61,23 @@ const HomePageStatiebi = () => {
           }
         }
       `}</style>
-      <div className="w-full sm:w-10/12 flex justify-between lg:mt-20 mt-[42px] mx-auto pl-4 pr-4 lg:pl-2 lg:pr-2">
-        <p className="section-title">სტატიები</p>
-        <p className="see-all">ნახე ყველა</p>
+      <div className="w-full sm:w-10/12 flex items-center justify-between mx-auto pl-4 pr-4 lg:pl-2 lg:pr-2">
+        <p className="text-[#474F7A] text-[24px] font-bold">სტატიები</p>
+        <Link href='/all-articles' className="text-[#474F7A] text-[14px] font-semibold">ნახე ყველა</Link>
       </div>
-      <div className="w-10/12 mx-auto flex articles-container overflow-x-auto flex-row gap-5">
+      <div className="w-10/12 mx-auto flex articles-container overflow-x-auto mt-5 flex-row gap-5">
         {articles.map(article => (
-          <Link href={`/statiebi/${article.id}`} passHref key={article.id}>
-            <div className="article bg-[#F6F4F8] rounded-tl-[10px] rounded-tr-[10px] border border-[#B6A8CD] overflow-hidden">
+          <Link href={`/all-articles/${article.id}`} passHref key={article.id}>
+            <div className="article bg-[#F6F4F8] rounded-tl-[10px] rounded-tr-[10px] border border-[#B6A8CD] overflow-hidden" style={{ minWidth: '300px' }}>
               <div className="article-image-container relative w-full h-[200px]">
                 <Image
                   src={article.acf.image || '/images/default-image.png'}
                   alt="article-cover"
-                  layout="fill"
+                  fill
                   sizes="(max-width: 768px) 100vw, 33vw"
                   style={{ objectFit: 'cover' }}
                   className="article-image"
+                  priority
                 />
               </div>
               <div className="p-[18px]">
@@ -81,7 +88,7 @@ const HomePageStatiebi = () => {
                   {truncateText(article.acf.title, 10)}
                 </span>
                 <p className="text-sm pt-[18px]" style={{ color: '#000' }}>
-                  {truncateText(article.acf['main-text'], 30)}
+                  {truncateText(stripHtml(article.acf['main-text']), 30)}
                 </p>
                 <div className="flex flex-col justify-end pt-[30px] items-end">
                   <span className="text-[15px] text-[#AD88C6]">
