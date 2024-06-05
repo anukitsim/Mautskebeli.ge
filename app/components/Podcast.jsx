@@ -5,7 +5,6 @@ import CustomYoutubePlayer from "./CustomYoutube";
 import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 
-
 const PlayButton = ({ onClick }) => (
   <img
     src="/images/card-play-button.png"
@@ -151,13 +150,18 @@ const Podcast = () => {
         });
 
         setVideos(sortedVideos);
+        if (sortedVideos.length > 0 && !selectedVideoId) {
+          setSelectedVideoId(sortedVideos[0].id);
+        }
+        setLoading(false);
       } catch (error) {
         console.error(error);
+        setLoading(false);
       }
     };
 
     fetchVideos();
-  }, [apiKey, playlistId]);
+  }, [apiKey, playlistId, selectedVideoId]);
 
   useEffect(() => {
     if (isLive) {
@@ -192,97 +196,103 @@ const Podcast = () => {
   );
 
   return (
-  
-      <div>
-        {videos.length > 0 && (
-          <>
-            {isLive && selectedVideoId === liveStream?.id && (
-              <h1 className="text-[#FECE27] text-[20px] font-extrabold mt-5 mb-4 animate-pulse">
-                პირდაპირი ეთერი
-              </h1>
-            )}
+    <div>
+      {videos.length > 0 && (
+        <>
+          {isLive && selectedVideoId === liveStream?.id && (
+            <h1 className="text-[#FECE27] text-[20px] font-extrabold mt-5 mb-4 animate-pulse">
+              პირდაპირი ეთერი
+            </h1>
+          )}
 
-            <div ref={mainVideoRef}>
-              <CustomYoutubePlayer
-                key={customPlayerKey}
-                videoId={
-                  selectedVideoId ? selectedVideoId : videos[0].id
-                }
-                onClose={() => setSelectedVideoId("")}
-                videoData={videos.find((video) => video.id === selectedVideoId)}
-                style={{ width: "100%", height: "500px" }}
-                customOverlayStyle={{ height: "35%", top: "65%" }}
-              />
+          <div ref={mainVideoRef} className="mt-[-30px] sm:mt-0">
+            <CustomYoutubePlayer
+              key={customPlayerKey}
+              videoId={selectedVideoId}
+              onClose={() => setSelectedVideoId("")}
+              videoData={videos.find((video) => video.id === selectedVideoId)}
+              style={{ width: "100%", height: "300px" }}
+              customOverlayStyle={{ height: "35%", top: "65%" }}
+            />
+          </div>
+          <div className="mx-auto lg:mt-0 mt-[-190px] lg:w-10/12 sm:w-full flex flex-col gap-[23px] pl-5 pr-5">
+            <h2 className="text-[32px] text-[#474F7A] font-bold">
+              {videos.find((video) => video.id === selectedVideoId)?.snippet.title || ""}
+            </h2>
+            <p className="text-[16px] text-[#474F7A] font-light">
+              {videos.find((video) => video.id === selectedVideoId)?.snippet.description || ""}
+            </p>
+            <div className="flex lg:flex-row flex-col gap-2 mb-20 mt-2">
+              <a
+                href={`https://www.youtube.com/watch?v=${selectedVideoId}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <button className="bg-[#FECE27] whitespace-nowrap text-[#474F7A] pl-[18px] pr-[18px] pt-[4px] pb-[4px] text-[16px] font-semibold rounded flex gap-[12px] items-center justify-center">
+                  <Image
+                    src="/images/youtube-share.png"
+                    alt="youtube share"
+                    width={24}
+                    height={24}
+                  />
+                  YouTube - ზე გადასვლა
+                </button>
+              </a>
+              <a
+                href={`https://www.facebook.com/sharer/sharer.php?u=https://www.youtube.com/watch?v=${selectedVideoId}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <button className="bg-[#FECE27] text-[#474F7A] pl-[18px] pr-[18px] pt-[4px] pb-[4px] text-[16px] font-semibold rounded flex gap-[12px] items-center justify-center">
+                  <Image
+                    src="/images/share.png"
+                    alt="facebook share"
+                    width={24}
+                    height={24}
+                  />
+                  გაზიარება
+                </button>
+              </a>
             </div>
-            <div className="mx-auto lg:mt-0 mt-[-50%] lg:w-10/12 sm:w-full flex flex-col gap-[23px] pl-5 pr-5">
-              <h2 className="text-[32px] text-[#474F7A] font-bold">
-                {videos.find((video) => video.id === selectedVideoId)?.snippet
-                  .title || ""}
-              </h2>
-              <p className="text-[16px] text-[#474F7A] font-light">
-                {videos.find((video) => video.id === selectedVideoId)?.snippet
-                  .description || ""}
-              </p>
-              <div className="flex lg:flex-row flex-col gap-2 mb-20 mt-2">
-                <a
-                  href={`https://www.youtube.com/watch?v=${selectedVideoId}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <button className="bg-[#FECE27] whitespace-nowrap text-[#474F7A] pl-[18px] pr-[18px] pt-[4px] pb-[4px] text-[16px] font-semibold rounded flex gap-[12px] items-center justify-center">
-                    <Image
-                      src="/images/youtube-share.png"
-                      alt="youtube share"
-                      width={24}
-                      height={24}
-                    />
-                    YouTube - ზე გადასვლა
-                  </button>
-                </a>
-                <a
-                  href={`https://www.facebook.com/sharer/sharer.php?u=https://www.youtube.com/watch?v=${selectedVideoId}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <button className="bg-[#FECE27] text-[#474F7A] pl-[18px] pr-[18px] pt-[4px] pb-[4px] text-[16px] font-semibold rounded flex gap-[12px] items-center justify-center">
-                    <Image
-                      src="/images/share.png"
-                      alt="facebook share"
-                      width={24}
-                      height={24}
-                    />
-                    გაზიარება
-                  </button>
-                </a>
-              </div>
-              <div className="flex justify-end mt-4">
+            <div className="flex justify-end mt-4">
               <button
                 onClick={handlePreviousPage}
                 disabled={currentPage === 1}
-                className=" rounded-lg mx-2"
+                className="rounded-lg mx-2"
               >
-                 <img
-                    src="/images/videos-left.png"
-                    alt="playbutton"
-                    width={32}
-                    height={32}
-                  />
+                <img
+                  src="/images/videos-left.png"
+                  alt="previous"
+                  width={32}
+                  height={32}
+                />
               </button>
               <button
                 onClick={handleNextPage}
                 disabled={currentPage * videosPerPage >= videos.length}
-                className=" rounded-lg mx-2"
+                className="rounded-lg mx-2"
               >
-                  <img
-                    src="/images/videos-right.png"
-                    alt="playbutton"
-                    width={32}
-                    height={32}
-                  />
+                <img
+                  src="/images/videos-right.png"
+                  alt="next"
+                  width={32}
+                  height={32}
+                />
               </button>
             </div>
-            </div>
-            <div className="w-10/12  mx-auto lg:grid hidden grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 px-2 my-4">
+          </div>
+          <div className="w-10/12 mx-auto lg:grid hidden grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 px-2 my-4">
+            {paginatedVideos.map((video) => (
+              <VideoCard
+                key={video.id}
+                videoId={video.id}
+                caption={video.snippet.title}
+                onSelect={handleVideoCardClick}
+              />
+            ))}
+          </div>
+          <div className="flex sm:hidden mt-10 overflow-x-auto hide-scroll-bar pl-2 pr-2">
+            <div className="flex gap-4">
               {paginatedVideos.map((video) => (
                 <VideoCard
                   key={video.id}
@@ -292,23 +302,10 @@ const Podcast = () => {
                 />
               ))}
             </div>
-            <div className="flex sm:hidden mt-10 overflow-x-auto hide-scroll-bar pl-2 pr-2">
-              <div className="flex gap-4">
-                {paginatedVideos.map((video) => (
-                  <VideoCard
-                    key={video.id}
-                    videoId={video.id}
-                    caption={video.snippet.title}
-                    onSelect={handleVideoCardClick}
-                  />
-                ))}
-              </div>
-            </div>
-            
-          </>
-        )}
-      </div>
-
+          </div>
+        </>
+      )}
+    </div>
   );
 };
 

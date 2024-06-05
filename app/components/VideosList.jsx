@@ -61,14 +61,18 @@ function VideosList({ endpoint, title }) {
 
   const fetchVideos = async () => {
     try {
-      const response = await fetch(endpoint);
+      const response = await fetch('https://mautskebeli.wpenginepowered.com/wp-json/wp/v2/videos/');
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
-      const extractedVideos = Object.values(data).flat().filter(video => video.acf_fields && video.acf_fields.video_url);
-      setVideos(extractedVideos);
-      setError(null); // Clear any previous errors
+      const videos = data.map(video => ({
+        post_id: video.post_id,
+        title: video.title,
+        videoId: extractVideoId(video.video_url)
+      }));
+      setVideos(videos);
+      setError(null);
     } catch (error) {
       console.error("Error fetching videos:", error);
       setError("Failed to fetch videos. Please try again later.");
@@ -101,7 +105,7 @@ function VideosList({ endpoint, title }) {
         <p className="text-[#474F7A] text-[24px] font-bold">{title}</p>
       </div>
       {loading ? (
-        <img className="text-center mt-10" src="/images/loader.svg" alt="loading"/>
+        <img className="text-center mt-10" src="/images/loader.svg" alt="loading" />
       ) : error ? (
         <p className="text-center mt-10 text-red-500">{error}</p>
       ) : (
@@ -110,7 +114,7 @@ function VideosList({ endpoint, title }) {
             {videos.map((video) => (
               <div key={video.post_id} className="px-2 w-full">
                 <VideoCard
-                  videoId={extractVideoId(video.acf_fields.video_url)}
+                  videoId={video.videoId}
                   caption={video.title}
                   onSelect={handleVideoSelect}
                 />
@@ -122,7 +126,7 @@ function VideosList({ endpoint, title }) {
               {videos.map((video) => (
                 <div key={video.post_id} className="inline-block px-2 w-[248px]">
                   <VideoCard
-                    videoId={extractVideoId(video.acf_fields.video_url)}
+                    videoId={video.videoId}
                     caption={video.title}
                     onSelect={handleVideoSelect}
                   />
@@ -138,6 +142,7 @@ function VideosList({ endpoint, title }) {
           onRequestClose={closeModal}
           contentLabel="Video Modal"
           className="modalContent z-40"
+          ariaHideApp={false}
           style={{
             overlay: {
               zIndex: 1000,
@@ -147,7 +152,7 @@ function VideosList({ endpoint, title }) {
         >
           <div className="modalContentArea" onClick={closeModal}>
             <div className="max-w-[900px] mx-auto" onClick={handleVideoContainerClick}>
-              <CustomYoutubePlayer videoId={selectedVideoId} />
+              <CustomYoutubePlayer videoId={selectedVideoId} numVideos={2}/>
             </div>
           </div>
           <button onClick={closeModal} className="absolute top-0 left-10 z-50">

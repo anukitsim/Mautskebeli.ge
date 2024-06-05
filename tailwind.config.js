@@ -20,7 +20,14 @@ module.exports = {
       },
       backgroundColor: {
         'lilac-20/20': 'rgba(224, 219, 232, 0.20)',
-      }
+      },
+      fontFamily: {
+        'alk-tall-mtavruli': ['"ALK Tall Mtavruli"', 'sans-serif'],
+        'noto-sans-georgian': ['var(--font-noto-sans-georgian)', 'sans-serif'],
+      },
+      lineHeight: {
+        'extra-loose': '2.5',  // Custom line height
+      },
     },
     
   },

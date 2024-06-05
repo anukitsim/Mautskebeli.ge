@@ -72,9 +72,7 @@ function ShromaVideos() {
   useEffect(() => {
     const fetchVideos = async () => {
       try {
-        const response = await fetch(
-          `https://mautskebeli.local/wp-json/wp/v2/xelovneba?per_page=100`
-        );
+        const response = await fetch(`${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/wp/v2/xelovneba?per_page=100`);
         if (!response.ok)
           throw new Error(`HTTP error! status: ${response.status}`);
         const data = await response.json();
@@ -96,8 +94,8 @@ function ShromaVideos() {
     fetchVideos();
   }, []);
 
-  const endIndex = currentPage * 4;
-  const startIndex = endIndex - 4;
+  const endIndex = currentPage * 16;
+  const startIndex = endIndex - 16;
   const paginatedVideos = videos.slice(startIndex, endIndex);
 
   return (

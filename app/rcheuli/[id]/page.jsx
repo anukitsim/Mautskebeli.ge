@@ -69,20 +69,20 @@ const VideoPage = () => {
   return (
     <section className="w-full mx-auto px-4 lg:px-0">
       <div className="max-w-6xl mx-auto">
-        <h1 className="text-3xl lg:text-4xl font-bold mb-5 mt-10 pl-24">{videoPost.title.rendered}</h1>
+        <h1 className="text-3xl lg:text-4xl font-bold mb-5 mt-10 text-left">{videoPost.title.rendered}</h1>
         <div className="relative w-full mb-5" style={{ paddingBottom: '56.25%', height: 0 }}>
           <div className="absolute top-0 left-0 w-full h-full">
             <CustomYoutubePlayer videoUrl={videoUrl} videoId={videoId} numVideos={2}/>
           </div>
         </div>
-        <p className="text-lg mb-5 mt-20 pl-24">{videoPost.acf_fields.description}</p>
-        <div className="flex gap-2">
+        <p className="text-[16px] text-[#474F7A] font-light lg:ml-20 p-5 mb-5 mt-[270px] text-balance lg:mt-10 w-full  px-4 lg:px-0">{videoPost.acf_fields.description}</p>
+        <div className="flex flex-col  lg:ml-20 lg:flex-row gap-4 items-start lg:items-start px-4 lg:px-0">
           <a
             href={videoUrl}
             target="_blank"
             rel="noopener noreferrer"
           >
-            <button className="bg-[#FECE27] ml-24 text-[#474F7A] pl-[18px] pr-[18px] pt-[4px] pb-[4px] text-[16px] font-semibold rounded flex gap-[12px] items-center justify-center">
+            <button className="bg-[#FECE27] whitespace-nowrap text-[#474F7A] pl-[18px] pr-[18px] pt-[4px] pb-[4px] text-[16px] font-semibold rounded flex gap-[12px] items-center justify-center">
               <Image
                 src="/images/youtube-share.png"
                 alt="YouTube"

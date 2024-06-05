@@ -33,9 +33,9 @@ const Footer = () => {
       </div>
       <div className="h-full w-1/3 flex flex-col gap-[18px]">
       <h1 className="text-[#AD88C6] text-[16px] font-bold">ნავიგაცია</h1>
-       <Link href='#'>ჩვენს შესახებ</Link>
+       <Link href='/about-us'>ჩვენს შესახებ</Link>
        <Link href='/donation'>დონაცია</Link>
-       <Link href='#'>ვიდეოები</Link>
+       <Link href='/all-videos'>ვიდეოები</Link>
        <Link href='/text'>ტექსტი</Link>
        <Link href='/#'>სპორტი</Link>
        <p>ამბები</p>
@@ -45,23 +45,23 @@ const Footer = () => {
       
         <div className="flex gap-[10px] text-[16px]">
             <Image src="/images/facebook.png" alt="mail" width={0} height={0}  style={{ width: 'auto', height: '20px' }}/>
-            <Link href='https://www.facebook.com/mautskebeli.ge'>Facebook</Link>
+            <Link target="_blank" href='https://www.facebook.com/mautskebeli.ge'>Facebook</Link>
           </div>
           <div className="flex gap-[10px] text-[16px]">
             <Image src="/images/footer-youtube.png" alt="mail" width={0} height={0}  style={{ width: 'auto', height: '20px' }}/>
-            <Link href='https://www.youtube.com/@mautskebeli'>YouTube</Link>
+            <Link target="_blank" href='https://www.youtube.com/@mautskebeli'>YouTube</Link>
           </div>
           <div className="flex gap-[10px] ">
             <Image src="/images/instagram.png" alt="mail" width={0} height={0}  style={{ width: 'auto', height: '20px' }}/>
-            <Link href='https://www.instagram.com/mautskebeli.ge/' className="text-[16px] whitespace-nowrap">Instagram</Link>
+            <Link target="_blank" href='https://www.instagram.com/mautskebeli.ge/' className="text-[16px] whitespace-nowrap">Instagram</Link>
           </div>
           <div className="flex gap-[10px] text-[16px]">
             <Image src="/images/tiktok.png" alt="mail" width={0} height={0}  style={{ width: 'auto', height: '20px' }}/>
-            <Link href='https://www.tiktok.com/@mautskebeli.ge'>TikTok</Link>
+            <Link target="_blank" href='https://www.tiktok.com/@mautskebeli.ge'>TikTok</Link>
           </div>
           <div className="flex gap-[10px] text-[16px]">
             <Image src="/images/twitter.png" alt="mail" width={0} height={0}  style={{ width: 'auto', height: '20px' }}/>
-            <Link href='https://x.com/mautskebeli?s=21'>X Twitter</Link>
+            <Link target="_blank" href='https://x.com/mautskebeli?s=21'>X Twitter</Link>
           </div>
           <div className="flex gap-[10px] text-[16px]">
             <Image src="/images/telegram.png" alt="mail" width={0} height={0}  style={{ width: 'auto', height: '20px' }}/>
@@ -136,7 +136,7 @@ const Footer = () => {
         <h1 className="text-white text-[15px] font-bold">გამოგვიწერე</h1>
         <div className="flex gap-[16px] text-[#474F7A]">
         <div className="flex gap-[6px] text-[16px]">
-            <Image src="/images/facebook-mobile.png" alt="mail" width={20} height={20}  style={{ width: 'auto', height: '20px' }}/>
+            <Image src="/images/facebook-mobile.png" alt="mail" width={0} height={0}  style={{ width: 'auto', height: '20px' }}/>
             <span>Facebook</span>
           </div>
           <div className="flex gap-[6px] text-[16px]">

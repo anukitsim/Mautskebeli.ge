@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
@@ -29,7 +29,7 @@ const PostPage = () => {
   }, [id]);
 
   if (!post) {
-    return   <img src="/images/loader.svg" />;
+    return <img src="/images/loader.svg" alt="Loading" />;
   }
 
   const getYoutubeId = (url) => {
@@ -38,26 +38,38 @@ const PostPage = () => {
   };
 
   return (
-    <div className="post-container mx-auto mt-10 w-10/12 p-5">
-      <h1 className="text-3xl font-bold mb-5 text-start ml-24">{post.title.rendered}</h1>
+    <div className="post-container mx-auto mt-10 w-full md:w-10/12 p-5">
       {post.acf.video ? (
-        <div className="relative w-full mb-5 aspect-w-16 aspect-h-9">
-          <CustomYoutubePlayer videoUrl={post.acf.video} videoId={getYoutubeId(post.acf.video)} />
-        </div>
+        <>
+          <div className="relative w-full mb-5 aspect-w-16 aspect-h-9">
+            <CustomYoutubePlayer videoUrl={post.acf.video} videoId={getYoutubeId(post.acf.video)} />
+          </div>
+          <h1 className="text-2xl md:text-3xl font-bold text-[#FECE27] mb-5 mt-[250px] md:mt-8">
+            {post.title.rendered}
+          </h1>
+        </>
       ) : (
-        post.acf.image && (
-            <div className="relative w-full h-96 mb-5">
+        <div className="relative w-full mb-5 h-64 sm:h-96">
+          {post.acf.image && (
+            <>
               <Image
                 src={post.acf.image}
                 alt={post.acf.title}
                 fill
+                priority
                 style={{ objectFit: 'cover' }}
                 className="rounded-lg"
               />
-            </div>
-          )
-        )}
-        <p className="text-lg leading-7 mb-5 ml-24">{post.acf['main-text']}</p>
+              <h1 className="absolute bottom-0 left-0 w-full bg-opacity-75 text-[#FECE27] text-2xl md:text-3xl font-bold p-4">
+                {post.title.rendered}
+              </h1>
+            </>
+          )}
+        </div>
+      )}
+      <p className="text-lg leading-7 mb-5 mt-4 md:mt-8">
+        {post.acf['main-text']}
+      </p>
     </div>
   );
 };

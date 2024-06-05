@@ -10,7 +10,6 @@ const PostContent = ({ post, error }) => {
   useEffect(() => {
     if (!window.FB) {
       window.fbAsyncInit = function() {
-        console.log('Initializing Facebook SDK with App ID:', process.env.NEXT_PUBLIC_FACEBOOK_APP_ID);
         FB.init({
           appId: process.env.NEXT_PUBLIC_FACEBOOK_APP_ID,
           autoLogAppEvents: true,
@@ -22,16 +21,11 @@ const PostContent = ({ post, error }) => {
 
       (function(d, s, id){
         var js, fjs = d.getElementsByTagName(s)[0];
-        if (d.getElementById(id)) {
-          console.log('Facebook SDK already loaded');
-          return;
+        if (!d.getElementById(id)) {
+          js = d.createElement(s); js.id = id;
+          js.src = "https://connect.facebook.net/en_US/sdk.js";
+          fjs.parentNode.insertBefore(js, fjs);
         }
-        js = d.createElement(s); js.id = id;
-        js.src = "https://connect.facebook.net/en_US/sdk.js";
-        js.onload = function() {
-          console.log('Facebook SDK script loaded');
-        };
-        fjs.parentNode.insertBefore(js, fjs);
       }(document, 'script', 'facebook-jssdk'));
     }
   }, []);
@@ -62,9 +56,9 @@ const PostContent = ({ post, error }) => {
   }
 
   return (
-    <div className="bg-[#FECE27] min-h-screen flex items-start justify-center">
-      <div className="bg-[#FECE27] mt-10 rounded-lg shadow-lg p-6 flex flex-col lg:flex-row w-11/12 lg:w-10/12">
-        <div className="lg:w-1/2">
+    <div className="bg-[#FECE27] min-h-screen flex items-center justify-center w-full">
+      <div className="bg-[#FECE27] mt-10 rounded-lg shadow-lg p-6 flex flex-col lg:flex-row w-full h-full">
+        <div className="lg:w-1/2 h-full sm:w-[100vw] flex items-center justify-center">
           {post.attachments && post.attachments.data && post.attachments.data[0].type === 'album' ? (
             <AlbumSlider message={post.message} post={post} />
           ) : (
@@ -72,17 +66,17 @@ const PostContent = ({ post, error }) => {
               <img
                 src={post.attachments.data[0].media.image.src}
                 alt="Post Image"
-                className="rounded-[6px] w-full h-auto"
-                style={{ minHeight: '600px', objectFit: 'cover' }}
+                className="rounded-[6px] h-full object-cover"
               />
             )
           )}
         </div>
-        <div className="lg:w-1/2 p-6 flex flex-col justify-center">
+        <div className="lg:w-1/2 lg:p-6 sm:p-0 flex flex-col justify-center h-full">
           <div className="flex gap-4">
             <button
               onClick={() => setShowShareOptions(true)}
-              className="bg-[#AD88C6] text-[#474F7A] pl-[18px] pr-[18px] pt-[4px] pb-[4px] text-[16px] font-semibold rounded flex gap-[12px] items-center justify-center"
+              className="bg-[#AD88C6] text-[#474F7A] px-4 py-1 sm:py-1 md:py-2 sm:text-sm md:text-lg font-semibold rounded flex gap-2 items-center justify-center"
+              style={{ marginTop: '10px' }}
             >
               <Image
                 src="/images/share.svg"
@@ -96,7 +90,8 @@ const PostContent = ({ post, error }) => {
               href={generatePermalink(post.id)}
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-[#AD88C6] text-[#474F7A] pl-[18px] pr-[18px] pt-[4px] pb-[4px] text-[16px] font-semibold rounded flex gap-[12px] items-center justify-center"
+              className="bg-[#AD88C6] text-[#474F7A] px-4 py-1 sm:py-1 md:py-2 sm:text-sm md:text-lg font-semibold rounded flex gap-2 whitespace-nowrap items-center justify-center"
+              style={{ marginTop: '10px' }}
             >
               <Image
                 src="/images/facebook.svg"
@@ -109,11 +104,11 @@ const PostContent = ({ post, error }) => {
           </div>
           {showShareOptions && (
             <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
-              <div className="bg-[#FECE27] rounded-lg p-6 w-80">
-                <h2 className="text-xl text-[#474F7A] font-bold mb-4">გააზიარე</h2>
+              <div className="rounded-lg p-6 w-80">
+                <h2 className="text-xl text-white font-bold mb-4">გააზიარე</h2>
                 <button
                   onClick={shareOnFacebook}
-                  className="w-full text-left px-4 py-2 mb-2 text-[#474F7A] bg-[#AD88C6] hover:bg-gray-200 rounded"
+                  className="w-full text-left px-4 py-2 mb-2 text-[#474F7A] bg-white hover:bg-gray-200 rounded"
                 >
                   <Image
                     src="/images/facebook.svg"
@@ -125,7 +120,7 @@ const PostContent = ({ post, error }) => {
                 </button>
                 <button
                   onClick={shareOnTwitter}
-                  className="w-full text-left px-4 py-2 mb-2 text-[#474F7A] bg-[#AD88C6] hover:bg-gray-200 rounded"
+                  className="w-full text-left px-4 py-2 text-[#474F7A] bg-white hover:bg-gray-200 rounded"
                 >
                   <Image
                     src="/images/twitter.svg"
@@ -137,14 +132,14 @@ const PostContent = ({ post, error }) => {
                 </button>
                 <button
                   onClick={() => setShowShareOptions(false)}
-                  className="w-full text-left px-4 py-2 mt-4 text-[#474F7A] bg-red-100 hover:bg-red-200 rounded"
+                  className="w-full text-left px-4 py-2 mt-4 text-[#474F7A] bg-white hover:bg-gray-200 rounded"
                 >
                   გათიშვა
                 </button>
               </div>
             </div>
           )}
-          {post.message && <p className="text-lg mb-4 mt-10">{post.message}</p>}
+          {post.message && <p className="text-lg text-[#474F7A] mb-4 mt-10">{post.message}</p>}
         </div>
       </div>
     </div>

@@ -44,7 +44,7 @@ const AllArticlesList = () => {
   }, []);
 
   return (
-    <section className="mx-auto] flex flex-col">
+    <section className="mx-auto flex flex-col">
       <div className="w-full sm:w-10/12 flex items-center justify-between lg:mt-20 mt-[42px] mx-auto pl-4 pr-4 lg:pl-2 lg:pr-2">
         <p className="text-[#474F7A] text-[24px] font-bold">ყველა სტატია</p>
       </div>
@@ -56,10 +56,11 @@ const AllArticlesList = () => {
                 <Image
                   src={article.acf.image || '/images/default-image.png'}
                   alt="article-cover"
-                  fill
+                  layout="fill"
                   sizes="(max-width: 768px) 100vw, 33vw"
                   style={{ objectFit: 'cover' }}
                   className="article-image"
+                  onError={(e) => { e.target.src = '/images/default-image.png'; }}
                 />
               </div>
               <div className="p-[18px]">

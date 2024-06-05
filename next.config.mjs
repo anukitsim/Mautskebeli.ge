@@ -6,6 +6,12 @@ const nextConfig = {
           formats: ['image/avif', 'image/webp']
         
       },
+      lineHeight: {
+        'extra-loose': '2.5',  // Custom line height
+      },
+      fontFamily: {
+        'alk-tall-mtavruli': ['"ALK Tall Mtavruli"', 'sans-serif'],
+      },
 };
 
 export default nextConfig;
