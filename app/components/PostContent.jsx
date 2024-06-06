@@ -75,7 +75,7 @@ const PostContent = ({ post, error }) => {
           <div className="flex gap-4">
             <button
               onClick={() => setShowShareOptions(true)}
-              className="bg-[#AD88C6] text-[#474F7A] px-4 py-1 sm:py-1 md:py-2 sm:text-sm md:text-lg font-semibold rounded flex gap-2 items-center justify-center"
+              className="bg-[#AD88C6] text-[#474F7A] pl-[18px] pr-[18px] pt-[4px] pb-[4px] text-[16px] font-seibold rounded flex gap-[12px] items-center justify-center"
               style={{ marginTop: '10px' }}
             >
               <Image
@@ -90,7 +90,7 @@ const PostContent = ({ post, error }) => {
               href={generatePermalink(post.id)}
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-[#AD88C6] text-[#474F7A] px-4 py-1 sm:py-1 md:py-2 sm:text-sm md:text-lg font-semibold rounded flex gap-2 whitespace-nowrap items-center justify-center"
+              className="bg-[#AD88C6] text-[#474F7A] pl-[18px] pr-[18px] pt-[4px] pb-[4px] text-[16px] font-seibold rounded flex gap-[12px] items-center justify-center"
               style={{ marginTop: '10px' }}
             >
               <Image
