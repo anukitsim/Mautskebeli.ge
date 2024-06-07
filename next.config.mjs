@@ -12,6 +12,9 @@ const nextConfig = {
       fontFamily: {
         'alk-tall-mtavruli': ['"ALK Tall Mtavruli"', 'sans-serif'],
       },
+      experimental: {
+        appDir: true,
+      },
 };
 
 export default nextConfig;

@@ -4,52 +4,51 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
 const PlayButton = ({ onClick }) => (
-    <img
-      src="/images/card-play-button.png"
-      alt="playbutton"
-      width={42}
-      height={42}
-      onClick={onClick}
-      className="cursor-pointer transform hover:scale-110"
-    />
+  <Image
+    src="/images/card-play-button.png"
+    alt="playbutton"
+    width={42}
+    height={42}
+    onClick={onClick}
+    className="cursor-pointer transform hover:scale-110"
+  />
+);
+
+const extractVideoId = (videoUrl) => {
+  const match = videoUrl.match(
+    /(?:youtube\.com\/(?:[^/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?/\s]{11})/
   );
-  
-  const extractVideoId = (videoUrl) => {
-    const match = videoUrl.match(
-      /(?:youtube\.com\/(?:[^/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?/\s]{11})/
-    );
-    return match ? match[1] : null;
-  };
-  
-  const getThumbnailUrl = (videoId) => {
-    return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
-  };
-  
-  const VideoCard = ({ videoId, caption, onSelect }) => {
-    const thumbnailUrl = getThumbnailUrl(videoId);
-  
-    return (
+  return match ? match[1] : null;
+};
+
+const getThumbnailUrl = (videoId) => {
+  return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+};
+
+const VideoCard = ({ videoId, caption, onSelect }) => {
+  const thumbnailUrl = getThumbnailUrl(videoId);
+
+  return (
+    <div
+      className="relative flex flex-col items-start gap-2 p-2.5 rounded-lg bg-[#AD88C6] h-56"
+      onClick={() => onSelect(videoId)}
+    >
       <div
-        className="relative flex flex-col items-start gap-2 p-2.5 rounded-lg bg-[#AD88C6] h-56"
-        onClick={() => onSelect(videoId)}
+        className="relative w-full bg-cover bg-center rounded-lg"
+        style={{ height: '70%' }}
       >
         <div
-          className="relative w-full bg-cover bg-center rounded-lg"
-          style={{ height: "70%" }}
-        >
-          <div
-            style={{ backgroundImage: `url(${thumbnailUrl})`, height: "100%" }}
-            className="w-full bg-cover bg-center rounded-lg"
-          ></div>
-          <div className="absolute inset-0 flex justify-center items-center">
-            <PlayButton onClick={() => onSelect(videoId)} />
-          </div>
+          style={{ backgroundImage: `url(${thumbnailUrl})`, height: '100%' }}
+          className="w-full bg-cover bg-center rounded-lg"
+        ></div>
+        <div className="absolute inset-0 flex justify-center items-center">
+          <PlayButton onClick={() => onSelect(videoId)} />
         </div>
-        <p className="text-white text-sm font-semibold">{caption}</p>
       </div>
-    );
-  };
-
+      <p className="text-white text-sm font-semibold">{caption}</p>
+    </div>
+  );
+};
 
 const Search = ({ isSearchOpen, setIsSearchOpen }) => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -67,7 +66,7 @@ const Search = ({ isSearchOpen, setIsSearchOpen }) => {
           <Image src="/images/search.png" alt="Search" width={25} height={25} />
         </button>
       </div>
-      <div className={`${isSearchOpen ? "flex" : "hidden"} absolute top-full right-5 mt-1 mr-4 bg-white p-2 rounded-md shadow-lg z-40`}>
+      <div className={`${isSearchOpen ? 'flex' : 'hidden'} absolute top-full right-5 mt-1 mr-4 bg-white p-2 rounded-md shadow-lg z-40`}>
         <input
           type="text"
           placeholder="Search..."
