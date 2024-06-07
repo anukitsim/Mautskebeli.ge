@@ -75,12 +75,12 @@ const Search = ({ isSearchOpen, setIsSearchOpen }) => {
           onChange={(e) => setSearchQuery(e.target.value)}
         />
         <button onClick={handleSearch} type="submit" className="p-2">
-          <Image src="/images/search.png" alt="Search" width={20} height={20} />
+          <Image src="/images/Search.png" alt="Search" width={20} height={20} />
         </button>
       </div>
       <form onSubmit={handleSearch} className="hidden sm:flex items-center gap-2.5 bg-white rounded h-9 md:w-[340px]">
         <button type="submit" className="p-2 bg-white rounded-full">
-          <Image src="/images/search.png" alt="Search" width={20} height={20} />
+          <Image src="/images/Search.png" alt="Search" width={20} height={20} />
         </button>
         <input
           type="text"
