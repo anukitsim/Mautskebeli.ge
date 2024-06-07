@@ -35,6 +35,22 @@ const SearchPage = () => {
   const router = useRouter();
 
   useEffect(() => {
+    const fetchImageUrl = async (imageId) => {
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/wp/v2/media/${imageId}`
+        );
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        return data.source_url;
+      } catch (error) {
+        console.error("Failed to fetch image URL:", error);
+        return null;
+      }
+    };
+
     const fetchSearchResults = async () => {
       setLoading(true);
       const videoPostTypes = [
@@ -99,12 +115,20 @@ const SearchPage = () => {
           .filter((result) => result.status === "fulfilled")
           .flatMap((result) => result.value);
 
-        const articleData = successfulArticleResults.map((post) => ({
-          id: post.id,
-          title: post.title.rendered,
-          acf: post.acf,
-          postType: post.type,
-        }));
+        const articleDataPromises = successfulArticleResults.map(async (post) => {
+          const imageUrl = await fetchImageUrl(post.acf.image);
+          return {
+            id: post.id,
+            title: post.title.rendered,
+            acf: {
+              ...post.acf,
+              imageUrl: imageUrl || "/images/default-image.png",
+            },
+            postType: post.type,
+          };
+        });
+
+        const articleData = await Promise.all(articleDataPromises);
 
         setVideoResults(videoData);
         setArticleResults(articleData);
@@ -178,27 +202,15 @@ const SearchPage = () => {
                   style={{ minWidth: "300px" }}
                 >
                   <div className="article-image-container relative w-full h-[200px]">
-                    {article.acf?.image ? (
-                      <Image
-                        src={article.acf.image}
-                        alt="article-cover"
-                        fill
-                        sizes="(max-width: 768px) 100vw, 33vw"
-                        style={{ objectFit: "cover" }}
-                        className="article-image"
-                        priority
-                      />
-                    ) : (
-                      <Image
-                        src="/images/default-image.png"
-                        alt="article-cover"
-                        fill
-                        sizes="(max-width: 768px) 100vw, 33vw"
-                        style={{ objectFit: "cover" }}
-                        className="article-image"
-                        priority
-                      />
-                    )}
+                    <Image
+                      src={article.acf.imageUrl}
+                      alt="article-cover"
+                      fill
+                      sizes="(max-width: 768px) 100vw, 33vw"
+                      style={{ objectFit: "cover" }}
+                      className="article-image"
+                      priority
+                    />
                   </div>
                   <div className="p-[18px]">
                     <h2
