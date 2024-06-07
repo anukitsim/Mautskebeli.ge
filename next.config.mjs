@@ -4,8 +4,11 @@ const nextConfig = {
     domains: ['mautskebeli.wpenginepowered.com', 'img.youtube.com', 'localhost'],
     formats: ['image/avif', 'image/webp'],
   },
-  experimental: {
-    appDir: true,
+  lineHeight: {
+    'extra-loose': '2.5',  // Custom line height
+  },
+  fontFamily: {
+    'alk-tall-mtavruli': ['"ALK Tall Mtavruli"', 'sans-serif'],
   },
 };
 

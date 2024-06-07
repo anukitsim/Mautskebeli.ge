@@ -27,9 +27,7 @@ const truncateText = (text, limit) => {
   return text;
 };
 
-const SearchPage = () => {
-  const searchParams = useSearchParams();
-  const searchQuery = searchParams.get('query');
+const SearchResults = ({ searchQuery }) => {
   const [videoResults, setVideoResults] = useState([]);
   const [articleResults, setArticleResults] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -242,10 +240,15 @@ const SearchPage = () => {
   );
 };
 
-const WrappedSearchPage = () => (
-  <Suspense fallback={<div>Loading...</div>}>
-    <SearchPage />
-  </Suspense>
-);
+const SearchPage = () => {
+  const searchParams = useSearchParams();
+  const searchQuery = searchParams.get('query');
+  
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <SearchResults searchQuery={searchQuery} />
+    </Suspense>
+  );
+};
 
-export default WrappedSearchPage;
+export default SearchPage;
