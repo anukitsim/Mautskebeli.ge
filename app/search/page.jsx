@@ -243,12 +243,14 @@ const SearchResults = ({ searchQuery }) => {
 const SearchPage = () => {
   const searchParams = useSearchParams();
   const searchQuery = searchParams.get('query');
-  
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <SearchResults searchQuery={searchQuery} />
-    </Suspense>
-  );
+
+  return <SearchResults searchQuery={searchQuery} />;
 };
 
-export default SearchPage;
+const WrappedSearchPage = () => (
+  <Suspense fallback={<div>Loading...</div>}>
+    <SearchPage />
+  </Suspense>
+);
+
+export default WrappedSearchPage;

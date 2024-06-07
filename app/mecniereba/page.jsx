@@ -1,8 +1,6 @@
-// shroma/page.jsx
-
 "use client";
 
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, Suspense } from "react";
 import CustomYoutubePlayer from "../components/CustomYoutube";
 import Header from "../components/Header";
 import Navigation from "../components/Navigation";
@@ -277,6 +275,14 @@ function ShromaVideos() {
   );
 }
 
+function WrappedShromaVideos() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ShromaVideos />
+    </Suspense>
+  );
+}
+
 export default function Page() {
-  return <ShromaVideos />;
+  return <WrappedShromaVideos />;
 }
