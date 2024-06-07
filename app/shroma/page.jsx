@@ -65,6 +65,8 @@ function ShromaVideos() {
     title: "",
     description: "",
   });
+  const [lastSelectedVideoId, setLastSelectedVideoId] = useState(null);
+  const [customPlayerKey, setCustomPlayerKey] = useState(0);
 
   const videoPlayerRef = useRef(null);
   const router = useRouter();
@@ -110,11 +112,20 @@ function ShromaVideos() {
     fetchVideos();
   }, []);
 
+  useEffect(() => {
+    if (activeVideoId !== lastSelectedVideoId) {
+      setLastSelectedVideoId(activeVideoId);
+      setTimeout(() => {
+        videoPlayerRef.current?.scrollIntoView({ behavior: "smooth" });
+      }, 100);
+    }
+  }, [activeVideoId]);
+
   const handleVideoSelect = (videoId, acf) => {
     setActiveVideoId(videoId);
     setActiveVideoAcf(acf);
+    setCustomPlayerKey((prevKey) => prevKey + 1);
     router.push(`?videoId=${videoId}`, undefined, { shallow: true });
-    videoPlayerRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   const endIndex = currentPage * 16;
@@ -133,19 +144,19 @@ function ShromaVideos() {
         ) : (
           videos.length > 0 && (
             <>
-              <div ref={videoPlayerRef} className="relative" style={{ zIndex: 10 }} >
-                <CustomYoutubePlayer videoId={activeVideoId} />
+              <div ref={videoPlayerRef} className="relative" style={{ zIndex: 10 }}>
+                <CustomYoutubePlayer key={customPlayerKey} videoId={activeVideoId} />
                 <div className="mx-auto lg:mt-0 mt-[-50%] lg:w-10/12 sm:w-full flex flex-col gap-[23px] pl-5 pr-5">
-                  <h2 className="text-[32px] text-[#474F7A]  font-bold">
+                  <h2 className="text-[32px] text-[#474F7A] font-bold">
                     {activeVideoAcf.title}
                   </h2>
                   <div className="flex lg:flex-row flex-col gap-2 mt-2">
-                  <a
+                    <a
                       href={`https://www.youtube.com/watch?v=${activeVideoId}`}
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      <button className="bg-[#FECE27] whitespace-nowrap  text-[#474F7A] pl-[18px] pr-[18px] pt-[4px] pb-[4px] text-[16px] font-seibold rounded flex  gap-[12px] items-center justify-center">
+                      <button className="bg-[#FECE27] whitespace-nowrap text-[#474F7A] pl-[18px] pr-[18px] pt-[4px] pb-[4px] text-[16px] font-seibold rounded flex gap-[12px] items-center justify-center">
                         <Image
                           src="/images/youtube-share.png"
                           alt="facebook share"
@@ -157,7 +168,7 @@ function ShromaVideos() {
                     </a>
                     <button
                       onClick={() => setShowShareOptions(true)}
-                      className="bg-[#FECE27]  text-[#474F7A] pl-[18px] pr-[18px] pt-[4px] pb-[4px] text-[16px] font-seibold rounded flex gap-[12px] items-center justify-center"
+                      className="bg-[#FECE27] text-[#474F7A] pl-[18px] pr-[18px] pt-[4px] pb-[4px] text-[16px] font-seibold rounded flex gap-[12px] items-center justify-center"
                     >
                       <Image
                         src="/images/share.png"
@@ -168,7 +179,7 @@ function ShromaVideos() {
                       გაზიარება
                     </button>
                     {showShareOptions && (
-                     <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 1000 }} className="bg-gray-800 bg-opacity-50 flex items-center justify-center">
+                      <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 1000 }} className="bg-gray-800 bg-opacity-50 flex items-center justify-center">
                         <div className="rounded-lg p-6 w-80">
                           <h2 className="text-xl text-white font-bold mb-4">
                             გააზიარე

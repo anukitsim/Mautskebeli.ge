@@ -23,16 +23,7 @@ export default function Home() {
           <SportNavigation />
         </div>
 
-        <div className="mx-auto mt-[24px]  w-11/12 md:w-10/12">
-        <SportMain />
-      
-        </div>
-        <FacebookNews />
-        <HomePageVideos />
-        <HomePageStatiebi />
-        <HomePagePodcast />
-        <HomePageRcheuli />
-        <DonationPopup />
+       
         <Footer />
       </main>
 

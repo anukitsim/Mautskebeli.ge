@@ -17,16 +17,6 @@ const SportHeader = () => {
       </Link>
        
         <div className="flex gap-8">
-          <Link href="/live" className="flex gap-2.5 text-xs justify-center items-center">
-            <Image
-              src="/images/pirdapiri-eteri.png"
-              alt="Live"
-              width={20}
-              height={20}
-            />
-            {/* Hide text on small screens */}
-            <span className="hidden sm:inline text-[#474F7A]">პირდაპირი ეთერი</span>
-          </Link>
           
         </div>
       </div>

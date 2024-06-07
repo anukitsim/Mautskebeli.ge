@@ -2,14 +2,13 @@
 
 import React, { useEffect, useState, useRef } from "react";
 import CustomYoutubePlayer from "./CustomYoutube";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import Image from "next/image";
-
 
 const PlayButton = ({ onClick }) => (
   <img
     src="/images/card-play-button.png"
-    alt="playbutton"
+    alt="play button"
     width={42}
     height={42}
     onClick={onClick}
@@ -71,11 +70,13 @@ const Podcast = () => {
   const [customPlayerKey, setCustomPlayerKey] = useState(0);
 
   const mainVideoRef = useRef(null);
+  const router = useRouter();
 
   const handleVideoCardClick = (videoId) => {
     setSelectedVideoId(videoId);
     setCustomPlayerKey((prevKey) => prevKey + 1);
     mainVideoRef.current?.scrollIntoView({ behavior: "smooth" });
+    router.push(`?chId=${channelId}&videoId=${videoId}`, undefined, { shallow: true });
   };
 
   useEffect(() => {
@@ -165,6 +166,13 @@ const Podcast = () => {
       setCustomPlayerKey((prevKey) => prevKey + 1);
     }
   }, [isLive]);
+
+  useEffect(() => {
+    const initialVideoId = searchParams.get("videoId") || (videos[0] && videos[0].id);
+    if (initialVideoId) {
+      handleVideoCardClick(initialVideoId);
+    }
+  }, [videos]);
 
   if (loading) {
     return (
