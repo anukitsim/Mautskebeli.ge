@@ -50,7 +50,7 @@ const Live = () => {
   }, [apiVersion, pageAccessToken, pageId]);
 
   if (isLoading) {
-    return <div className="p-5">Loading...</div>;
+    return <div className="p-5"><img src="/images/loader.svg" alt="Loading" /></div>;
   }
   console.log(liveVideos);
   return (

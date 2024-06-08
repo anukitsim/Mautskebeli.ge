@@ -277,7 +277,7 @@ function ShromaVideos() {
 
 function WrappedShromaVideos() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<div> <img src="/images/loader.svg" /></div>}>
       <ShromaVideos />
     </Suspense>
   );

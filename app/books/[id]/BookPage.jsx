@@ -129,7 +129,7 @@ const BookPage = ({ params }) => {
   };
 
   if (!isMounted || !book) {
-    return <div>Loading...</div>;
+    return <div> <img src="/images/loader.svg" /></div>;
   }
 
   return (

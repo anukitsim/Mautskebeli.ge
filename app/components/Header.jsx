@@ -27,16 +27,7 @@ const Header = () => {
             {/* Hide text on small screens */}
             <span className="hidden sm:inline text-[#474F7A]">პირდაპირი ეთერი</span>
           </Link>
-          <Link href="/donation" className="flex gap-2.5 text-xs justify-center items-center">
-            <Image
-              src="/images/donacia.png"
-              alt="Donation"
-              width={20}
-              height={20}
-            />
-            {/* Hide text on small screens */}
-            <span className="hidden sm:inline text-[#474F7A]">დონაცია</span>
-          </Link>
+         
         </div>
       </div>
     </header>

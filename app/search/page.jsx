@@ -31,17 +31,20 @@ const fetchImageUrl = async (imageId) => {
   if (!imageId) return null;
 
   try {
-    const response = await fetch(`https://mautskebeli.wpenginepowered.com/wp-json/wp/v2/media/${imageId}`);
+    const response = await fetch(`${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/wp/v2/media/${imageId}`);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     const data = await response.json();
+    console.log('Fetched Image URL:', data.source_url);
     return data.source_url;
   } catch (error) {
     console.error('Failed to fetch image URL:', error);
     return null;
   }
 };
+
+
 
 const CustomLoader = () => (
   <div className="flex justify-center items-center mt-4">
@@ -58,12 +61,9 @@ const SearchResults = ({ searchQuery }) => {
   const [isMobile, setIsMobile] = useState(false);
   const router = useRouter();
 
-  const videosPerPage = isMobile ? 4 : Math.max(1, Math.floor(window.innerWidth / 250));
-  const articlesPerPage = isMobile ? 4 : Math.max(1, Math.floor(window.innerWidth / 300));
-
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
+      setIsMobile(typeof window !== 'undefined' && window.innerWidth < 768);
     };
 
     handleResize();
@@ -84,8 +84,6 @@ const SearchResults = ({ searchQuery }) => {
         'kalaki',
         'shroma',
         'xelovneba',
-        'ekonomika',
-        'resursebi',
       ];
       const articlePostTypes = ['article', 'targmani'];
 
@@ -178,12 +176,12 @@ const SearchResults = ({ searchQuery }) => {
     setCurrentArticlePage(newPage);
   };
 
-  const videoStartIndex = (currentVideoPage - 1) * videosPerPage;
-  const videoEndIndex = videoStartIndex + videosPerPage;
+  const videoStartIndex = (currentVideoPage - 1) * (isMobile ? 4 : Math.max(1, Math.floor((typeof window !== 'undefined' ? window.innerWidth : 1200) / 250)));
+  const videoEndIndex = videoStartIndex + (isMobile ? 4 : Math.max(1, Math.floor((typeof window !== 'undefined' ? window.innerWidth : 1200) / 250)));
   const paginatedVideoResults = videoResults.slice(videoStartIndex, videoEndIndex);
 
-  const articleStartIndex = (currentArticlePage - 1) * articlesPerPage;
-  const articleEndIndex = articleStartIndex + articlesPerPage;
+  const articleStartIndex = (currentArticlePage - 1) * (isMobile ? 4 : Math.max(1, Math.floor((typeof window !== 'undefined' ? window.innerWidth : 1200) / 300)));
+  const articleEndIndex = articleStartIndex + (isMobile ? 4 : Math.max(1, Math.floor((typeof window !== 'undefined' ? window.innerWidth : 1200) / 300)));
   const paginatedArticleResults = articleResults.slice(articleStartIndex, articleEndIndex);
 
   if (loading) {
@@ -230,7 +228,7 @@ const SearchResults = ({ searchQuery }) => {
               </div>
             ))}
           </div>
-          <div className="flex md:hidden gap-4 overflow-x-auto hide-scroll-bar" style={{ overflowX: 'scroll' }}>
+          <div className="flex md:hidden gap-4 overflow-x-auto hide-scroll-bar">
             {paginatedVideoResults.map((video) => (
               <div key={video.id} className="flex-shrink-0 w-[250px] mr-4">
                 <SearchVideoCard
@@ -277,8 +275,9 @@ const SearchResults = ({ searchQuery }) => {
                       <Image
                         src={article.acf.image}
                         alt="article-cover"
+                        
                         fill
-                        sizes="(max-width: 400px) 100vw, 33vw"
+                        sizes="(max-width: 300px) 100vw, (max-width: 1024px) 50vw, 33vw, (min-width: 1200px) 25vw"
                         style={{ objectFit: 'cover' }}
                         className="article-image"
                         priority
@@ -288,7 +287,7 @@ const SearchResults = ({ searchQuery }) => {
                         src="/images/default-image.png"
                         alt="article-cover"
                         fill
-                        sizes="(max-width: 300px) 100vw, 33vw"
+                        sizes="(max-width: 300px) 100vw, (max-width: 1024px) 50vw, 33vw, (min-width: 1200px) 25vw"
                         style={{ objectFit: 'cover' }}
                         className="article-image"
                         priority
@@ -318,7 +317,7 @@ const SearchResults = ({ searchQuery }) => {
               </Link>
             ))}
           </div>
-          <div className="flex md:hidden gap-4 overflow-x-auto hide-scroll-bar" style={{ overflowX: 'scroll' }}>
+          <div className="flex md:hidden gap-4 overflow-x-auto hide-scroll-bar">
             {paginatedArticleResults.map((article) => (
               <Link href={`/all-articles/${article.id}`} passHref key={article.id} className="flex-shrink-0 w-[300px] mr-4">
                 <div
@@ -331,7 +330,7 @@ const SearchResults = ({ searchQuery }) => {
                         src={article.acf.image}
                         alt="article-cover"
                         fill
-                        sizes="(max-width: 400px) 100vw, 33vw"
+                        sizes="(max-width: 300px) 100vw, (max-width: 1024px) 50vw, 33vw, (min-width: 1200px) 25vw"
                         style={{ objectFit: 'cover' }}
                         className="article-image"
                         priority
@@ -341,7 +340,7 @@ const SearchResults = ({ searchQuery }) => {
                         src="/images/default-image.png"
                         alt="article-cover"
                         fill
-                        sizes="(max-width: 300px) 100vw, 33vw"
+                        sizes="(max-width: 300px) 100vw, (max-width: 1024px) 50vw, 33vw, (min-width: 1200px) 25vw"
                         style={{ objectFit: 'cover' }}
                         className="article-image"
                         priority

@@ -1,5 +1,4 @@
 
-import DonationPopup from "../components/DonationPopup";
 import FacebookNews from "../components/FacebookNews";
 import Footer from "../components/Footer";
 import Header from "../components/Header";
@@ -31,7 +30,7 @@ export default function Home() {
         <HomePageStatiebi />
         <HomePagePodcast />
         <HomePageRcheuli />
-        <DonationPopup />
+       
         <Footer />
       </main>
 

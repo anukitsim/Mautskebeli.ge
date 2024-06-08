@@ -68,7 +68,7 @@ const Footer = () => {
         <div className="h-full w-1/3 flex flex-col gap-[18px]">
           <h1 className="text-[#AD88C6] text-[16px] font-bold">ნავიგაცია</h1>
           <Link href="/about-us">ჩვენს შესახებ</Link>
-          <Link href="/donation">დონაცია</Link>
+          
           <Link href="/all-videos">ვიდეოები</Link>
           <Link href="/text">ტექსტი</Link>
           <Link href="/sporti">სპორტი</Link>

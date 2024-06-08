@@ -122,7 +122,7 @@ const ArticlePage = ({ params }) => {
   };
 
   if (!isMounted || !article) {
-    return <div>Loading...</div>;
+    return <div> <img src="/images/loader.svg" /></div>;
   }
 
   return (

@@ -1,12 +1,9 @@
 
-import DonationPopup from "../components/DonationPopup";
-import FacebookNews from "../components/FacebookNews";
+
+
 import Footer from "../components/Footer";
 import SportHeader from "../components/SportHeader";
-import HomePagePodcast from "../components/HomePagePodcast";
-import HomePageRcheuli from "../components/HomePageRcheuli";
-import HomePageStatiebi from "../components/HomePageStatiebi";
-import HomePageVideos from "../components/HomePageVideos";
+
 
 import SportNavigation from "../components/SportNavigation";
 import SportMain from "../components/SportMain";

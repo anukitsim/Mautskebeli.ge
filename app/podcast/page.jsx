@@ -3,7 +3,7 @@ import Podcast from "../components/Podcast";
 
 const Page = () => {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<div> <img src="/images/loader.svg" /></div>}>
       <div>
         <Podcast />
       </div>

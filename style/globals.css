@@ -485,26 +485,7 @@ margin-right: 10px;
 
 /* Add these styles to your global styles or component-specific styles */
 
-.donation-modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black overlay */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000; /* Adjust the z-index as needed */
-}
 
-.donation-modal {
- 
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); /* Optional: Add a box shadow */
-  z-index: 1001; /* Adjust the z-index to appear above the overlay */
-}
 
 .v-volume {
   position: relative;
@@ -783,4 +764,5 @@ input[type="range"]::-moz-focus-outer {
     background-color: #FBFAFC; /* Ensure title section background matches */
   }
 }
+
 

@@ -56,7 +56,7 @@ const VideoPage = () => {
   }, [id]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div> <img src="/images/loader.svg" /></div>;
   }
 
   if (!videoPost) {
