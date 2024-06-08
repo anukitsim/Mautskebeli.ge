@@ -1,6 +1,6 @@
 'use client';
 
-import React from "react";
+import React from 'react';
 
 const PlayButton = ({ onClick }) => (
   <img
@@ -17,12 +17,22 @@ const getThumbnailUrl = (videoId) => {
   return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
 };
 
+const truncateText = (text, limit) => {
+  const words = text.split(' ');
+  if (words.length > limit) {
+    return words.slice(0, limit).join(' ') + '...';
+  }
+  return text;
+};
+
 const SearchVideoCard = ({ videoId, caption, onSelect }) => {
   const thumbnailUrl = getThumbnailUrl(videoId);
+  const truncatedCaption = truncateText(caption, 7);
 
   return (
     <div
-      className="relative flex flex-col items-start gap-2 p-2.5 rounded-lg bg-[#AD88C6] h-56 cursor-pointer"
+      className="relative flex flex-col items-start gap-2 p-2.5 rounded-lg bg-[#AD88C6] cursor-pointer h-full"
+      style={{ width: "280px", height: "200px" }}
       onClick={() => onSelect(videoId)}
     >
       <div
@@ -37,7 +47,7 @@ const SearchVideoCard = ({ videoId, caption, onSelect }) => {
           <PlayButton onClick={() => onSelect(videoId)} />
         </div>
       </div>
-      <p className="text-white text-sm font-semibold">{caption}</p>
+      <p className="text-white text-sm font-semibold">{truncatedCaption}</p>
     </div>
   );
 };

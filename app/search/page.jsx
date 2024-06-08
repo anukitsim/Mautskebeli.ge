@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
-import SearchVideoCard from '../components/SearchVideoCard'; // Ensure this path is correct
+import SearchVideoCard from '../components/SearchVideoCard';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -27,11 +27,52 @@ const truncateText = (text, limit) => {
   return text;
 };
 
+const fetchImageUrl = async (imageId) => {
+  if (!imageId) return null;
+
+  try {
+    const response = await fetch(`https://mautskebeli.wpenginepowered.com/wp-json/wp/v2/media/${imageId}`);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const data = await response.json();
+    return data.source_url;
+  } catch (error) {
+    console.error('Failed to fetch image URL:', error);
+    return null;
+  }
+};
+
+const CustomLoader = () => (
+  <div className="flex justify-center items-center mt-4">
+    <img src="/images/loader.svg" alt="loading" />
+  </div>
+);
+
 const SearchResults = ({ searchQuery }) => {
   const [videoResults, setVideoResults] = useState([]);
   const [articleResults, setArticleResults] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [currentVideoPage, setCurrentVideoPage] = useState(1);
+  const [currentArticlePage, setCurrentArticlePage] = useState(1);
+  const [isMobile, setIsMobile] = useState(false);
   const router = useRouter();
+
+  const videosPerPage = isMobile ? 4 : Math.max(1, Math.floor(window.innerWidth / 250));
+  const articlesPerPage = isMobile ? 4 : Math.max(1, Math.floor(window.innerWidth / 300));
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
 
   useEffect(() => {
     const fetchSearchResults = async () => {
@@ -103,12 +144,17 @@ const SearchResults = ({ searchQuery }) => {
           .filter((result) => result.status === 'fulfilled')
           .flatMap((result) => result.value);
 
-        const articleData = successfulArticleResults.map((post) => ({
-          id: post.id,
-          title: post.title.rendered,
-          acf: post.acf,
-          postType: post.type,
-        }));
+        const articleData = await Promise.all(
+          successfulArticleResults.map(async (post) => {
+            const imageUrl = await fetchImageUrl(post.acf?.image);
+            return {
+              id: post.id,
+              title: post.title.rendered,
+              acf: { ...post.acf, image: imageUrl },
+              postType: post.type,
+            };
+          })
+        );
 
         setVideoResults(videoData);
         setArticleResults(articleData);
@@ -124,60 +170,107 @@ const SearchResults = ({ searchQuery }) => {
     }
   }, [searchQuery]);
 
+  const handleVideoPageChange = (newPage) => {
+    setCurrentVideoPage(newPage);
+  };
+
+  const handleArticlePageChange = (newPage) => {
+    setCurrentArticlePage(newPage);
+  };
+
+  const videoStartIndex = (currentVideoPage - 1) * videosPerPage;
+  const videoEndIndex = videoStartIndex + videosPerPage;
+  const paginatedVideoResults = videoResults.slice(videoStartIndex, videoEndIndex);
+
+  const articleStartIndex = (currentArticlePage - 1) * articlesPerPage;
+  const articleEndIndex = articleStartIndex + articlesPerPage;
+  const paginatedArticleResults = articleResults.slice(articleStartIndex, articleEndIndex);
+
   if (loading) {
-    return <div>Loading...</div>;
+    return <CustomLoader />;
   }
 
   return (
     <div className="container mx-auto p-4">
-      <div
-        className="flex items-center gap-10 p-3"
-        style={{
-          width: '580px',
-          borderRadius: '4px',
-          border: '1px solid #E0DBE8',
-        }}
-      >
+      <div className="flex items-center gap-10 p-3 w-full" style={{ borderRadius: '4px', border: '1px solid #E0DBE8' }}>
         <span className="text-[16px] font-noto-sans-georgian text-[#474F7A]">
-          {videoResults.length + articleResults.length} შედეგი სიტყვაზე "
-          {searchQuery}"
+          {videoResults.length + articleResults.length} შედეგი სიტყვაზე "{searchQuery}"
         </span>
       </div>
 
       {videoResults.length > 0 && (
-        <div>
-          <h2 className="text-[16px] font-noto-sans-georgian text-[#474F7A]">
-            ვიდეო
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4">
-            {videoResults.map((video) => (
-              <SearchVideoCard
-                key={video.id}
-                videoId={video.videoId}
-                caption={video.title}
-                onSelect={(videoId) =>
-                  router.push(`/${video.postType}?videoId=${videoId}`)
-                }
-              />
+        <div className="mt-4">
+          <div className="flex justify-between items-center mb-2">
+            <h2 className="text-[24px] font-bold font-noto-sans-georgian text-[#474F7A] pt-10 pb-10">ვიდეო</h2>
+            <div className="flex gap-2">
+              <button
+                onClick={() => handleVideoPageChange(Math.max(1, currentVideoPage - 1))}
+                disabled={currentVideoPage === 1}
+                className="bg-white rounded-full p-2"
+              >
+                <Image src="/images/videos-left.png" alt="Previous" width={32} height={32} />
+              </button>
+              <button
+                onClick={() => handleVideoPageChange(currentVideoPage + 1)}
+                disabled={videoEndIndex >= videoResults.length}
+                className="bg-white rounded-full p-2"
+              >
+                <Image src="/images/videos-right.png" alt="Next" width={32} height={32} />
+              </button>
+            </div>
+          </div>
+          <div className="hidden md:grid gap-4" style={{ gridTemplateColumns: `repeat(auto-fill, minmax(250px, 1fr))` }}>
+            {paginatedVideoResults.map((video) => (
+              <div key={video.id} className="flex-shrink-0">
+                <SearchVideoCard
+                  videoId={video.videoId}
+                  caption={video.title}
+                  onSelect={(videoId) => router.push(`/${video.postType}?videoId=${videoId}`)}
+                />
+              </div>
+            ))}
+          </div>
+          <div className="flex md:hidden gap-4 overflow-x-auto hide-scroll-bar" style={{ overflowX: 'scroll' }}>
+            {paginatedVideoResults.map((video) => (
+              <div key={video.id} className="flex-shrink-0 w-[250px] mr-4">
+                <SearchVideoCard
+                  videoId={video.videoId}
+                  caption={video.title}
+                  onSelect={(videoId) => router.push(`/${video.postType}?videoId=${videoId}`)}
+                />
+              </div>
             ))}
           </div>
         </div>
       )}
+
       {articleResults.length > 0 && (
         <div className="mt-4">
-          <h2 className="text-[16px] font-noto-sans-georgian text-[#474F7A]">
-            სტატიები
-          </h2>
-          <div className="grid gap-5 mt-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
-            {articleResults.map((article) => (
-              <Link
-                href={`/all-articles/${article.id}`}
-                passHref
-                key={article.id}
+          <div className="flex justify-between items-center mb-2">
+            <h2 className="text-[24px] font-bold font-noto-sans-georgian text-[#474F7A] pt-10 pb-10">სტატიები</h2>
+            <div className="flex gap-2">
+              <button
+                onClick={() => handleArticlePageChange(Math.max(1, currentArticlePage - 1))}
+                disabled={currentArticlePage === 1}
+                className="bg-white rounded-full p-2"
               >
+                <Image src="/images/videos-left.png" alt="Previous" width={32} height={32} />
+              </button>
+              <button
+                onClick={() => handleArticlePageChange(currentArticlePage + 1)}
+                disabled={articleEndIndex >= articleResults.length}
+                className="bg-white rounded-full p-2"
+              >
+                <Image src="/images/videos-right.png" alt="Next" width={32} height={32} />
+              </button>
+            </div>
+          </div>
+          <div className="hidden md:grid gap-4" style={{ gridTemplateColumns: `repeat(auto-fill, minmax(300px, 1fr))` }}>
+            {paginatedArticleResults.map((article) => (
+              <Link href={`/all-articles/${article.id}`} passHref key={article.id} className="flex-shrink-0">
                 <div
                   className="article bg-[#F6F4F8] rounded-tl-[10px] rounded-tr-[10px] border border-[#B6A8CD] overflow-hidden"
-                  style={{ minWidth: '300px' }}
+                  style={{ minWidth: '300px', width: '100%' }}
                 >
                   <div className="article-image-container relative w-full h-[200px]">
                     {article.acf?.image ? (
@@ -185,7 +278,7 @@ const SearchResults = ({ searchQuery }) => {
                         src={article.acf.image}
                         alt="article-cover"
                         fill
-                        sizes="(max-width: 768px) 100vw, 33vw"
+                        sizes="(max-width: 400px) 100vw, 33vw"
                         style={{ objectFit: 'cover' }}
                         className="article-image"
                         priority
@@ -195,7 +288,7 @@ const SearchResults = ({ searchQuery }) => {
                         src="/images/default-image.png"
                         alt="article-cover"
                         fill
-                        sizes="(max-width: 768px) 100vw, 33vw"
+                        sizes="(max-width: 300px) 100vw, 33vw"
                         style={{ objectFit: 'cover' }}
                         className="article-image"
                         priority
@@ -203,19 +296,66 @@ const SearchResults = ({ searchQuery }) => {
                     )}
                   </div>
                   <div className="p-[18px]">
-                    <h2
-                      className="text-[20px] font-bold mb-2"
-                      style={{ color: '#474F7A' }}
-                    >
+                    <h2 className="text-[20px] font-bold mb-2" style={{ color: '#474F7A' }}>
                       {article.title}
                     </h2>
                     <span className="text-[#8D91AB] text-[14px] font-bold">
                       {truncateText(article.acf?.title || '', 10)}
                     </span>
-                    <p
-                      className="text-sm pt-[18px]"
-                      style={{ color: '#000' }}
-                    >
+                    <p className="text-sm pt-[18px]" style={{ color: '#000' }}>
+                      {truncateText(stripHtml(article.acf?.['main-text'] || ''), 30)}
+                    </p>
+                    <div className="flex flex-col justify-end pt-[30px] items-end">
+                      <span className="text-[15px] text-[#AD88C6]">
+                        {article.acf?.translator || ''}
+                      </span>
+                      <button className="text-white text-[12px] mt-[16px] bg-[#AD88C6] rounded-[6px] pt-[10px] pb-[10px] pl-[12px] pr-[12px]">
+                        ნახეთ სრულად
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+          <div className="flex md:hidden gap-4 overflow-x-auto hide-scroll-bar" style={{ overflowX: 'scroll' }}>
+            {paginatedArticleResults.map((article) => (
+              <Link href={`/all-articles/${article.id}`} passHref key={article.id} className="flex-shrink-0 w-[300px] mr-4">
+                <div
+                  className="article bg-[#F6F4F8] rounded-tl-[10px] rounded-tr-[10px] border border-[#B6A8CD] overflow-hidden"
+                  style={{ minWidth: '300px', width: '300px' }}
+                >
+                  <div className="article-image-container relative w-full h-[200px]">
+                    {article.acf?.image ? (
+                      <Image
+                        src={article.acf.image}
+                        alt="article-cover"
+                        fill
+                        sizes="(max-width: 400px) 100vw, 33vw"
+                        style={{ objectFit: 'cover' }}
+                        className="article-image"
+                        priority
+                      />
+                    ) : (
+                      <Image
+                        src="/images/default-image.png"
+                        alt="article-cover"
+                        fill
+                        sizes="(max-width: 300px) 100vw, 33vw"
+                        style={{ objectFit: 'cover' }}
+                        className="article-image"
+                        priority
+                      />
+                    )}
+                  </div>
+                  <div className="p-[18px]">
+                    <h2 className="text-[20px] font-bold mb-2" style={{ color: '#474F7A' }}>
+                      {article.title}
+                    </h2>
+                    <span className="text-[#8D91AB] text-[14px] font-bold">
+                      {truncateText(article.acf?.title || '', 10)}
+                    </span>
+                    <p className="text-sm pt-[18px]" style={{ color: '#000' }}>
                       {truncateText(stripHtml(article.acf?.['main-text'] || ''), 30)}
                     </p>
                     <div className="flex flex-col justify-end pt-[30px] items-end">
@@ -233,6 +373,7 @@ const SearchResults = ({ searchQuery }) => {
           </div>
         </div>
       )}
+
       {videoResults.length === 0 && articleResults.length === 0 && (
         <p className="mt-4">No results found.</p>
       )}
@@ -248,7 +389,7 @@ const SearchPage = () => {
 };
 
 const WrappedSearchPage = () => (
-  <Suspense fallback={<div>Loading...</div>}>
+  <Suspense fallback={<CustomLoader />}>
     <SearchPage />
   </Suspense>
 );
