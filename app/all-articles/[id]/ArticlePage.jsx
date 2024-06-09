@@ -176,25 +176,25 @@ const ArticlePage = ({ params }) => {
                 <h2 className="text-xl text-white font-bold mb-4">გააზიარე</h2>
                 <button
                   onClick={shareOnFacebook}
-                  className="w-full text-left px-4 py-2 mb-2 text-[#474F7A] bg-white hover:bg-gray-200 rounded"
+                  className="w-full text-left px-4 py-2 mb-2 text-white rounded"
                 >
                   <Image
                     src="/images/facebook.svg"
                     alt="facebook share"
-                    width={24}
-                    height={24}
+                    width={40}
+                    height={40}
                   />
                   Facebook
                 </button>
                 <button
                   onClick={shareOnTwitter}
-                  className="w-full text-left px-4 py-2 mb-2 text-[#474F7A] bg-white hover:bg-gray-200 rounded"
+                  className="w-full text-left px-4 py-2 mb-2 text-white  rounded"
                 >
                   <Image
                     src="/images/twitter.svg"
                     alt="twitter share"
-                    width={24}
-                    height={24}
+                    width={40}
+                    height={40}
                   />
                   Twitter
                 </button>

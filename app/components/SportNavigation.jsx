@@ -95,7 +95,7 @@ const SportNavigation = ({ onVideoSelect }) => {
       <div className="w-full sm:w-10/12 mx-auto flex justify-between items-center relative">
         <div className="sm:hidden z-50 ml-7">
           <button onClick={toggleMenu}>
-            <img src={isMenuOpen ? "/images/cross.svg" : "/images/hamburger.svg"} alt={isMenuOpen ? "Close" : "Menu"} width="30" height="30" />
+            <img src={isMenuOpen ? "/images/cross-white.svg" : "/images/hamburger.svg"} alt={isMenuOpen ? "Close" : "Menu"} width="30" height="30" />
           </button>
         </div>
         <ul className="hidden sm:flex gap-10 items-center text-black text-xs sm:text-sm">
@@ -107,7 +107,7 @@ const SportNavigation = ({ onVideoSelect }) => {
         </ul>
         <div className="sm:hidden z-50">
           <button onClick={toggleSearch} className="mr-7">
-            <Image src="/images/search.png" alt="Search" width={25} height={25} />
+            <Image src="/images/search-white.png" alt="Search" width={25} height={25} />
           </button>
         </div>
         <div className={`${isSearchOpen ? "flex" : "hidden"} absolute top-full right-5 mt-1 mr-4 bg-white p-2 rounded-md shadow-lg z-40`}>
@@ -231,7 +231,7 @@ const SportNavigation = ({ onVideoSelect }) => {
         </div>
         <form onSubmit={handleSearch} className="hidden sm:flex items-center gap-2.5 bg-[#AD88C6] rounded h-9 md:w-[340px]">
           <button type="submit" className="p-2 bg-[#AD88C6] rounded-full">
-            <Image src="/images/search.png" alt="Search" width={20} height={20} />
+            <Image src="/images/search-yellow.png" alt="Search" width={20} height={20} />
           </button>
           <input
             type="text"

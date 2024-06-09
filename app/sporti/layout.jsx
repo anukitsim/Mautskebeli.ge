@@ -16,7 +16,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className={notoSansGeorgian.variable}>
-      <body>{children}</body>
+      <body className='bg-[#AD88C6]'>{children}</body>
     </html>
   );
 }
