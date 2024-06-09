@@ -54,7 +54,7 @@ const Sidebar = () => {
         />
         <span className="text-[#222] text-[15px]">ხელოვნება</span>
       </Link>
-      <Link href="/qalaqi" className="flex flex-row gap-3">
+      <Link href="/kalaki" className="flex flex-row gap-3">
         <Image
           src="/images/qalaqi.png"
           alt="qalaqi"

@@ -187,7 +187,7 @@ const SportNavigation = ({ onVideoSelect }) => {
               />
               <span className="text-white text-[15px]">ხელოვნება</span>
             </Link>
-            <Link href="/qalaqi" className="flex flex-row gap-3">
+            <Link href="/kalaki" className="flex flex-row gap-3">
               <Image
                 src="/images/kalaki-white.png"
                 alt="qalaqi"
