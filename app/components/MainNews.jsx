@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
@@ -123,6 +123,9 @@ const MainNews = () => {
     if (cachedSlides) {
       setSlides(JSON.parse(cachedSlides));
       setLoading(false);
+
+      // Fetch the latest data in the background and update the state
+      fetchSlides();
     } else {
       fetchSlides();
     }
@@ -145,7 +148,7 @@ const MainNews = () => {
   };
 
   if (loading) {
-    return  <img src="/images/loader.svg" alt="Loading" />;
+    return <img src="/images/loader.svg" alt="Loading" />;
   }
 
   if (!Array.isArray(slides) || slides.length <= 0) {

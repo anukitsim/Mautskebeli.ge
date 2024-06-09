@@ -11,7 +11,7 @@ const scrollToTop = () => {
   });
 };
 
-const Footer = () => {
+const SportFooter = () => {
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
   const [message, setMessage] = useState('');
@@ -47,10 +47,10 @@ const Footer = () => {
 
   return (
     <>
-      <footer className="lg:flex hidden w-9/12 h-[300px] mb-[35px] mx-auto mt-[69px]  gap-[40px]">
+      <footer className="lg:flex hidden w-9/12 h-[300px] mb-[35px] mx-auto mt-[69px]  gap-[55px]">
         {/* Desktop version of the footer */}
         <div className="h-full w-1/2 flex flex-col gap-[18px]">
-          <h1 className="text-[#AD88C6] text-[16px] font-bold">კონტაქტი</h1>
+          <h1 className="text-[#FECE27] text-[16px] font-bold">კონტაქტი</h1>
           <div className="flex gap-[10px] text-[16px]">
             <Image src="/images/mail.png" alt="mail" width={0} height={0} style={{ width: "auto", height: "20px" }} />
             <a href="mailto:platformforsj@gmail.com" className="text-[16px]">platformforsj@gmail.com</a>
@@ -66,7 +66,7 @@ const Footer = () => {
           <Image src="/images/logo.png" alt="logo" width={116} height={32} className="mt-[32px]" />
         </div>
         <div className="h-full w-1/3 flex flex-col gap-[18px]">
-          <h1 className="text-[#AD88C6] text-[16px] font-bold">ნავიგაცია</h1>
+          <h1 className="text-[#FECE27] text-[16px] font-bold">ნავიგაცია</h1>
           <Link href="/about-us">ჩვენს შესახებ</Link>
           
           <Link href="/all-videos">ვიდეოები</Link>
@@ -75,37 +75,7 @@ const Footer = () => {
           <Link href='/bolo-ambebi'>ამბები</Link>
         </div>
         <div className="h-full w-1/3 flex flex-col gap-[16px]">
-        <h1 className="text-[#AD88C6] text-[16px] font-bold">გამოგვიწერე</h1>
-      
-        <Link href='https://www.facebook.com/mautskebeli.ge' target='_blank' className="flex gap-[10px] text-[16px]">
-            <Image src="/images/facebook.png" alt="mail" width={20} height={20} />
-            <span>Facebook</span>
-          </Link>
-          <Link href='https://www.youtube.com/@mautskebeli' target='_blank' className="flex gap-[10px] text-[16px]">
-            <Image src="/images/footer-youtube.png" alt="mail" width={20} height={20} />
-            <span>YouTube</span>
-          </Link>
-          <Link href='https://www.instagram.com/mautskebeli.ge/' target='_blank' className="flex gap-[10px] ">
-            <Image src="/images/instagram.png" alt="mail" width={20} height={20} />
-            <span className="text-[16px] whitespace-nowrap">Instagram</span>
-          </Link>
-          <Link href='https://www.tiktok.com/@mautskebeli.ge' target='_blank' className="flex gap-[10px] text-[16px]">
-            <Image src="/images/tiktok.png" alt="mail" width={20} height={20} />
-            <span>TikTok</span>
-          </Link>
-          <Link href='https://x.com/mautskebeli' target='_blank' className="flex gap-[10px] text-[16px]">
-            <Image src="/images/twitter.png" alt="mail" width={20} height={20} />
-            <span>X Twitter</span>
-          </Link>
-          <div className="flex gap-[10px] text-[16px]">
-            <Image src="/images/telegram.png" alt="mail" width={20} height={20} />
-            <span>Telegram</span>
-          </div>
-     
-      </div>
-
-        <div className="h-full w-1/2 flex flex-col gap-[16px]">
-          <h1 className="text-[#AD88C6] text-[16px] font-bold">გამოიწერე სიახლეები</h1>
+          <h1 className="text-[#FECE27] text-[16px] font-bold">კონტაქტი</h1>
           {/* Subscription form for Desktop */}
           <form onSubmit={handleSubmit} className="flex flex-col gap-[10px] mt-2">
             <input
@@ -137,27 +107,8 @@ const Footer = () => {
           <p className="text-[#6E6893] text-[14px] mt-4">
             სიახლეების მიმღებთა სიიდან ამოწერა ყოველთვის შეგიძლიათ
           </p>
-          {message && <p className="text-[#AD88C6] text-[16px]">{message}</p>}
-           {/* Scroll to top button */}
-           <button
-            onClick={scrollToTop}
-            className="mt-[35px] self-end justify-self-end p-2 text-[#474F7A] text-[16px] cursor-pointer flex items-center justify-center"
-            aria-label="Scroll to top"
-          >
-            საწყისზე დაბრუნება
-            <div className="flex justify-center items-center ml-2">
-              {/* Adjust width and height as per your image's aspect ratio */}
-              <Image
-                src="/images/top.png"
-                alt="Scroll to top"
-                width={0}
-                height={0}
-                style={{ width: "auto", height: "20px" }}
-              />
-            </div>
-          </button>
+          {message && <p className="text-[#FECE27] text-[16px]">{message}</p>}
         </div>
-        
       </footer>
 
       {/* Mobile screen Footer */}
@@ -177,73 +128,6 @@ const Footer = () => {
             <Image src="/images/loacation.png" alt="location" width={0} height={0} style={{ width: 'auto', height: '20px' }} />
             <a href="https://www.google.com/maps/search/?api=1&query=Kostava+30,+Batumi" target="_blank" className="text-[16px] whitespace-nowrap">ბათუმი, კოსტავას 30</a>
           </div>
-        </div>
-        <div className="flex flex-col justify-center items-center gap-[18px]">
-          <h1 className="text-white text-[15px] font-bold">გამოგვიწერე</h1>
-          <div className="flex gap-[16px] text-[#474F7A]">
-            <div className="flex gap-[6px] text-[16px]">
-              <Image
-                src="/images/facebook-mobile.png"
-                alt="mail"
-                width={0}
-                height={0}
-                style={{ width: "auto", height: "20px" }}
-              />
-              <span>Facebook</span>
-            </div>
-            <div className="flex gap-[6px] text-[16px]">
-              <Image
-                src="/images/youtube-mobile.png"
-                alt="mail"
-                width={0}
-                height={0}
-                style={{ width: "auto", height: "20px" }}
-              />
-              <span>YouTube</span>
-            </div>
-            <div className="flex gap-[6px] text-[16px]">
-              <Image
-                src="/images/instagram-mobile.png"
-                alt="mail"
-                width={0}
-                height={0}
-                style={{ width: "auto", height: "20px" }}
-              />
-              <span className="text-[16px] whitespace-nowrap">Instagram</span>
-            </div>
-          </div>
-          <div className="flex gap-[16px] text-[#474F7A]">
-            <div className="flex gap-[6px] text-[16px]">
-              <Image
-                src="/images/tiktok-mobile.png"
-                alt="mail"
-                width={0}
-                height={0}
-                style={{ width: "auto", height: "20px" }}
-              />
-              <span>TikTok</span>
-            </div>
-            <div className="flex gap-[6px] text-[16px]">
-              <Image
-                src="/images/twitter-mobile.png"
-                alt="mail"
-                width={0}
-                height={0}
-                style={{ width: "auto", height: "20px" }}
-              />
-              <span>X Twitter</span>
-            </div>
-            <div className="flex gap-[6px] text-[16px]">
-              <Image
-                src="/images/telegram-mobile.png"
-                alt="mail"
-                width={0}
-                height={0}
-                style={{ width: "auto", height: "20px" }}
-              />
-              <span>Telegram</span>
-            </div>
-            </div>
         </div>
         <div className="flex flex-col justify-center items-center gap-[18px]">
           <h1 className="text-white text-[15px] font-bold">გამოგვიწერე</h1>
@@ -281,7 +165,6 @@ const Footer = () => {
               გამოიწერე
             </button>
             {message && <p className="text-[#6E6893] text-[14px] mt-4">{message}</p>}
-            
           </form>
         </div>
         <div className="flex flex-col justify-center items-center gap-[18px]">
@@ -297,28 +180,11 @@ const Footer = () => {
               <p>სპორტი</p>
               <p>ამბები</p>
             </div>
-            
           </div>
-          <button
-              onClick={scrollToTop}
-              className="mt-[35px] self-end justify-self-end p-2 text-[#474F7A] text-[16px] cursor-pointer flex items-center justify-center"
-              aria-label="Scroll to top"
-            >
-              საწყისზე დაბრუნება
-              <div className="flex justify-center items-center ml-2">
-                {/* Adjust width and height as per your image's aspect ratio */}
-                <Image
-                  src="/images/top.png"
-                  alt="Scroll to top"
-                  width={20}
-                  height={20}
-                />
-              </div>
-            </button>
         </div>
       </footer>
     </>
   );
 };
 
-export default Footer;
+export default SportFooter;
