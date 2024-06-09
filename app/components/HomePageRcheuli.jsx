@@ -4,6 +4,35 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 
+const videoPostTypes = [
+  "kalaki",
+  "mecniereba",
+  "medicina",
+  "msoflio",
+  "saxli",
+  "shroma",
+  "xelovneba",
+];
+
+const extractVideoId = (videoUrl) => {
+  if (!videoUrl) return null;
+  const match = videoUrl.match(
+    /(?:youtube\.com\/(?:[^/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?/\s]{11})/
+  );
+  return match ? match[1] : null;
+};
+
+const constructUrl = (post) => {
+  const { post_id, post_type, acf_fields } = post;
+  const videoId = extractVideoId(acf_fields.video_url);
+
+  if (videoId) {
+    return `/${post_type}?videoId=${videoId}`;
+  }
+
+  return `/all-articles/${post_id}`;
+};
+
 const HomePageRcheuli = () => {
   const [posts, setPosts] = useState([]);
 
@@ -11,7 +40,7 @@ const HomePageRcheuli = () => {
     const fetchPosts = async () => {
       try {
         const cacheBuster = new Date().getTime();
-        const response = await fetch(`https://mautskebeli.wpenginepowered.com/wp-json/wp/v2/acf-fields?cacheBuster=${cacheBuster}`);
+        const response = await fetch(`https://mautskebeli.wpenginepowered.com/wp-json/custom/v1/acf-fields?cacheBuster=${cacheBuster}`);
         
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -36,9 +65,9 @@ const HomePageRcheuli = () => {
 
   const getMediaThumbnail = (post) => {
     if (post.acf_fields.video_url) {
-      const videoIdMatch = post.acf_fields.video_url.match(/(?:youtu\.be\/|youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=))([^\n\s&]+)/);
+      const videoIdMatch = extractVideoId(post.acf_fields.video_url);
       if (videoIdMatch) {
-        return `https://img.youtube.com/vi/${videoIdMatch[1]}/hqdefault.jpg`;
+        return `https://img.youtube.com/vi/${videoIdMatch}/hqdefault.jpg`;
       }
       console.error('Invalid YouTube URL:', post.acf_fields.video_url);
       return '/images/default-thumbnail.png';
@@ -66,7 +95,7 @@ const HomePageRcheuli = () => {
         <div className="flex">
           {posts.map((post, index) => (
             <div key={index} className="inline-block px-2 w-[248px]">
-              <Link href={post.acf_fields.video_url ? `/rcheuli/${post.post_id}` : `/all-articles/${post.post_id}`}>
+              <Link href={constructUrl(post)}>
                 <div className="w-full aspect-w-16 aspect-h-9 rounded-t-lg lg:rounded-t-lg lg:rounded-b-none overflow-hidden relative bg-transparent">
                   <Image
                     src={getMediaThumbnail(post)}
@@ -88,7 +117,7 @@ const HomePageRcheuli = () => {
       <section className="lg:flex hidden w-10/12 mt-[69px] gap-[20px] mx-auto">
         {posts.map((post, index) => (
           <div key={index} className="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 flex flex-col">
-            <Link href={post.acf_fields.video_url ? `/rcheuli/${post.post_id}` : `/all-articles/${post.post_id}`}>
+            <Link href={constructUrl(post)}>
               <div className="w-full aspect-w-16 aspect-h-9 rounded-t-lg lg:rounded-t-lg lg:rounded-b-none overflow-hidden relative bg-transparent">
                 <Image
                   src={getMediaThumbnail(post)}
