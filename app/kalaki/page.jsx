@@ -1,12 +1,13 @@
 "use client";
 
-import React, { useEffect, useState, useRef, Suspense } from "react";
+import React, { useEffect, useState, useRef, Suspense, useCallback } from "react";
 import CustomYoutubePlayer from "../components/CustomYoutube";
 import Header from "../components/Header";
 import Navigation from "../components/Navigation";
 import { MenuProvider } from "../context/MenuContext";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
+import Head from 'next/head';
 
 const PlayButton = ({ onClick }) => (
   <img
@@ -65,13 +66,16 @@ function ShromaVideos() {
   });
   const [lastSelectedVideoId, setLastSelectedVideoId] = useState(null);
   const [customPlayerKey, setCustomPlayerKey] = useState(0);
+  const shareOptionsRef = useRef(null);
 
   const videoPlayerRef = useRef(null);
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [currentUrl, setCurrentUrl] = useState('');
 
   const shareOnFacebook = () => {
-    const shareUrl = `https://www.facebook.com/sharer/sharer.php?u=https://www.youtube.com/watch?v=${activeVideoId}`;
+    const youtubeUrl = `https://www.youtube.com/watch?v=${activeVideoId}`;
+    const shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(youtubeUrl)}`;
     window.open(shareUrl, "_blank");
   };
 
@@ -79,13 +83,16 @@ function ShromaVideos() {
     const text = encodeURIComponent(
       activeVideoAcf.title + " " + activeVideoAcf.description
     );
-    const url = `https://www.youtube.com/watch?v=${activeVideoId}`;
     const shareUrl = `https://twitter.com/intent/tweet?text=${text}&url=${encodeURIComponent(
-      url
+      `https://www.youtube.com/watch?v=${activeVideoId}`
     )}`;
     window.open(shareUrl, "_blank");
   };
-  
+
+  useEffect(() => {
+    setCurrentUrl(window.location.href);
+  }, [router.asPath]);
+
   useEffect(() => {
     const fetchVideos = async () => {
       setLoading(true);
@@ -109,10 +116,10 @@ function ShromaVideos() {
         setLoading(false);
       }
     };
-  
+
     fetchVideos();
-  }, [searchParams]);  // Ensure updates if searchParams change
-  
+  }, [searchParams]);
+
   useEffect(() => {
     if (activeVideoId !== lastSelectedVideoId) {
       setLastSelectedVideoId(activeVideoId);
@@ -125,7 +132,25 @@ function ShromaVideos() {
     setActiveVideoAcf(acf);
     setCustomPlayerKey((prevKey) => prevKey + 1);
     router.push(`?videoId=${videoId}`, undefined, { shallow: true });
+    setCurrentUrl(window.location.href);
   };
+
+  const handleClickOutside = useCallback((event) => {
+    if (shareOptionsRef.current && !shareOptionsRef.current.contains(event.target)) {
+      setShowShareOptions(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (showShareOptions) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showShareOptions, handleClickOutside]);
 
   const endIndex = currentPage * 16;
   const startIndex = endIndex - 16;
@@ -179,43 +204,37 @@ function ShromaVideos() {
                     </button>
                     {showShareOptions && (
                       <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 1000 }} className="bg-gray-800 bg-opacity-50 flex items-center justify-center">
-                        <div className="rounded-lg p-6 w-80">
+                        <div ref={shareOptionsRef} className="rounded-lg p-6 w-80" style={{backgroundColor: "rgba(0, 0, 0, 0.30)",}}>
                           <h2 className="text-xl text-white font-bold mb-4">
                             გააზიარე
                           </h2>
-                          <div className="flex items-center gap-5 ">
-                          <button
-                            onClick={shareOnFacebook}
-                            className=" text-left  text-white"
-                          >
-                            <Image
-                              src="/images/facebook.svg"
-                              alt="facebook share"
-                              width={24}
-                              height={24}
-                            />
-                            Facebook
-                          </button>
-                          <button
-                            onClick={shareOnTwitter}
-                            className=" text-left  text-white"
-                          >
-                            <Image
-                              src="/images/twitter.svg"
-                              alt="twitter share"
-                              width={24}
-                              height={24}
-                            />
-                            Twitter
-                          </button>
+                          <div className="flex items-center pt-7 gap-5 ">
+                            <button
+                              onClick={shareOnFacebook}
+                              className=" text-left  text-white"
+                            >
+                              <Image
+                                src="/images/facebook.svg"
+                                alt="facebook share"
+                                width={44}
+                                height={44}
+                              />
+                              Facebook
+                            </button>
+                            <button
+                              onClick={shareOnTwitter}
+                              className=" text-left  text-white"
+                            >
+                              <Image
+                                src="/images/twitter.svg"
+                                alt="twitter share"
+                                width={44}
+                                height={44}
+                              />
+                              Twitter
+                            </button>
                           </div>
                          
-                          <button
-                            onClick={() => setShowShareOptions(false)}
-                            className="w-full text-left px-4 py-2 mt-4 text-[#474F7A] bg-white hover:bg-gray-200 rounded"
-                          >
-                            გათიშვა
-                          </button>
                         </div>
                       </div>
                     )}

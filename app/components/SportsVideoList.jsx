@@ -1,8 +1,7 @@
 "use client";
 
-import React, { useEffect, useState, useRef, Suspense } from "react";
+import React, { useEffect, useState, useRef, Suspense, useCallback } from "react";
 import CustomYoutubePlayer from "../components/CustomYoutube";
-
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 
@@ -18,7 +17,6 @@ const PlayButton = ({ onClick }) => (
 );
 
 const extractVideoId = (videoUrl) => {
-  if (!videoUrl) return null;
   const match = videoUrl.match(
     /(?:youtube\.com\/(?:[^/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?/\s]{11})/
   );
@@ -64,13 +62,16 @@ function ShromaVideos() {
   });
   const [lastSelectedVideoId, setLastSelectedVideoId] = useState(null);
   const [customPlayerKey, setCustomPlayerKey] = useState(0);
+  const shareOptionsRef = useRef(null);
 
   const videoPlayerRef = useRef(null);
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [currentUrl, setCurrentUrl] = useState('');
 
   const shareOnFacebook = () => {
-    const shareUrl = `https://www.facebook.com/sharer/sharer.php?u=https://www.youtube.com/watch?v=${activeVideoId}`;
+    const youtubeUrl = `https://www.youtube.com/watch?v=${activeVideoId}`;
+    const shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(youtubeUrl)}`;
     window.open(shareUrl, "_blank");
   };
 
@@ -78,20 +79,24 @@ function ShromaVideos() {
     const text = encodeURIComponent(
       activeVideoAcf.title + " " + activeVideoAcf.description
     );
-    const url = `https://www.youtube.com/watch?v=${activeVideoId}`;
     const shareUrl = `https://twitter.com/intent/tweet?text=${text}&url=${encodeURIComponent(
-      url
+      `https://www.youtube.com/watch?v=${activeVideoId}`
     )}`;
     window.open(shareUrl, "_blank");
   };
 
   useEffect(() => {
+    setCurrentUrl(window.location.href);
+  }, [router.asPath]);
+
+  useEffect(() => {
     const fetchVideos = async () => {
+      setLoading(true);
       try {
         let allVideos = [];
         let page = 1;
         let totalPages = 1;
-        
+
         do {
           const response = await fetch(
             `https://mautskebeli.wpenginepowered.com/wp-json/wp/v2/sporti-videos?page=${page}&per_page=20`
@@ -117,23 +122,39 @@ function ShromaVideos() {
       }
     };
     fetchVideos();
-  }, []);
+  }, [searchParams]);
 
   useEffect(() => {
     if (activeVideoId !== lastSelectedVideoId) {
       setLastSelectedVideoId(activeVideoId);
-      setTimeout(() => {
-        videoPlayerRef.current?.scrollIntoView({ behavior: "smooth" });
-      }, 100);
+      videoPlayerRef.current?.scrollIntoView({ behavior: "smooth" });
     }
-  }, [activeVideoId]);
+  }, [activeVideoId, lastSelectedVideoId]);
 
   const handleVideoSelect = (videoId, acf) => {
     setActiveVideoId(videoId);
     setActiveVideoAcf(acf);
     setCustomPlayerKey((prevKey) => prevKey + 1);
     router.push(`?videoId=${videoId}`, undefined, { shallow: true });
+    setCurrentUrl(window.location.href);
   };
+
+  const handleClickOutside = useCallback((event) => {
+    if (shareOptionsRef.current && !shareOptionsRef.current.contains(event.target)) {
+      setShowShareOptions(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (showShareOptions) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showShareOptions, handleClickOutside]);
 
   const endIndex = currentPage * 16;
   const startIndex = endIndex - 16;
@@ -141,16 +162,15 @@ function ShromaVideos() {
 
   return (
     <>
-     
       <div>
         {loading ? (
           <img src="/images/loader.svg" />
         ) : (
           videos.length > 0 && (
             <>
-              <div ref={videoPlayerRef} className="relative" style={{ zIndex: 10 }}>
+              <div ref={videoPlayerRef} className="relative mt-[74px]" style={{ zIndex: 10 }}>
                 <CustomYoutubePlayer key={customPlayerKey} videoId={activeVideoId} />
-                <div className="mx-auto lg:mt-0 mt-[-50%] lg:w-10/12 sm:w-full flex flex-col gap-[23px] pl-5 pr-5">
+                <div className="mx-auto mt-[7%] lg:w-10/12 sm:w-full flex flex-col gap-[23px] pl-5 pr-5">
                   <h2 className="text-[32px] text-[#474F7A] font-bold">
                     {activeVideoAcf.title}
                   </h2>
@@ -184,46 +204,42 @@ function ShromaVideos() {
                     </button>
                     {showShareOptions && (
                       <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 1000 }} className="bg-gray-800 bg-opacity-50 flex items-center justify-center">
-                        <div className="rounded-lg p-6 w-80">
+                        <div ref={shareOptionsRef} className="rounded-lg p-6 w-80" style={{backgroundColor: "rgba(0, 0, 0, 0.30)",}}>
                           <h2 className="text-xl text-white font-bold mb-4">
                             გააზიარე
                           </h2>
-                          <button
-                            onClick={shareOnFacebook}
-                            className="w-full text-left px-4 py-2 mb-2 text-[#474F7A] bg-white hover:bg-gray-200 rounded"
-                          >
-                            <Image
-                              src="/images/facebook.svg"
-                              alt="facebook share"
-                              width={24}
-                              height={24}
-                            />
-                            Facebook
-                          </button>
-                          <button
-                            onClick={shareOnTwitter}
-                            className="w-full text-left px-4 py-2 text-[#474F7A] bg-white hover:bg-gray-200 rounded"
-                          >
-                            <Image
-                              src="/images/twitter.svg"
-                              alt="twitter share"
-                              width={24}
-                              height={24}
-                            />
-                            Twitter
-                          </button>
-                          <button
-                            onClick={() => setShowShareOptions(false)}
-                            className="w-full text-left px-4 py-2 mt-4 text-[#474F7A] bg-white hover:bg-gray-200 rounded"
-                          >
-                            გათიშვა
-                          </button>
+                          <div className="flex items-center pt-7 gap-5 ">
+                            <button
+                              onClick={shareOnFacebook}
+                              className=" text-left  text-white"
+                            >
+                              <Image
+                                src="/images/facebook.svg"
+                                alt="facebook share"
+                                width={44}
+                                height={44}
+                              />
+                              Facebook
+                            </button>
+                            <button
+                              onClick={shareOnTwitter}
+                              className=" text-left  text-white"
+                            >
+                              <Image
+                                src="/images/twitter.svg"
+                                alt="twitter share"
+                                width={44}
+                                height={44}
+                              />
+                              Twitter
+                            </button>
+                          </div>
                         </div>
                       </div>
                     )}
                   </div>
-                  <p className="text-[16px] text-[#474F7A] font-llight">
-                    {activeVideoAcf.text}
+                  <p className="text-[16px] text-[#474F7A] font-light">
+                    {activeVideoAcf.description}
                   </p>
                 </div>
               </div>

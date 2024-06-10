@@ -210,7 +210,7 @@ const Podcast = () => {
               </h1>
             )}
 
-            <div ref={mainVideoRef}>
+            <div ref={mainVideoRef} className='p-[74px]'>
               <CustomYoutubePlayer
                 key={customPlayerKey}
                 videoId={

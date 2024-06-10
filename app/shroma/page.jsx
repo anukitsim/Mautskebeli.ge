@@ -8,6 +8,7 @@ import { MenuProvider } from "../context/MenuContext";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 
+
 const PlayButton = ({ onClick }) => (
   <img
     src="/images/card-play-button.png"
@@ -70,22 +71,27 @@ function ShromaVideos() {
   const videoPlayerRef = useRef(null);
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [currentUrl, setCurrentUrl] = useState('');
 
   const shareOnFacebook = () => {
-    const shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${window.location.href}`;
-    window.open(shareUrl, '_blank');
+    const youtubeUrl = `https://www.youtube.com/watch?v=${activeVideoId}`;
+    const shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(youtubeUrl)}`;
+    window.open(shareUrl, "_blank");
   };
 
   const shareOnTwitter = () => {
     const text = encodeURIComponent(
       activeVideoAcf.title + " " + activeVideoAcf.description
     );
-    const url = `${window.location.href}`;
     const shareUrl = `https://twitter.com/intent/tweet?text=${text}&url=${encodeURIComponent(
-      url
+      `https://www.youtube.com/watch?v=${activeVideoId}`
     )}`;
-    window.open(shareUrl, '_blank');
+    window.open(shareUrl, "_blank");
   };
+
+  useEffect(() => {
+    setCurrentUrl(window.location.href);
+  }, [router.asPath]);
 
   useEffect(() => {
     const fetchVideos = async () => {
@@ -112,7 +118,7 @@ function ShromaVideos() {
     };
 
     fetchVideos();
-  }, [searchParams]);  // Ensure updates if searchParams change
+  }, [searchParams]);
 
   useEffect(() => {
     if (activeVideoId !== lastSelectedVideoId) {
@@ -126,6 +132,7 @@ function ShromaVideos() {
     setActiveVideoAcf(acf);
     setCustomPlayerKey((prevKey) => prevKey + 1);
     router.push(`?videoId=${videoId}`, undefined, { shallow: true });
+    setCurrentUrl(window.location.href);
   };
 
   const handleClickOutside = useCallback((event) => {
@@ -197,11 +204,11 @@ function ShromaVideos() {
                     </button>
                     {showShareOptions && (
                       <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 1000 }} className="bg-gray-800 bg-opacity-50 flex items-center justify-center">
-                        <div ref={shareOptionsRef} className="rounded-lg p-6 w-80">
+                        <div ref={shareOptionsRef} className="rounded-lg p-6 w-80" style={{backgroundColor: "rgba(0, 0, 0, 0.30)",}}>
                           <h2 className="text-xl text-white font-bold mb-4">
                             გააზიარე
                           </h2>
-                          <div className="flex items-center gap-5 ">
+                          <div className="flex items-center pt-7 gap-5 ">
                             <button
                               onClick={shareOnFacebook}
                               className=" text-left  text-white"
@@ -209,8 +216,8 @@ function ShromaVideos() {
                               <Image
                                 src="/images/facebook.svg"
                                 alt="facebook share"
-                                width={24}
-                                height={24}
+                                width={44}
+                                height={44}
                               />
                               Facebook
                             </button>
@@ -221,19 +228,13 @@ function ShromaVideos() {
                               <Image
                                 src="/images/twitter.svg"
                                 alt="twitter share"
-                                width={24}
-                                height={24}
+                                width={44}
+                                height={44}
                               />
                               Twitter
                             </button>
                           </div>
                          
-                          <button
-                            onClick={() => setShowShareOptions(false)}
-                            className="w-full text-left px-4 py-2 mt-4 text-[#474F7A] bg-white hover:bg-gray-200 rounded"
-                          >
-                            გათიშვა
-                          </button>
                         </div>
                       </div>
                     )}

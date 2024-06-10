@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import Image from 'next/image';
 import Head from 'next/head';
 import DOMPurify from 'dompurify';
@@ -25,6 +25,7 @@ const ArticlePage = ({ params }) => {
   const [isMounted, setIsMounted] = useState(false);
   const [showShareOptions, setShowShareOptions] = useState(false);
   const [showScrollButton, setShowScrollButton] = useState(false);
+  const shareOptionsRef = useRef(null);
   const footerRef = useRef(null);
   const pathname = usePathname();
 
@@ -51,70 +52,53 @@ const ArticlePage = ({ params }) => {
   useEffect(() => {
     const handleScroll = () => {
       const scrollY = window.scrollY;
+      const scrollThreshold = 2000;
       const windowHeight = window.innerHeight;
       const documentHeight = document.documentElement.scrollHeight;
       const footerHeight = footerRef.current?.offsetHeight || 0;
       const bottomThreshold = documentHeight - (footerHeight + windowHeight * 2);
-
-      if (scrollY > 200 && scrollY < bottomThreshold) {
+  
+      if (scrollY > scrollThreshold && scrollY < bottomThreshold) {
         setShowScrollButton(true);
       } else {
         setShowScrollButton(false);
       }
     };
-
+  
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  useEffect(() => {
-    if (!window.FB) {
-      window.fbAsyncInit = function () {
-        FB.init({
-          appId: process.env.NEXT_PUBLIC_FACEBOOK_APP_ID,
-          autoLogAppEvents: true,
-          xfbml: true,
-          version: 'v13.0',
-        });
-      };
-
-      (function (d, s, id) {
-        var js,
-          fjs = d.getElementsByTagName(s)[0];
-        if (d.getElementById(id)) {
-          return;
-        }
-        js = d.createElement(s);
-        js.id = id;
-        js.src = 'https://connect.facebook.net/en_US/sdk.js';
-        fjs.parentNode.insertBefore(js, fjs);
-      })(document, 'script', 'facebook-jssdk');
+  const handleClickOutside = useCallback((event) => {
+    if (showShareOptions && shareOptionsRef.current && !shareOptionsRef.current.contains(event.target)) {
+      setShowShareOptions(false);
     }
-  }, []);
+  }, [showShareOptions]);
 
-  const shareOnFacebook = () => {
-    const currentUrl = window.location.href;
-    const shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(currentUrl)}`;
-    window.open(shareUrl, '_blank');
-  };
-
-  const shareOnTwitter = () => {
-    const currentUrl = window.location.href;
-    const text = encodeURIComponent(article.title.rendered);
-    const shareUrl = `https://twitter.com/intent/tweet?text=${text}&url=${encodeURIComponent(currentUrl)}`;
-    window.open(shareUrl, '_blank');
-  };
-
-  const shareOnInstagram = () => {
-    alert('Instagram sharing is not supported directly via web. Please use the Instagram app.');
-  };
+  useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [handleClickOutside]);
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const shareOnFacebook = () => {
+    const currentUrl = window.location.href;
+    window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(currentUrl)}`, '_blank');
+  };
+
+  const shareOnTwitter = () => {
+    const currentUrl = window.location.href;
+    const text = encodeURIComponent(article.title.rendered);
+    window.open(`https://twitter.com/intent/tweet?text=${text}&url=${encodeURIComponent(currentUrl)}`, '_blank');
+  };
+
   if (!isMounted || !article) {
-    return <div> <img src="/images/loader.svg" /></div>;
+    return <div>Loading...</div>;
   }
 
   const currentUrl = `https://mautskebeli-ge-4bpc.vercel.app${pathname}`;
@@ -133,7 +117,7 @@ const ArticlePage = ({ params }) => {
           <div className="w-full h-auto mb-5">
             <Image
               src={article.acf.image}
-              alt={article.acf.title}
+              alt={article.title.rendered}
               width={800}
               height={450}
               style={{ objectFit: 'cover' }}
@@ -150,12 +134,6 @@ const ArticlePage = ({ params }) => {
             className="text-[#474F7A] text-wrap w-full font-noto-sans-georgian text-[14px] sm:text-[16px] font-normal text-justify leading-[30px] sm:leading-[35px] tracking-[0.32px]"
             dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(article.acf['main-text']) }}
           ></div>
-          {article.acf['შენიშვნები'] && (
-            <div
-              className="prose prose-lg max-w-none mt-10"
-              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(article.acf['შენიშვნები']) }}
-            ></div>
-          )}
           <div className="flex flex-wrap gap-4 mt-10">
             <button
               onClick={() => setShowShareOptions(true)}
@@ -163,7 +141,7 @@ const ArticlePage = ({ params }) => {
             >
               <Image
                 src="/images/share.png"
-                alt="facebook share"
+                alt="share icon"
                 width={24}
                 height={24}
               />
@@ -172,38 +150,18 @@ const ArticlePage = ({ params }) => {
           </div>
           {showShareOptions && (
             <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
-              <div className="rounded-lg p-6 w-80">
+              <div ref={shareOptionsRef} className="rounded-lg p-6 w-80" style={{ backgroundColor: "rgba(0, 0, 0, 0.30)" }}>
                 <h2 className="text-xl text-white font-bold mb-4">გააზიარე</h2>
-                <button
-                  onClick={shareOnFacebook}
-                  className="w-full text-left px-4 py-2 mb-2 text-white rounded"
-                >
-                  <Image
-                    src="/images/facebook.svg"
-                    alt="facebook share"
-                    width={40}
-                    height={40}
-                  />
-                  Facebook
-                </button>
-                <button
-                  onClick={shareOnTwitter}
-                  className="w-full text-left px-4 py-2 mb-2 text-white  rounded"
-                >
-                  <Image
-                    src="/images/twitter.svg"
-                    alt="twitter share"
-                    width={40}
-                    height={40}
-                  />
-                  Twitter
-                </button>
-                <button
-                  onClick={() => setShowShareOptions(false)}
-                  className="w-full text-left px-4 py-2 mt-4 text-[#474F7A] bg-white hover:bg-gray-200 rounded"
-                >
-                  გათიშვა
-                </button>
+                <div className="flex items-center pt-7 gap-5 ">
+                  <button onClick={shareOnFacebook} className="text-left text-white">
+                    <Image src="/images/facebook.svg" alt="facebook share" width={44} height={44} />
+                    Facebook
+                  </button>
+                  <button onClick={shareOnTwitter} className="text-left text-white">
+                    <Image src="/images/twitter.svg" alt="twitter share" width={44} height={44} />
+                    Twitter
+                  </button>
+                </div>
               </div>
             </div>
           )}

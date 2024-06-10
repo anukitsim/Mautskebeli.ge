@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import Image from 'next/image';
 import DOMPurify from 'dompurify';
 
@@ -22,6 +22,7 @@ const ArticlePage = ({ params }) => {
   const [showShareOptions, setShowShareOptions] = useState(false);
   const [showScrollButton, setShowScrollButton] = useState(false);
   const footerRef = useRef(null);
+  const shareOptionsRef = useRef(null);
 
   useEffect(() => {
     setIsMounted(true);
@@ -46,55 +47,35 @@ const ArticlePage = ({ params }) => {
   useEffect(() => {
     const handleScroll = () => {
       const scrollY = window.scrollY;
+      const scrollThreshold = 2000;
       const windowHeight = window.innerHeight;
       const documentHeight = document.documentElement.scrollHeight;
       const footerHeight = footerRef.current?.offsetHeight || 0;
       const bottomThreshold = documentHeight - (footerHeight + windowHeight * 2);
-
-      if (scrollY > 200 && scrollY < bottomThreshold) {
+  
+      if (scrollY > scrollThreshold && scrollY < bottomThreshold) {
         setShowScrollButton(true);
       } else {
         setShowScrollButton(false);
       }
     };
-
+  
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  useEffect(() => {
-    if (!window.FB) {
-      window.fbAsyncInit = function () {
-        console.log(
-          'Initializing Facebook SDK with App ID:',
-          process.env.NEXT_PUBLIC_FACEBOOK_APP_ID
-        );
-        FB.init({
-          appId: process.env.NEXT_PUBLIC_FACEBOOK_APP_ID,
-          autoLogAppEvents: true,
-          xfbml: true,
-          version: 'v13.0',
-        });
-        console.log('Facebook SDK Initialized');
-      };
-
-      (function (d, s, id) {
-        var js,
-          fjs = d.getElementsByTagName(s)[0];
-        if (d.getElementById(id)) {
-          console.log('Facebook SDK already loaded');
-          return;
-        }
-        js = d.createElement(s);
-        js.id = id;
-        js.src = 'https://connect.facebook.net/en_US/sdk.js';
-        js.onload = function () {
-          console.log('Facebook SDK script loaded');
-        };
-        fjs.parentNode.insertBefore(js, fjs);
-      })(document, 'script', 'facebook-jssdk');
+  const handleClickOutside = useCallback((event) => {
+    if (showShareOptions && shareOptionsRef.current && !shareOptionsRef.current.contains(event.target)) {
+      setShowShareOptions(false);
     }
-  }, []);
+  }, [showShareOptions]);
+
+  useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [handleClickOutside]);
 
   const generatePermalink = (articleId) => {
     return `https://mautskebeli.wpenginepowered.com/targmani/${articleId}`;
@@ -102,19 +83,12 @@ const ArticlePage = ({ params }) => {
 
   const shareOnFacebook = () => {
     const permalink = generatePermalink(article.id);
-    const shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(permalink)}`;
-    window.open(shareUrl, '_blank');
+    window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(permalink)}`, '_blank');
   };
 
   const shareOnTwitter = () => {
     const text = encodeURIComponent(article.title.rendered);
-    const pageUrl = encodeURIComponent(window.location.href);
-    const shareUrl = `https://twitter.com/intent/tweet?text=${text}&url=${pageUrl}`;
-    window.open(shareUrl, '_blank');
-  };
-
-  const shareOnInstagram = () => {
-    alert('Instagram sharing is not supported directly via web. Please use the Instagram app.');
+    window.open(`https://twitter.com/intent/tweet?text=${text}&url=${encodeURIComponent(window.location.href)}`, '_blank');
   };
 
   const scrollToTop = () => {
@@ -157,11 +131,11 @@ const ArticlePage = ({ params }) => {
         <div className="flex flex-wrap gap-4 mt-10">
           <button
             onClick={() => setShowShareOptions(true)}
-            className="bg-[#FECE27]  text-[#474F7A] pl-[18px] pr-[18px] pt-[4px] pb-[4px] text-[16px] font-seibold rounded flex gap-[12px] items-center justify-center"
+            className="bg-[#FECE27] text-[#474F7A] pl-[18px] pr-[18px] pt-[4px] pb-[4px] text-[16px] font-seibold rounded flex gap-[12px] items-center justify-center"
           >
             <Image
               src="/images/share.png"
-              alt="facebook share"
+              alt="share icon"
               width={24}
               height={24}
             />
@@ -170,37 +144,15 @@ const ArticlePage = ({ params }) => {
         </div>
         {showShareOptions && (
           <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
-            <div className="rounded-lg p-6 w-80">
+            <div ref={shareOptionsRef} className="rounded-lg p-6 w-80" style={{ backgroundColor: "rgba(0, 0, 0, 0.30)" }}>
               <h2 className="text-xl text-white font-bold mb-4">გააზიარე</h2>
-              <button
-                onClick={shareOnFacebook}
-                className="w-full text-left px-4 py-2 mb-2 text-[#474F7A] bg-white hover:bg-gray-200 rounded"
-              >
-                <Image
-                  src="/images/facebook.svg"
-                  alt="facebook share"
-                  width={24}
-                  height={24}
-                />
+              <button onClick={shareOnFacebook} className="text-left text-white">
+                <Image src="/images/facebook.svg" alt="facebook share" width={44} height={44} />
                 Facebook
               </button>
-              <button
-                onClick={shareOnTwitter}
-                className="w-full text-left px-4 py-2 mb-2 text-[#474F7A] bg-white hover:bg-gray-200 rounded"
-              >
-                <Image
-                  src="/images/twitter.svg"
-                  alt="twitter share"
-                  width={24}
-                  height={24}
-                />
+              <button onClick={shareOnTwitter} className="text-left text-white">
+                <Image src="/images/twitter.svg" alt="twitter share" width={44} height={44} />
                 Twitter
-              </button>
-              <button
-                onClick={() => setShowShareOptions(false)}
-                className="w-full text-left px-4 py-2 mt-4 text-[#474F7A] bg-white hover:bg-gray-200 rounded"
-              >
-                გათიშვა
               </button>
             </div>
           </div>
