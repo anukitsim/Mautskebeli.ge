@@ -72,7 +72,7 @@ function ShromaVideos() {
   const searchParams = useSearchParams();
 
   const shareOnFacebook = () => {
-    const shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${window.location.href}`;
+    const shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${window.location.href}&title=${encodeURIComponent(activeVideoAcf.title)}&description=${encodeURIComponent(activeVideoAcf.description)}&picture=${encodeURIComponent(`https://img.youtube.com/vi/${activeVideoId}/hqdefault.jpg`)}`;
     window.open(shareUrl, "_blank");
   };
 
@@ -308,4 +308,3 @@ function WrappedShromaVideos() {
 export default function Page() {
   return <WrappedShromaVideos />;
 }
-
