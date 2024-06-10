@@ -98,7 +98,7 @@ const ArticlePage = ({ params }) => {
   };
 
   if (!isMounted || !article) {
-    return <div>Loading...</div>;
+    return <img src="/images/loader.svg" alt="Loading" />;
   }
 
   const currentUrl = `https://mautskebeli-ge-4bpc.vercel.app${pathname}`;

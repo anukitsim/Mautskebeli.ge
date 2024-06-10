@@ -28,7 +28,7 @@ const FacebookNews = async () => {
     <>
      <div className="w-full sm:w-10/12 flex items-center justify-between lg:mt-20 mt-[10px] mx-auto pl-10 pr- lg:pl-2 lg:pr-2">
         <p className="text-[#474F7A] text-[24px] font-bold">ბოლო ამბები</p>
-        <Link href='/bolo-ambebi' className="text-[#474F7A] text-[14px] font-semibold">ნახე ყველა</Link>
+      
       </div>
      <div className="flex flex-col md:flex-row gap-5 pb-6 items-start w-10/12 mx-auto lg:mt-10 mt-[350px]">
       {latestPosts?.map((post, index) => (

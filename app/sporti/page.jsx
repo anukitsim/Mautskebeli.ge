@@ -5,6 +5,7 @@ import SportMain from "../components/SportMain";
 import { MenuProvider } from "../context/MenuContext";
 import SportHomePageVideos from "../components/SportHomePageVideos";
 import SportFooter from "../components/SportFooter";
+import SportsArticles from "../components/SportsArticles";
 
 export default function Home() {
   return (
@@ -15,7 +16,7 @@ export default function Home() {
           <SportNavigation />
         </div>
         <SportHomePageVideos />
-
+<SportsArticles />
         <SportFooter />
       </main>
     </MenuProvider>

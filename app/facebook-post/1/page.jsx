@@ -1,20 +1,27 @@
 import { fetchFacebookPost } from '../../../utils/fetchFacebookPost';
 import PostContent from '@/app/components/PostContent';
+import YellowFacebookNews from '@/app/components/YellowFacebookNews';
 
-async function getData() {
-  const post = await fetchFacebookPost(0); // First post
+async function getData(postId) {
+  const post = await fetchFacebookPost(postId);
   return post;
 }
 
 export default async function Page() {
   let post, error;
+  const postId = 0; // Current post ID
 
   try {
-    post = await getData();
+    post = await getData(postId);
   } catch (err) {
     console.error('Error fetching or processing data:', err.message);
     error = 'Error fetching or processing data. Please try again later.';
   }
 
-  return <PostContent post={post} error={error} />;
+  return (
+    <div className='bg-[#FECE27]'>
+      <PostContent post={post} error={error} />
+      <YellowFacebookNews currentPostId={postId + 1} /> {/* Adjust postId to match the route format */}
+    </div>
+  );
 }

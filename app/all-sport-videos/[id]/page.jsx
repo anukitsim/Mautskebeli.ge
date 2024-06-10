@@ -36,7 +36,7 @@ export default function VideoPage() {
   }, [id]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <img src="/images/loader.svg" alt="Loading" />;
   }
 
   if (error) {
