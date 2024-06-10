@@ -4,6 +4,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import Modal from "react-modal";
 import Image from "next/image";
 import CustomYoutubePlayer from "./CustomYoutube";
+import Link from "next/link";
 
 const PlayButton = ({ onClick }) => (
   <img
@@ -27,27 +28,47 @@ const getThumbnailUrl = (videoId) => {
   return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
 };
 
-const VideoCard = ({ videoId, caption, onSelect }) => {
+// Mapping of post types to URL-friendly versions
+const postTypeUrlMap = {
+  'kalaki': 'qalaqi',
+  'main': 'main',
+  'mecniereba': 'mecniereba',
+  'medicina': 'medicina',
+  'msoflio': 'msoflio',
+  'saxli': 'saxli-yvelas', 
+  'shroma': 'shroma',
+  'xelovneba': 'xelovneba'
+};
+
+const VideoCard = ({ videoId, caption, onSelect, postType }) => {
   const thumbnailUrl = getThumbnailUrl(videoId);
+  const postTypeUrl = postTypeUrlMap[postType] || postType; // Map the post type to URL-friendly version
+
+  const handlePlayClick = (e) => {
+    e.stopPropagation(); // Prevent the card click from propagating
+    onSelect(videoId);
+  };
+
+  const videoPageUrl = `/${postTypeUrl}?videoId=${videoId}`;
 
   return (
-    <div
-      className="relative flex flex-col items-start gap-2 p-2.5 rounded-lg bg-[#AD88C6] h-56"
-      onClick={() => onSelect(videoId)}
-    >
+    <div className="relative flex flex-col items-start gap-2 p-2.5 rounded-lg bg-[#AD88C6] h-56">
       <div
         className="relative w-full bg-cover bg-center rounded-lg"
         style={{ height: "70%" }}
+        onClick={handlePlayClick}
       >
         <div
           style={{ backgroundImage: `url(${thumbnailUrl})`, height: "100%" }}
           className="w-full bg-cover bg-center rounded-lg"
         ></div>
         <div className="absolute inset-0 flex justify-center items-center">
-          <PlayButton onClick={() => onSelect(videoId)} />
+          <PlayButton onClick={handlePlayClick} />
         </div>
       </div>
-      <p className="text-white text-sm font-semibold">{caption}</p>
+      <Link href={videoPageUrl} className="text-white text-sm font-semibold cursor-pointer">
+        {caption}
+      </Link>
     </div>
   );
 };
@@ -61,7 +82,7 @@ function VideosList({ endpoint, title }) {
 
   const fetchVideos = async () => {
     try {
-      const response = await fetch('https://mautskebeli.wpenginepowered.com/wp-json/wp/v2/videos/');
+      const response = await fetch('https://mautskebeli.wpenginepowered.com/wp-json/custom/v1/all_videos');
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -69,8 +90,10 @@ function VideosList({ endpoint, title }) {
       const videos = data.map(video => ({
         post_id: video.post_id,
         title: video.title,
-        videoId: extractVideoId(video.video_url)
+        videoId: extractVideoId(video.video_url),
+        post_type: video.post_type // Ensure that post_type is correctly passed
       }));
+      console.log('Fetched videos:', videos.length, videos); 
       setVideos(videos);
       setError(null);
     } catch (error) {
@@ -117,6 +140,7 @@ function VideosList({ endpoint, title }) {
                   videoId={video.videoId}
                   caption={video.title}
                   onSelect={handleVideoSelect}
+                  postType={video.post_type} // Ensure post_type is passed correctly
                 />
               </div>
             ))}
@@ -129,6 +153,7 @@ function VideosList({ endpoint, title }) {
                     videoId={video.videoId}
                     caption={video.title}
                     onSelect={handleVideoSelect}
+                    postType={video.post_type} // Ensure post_type is passed correctly
                   />
                 </div>
               ))}
