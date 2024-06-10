@@ -197,7 +197,7 @@ function ShromaVideos() {
                     </button>
                     {showShareOptions && (
                       <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 1000 }} className="bg-gray-800 bg-opacity-50 flex items-center justify-center">
-                        <div ref={shareOptionsRef} className="rounded-lg p-6 w-80 flex flex-col items-center">
+                        <div ref={shareOptionsRef} className="rounded-lg p-6 w-80">
                           <h2 className="text-xl text-white font-bold mb-4">
                             გააზიარე
                           </h2>
@@ -209,10 +209,10 @@ function ShromaVideos() {
                               <Image
                                 src="/images/facebook.svg"
                                 alt="facebook share"
-                                width={44}
-                                height={44}
+                                width={24}
+                                height={24}
                               />
-                             
+                              Facebook
                             </button>
                             <button
                               onClick={shareOnTwitter}
@@ -221,14 +221,19 @@ function ShromaVideos() {
                               <Image
                                 src="/images/twitter.svg"
                                 alt="twitter share"
-                                width={44}
-                                height={44}
+                                width={24}
+                                height={24}
                               />
-                             
+                              Twitter
                             </button>
                           </div>
                          
-                         
+                          <button
+                            onClick={() => setShowShareOptions(false)}
+                            className="w-full text-left px-4 py-2 mt-4 text-[#474F7A] bg-white hover:bg-gray-200 rounded"
+                          >
+                            გათიშვა
+                          </button>
                         </div>
                       </div>
                     )}
@@ -303,3 +308,4 @@ function WrappedShromaVideos() {
 export default function Page() {
   return <WrappedShromaVideos />;
 }
+
