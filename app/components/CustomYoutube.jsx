@@ -325,7 +325,7 @@ export default function CustomYoutubePlayer({
   }, [player]);
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
+    <main className="flex  flex-col items-center justify-between ">
       <div
         className="video-container js-media-container js-video-container"
         style={{

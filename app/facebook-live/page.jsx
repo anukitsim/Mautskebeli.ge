@@ -28,7 +28,13 @@ const Live = () => {
           });
           const data = await response.json();
           if (data && Array.isArray(data.data)) {
-            setLiveVideos((prevVideos) => [...prevVideos, ...data.data]);
+            setLiveVideos((prevVideos) => [
+              ...prevVideos,
+              ...data.data.map((video) => ({
+                ...video,
+                description: video.description && video.description.trim() ? video.description : "პირდაპირი ეთერი",
+              })),
+            ]);
           } else {
             console.warn("Unexpected response format:", data);
           }
@@ -50,15 +56,17 @@ const Live = () => {
   }, [apiVersion, pageAccessToken, pageId]);
 
   if (isLoading) {
-    return <div className="p-5"><img src="/images/loader.svg" alt="Loading" /></div>;
+    return (
+      <div className="p-5">
+        <img src="/images/loader.svg" alt="Loading" />
+      </div>
+    );
   }
   console.log(liveVideos);
   return (
     <div className="p-5">
-   
       <div className="flex lg:flex-row flex-col w-full mt-4">
         <div className="flex flex-col w-8/12 pr-4">
-          <h2 className="text-3xl text-[#474F7A] mb-4 font-bold">მაუწყებელი ფეისბუკი, არქივი</h2>
           {liveVideos.length > 0 && (
             <div
               className="video-container-fb mb-4 border"
@@ -69,7 +77,7 @@ const Live = () => {
             />
           )}
         </div>
-        <div className="flex flex-col lg:w-4/12 w-full mt-[3.2rem] overflow-y-auto max-h-[550px]">
+        <div className="flex flex-col lg:w-4/12 w-full overflow-y-auto max-h-[550px]">
           {liveVideos.map((video, index) => (
             <div
               key={video.id + index}
@@ -77,7 +85,7 @@ const Live = () => {
               onClick={() => setSelectedVideo(video.embed_html)}
             >
               <p className="video-title text-sm font-semibold">
-                {video.description || "Untitled Video"}
+                {video.description}
               </p>
             </div>
           ))}

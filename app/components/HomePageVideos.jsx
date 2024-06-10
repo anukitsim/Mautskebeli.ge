@@ -1,4 +1,4 @@
-"use client";
+"use client"
 
 import React, { useEffect, useState, useCallback } from "react";
 import Modal from "react-modal";
@@ -9,7 +9,7 @@ import Link from "next/link";
 const PlayButton = ({ onClick }) => (
   <img
     src="/images/card-play-button.png"
-    alt="playbutton"
+    alt="play button"
     width={42}
     height={42}
     onClick={onClick}
@@ -28,27 +28,36 @@ const getThumbnailUrl = (videoId) => {
   return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
 };
 
-const VideoCard = ({ videoId, caption, onSelect }) => {
+const VideoCard = ({ videoId, caption, onSelect, postType }) => {
   const thumbnailUrl = getThumbnailUrl(videoId);
+
+  const handlePlayClick = (e) => {
+    e.stopPropagation(); // Prevent the card click from propagating
+    onSelect(videoId);
+  };
+
+  const videoPageUrl = `/${postType}?videoId=${videoId}`;
 
   return (
     <div
       className="relative flex flex-col items-start gap-2 p-2.5 rounded-lg bg-[#AD88C6] h-56"
-      onClick={() => onSelect(videoId)}
     >
       <div
         className="relative w-full bg-cover bg-center rounded-lg"
         style={{ height: "70%" }}
+        onClick={handlePlayClick}
       >
         <div
           style={{ backgroundImage: `url(${thumbnailUrl})`, height: "100%" }}
           className="w-full bg-cover bg-center rounded-lg"
         ></div>
         <div className="absolute inset-0 flex justify-center items-center">
-          <PlayButton onClick={() => onSelect(videoId)} />
+          <PlayButton onClick={handlePlayClick} />
         </div>
       </div>
-      <p className="text-white text-sm font-semibold">{caption}</p>
+      <Link href={videoPageUrl} className="text-white text-sm font-semibold cursor-pointer">
+        {caption}
+      </Link>
     </div>
   );
 };
@@ -89,7 +98,10 @@ function HomePageVideos() {
           }
         })
       );
-      const allVideos = videos.flat().slice(0, 4);
+      const allVideos = videos.flat().map(video => ({
+        ...video,
+        post_type: video.type // Ensure that post_type is correctly passed
+      })).slice(0, 4);
       setRandomVideos(allVideos);
     } catch (error) {
       console.error("Error fetching videos:", error);
@@ -114,6 +126,11 @@ function HomePageVideos() {
     e.stopPropagation();
   }, []);
 
+  const handleModalClick = useCallback((e) => {
+    // Close modal if clicked outside the video container
+    closeModal();
+  }, [closeModal]);
+
   return (
     <>
       <div className="w-full sm:w-10/12 flex items-center justify-between lg:mt-20 mt-[42px] mx-auto pl-4 pr-4 lg:pl-2 lg:pr-2">
@@ -128,6 +145,7 @@ function HomePageVideos() {
                 videoId={extractVideoId(video.acf.video_url)}
                 caption={video.title.rendered}
                 onSelect={handleVideoSelect}
+                postType={video.post_type} // Passing post_type correctly
               />
             </div>
           ))}
@@ -143,6 +161,7 @@ function HomePageVideos() {
               videoId={extractVideoId(video.acf.video_url)}
               caption={video.title.rendered}
               onSelect={handleVideoSelect}
+              postType={video.post_type} // Ensuring post_type is passed correctly
             />
           </div>
         ))}
@@ -158,11 +177,15 @@ function HomePageVideos() {
             overlay: {
               zIndex: 1000,
               backgroundColor: "rgba(0, 0, 0, 0.75)",
+             
             },
+            content: {
+              outline: 'none' // Remove outline from modal content
+            }
           }}
         >
-          <div className="modalContentArea" onClick={handleVideoContainerClick}>
-            <div className="max-w-[900px] mx-auto" onClick={handleVideoContainerClick}>
+          <div className="modalContentArea" onClick={handleModalClick}>
+            <div className="max-w-[900px] mx-auto pt-20" onClick={handleVideoContainerClick}>
               <CustomYoutubePlayer videoId={selectedVideoId} numVideos={2} />
             </div>
           </div>

@@ -85,18 +85,20 @@ function ShromaVideos() {
     )}`;
     window.open(shareUrl, "_blank");
   };
-
+  
   useEffect(() => {
     const fetchVideos = async () => {
+      setLoading(true);
       try {
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/wp/v2/shroma?per_page=100`
         );
-        if (!response.ok)
+        if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
+        }
         const data = await response.json();
         setVideos(data);
-        const initialVideoId = searchParams.get("videoId") || extractVideoId(data[0].acf.video_url);
+        const initialVideoId = searchParams.get("videoId") || extractVideoId(data[0]?.acf.video_url);
         const initialVideo = data.find(video => extractVideoId(video.acf.video_url) === initialVideoId);
         if (initialVideo) {
           handleVideoSelect(initialVideoId, initialVideo.acf);
@@ -107,17 +109,16 @@ function ShromaVideos() {
         setLoading(false);
       }
     };
+  
     fetchVideos();
-  }, []);
-
+  }, [searchParams]);  // Ensure updates if searchParams change
+  
   useEffect(() => {
     if (activeVideoId !== lastSelectedVideoId) {
       setLastSelectedVideoId(activeVideoId);
-      setTimeout(() => {
-        videoPlayerRef.current?.scrollIntoView({ behavior: "smooth" });
-      }, 100);
+      videoPlayerRef.current?.scrollIntoView({ behavior: "smooth" });
     }
-  }, [activeVideoId]);
+  }, [activeVideoId, lastSelectedVideoId]);
 
   const handleVideoSelect = (videoId, acf) => {
     setActiveVideoId(videoId);
@@ -142,9 +143,9 @@ function ShromaVideos() {
         ) : (
           videos.length > 0 && (
             <>
-              <div ref={videoPlayerRef} className="relative" style={{ zIndex: 10 }}>
+              <div ref={videoPlayerRef} className="relative mt-[74px]" style={{ zIndex: 10 }}>
                 <CustomYoutubePlayer key={customPlayerKey} videoId={activeVideoId} />
-                <div className="mx-auto lg:mt-0 mt-[-50%] lg:w-10/12 sm:w-full flex flex-col gap-[23px] pl-5 pr-5">
+                <div className="mx-auto mt-[7%] lg:w-10/12 sm:w-full flex flex-col gap-[23px] pl-5 pr-5">
                   <h2 className="text-[32px] text-[#474F7A] font-bold">
                     {activeVideoAcf.title}
                   </h2>
@@ -182,9 +183,10 @@ function ShromaVideos() {
                           <h2 className="text-xl text-white font-bold mb-4">
                             გააზიარე
                           </h2>
+                          <div className="flex items-center gap-5 ">
                           <button
                             onClick={shareOnFacebook}
-                            className="w-full text-left px-4 py-2 mb-2 text-[#474F7A] bg-white hover:bg-gray-200 rounded"
+                            className=" text-left  text-white"
                           >
                             <Image
                               src="/images/facebook.svg"
@@ -196,7 +198,7 @@ function ShromaVideos() {
                           </button>
                           <button
                             onClick={shareOnTwitter}
-                            className="w-full text-left px-4 py-2 text-[#474F7A] bg-white hover:bg-gray-200 rounded"
+                            className=" text-left  text-white"
                           >
                             <Image
                               src="/images/twitter.svg"
@@ -206,6 +208,8 @@ function ShromaVideos() {
                             />
                             Twitter
                           </button>
+                          </div>
+                         
                           <button
                             onClick={() => setShowShareOptions(false)}
                             className="w-full text-left px-4 py-2 mt-4 text-[#474F7A] bg-white hover:bg-gray-200 rounded"
