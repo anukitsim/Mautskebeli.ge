@@ -72,8 +72,8 @@ function ShromaVideos() {
   const searchParams = useSearchParams();
 
   const shareOnFacebook = () => {
-    const shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}`;
-    window.open(shareUrl, "_blank");
+    const shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${window.location.href}`;
+    window.open(shareUrl, '_blank');
   };
 
   const shareOnTwitter = () => {
@@ -84,7 +84,7 @@ function ShromaVideos() {
     const shareUrl = `https://twitter.com/intent/tweet?text=${text}&url=${encodeURIComponent(
       url
     )}`;
-    window.open(shareUrl, "_blank");
+    window.open(shareUrl, '_blank');
   };
 
   useEffect(() => {
