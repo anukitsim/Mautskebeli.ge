@@ -98,7 +98,7 @@ function ShromaVideos() {
       setLoading(true);
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/wp/v2/shroma?per_page=100`
+          `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/wp/v2/resursebi?per_page=100`
         );
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);

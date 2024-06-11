@@ -108,7 +108,9 @@ const HomePageRcheuli = () => {
                 </div>
               </Link>
               <div className="w-full bg-[#AD88C6] h-10 lg:rounded-b-lg p-2">
-                <p className="text-white text-sm">{truncateTitle(post.title, 3)}</p>
+                <Link href={constructUrl(post)}>
+                  <p className="text-white text-sm">{truncateTitle(post.title, 3)}</p>
+                </Link>
               </div>
             </div>
           ))}
@@ -130,7 +132,9 @@ const HomePageRcheuli = () => {
               </div>
             </Link>
             <div className="w-full bg-[#AD88C6] h-[64px] lg:rounded-b-lg p-2">
-              <p className="text-white text-sm">{truncateTitle(post.title, 6)}</p>
+              <Link href={constructUrl(post)}>
+                <p className="text-white text-sm">{truncateTitle(post.title, 6)}</p>
+              </Link>
             </div>
           </div>
         ))}

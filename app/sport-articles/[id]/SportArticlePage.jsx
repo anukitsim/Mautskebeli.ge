@@ -8,7 +8,7 @@ import { usePathname } from 'next/navigation';
 
 async function fetchArticle(id) {
   const res = await fetch(
-    `https://mautskebeli.wpenginepowered.com/wp-json/wp/v2/article/${id}?acf_format=standard&_fields=id,title,acf,date`
+    `https://mautskebeli.wpenginepowered.com/wp-json/wp/v2/sport-article/${id}?acf_format=standard&_fields=id,title,acf,date`
   );
   if (!res.ok) {
     throw new Error('Failed to fetch article');
@@ -20,7 +20,7 @@ function addLineBreaks(htmlContent) {
   return htmlContent.replace(/<\/p>/g, '</p><br>');
 }
 
-const ArticlePage = ({ params }) => {
+const SportArticlePage = ({ params }) => {
   const [article, setArticle] = useState(null);
   const [isMounted, setIsMounted] = useState(false);
   const [showShareOptions, setShowShareOptions] = useState(false);
@@ -185,4 +185,4 @@ const ArticlePage = ({ params }) => {
   );
 };
 
-export default ArticlePage;
+export default SportArticlePage;

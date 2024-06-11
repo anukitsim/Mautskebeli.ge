@@ -222,7 +222,7 @@ const Podcast = () => {
                 customOverlayStyle={{ height: "35%", top: "65%" }}
               />
             </div>
-            <div className="mx-auto lg:mt-0 mt-[-50%] lg:w-10/12 sm:w-full flex flex-col gap-[23px] pl-5 pr-5">
+            <div className="mx-auto lg:mt-0 mt-[130%] lg:w-10/12 sm:w-full flex flex-col gap-[23px] pl-5 pr-5">
               <h2 className="text-[32px] text-[#474F7A] font-bold">
                 {videos.find((video) => video.id === selectedVideoId)?.snippet
                   .title || ""}

@@ -170,7 +170,7 @@ function ShromaVideos() {
             <>
               <div ref={videoPlayerRef} className="relative mt-[74px]" style={{ zIndex: 10 }}>
                 <CustomYoutubePlayer key={customPlayerKey} videoId={activeVideoId} />
-                <div className="mx-auto mt-[7%] lg:w-10/12 sm:w-full flex flex-col gap-[23px] pl-5 pr-5">
+                <div className="mx-auto lg:mt-[7%] lg:w-10/12 mt-[100%] sm:w-full flex flex-col gap-[23px] pl-5 pr-5">
                   <h2 className="text-[32px] text-[#474F7A] font-bold">
                     {activeVideoAcf.title}
                   </h2>

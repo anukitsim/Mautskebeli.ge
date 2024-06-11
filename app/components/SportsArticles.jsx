@@ -93,15 +93,15 @@ const SportsArticles = () => {
       `}</style>
       <div className="w-full sm:w-10/12 flex items-center justify-between mx-auto pl-4 pr-4 lg:pl-2 lg:pr-2">
         <p className="text-[#474F7A] text-[24px] font-bold">სტატიები</p>
-        <Link href='/all-articles' className="text-[#474F7A] text-[14px] font-semibold">ნახე ყველა</Link>
+        <Link href='/sport-articles' className="text-[#474F7A] text-[14px] font-semibold">ნახე ყველა</Link>
       </div>
       <div className="w-10/12 mx-auto flex articles-container overflow-x-auto mt-5 flex-row gap-5">
         {articles.map(article => {
           const imageUrl = article.acf.image ? article.acf.image : '/images/default-image.png';
           console.log(`Article ID: ${article.id}, Image URL: ${imageUrl}`); // Debugging log
           return (
-            <Link href={`/all-articles/${article.id}`} passHref key={article.id}>
-              <div className="article bg-[#F6F4F8] rounded-tl-[10px] rounded-tr-[10px] border border-[#B6A8CD] overflow-hidden" style={{ minWidth: '300px' }}>
+            <Link href={`/sport-articles/${article.id}`} passHref key={article.id}>
+              <div className="article bg-[#F6F4F8] rounded-tl-[10px] rounded-tr-[10px] border border-[#B6A8CD] overflow-hidden" style={{ minWidth: '300px', maxWidth: '400px' }}>
                 <div className="article-image-container relative w-full h-[200px]">
                   <Image
                     src={imageUrl}

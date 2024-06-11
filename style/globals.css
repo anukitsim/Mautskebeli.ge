@@ -609,6 +609,60 @@ input[type="range"]::-moz-focus-outer {
     background: none;
     position: absolute;
   }
+
+  @media (min-width: 1024px) {
+    .video-container {
+      max-width: 900px; /* Limits the player's maximum width on larger screens */
+      margin: auto; /* Centers the player */
+    }
+  }
+  
+  /* Adjustments for very large screens */
+  @media (min-width: 1400px) {
+    .video-container {
+      position: relative;
+      width: 100%; /* Adjust the width as needed */
+      max-width: 80vw; /* Set a maximum width if necessary */
+      margin: 0 auto; 
+    }
+  }
+
+  @media (min-width: 1600px) {
+    .video-container {
+      position: relative;
+  width: 100%; /* Adjust the width as needed */
+  max-width: 80vw; /* Set a maximum width if necessary */
+  margin: 0 auto; 
+    }
+  }
+
+  @media (min-width: 1700px) {
+    .video-container {
+      position: relative;
+      width: 100%; /* Adjust the width as needed */
+      max-width: 80vw; /* Set a maximum width if necessary */
+      margin: 0 auto; 
+    }
+  }
+
+  @media (min-width: 1800px) {
+    .video-container {
+      position: relative;
+  width: 100%; /* Adjust the width as needed */
+  max-width: 80vw; /* Set a maximum width if necessary */
+  margin: 0 auto; 
+    }
+  }
+  
+  /* Very large desktops */
+  @media (min-width: 1920px) {
+    .video-container {
+      position: relative;
+      width: 100%; /* Adjust the width as needed */
+      max-width: 80vw; /* Set a maximum width if necessary */
+      margin: 0 auto; 
+    }
+  }
   
 
   .video-container .custom-overlay {

@@ -4,12 +4,12 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 
-const AllArticlesList = () => {
+const AllArticlesPage = () => {
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const CACHE_KEY = 'cachedArticles';
-  const CACHE_TIMESTAMP_KEY = 'cacheTimestamp';
+  const CACHE_KEY = 'cachedSportArticles';
+  const CACHE_TIMESTAMP_KEY = 'cacheSportTimestamp';
   const CACHE_DURATION = 60 * 60 * 1000; // 1 hour
 
   const stripHtml = (html) => {
@@ -27,7 +27,7 @@ const AllArticlesList = () => {
 
   const fetchArticles = async (page = 1, articles = []) => {
     try {
-      const response = await fetch(`https://mautskebeli.wpenginepowered.com/wp-json/wp/v2/article?acf_format=standard&_fields=id,title,acf,date&per_page=20&page=${page}&_=${new Date().getTime()}`);
+      const response = await fetch(`https://mautskebeli.wpenginepowered.com/wp-json/wp/v2/sport-article?acf_format=standard&_fields=id,title,acf,date&per_page=20`);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
@@ -75,7 +75,7 @@ const AllArticlesList = () => {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mt-5 mx-4 lg:mx-0">
             {articles.map(article => (
-              <Link href={`/all-articles/${article.id}`} passHref key={article.id}>
+              <Link href={`/sport-articles/${article.id}`} passHref key={article.id}>
                 <div className="bg-[#F6F4F8] rounded-tl-[10px] rounded-tr-[10px] border border-[#B6A8CD] overflow-hidden cursor-pointer">
                   <div className="relative w-full h-[200px]">
                     <Image
@@ -116,4 +116,4 @@ const AllArticlesList = () => {
   );
 };
 
-export default AllArticlesList;
+export default AllArticlesPage;
