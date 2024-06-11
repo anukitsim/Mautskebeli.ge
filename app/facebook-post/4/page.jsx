@@ -19,7 +19,7 @@ export default async function Page() {
   }
 
   return (
-    <div className='bg-[#FECE27]'>
+    <div className=''>
       <PostContent post={post} error={error} />
       <YellowFacebookNews currentPostId={postId + 1} /> {/* Adjusted to match the route format */}
     </div>

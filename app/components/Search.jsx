@@ -80,7 +80,7 @@ const Search = ({ isSearchOpen, setIsSearchOpen }) => {
       </div>
       <form onSubmit={handleSearch} className="hidden sm:flex items-center gap-2.5 bg-white rounded h-9 md:w-[340px]">
         <button type="submit" className="p-2 bg-white rounded-full">
-          <Image src="/images/Search.png" alt="Search" width={20} height={20} />
+          <img src="/images/Search.png" alt="Search" width={20} height={20} />
         </button>
         <input
           type="text"

@@ -7,7 +7,7 @@ import Navigation from "../components/Navigation";
 import { MenuProvider } from "../context/MenuContext";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
-import Head from 'next/head';
+
 
 const PlayButton = ({ onClick }) => (
   <img
@@ -140,7 +140,7 @@ function ShromaVideos() {
       setShowShareOptions(false);
     }
   }, []);
-  
+
   useEffect(() => {
     if (showShareOptions) {
       document.addEventListener("mousedown", handleClickOutside);
@@ -151,7 +151,6 @@ function ShromaVideos() {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [showShareOptions, handleClickOutside]);
-  
 
   const endIndex = currentPage * 16;
   const startIndex = endIndex - 16;
@@ -171,7 +170,7 @@ function ShromaVideos() {
             <>
               <div ref={videoPlayerRef} className="relative mt-[74px]" style={{ zIndex: 10 }}>
                 <CustomYoutubePlayer key={customPlayerKey} videoId={activeVideoId} />
-                <div className="mx-auto mt-[7%] lg:w-10/12 sm:w-full flex flex-col gap-[23px] pl-5 pr-5">
+                <div className="mx-auto lg:mt-[7%] lg:w-10/12 mt-[100%] sm:w-full flex flex-col gap-[23px] pl-5 pr-5">
                   <h2 className="text-[32px] text-[#474F7A] font-bold">
                     {activeVideoAcf.title}
                   </h2>
@@ -205,7 +204,7 @@ function ShromaVideos() {
                     </button>
                     {showShareOptions && (
                       <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 1000 }} className="bg-gray-800 bg-opacity-50 flex items-center justify-center">
-                       <div ref={shareOptionsRef} className="rounded-lg p-6 w-80" style={{backgroundColor: "rgba(0, 0, 0, 0.30)"}}>
+                        <div ref={shareOptionsRef} className="rounded-lg p-6 w-80" style={{backgroundColor: "rgba(0, 0, 0, 0.30)",}}>
                           <h2 className="text-xl text-white font-bold mb-4">
                             გააზიარე
                           </h2>
