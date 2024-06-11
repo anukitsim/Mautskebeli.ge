@@ -50,8 +50,8 @@ const Navigation = ({ onVideoSelect }) => {
             <Link href="/">მთავარი</Link>
             <Link href="/text">ტექსტი</Link>
             <Link href="/podcast">პოდკასტი</Link>
-            <Link href="#">სპორტი</Link>
-            <Link href="#">ჩვენს შესახებ</Link>
+            <Link href="/sporti">სპორტი</Link>
+            <Link href="/about-us">ჩვენს შესახებ</Link>
             <button onClick={toggleCategories} className="text-white text-[16px] font-semibold flex items-center gap-2">
               კატეგორიები
               <svg

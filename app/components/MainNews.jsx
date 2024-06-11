@@ -176,7 +176,7 @@ const MainNews = () => {
               />
               <div className="absolute bottom-5 left-5 text-white">
                 <h2 className="text-[#FECE27] text-[20px] font-extrabold">
-                  დღის მთავარი ამბები
+                   მთავარი ამბები
                 </h2>
                 <p className="text-[#FFF] tracking-normal pt-[10px] font-alk-tall-mtavruli lg:text-[72px] sm:text-[30px] font-light leading-none [text-edge:cap] [leading-trim:both]">
                   {slide.title.split(" ").slice(0, 7).join(" ")}
