@@ -10,7 +10,7 @@ const videoPostTypes = [
   "mecniereba",
   "medicina",
   "msoflio",
-  "saxli",
+  "saxli-yvelas",
   "shroma",
   "xelovneba",
   "ekonomika",
