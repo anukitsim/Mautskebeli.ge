@@ -20,9 +20,9 @@ async function fetchArticle(id) {
   return res.json();
 }
 
-function addLineBreaks(htmlContent) {
-  return htmlContent.replace(/<\/p>/g, '</p><br>');
-}
+// function addLineBreaks(htmlContent) {
+//   return htmlContent.replace(/<\/p>/g, '</p><br>');
+// }
 
 // Function to format the date into a more readable form
 function formatDate(dateString) {
@@ -50,7 +50,7 @@ const ArticlePage = ({ params }) => {
           ...fetchedArticle,
           acf: {
             ...fetchedArticle.acf,
-            'main-text': addLineBreaks(fetchedArticle.acf['main-text']),
+            'main-text': (fetchedArticle.acf['main-text']),
           },
           formattedDate: formatDate(fetchedArticle.date), // Format the date
         };
