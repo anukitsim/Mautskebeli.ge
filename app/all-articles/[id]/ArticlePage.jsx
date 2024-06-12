@@ -4,7 +4,11 @@ import { useEffect, useState, useRef, useCallback } from 'react';
 import Image from 'next/image';
 import Head from 'next/head';
 import DOMPurify from 'dompurify';
-import { usePathname } from 'next/navigation';
+import { usePathname } from 'next/navigation'
+import moment from 'moment';
+import 'moment/locale/ka';  // This imports the Georgian locale
+;
+
 
 async function fetchArticle(id) {
   const res = await fetch(
@@ -19,6 +23,14 @@ async function fetchArticle(id) {
 function addLineBreaks(htmlContent) {
   return htmlContent.replace(/<\/p>/g, '</p><br>');
 }
+
+// Function to format the date into a more readable form
+function formatDate(dateString) {
+  moment.locale('ka');  // Set the locale to Georgian
+  return moment(dateString).format('LL');  // 'LL' is a format that shows the date in a more readable form
+}
+
+
 
 const ArticlePage = ({ params }) => {
   const [article, setArticle] = useState(null);
@@ -40,6 +52,7 @@ const ArticlePage = ({ params }) => {
             ...fetchedArticle.acf,
             'main-text': addLineBreaks(fetchedArticle.acf['main-text']),
           },
+          formattedDate: formatDate(fetchedArticle.date), // Format the date
         };
         setArticle(updatedContent);
       } catch (error) {
@@ -57,14 +70,14 @@ const ArticlePage = ({ params }) => {
       const documentHeight = document.documentElement.scrollHeight;
       const footerHeight = footerRef.current?.offsetHeight || 0;
       const bottomThreshold = documentHeight - (footerHeight + windowHeight * 2);
-  
+
       if (scrollY > scrollThreshold && scrollY < bottomThreshold) {
         setShowScrollButton(true);
       } else {
         setShowScrollButton(false);
       }
     };
-  
+
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -115,6 +128,7 @@ const ArticlePage = ({ params }) => {
       <section className="w-full mx-auto mt-10 px-4 lg:px-0 overflow-x-hidden relative">
         <div className="w-full lg:w-[54%] mx-auto bg-opacity-90 p-5 rounded-lg">
           <div className="w-full h-auto mb-5">
+          
             <Image
               src={article.acf.image}
               alt={article.title.rendered}
@@ -129,6 +143,7 @@ const ArticlePage = ({ params }) => {
             <h2 className="font-noto-sans-georgian text-[16px] sm:text-[24px] font-extrabold text-[#AD88C6] leading-normal mb-5">
               {article.acf['ავტორი']}
             </h2>
+            <p className="text-[#474F7A] font-semibold pb-10">{article.formattedDate}</p> {/* Display the formatted date */}
           </div>
           <div
             className="text-[#474F7A] text-wrap w-full font-noto-sans-georgian text-[14px] sm:text-[16px] font-normal lg:text-justify leading-[30px] sm:leading-[35px] tracking-[0.32px]"
