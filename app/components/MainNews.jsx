@@ -13,6 +13,8 @@ const videoPostTypes = [
   "saxli",
   "shroma",
   "xelovneba",
+  "ekonomika",
+  "resursebi"
 ];
 
 const constructUrl = (post) => {
