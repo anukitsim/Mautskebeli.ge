@@ -38,10 +38,6 @@ const ArticlePage = ({ params }) => {
         const fetchedArticle = await fetchArticle(params.id);
         setArticle({
           ...fetchedArticle,
-          acf: {
-            ...fetchedArticle.acf,
-            'main-text': fetchedArticle.acf['main-text'],
-          },
           formattedDate: formatDate(fetchedArticle.date),
         });
       } catch (error) {
@@ -94,6 +90,8 @@ const ArticlePage = ({ params }) => {
     return <img src="/images/loader.svg" alt="Loading" />;
   }
 
+  const ogImage = article.acf.image;
+
   return (
     <>
       <Head>
@@ -102,12 +100,14 @@ const ArticlePage = ({ params }) => {
         <meta property="og:type" content="article" />
         <meta property="og:title" content={article.title.rendered} />
         <meta property="og:description" content={article.acf.title} />
-        <meta property="og:image" content={article.acf.image} />
+        <meta property="og:image" content={ogImage} />
+        <meta property="og:image:alt" content={article.title.rendered} />
       </Head>
+
       <section className="w-full mx-auto mt-10 px-4 lg:px-0 overflow-x-hidden relative">
         <div className="w-full lg:w-[54%] mx-auto bg-opacity-90 p-5 rounded-lg">
           <div className="w-full h-auto mb-5">
-            <Image src={article.acf.image} alt={article.title.rendered} width={800} height={450} style={{ objectFit: 'cover' }} className="rounded-lg w-full" />
+            <Image src={ogImage} alt={article.title.rendered} width={800} height={450} style={{ objectFit: 'cover' }} className="rounded-lg w-full" />
             <h1 className="font-alk-tall-mtavruli text-[32px] sm:text-[64px] font-light leading-none text-[#474F7A] mt-[24px] mb-5">{article.title.rendered}</h1>
             <h2 className="font-noto-sans-georgian text-[16px] sm:text-[24px] font-extrabold text-[#AD88C6] leading-normal mb-5">{article.acf['ავტორი']}</h2>
             <p className="text-[#474F7A] font-semibold pb-10">{article.formattedDate}</p>
