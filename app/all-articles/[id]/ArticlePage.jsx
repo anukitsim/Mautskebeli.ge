@@ -4,33 +4,23 @@ import { useEffect, useState, useRef, useCallback } from 'react';
 import Image from 'next/image';
 import Head from 'next/head';
 import DOMPurify from 'dompurify';
-import { usePathname } from 'next/navigation'
+import { usePathname } from 'next/navigation';
 import moment from 'moment';
-import 'moment/locale/ka';  // This imports the Georgian locale
-;
-
+import 'moment/locale/ka';
+import { FacebookShareButton, FacebookIcon, TwitterShareButton, TwitterIcon } from 'next-share';
 
 async function fetchArticle(id) {
-  const res = await fetch(
-    `https://mautskebeli.wpenginepowered.com/wp-json/wp/v2/article/${id}?acf_format=standard&_fields=id,title,acf,date`
-  );
+  const res = await fetch(`https://mautskebeli.wpenginepowered.com/wp-json/wp/v2/article/${id}?acf_format=standard&_fields=id,title,acf,date`);
   if (!res.ok) {
     throw new Error('Failed to fetch article');
   }
   return res.json();
 }
 
-// function addLineBreaks(htmlContent) {
-//   return htmlContent.replace(/<\/p>/g, '</p><br>');
-// }
-
-// Function to format the date into a more readable form
 function formatDate(dateString) {
-  moment.locale('ka');  // Set the locale to Georgian
-  return moment(dateString).format('LL');  // 'LL' is a format that shows the date in a more readable form
+  moment.locale('ka');
+  return moment(dateString).format('LL');
 }
-
-
 
 const ArticlePage = ({ params }) => {
   const [article, setArticle] = useState(null);
@@ -46,15 +36,14 @@ const ArticlePage = ({ params }) => {
     const getArticle = async () => {
       try {
         const fetchedArticle = await fetchArticle(params.id);
-        const updatedContent = {
+        setArticle({
           ...fetchedArticle,
           acf: {
             ...fetchedArticle.acf,
-            'main-text': (fetchedArticle.acf['main-text']),
+            'main-text': fetchedArticle.acf['main-text'],
           },
-          formattedDate: formatDate(fetchedArticle.date), // Format the date
-        };
-        setArticle(updatedContent);
+          formattedDate: formatDate(fetchedArticle.date),
+        });
       } catch (error) {
         console.error(error);
       }
@@ -99,98 +88,55 @@ const ArticlePage = ({ params }) => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const shareOnFacebook = () => {
-    const currentUrl = window.location.href;
-    window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(currentUrl)}`, '_blank');
-  };
-
-  const shareOnTwitter = () => {
-    const currentUrl = window.location.href;
-    const text = encodeURIComponent(article.title.rendered);
-    window.open(`https://twitter.com/intent/tweet?text=${text}&url=${encodeURIComponent(currentUrl)}`, '_blank');
-  };
+  const articleUrl = `https://mautskebeli.ge/all-articles/${params.id}`;
 
   if (!isMounted || !article) {
     return <img src="/images/loader.svg" alt="Loading" />;
   }
 
-  const currentUrl = `https://mautskebeli-ge-4bpc.vercel.app${pathname}`;
-
   return (
     <>
       <Head>
-        <title>{article.title.rendered}</title>
-        <meta property="og:title" content={article.title.rendered} />
-        <meta property="og:description" content={article.acf['main-text'].substring(0, 200)} />
-        <meta property="og:image" content={article.acf.image} />
-        <meta property="og:url" content={currentUrl} />
+        <title>{article.title}</title>
+        <meta property="og:url" content={articleUrl} />
+        <meta property="og:type" content="article" />
+        <meta property="og:title" content={article.title} />
+        <meta property="og:description" content={article.description} />
+        <meta property="og:image" content={`https://mautskebeli.ge/images/${article.imageId}.jpg`} />
       </Head>
       <section className="w-full mx-auto mt-10 px-4 lg:px-0 overflow-x-hidden relative">
         <div className="w-full lg:w-[54%] mx-auto bg-opacity-90 p-5 rounded-lg">
           <div className="w-full h-auto mb-5">
-          
-            <Image
-              src={article.acf.image}
-              alt={article.title.rendered}
-              width={800}
-              height={450}
-              style={{ objectFit: 'cover' }}
-              className="rounded-lg w-full"
-            />
-            <h1 className="font-alk-tall-mtavruli text-[32px] sm:text-[64px] font-light leading-none text-[#474F7A] mt-[24px] mb-5">
-              {article.title.rendered}
-            </h1>
-            <h2 className="font-noto-sans-georgian text-[16px] sm:text-[24px] font-extrabold text-[#AD88C6] leading-normal mb-5">
-              {article.acf['ავტორი']}
-            </h2>
-            <p className="text-[#474F7A] font-semibold pb-10">{article.formattedDate}</p> {/* Display the formatted date */}
+            <Image src={article.acf.image} alt={article.title.rendered} width={800} height={450} style={{ objectFit: 'cover' }} className="rounded-lg w-full" />
+            <h1 className="font-alk-tall-mtavruli text-[32px] sm:text-[64px] font-light leading-none text-[#474F7A] mt-[24px] mb-5">{article.title.rendered}</h1>
+            <h2 className="font-noto-sans-georgian text-[16px] sm:text-[24px] font-extrabold text-[#AD88C6] leading-normal mb-5">{article.acf['ავტორი']}</h2>
+            <p className="text-[#474F7A] font-semibold pb-10">{article.formattedDate}</p>
           </div>
-          <div
-            className="text-[#474F7A] text-wrap w-full font-noto-sans-georgian text-[14px] sm:text-[16px] font-normal lg:text-justify leading-[30px] sm:leading-[35px] tracking-[0.32px]"
-            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(article.acf['main-text']) }}
-          ></div>
+          <div className="text-[#474F7A] text-wrap w-full font-noto-sans-georgian text-[14px] sm:text-[16px] font-normal lg:text-justify leading-[30px] sm:leading-[35px] tracking-[0.32px]" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(article.acf['main-text']) }}></div>
           <div className="flex flex-wrap gap-4 mt-10">
-            <button
-              onClick={() => setShowShareOptions(true)}
-              className="bg-[#FECE27] text-[#474F7A] pl-[18px] pr-[18px] pt-[4px] pb-[4px] text-[16px] font-seibold rounded flex gap-[12px] items-center justify-center"
-            >
-              <Image
-                src="/images/share.png"
-                alt="share icon"
-                width={24}
-                height={24}
-              />
-              გაზიარება
+            <button onClick={() => setShowShareOptions(true)} className="bg-[#FECE27] text-[#474F7A] pl-[18px] pr-[18px] pt-[4px] pb-[4px] text-[16px] font-seibold rounded flex gap-[12px] items-center justify-center">
+              <Image src="/images/share.png" alt="share icon" width={24} height={24}/>
             </button>
           </div>
           {showShareOptions && (
             <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
               <div ref={shareOptionsRef} className="rounded-lg p-6 w-80" style={{ backgroundColor: "rgba(0, 0, 0, 0.30)" }}>
                 <h2 className="text-xl text-white font-bold mb-4">გააზიარე</h2>
-                <div className="flex items-center pt-7 gap-5 ">
-                  <button onClick={shareOnFacebook} className="text-left text-white">
-                    <Image src="/images/facebook.svg" alt="facebook share" width={44} height={44} />
-                    Facebook
-                  </button>
-                  <button onClick={shareOnTwitter} className="text-left text-white">
-                    <Image src="/images/twitter.svg" alt="twitter share" width={44} height={44} />
-                    Twitter
-                  </button>
+                <div className="flex items-center pt-7 gap-5">
+                  <FacebookShareButton url={articleUrl} quote={article.title.rendered}>
+                    <FacebookIcon size={44} round={true} />
+                  </FacebookShareButton>
+                  <TwitterShareButton url={articleUrl} title={article.title.rendered}>
+                    <TwitterIcon size={44} round={true} />
+                  </TwitterShareButton>
                 </div>
               </div>
             </div>
           )}
         </div>
         {showScrollButton && (
-          <button
-            onClick={scrollToTop}
-            className="fixed bottom-10 right-10 text-[#474F7A] w-[210px] h-[51px] rounded-[100px] inline-flex items-center justify-center gap-[10px]"
-            style={{
-              padding: '25px 32px 28px 32px',
-              background: '#FECE27',
-              boxShadow: '0 0 20px 5px rgba(254, 206, 39, 0.5)',
-            }}
-          >
+          <button onClick={scrollToTop} className="fixed bottom-10 right-10 text-[#474F7A] w-[210px] h-[51px] rounded-[100px] inline-flex items-center justify-center gap-[10px]"
+            style={{ padding: '25px 32px 28px 32px', background: '#FECE27', boxShadow: '0 0 20px 5px rgba(254, 206, 39, 0.5)' }}>
             <span className="whitespace-nowrap">საწყისზე დაბრუნება</span>
           </button>
         )}
