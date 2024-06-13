@@ -40,6 +40,13 @@ const ArticlePage = ({ params }) => {
           ...fetchedArticle,
           formattedDate: formatDate(fetchedArticle.date),
         });
+
+        // Console log to verify og:image
+        if (fetchedArticle.acf && fetchedArticle.acf.image) {
+          console.log('OG Image URL:', fetchedArticle.acf.image);
+        } else {
+          console.warn('OG Image URL is missing or invalid.');
+        }
       } catch (error) {
         console.error(error);
       }
@@ -101,6 +108,8 @@ const ArticlePage = ({ params }) => {
         <meta property="og:description" content={article.acf.title} />
         <meta property="og:image" content={ogImage} />
         <meta property="og:image:alt" content={article.title.rendered} />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
       </Head>
 
       <section className="w-full mx-auto mt-10 px-4 lg:px-0 overflow-x-hidden relative">
