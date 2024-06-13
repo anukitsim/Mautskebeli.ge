@@ -97,12 +97,12 @@ const ArticlePage = ({ params }) => {
   return (
     <>
       <Head>
-        <title>{article.title}</title>
+        <title>{article.title.rendered}</title>
         <meta property="og:url" content={articleUrl} />
         <meta property="og:type" content="article" />
-        <meta property="og:title" content={article.title} />
-        <meta property="og:description" content={article.description} />
-        <meta property="og:image" content={`https://mautskebeli.ge/images/${article.imageId}.jpg`} />
+        <meta property="og:title" content={article.title.rendered} />
+        <meta property="og:description" content={article.acf.title} />
+        <meta property="og:image" content={article.acf.image} />
       </Head>
       <section className="w-full mx-auto mt-10 px-4 lg:px-0 overflow-x-hidden relative">
         <div className="w-full lg:w-[54%] mx-auto bg-opacity-90 p-5 rounded-lg">
