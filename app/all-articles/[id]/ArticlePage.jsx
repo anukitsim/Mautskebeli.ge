@@ -84,7 +84,7 @@ const ArticlePage = ({ params }) => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const articleUrl = `https://www.mautskebeli.ge/all-articles/${params.id}`;
+  const articleUrl = `https://www.mautskebeli.ge/all-articles/${article.id}`;
 
   if (!isMounted || !article) {
     return <img src="/images/loader.svg" alt="Loading" />;
