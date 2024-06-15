@@ -3,7 +3,7 @@ import redirects from './redirects.json' assert { type: 'json' };
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ['mautskebeli.wpenginepowered.com', 'img.youtube.com', 'localhost'],
+    domains: ['mautskebeli.wpenginepowered.com', 'img.youtube.com', 'www.mautskebeli.ge'],
     formats: ['image/avif', 'image/webp'],
   },
   async redirects() {

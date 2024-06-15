@@ -138,7 +138,7 @@ const Navigation = ({ onVideoSelect }) => {
               />
               <span className="text-white text-[15px]">მსოფლიო</span>
             </Link>
-            <Link href="/saxli-yvelas" className="flex flex-row gap-3">
+            <Link href="/saxli" className="flex flex-row gap-3">
               <Image
                 src="/images/saxli-white.png"
                 alt="saxli-yvelas"

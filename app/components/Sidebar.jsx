@@ -84,10 +84,10 @@ const Sidebar = () => {
         />
         <span className="text-[#222] text-[15px]">მსოფლიო</span>
       </Link>
-      <Link href="/saxli-yvelas" className="flex flex-row gap-3">
+      <Link href="/saxli" className="flex flex-row gap-3">
         <Image
           src="/images/bechduri.png"
-          alt="saxli-yvelas"
+          alt="`saxli`-yvelas"
           width={0}
           height={0}
           style={{ width: 'auto', height: '20px' }}
