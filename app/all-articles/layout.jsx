@@ -3,7 +3,7 @@ import Header from "../components/Header";
 import Navigation from "../components/Navigation";
 import { MenuProvider } from "@/app/context/MenuContext";
 import Footer from "../components/Footer";
-import { fetchArticleTitle } from "../utils/fetchArticleTitle";
+import { fetchArticleTitle } from "../../utils/fetchArticleTitle"; // Correct path
 
 export async function generateMetadata({ searchParams }) {
   const articleId = searchParams.get('articleId');
@@ -11,7 +11,7 @@ export async function generateMetadata({ searchParams }) {
   let description = 'მედია პლათფორმა მაუწყებელი';
   let images = [
     {
-      url: 'https://www.mautskebeli.ge/og-bg.svg',
+      url: 'https://www.mautskebeli.ge/og-bg.png',
       width: 800,
       height: 600,
     },
