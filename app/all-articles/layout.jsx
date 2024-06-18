@@ -4,6 +4,7 @@ import Navigation from "../components/Navigation";
 import { MenuProvider } from "@/app/context/MenuContext";
 import Footer from "../components/Footer";
 import { fetchArticleTitle } from "../../utils/fetchArticleTitle";
+import Head from 'next/head';
 
 async function fetchArticleDetails(articleId) {
   const res = await fetch(`https://mautskebeli.wpenginepowered.com/wp-json/wp/v2/article/${articleId}?acf_format=standard&_fields=id,title,acf,date`);
@@ -14,16 +15,11 @@ async function fetchArticleDetails(articleId) {
 }
 
 export async function generateMetadata({ params }) {
-  const articleId = params.id; // Use params.id to get the article ID
+  const articleId = params.id;
   let title = 'მაუწყებელი';
   let description = 'მედია პლათფორმა მაუწყებელი';
-  let images = [
-    {
-      url: 'https://www.mautskebeli.ge/images/og-logo.jpg', // Default image URL
-      width: 800,
-      height: 600,
-    },
-  ];
+  let imageUrl = 'https://www.mautskebeli.ge/images/og-logo.jpg';
+  let articleUrl = `https://www.mautskebeli.ge/all-articles/${articleId}`;
 
   if (articleId) {
     try {
@@ -31,13 +27,7 @@ export async function generateMetadata({ params }) {
       title = article.title.rendered || title;
       description = article.acf.title || description;
       if (article.acf.image) {
-        images = [
-          {
-            url: article.acf.image,
-            width: 800,
-            height: 600,
-          },
-        ];
+        imageUrl = article.acf.image;
       }
     } catch (error) {
       console.error('Error fetching article details:', error);
@@ -50,37 +40,45 @@ export async function generateMetadata({ params }) {
     openGraph: {
       title,
       description,
-      url: articleId ? `https://www.mautskebeli.ge/all-articles/${articleId}` : 'https://www.mautskebeli.ge/',
+      url: articleUrl,
       siteName: 'მაუწყებელი',
-      images,
+      images: [
+        {
+          url: imageUrl,
+          width: 800,
+          height: 600,
+        },
+      ],
       locale: 'en_US',
       type: 'article',
     },
   };
 }
 
-export default function RootLayout({ children }) {
+export default function RootLayout({ children, metadata }) {
+  const { title, description, openGraph } = metadata || {};
+
   return (
     <html lang="en">
-      <head>
-        {/* Ensure meta tags are explicitly set */}
-        <meta property="og:title" content="მაუწყებელი" />
-        <meta property="og:description" content="მედია პლათფორმა მაუწყებელი" />
-        <meta property="og:url" content="https://www.mautskebeli.ge/" />
-        <meta property="og:image" content="https://www.mautskebeli.ge/images/og-logo.jpg" />
-        <meta property="og:image:width" content="800" />
-        <meta property="og:image:height" content="600" />
-        <meta property="og:type" content="article" />
-        <meta property="og:locale" content="en_US" />
-        <meta property="og:site_name" content="მაუწყებელი" />
-        {/* Ensure Twitter meta tags are set */}
+      <Head>
+        <title>{title}</title>
+        <meta name="description" content={description} />
+        <meta property="og:title" content={openGraph.title} />
+        <meta property="og:description" content={openGraph.description} />
+        <meta property="og:url" content={openGraph.url} />
+        <meta property="og:site_name" content={openGraph.siteName} />
+        <meta property="og:locale" content={openGraph.locale} />
+        <meta property="og:image" content={openGraph.images[0].url} />
+        <meta property="og:image:width" content={openGraph.images[0].width} />
+        <meta property="og:image:height" content={openGraph.images[0].height} />
+        <meta property="og:type" content={openGraph.type} />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="მაუწყებელი" />
-        <meta name="twitter:description" content="მედია პლათფორმა მაუწყებელი" />
-        <meta name="twitter:image" content="https://www.mautskebeli.ge/images/og-logo.jpg" />
-        <meta name="twitter:image:width" content="800" />
-        <meta name="twitter:image:height" content="600" />
-      </head>
+        <meta name="twitter:title" content={openGraph.title} />
+        <meta name="twitter:description" content={openGraph.description} />
+        <meta name="twitter:image" content={openGraph.images[0].url} />
+        <meta name="twitter:image:width" content={openGraph.images[0].width} />
+        <meta name="twitter:image:height" content={openGraph.images[0].height} />
+      </Head>
       <body>
         <MenuProvider>
           <div className="sticky top-0 z-50">
