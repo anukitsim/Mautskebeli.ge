@@ -62,6 +62,25 @@ export async function generateMetadata({ params }) {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
+      <head>
+        {/* Ensure meta tags are explicitly set */}
+        <meta property="og:title" content="მაუწყებელი" />
+        <meta property="og:description" content="მედია პლათფორმა მაუწყებელი" />
+        <meta property="og:url" content="https://www.mautskebeli.ge/" />
+        <meta property="og:image" content="https://www.mautskebeli.ge/images/og-logo.jpg" />
+        <meta property="og:image:width" content="800" />
+        <meta property="og:image:height" content="600" />
+        <meta property="og:type" content="article" />
+        <meta property="og:locale" content="en_US" />
+        <meta property="og:site_name" content="მაუწყებელი" />
+        {/* Ensure Twitter meta tags are set */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="მაუწყებელი" />
+        <meta name="twitter:description" content="მედია პლათფორმა მაუწყებელი" />
+        <meta name="twitter:image" content="https://www.mautskebeli.ge/images/og-logo.jpg" />
+        <meta name="twitter:image:width" content="800" />
+        <meta name="twitter:image:height" content="600" />
+      </head>
       <body>
         <MenuProvider>
           <div className="sticky top-0 z-50">
