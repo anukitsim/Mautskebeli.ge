@@ -3,10 +3,11 @@ import Header from "../components/Header";
 import Navigation from "../components/Navigation";
 import { MenuProvider } from "@/app/context/MenuContext";
 import Footer from "../components/Footer";
-import { fetchArticleTitle } from "../../utils/fetchArticleTitle"; // Correct path
+import { fetchArticleTitle } from "../../utils/fetchArticleTitle";
 
-export async function generateMetadata({ searchParams }) {
-  const articleId = searchParams.get('articleId');
+// Generate Open Graph metadata for the article
+export async function generateMetadata({ params }) {
+  const articleId = params.id;  // Use params.id to get the article ID
   let title = 'მაუწყებელი';
   let description = 'მედია პლათფორმა მაუწყებელი';
   let images = [

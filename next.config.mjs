@@ -8,7 +8,6 @@ const nextConfig = {
   },
   async redirects() {
     return redirects.map(({ source, destination }) => {
-      // Handle query parameters separately
       const [path, query] = source.split('?');
       const sourceObj = { source: path, destination, permanent: true };
 

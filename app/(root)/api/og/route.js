@@ -11,13 +11,7 @@ export async function GET(req) {
   const { searchParams } = req.nextUrl;
   const postTitle = searchParams.get("title");
 
-  // Fetch the font from the specified URL in your app's public directory
-  const font = fetch(
-    new URL("../../../../public/fonts/ALK_Tall_Mtavruli.ttf", import.meta.url)
-  ).then((res) => res.arrayBuffer());
-  const fontData = await font;
-
-  // Create an ImageResponse with dynamic content
+  // Create an ImageResponse with dynamic content using web fonts
   return new ImageResponse(
     (
       <div
@@ -28,8 +22,7 @@ export async function GET(req) {
           flexDirection: "column",
           alignItems: "flex-start",
           justifyContent: "center",
-          backgroundImage: `url(https://mautskebeli.ge/og-bg.svg)`,
-          backgroundSize: "cover",
+          backgroundImage: `url(http://localhost:3000/og-bg.png)`,
         }}
       >
         <div
@@ -54,13 +47,7 @@ export async function GET(req) {
     {
       width: 1920,
       height: 1080,
-      fonts: [
-        {
-          name: "ALK Tall Mtavruli",
-          data: fontData,
-          style: "normal",
-        },
-      ],
+      // No fonts option needed as we are using web fonts
     }
   );
 }
