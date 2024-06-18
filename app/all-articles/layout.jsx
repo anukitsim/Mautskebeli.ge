@@ -5,28 +5,43 @@ import { MenuProvider } from "@/app/context/MenuContext";
 import Footer from "../components/Footer";
 import { fetchArticleTitle } from "../../utils/fetchArticleTitle";
 
-// Generate Open Graph metadata for the article
+async function fetchArticleDetails(articleId) {
+  const res = await fetch(`https://mautskebeli.wpenginepowered.com/wp-json/wp/v2/article/${articleId}?acf_format=standard&_fields=id,title,acf,date`);
+  if (!res.ok) {
+    throw new Error('Failed to fetch article');
+  }
+  return res.json();
+}
+
 export async function generateMetadata({ params }) {
-  const articleId = params.id;  // Use params.id to get the article ID
+  const articleId = params.id; // Use params.id to get the article ID
   let title = 'მაუწყებელი';
   let description = 'მედია პლათფორმა მაუწყებელი';
   let images = [
     {
-      url: 'https://www.mautskebeli.ge/og-bg.png',
+      url: 'https://www.mautskebeli.ge/og-bg.svg',
       width: 800,
       height: 600,
     },
   ];
 
   if (articleId) {
-    title = await fetchArticleTitle(articleId);
-    images = [
-      {
-        url: `https://www.mautskebeli.ge/api/og?title=${encodeURIComponent(title)}`,
-        width: 800,
-        height: 600,
-      },
-    ];
+    try {
+      const article = await fetchArticleDetails(articleId);
+      title = article.title.rendered || title;
+      description = article.acf.title || description;
+      if (article.acf.image) {
+        images = [
+          {
+            url: article.acf.image,
+            width: 800,
+            height: 600,
+          },
+        ];
+      }
+    } catch (error) {
+      console.error('Error fetching article details:', error);
+    }
   }
 
   return {
