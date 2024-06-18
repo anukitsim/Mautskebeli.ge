@@ -63,21 +63,25 @@ export default function RootLayout({ children, metadata }) {
       <Head>
         <title>{title}</title>
         <meta name="description" content={description} />
-        <meta property="og:title" content={openGraph.title} />
-        <meta property="og:description" content={openGraph.description} />
-        <meta property="og:url" content={openGraph.url} />
-        <meta property="og:site_name" content={openGraph.siteName} />
-        <meta property="og:locale" content={openGraph.locale} />
-        <meta property="og:image" content={openGraph.images[0].url} />
-        <meta property="og:image:width" content={openGraph.images[0].width} />
-        <meta property="og:image:height" content={openGraph.images[0].height} />
-        <meta property="og:type" content={openGraph.type} />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={openGraph.title} />
-        <meta name="twitter:description" content={openGraph.description} />
-        <meta name="twitter:image" content={openGraph.images[0].url} />
-        <meta name="twitter:image:width" content={openGraph.images[0].width} />
-        <meta name="twitter:image:height" content={openGraph.images[0].height} />
+        {openGraph && (
+          <>
+            <meta property="og:title" content={openGraph.title} />
+            <meta property="og:description" content={openGraph.description} />
+            <meta property="og:url" content={openGraph.url} />
+            <meta property="og:site_name" content={openGraph.siteName} />
+            <meta property="og:locale" content={openGraph.locale} />
+            <meta property="og:image" content={openGraph.images[0].url} />
+            <meta property="og:image:width" content={openGraph.images[0].width} />
+            <meta property="og:image:height" content={openGraph.images[0].height} />
+            <meta property="og:type" content={openGraph.type} />
+            <meta name="twitter:card" content="summary_large_image" />
+            <meta name="twitter:title" content={openGraph.title} />
+            <meta name="twitter:description" content={openGraph.description} />
+            <meta name="twitter:image" content={openGraph.images[0].url} />
+            <meta name="twitter:image:width" content={openGraph.images[0].width} />
+            <meta name="twitter:image:height" content={openGraph.images[0].height} />
+          </>
+        )}
       </Head>
       <body>
         <MenuProvider>
