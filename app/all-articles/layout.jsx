@@ -50,7 +50,7 @@ export async function generateMetadata({ params }) {
     openGraph: {
       title,
       description,
-      url: `https://www.mautskebeli.ge/all-articles/${articleId}`,
+      url: articleId ? `https://www.mautskebeli.ge/all-articles/${articleId}` : 'https://www.mautskebeli.ge/',
       siteName: 'მაუწყებელი',
       images,
       locale: 'en_US',
