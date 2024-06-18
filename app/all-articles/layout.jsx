@@ -19,7 +19,7 @@ export async function generateMetadata({ params }) {
   let description = 'მედია პლათფორმა მაუწყებელი';
   let images = [
     {
-      url: 'https://www.mautskebeli.ge/og-bg.svg',
+      url: 'https://www.mautskebeli.ge/logo.png',
       width: 800,
       height: 600,
     },
