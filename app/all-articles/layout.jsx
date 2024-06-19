@@ -57,6 +57,7 @@ export async function generateMetadata({ params }) {
 export default function RootLayout({ children, metadata }) {
   const { title, description, openGraph } = metadata || {};
   const defaultImage = 'https://www.mautskebeli.ge/images/og-logo.jpg';
+  const fbAppId = process.env.NEXT_PUBLIC_FACEBOOK_APP_ID;
 
   return (
     <html lang="en">
@@ -67,7 +68,7 @@ export default function RootLayout({ children, metadata }) {
           <>
             <meta property="og:title" content={openGraph.title} />
             <meta property="og:description" content={openGraph.description} />
-            <meta property="og:url" content={openGraph.url || 'https://www.mautskebeli.ge'} />
+            <meta property="og:url" content={openGraph.url} />
             <meta property="og:site_name" content={openGraph.siteName} />
             <meta property="og:locale" content={openGraph.locale} />
             <meta property="og:image" content={openGraph.images[0].url || defaultImage} />
@@ -80,6 +81,7 @@ export default function RootLayout({ children, metadata }) {
             <meta name="twitter:image" content={openGraph.images[0].url || defaultImage} />
             <meta name="twitter:image:width" content={openGraph.images[0].width || 800} />
             <meta name="twitter:image:height" content={openGraph.images[0].height || 600} />
+            {fbAppId && <meta property="fb:app_id" content={fbAppId} />}
           </>
         )}
       </Head>
