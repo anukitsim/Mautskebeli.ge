@@ -5,49 +5,101 @@ import { NextRequest } from "next/server";
 // Route segment config
 export const runtime = "edge";
 
+// Function to fetch article details from the API
+async function fetchArticleDetails(articleId) {
+  const res = await fetch(`https://mautskebeli.wpenginepowered.com/wp-json/wp/v2/article/${articleId}?acf_format=standard&_fields=id,title,acf,date`);
+  if (!res.ok) {
+    throw new Error('Failed to fetch article');
+  }
+  return res.json();
+}
+
 // Define a function to handle GET requests
 export async function GET(req) {
-  // Extract title from query parameters
+  // Extract search parameters
   const { searchParams } = req.nextUrl;
-  const postTitle = searchParams.get("title");
+  const articleId = searchParams.get("id");
 
-  // Create an ImageResponse with dynamic content using web fonts
-  return new ImageResponse(
-    (
+  if (!articleId) {
+    console.error('Article ID is missing');
+    return new ImageResponse(
       <div
         style={{
           height: "100%",
           width: "100%",
           display: "flex",
-          flexDirection: "column",
-          alignItems: "flex-start",
+          alignItems: "center",
           justifyContent: "center",
-          backgroundImage: `url(http://localhost:3000/og-bg.png)`,
+          backgroundColor: "#000",
+          color: "#fff",
+          fontSize: 24,
         }}
       >
+        Article ID is missing
+      </div>,
+      { width: 1200, height: 630 }
+    );
+  }
+
+  try {
+    // Fetch article details
+    const article = await fetchArticleDetails(articleId);
+    const { title, acf } = article;
+    console.log('Fetched article details:', article);
+
+    // Create an ImageResponse with dynamic content
+    return new ImageResponse(
+      (
         <div
           style={{
-            marginLeft: 190,
-            marginRight: 190,
+            height: "100%",
+            width: "100%",
             display: "flex",
-            fontSize: 140,
-            fontFamily: "ALK Tall Mtavruli, sans-serif",
-            letterSpacing: "-0.05em",
-            fontStyle: "normal",
-            color: "white",
-            lineHeight: "120px",
-            whiteSpace: "pre-wrap",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundImage: `url(${acf.image || process.env.NEXT_PUBLIC_DEFAULT_BG_IMAGE})`,
+            backgroundSize: 'cover',
           }}
         >
-          {postTitle}
+          <div
+            style={{
+              backgroundColor: "rgba(0, 0, 0, 0.5)",
+              padding: "20px",
+              borderRadius: "10px",
+              color: "white",
+              fontSize: "48px",
+              fontFamily: "ALK Tall Mtavruli, sans-serif",
+              textAlign: "center",
+            }}
+          >
+            {title.rendered}
+          </div>
         </div>
-      </div>
-    ),
-    // ImageResponse options
-    {
-      width: 1920,
-      height: 1080,
-      // No fonts option needed as we are using web fonts
-    }
-  );
+      ),
+      {
+        width: 1200,
+        height: 630,
+      }
+    );
+  } catch (error) {
+    console.error('Error generating Open Graph image:', error);
+    return new ImageResponse(
+      <div
+        style={{
+          height: "100%",
+          width: "100%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: "#000",
+          color: "#fff",
+          fontSize: 24,
+        }}
+      >
+        Error generating Open Graph image
+      </div>,
+      { width: 1200, height: 630 }
+    );
+  }
 }

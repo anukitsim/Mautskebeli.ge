@@ -28,6 +28,7 @@ export async function generateMetadata({ params }) {
       if (article.acf.image) {
         imageUrl = article.acf.image;
       }
+      console.log('Generated Metadata:', { title, description, imageUrl, articleUrl });
     } catch (error) {
       console.error('Error fetching article details:', error);
     }
