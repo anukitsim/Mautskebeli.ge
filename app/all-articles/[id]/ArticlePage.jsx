@@ -32,6 +32,14 @@ const ArticlePage = ({ params }) => {
   const articleContentRef = useRef(null);
   const { id } = params;
 
+  const stripHtmlTags = (str) => {
+    if (!str) return '';
+    const tmp = document.createElement('div');
+    tmp.innerHTML = str;
+    return tmp.textContent || tmp.innerText || '';
+  };
+  
+
   useEffect(() => {
     setIsMounted(true);
     const getArticle = async () => {
@@ -146,7 +154,8 @@ const ArticlePage = ({ params }) => {
         <meta property="og:url" content={articleUrl} />
         <meta property="og:type" content="article" />
         <meta property="og:title" content={article.title.rendered} />
-        <meta property="og:description" content={article.acf['main-text'].replace(/<\/?[^>]+(>|$)/g, '').slice(0, 150)} />
+        <meta property="og:description" content={stripHtmlTags(article.acf['main-text']).slice(0, 150)} />
+
         <meta property="og:image" content={ogImage} />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />

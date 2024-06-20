@@ -30,7 +30,7 @@ export async function GET(req) {
 
     const stripHtmlTags = (str) => {
       if (!str) return '';
-      return str.replace(/<[^>]*>/g, '').replace(/<\/?p[^>]*>/g, ''); // Strips all HTML tags and specific <p> tags
+      return str.replace(/<\/?[^>]+(>|$)/g, '');
     };
 
     const ogTags = {
@@ -45,7 +45,7 @@ export async function GET(req) {
     return NextResponse.json(ogTags);
 
   } catch (error) {
-    console.error('Unexpected error:', error);
+    console.error('Unexpected error:', error.message);
     return NextResponse.json({ error: 'Unexpected error occurred' }, { status: 500 });
   }
 }
