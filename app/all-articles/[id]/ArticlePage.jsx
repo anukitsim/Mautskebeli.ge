@@ -1,5 +1,3 @@
-"use client"
-
 import { useEffect, useState, useRef, useCallback } from 'react';
 import Image from 'next/image';
 import Head from 'next/head';
@@ -95,7 +93,7 @@ const ArticlePage = ({ params }) => {
   }
 
   const articleUrl = `https://www.mautskebeli.ge/all-articles/${article.id}`;
-  const ogImage = article.acf.image ? `http://localhost:3000/api/og?title=${encodeURIComponent(article.title.rendered)}` : '/images/default-og-image.jpg';
+  const ogImage = article.acf.image ? article.acf.image : '/images/og-logo.jpg';
 
   return (
     <>
