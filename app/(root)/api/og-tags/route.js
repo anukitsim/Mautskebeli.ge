@@ -30,8 +30,7 @@ export async function GET(req) {
 
     const stripHtmlTags = (str) => {
       if (!str) return '';
-      const doc = new DOMParser().parseFromString(str, 'text/html');
-      return doc.body.textContent || "";
+      return str.replace(/<[^>]*>/g, '');
     };
 
     const rawDescription = article.acf['main-text'];

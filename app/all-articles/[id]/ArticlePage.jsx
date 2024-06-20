@@ -33,8 +33,7 @@ const ArticlePage = ({ params }) => {
 
   const stripHtmlTags = (str) => {
     if (!str) return '';
-    const doc = new DOMParser().parseFromString(str, 'text/html');
-    return doc.body.textContent || "";
+    return str.replace(/<[^>]*>/g, '');
   };
 
   useEffect(() => {
