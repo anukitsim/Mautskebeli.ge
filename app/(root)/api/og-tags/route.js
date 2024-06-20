@@ -1,3 +1,4 @@
+// pages/api/og-tags.js
 import { NextResponse } from 'next/server';
 
 export async function GET(req) {
@@ -29,14 +30,9 @@ export async function GET(req) {
       return NextResponse.json({ error: 'ACF fields missing in article' }, { status: 500 });
     }
 
-    // Function to strip HTML tags
-    const stripHtmlTags = (str) => {
-      return str.replace(/<[^>]*>?/gm, '');
-    };
-
     const ogTags = {
       title: article.title.rendered,
-      description: article.acf['main-text'] ? stripHtmlTags(article.acf['main-text']).slice(0, 150) : '',
+      description: article.acf['main-text'] ? article.acf['main-text'].slice(0, 150) : '',
       url: `https://www.mautskebeli.ge/all-articles/${article.id}`,
       image: article.acf.image ? article.acf.image : '/images/og-logo.jpg',
     };
