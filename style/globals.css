@@ -828,3 +828,13 @@ a.scale-on-hover:hover {
   color: #8C74B2;
   
 }
+
+.no-break a:hover {
+  text-decoration: underline;
+  color: #8C74B2;
+}
+
+
+.no-break {
+  white-space: nowrap;
+}
