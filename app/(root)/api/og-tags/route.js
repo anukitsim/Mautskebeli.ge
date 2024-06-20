@@ -12,7 +12,7 @@ export async function GET(req) {
   try {
     const apiUrl = `https://mautskebeli.wpenginepowered.com/wp-json/wp/v2/article/${id}?acf_format=standard&_fields=id,title,acf,date`;
     console.log(`Fetching article from: ${apiUrl}`);
-    
+
     const res = await fetch(apiUrl);
 
     if (!res.ok) {
@@ -30,12 +30,18 @@ export async function GET(req) {
 
     const stripHtmlTags = (str) => {
       if (!str) return '';
-      return str.replace(/<\/?[^>]+(>|$)/g, '');
+      const doc = new DOMParser().parseFromString(str, 'text/html');
+      return doc.body.textContent || "";
     };
+
+    const rawDescription = article.acf['main-text'];
+    const strippedDescription = stripHtmlTags(rawDescription).slice(0, 150);
+    console.log('Raw Description:', rawDescription);
+    console.log('Stripped Description:', strippedDescription);
 
     const ogTags = {
       title: article.title.rendered,
-      description: article.acf['main-text'] ? stripHtmlTags(article.acf['main-text']).slice(0, 150) : '',
+      description: strippedDescription,
       url: `https://www.mautskebeli.ge/all-articles/${article.id}`,
       image: article.acf.image ? article.acf.image : '/images/og-logo.jpg',
     };
@@ -43,7 +49,6 @@ export async function GET(req) {
     console.log('Generated OG tags:', ogTags);
 
     return NextResponse.json(ogTags);
-
   } catch (error) {
     console.error('Unexpected error:', error.message);
     return NextResponse.json({ error: 'Unexpected error occurred' }, { status: 500 });

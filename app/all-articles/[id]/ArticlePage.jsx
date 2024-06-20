@@ -8,7 +8,6 @@ import moment from 'moment';
 import 'moment/locale/ka';
 import { FacebookShareButton, FacebookIcon, TwitterShareButton, TwitterIcon } from 'next-share';
 
-
 async function fetchArticle(id) {
   const res = await fetch(`https://mautskebeli.wpenginepowered.com/wp-json/wp/v2/article/${id}?acf_format=standard&_fields=id,title,acf,date`);
   if (!res.ok) {
@@ -33,29 +32,23 @@ const ArticlePage = ({ params }) => {
   const { id } = params;
 
   const stripHtmlTags = (str) => {
-  if (!str) return '';
-  const tmp = document.createElement('div');
-  tmp.innerHTML = str;
-  return tmp.textContent || tmp.innerText || '';
-};
-
+    if (!str) return '';
+    const doc = new DOMParser().parseFromString(str, 'text/html');
+    return doc.body.textContent || "";
+  };
 
   useEffect(() => {
     setIsMounted(true);
     const getArticle = async () => {
       try {
         const fetchedArticle = await fetchArticle(id);
-        console.log(fetchedArticle.acf['main-text']);
+        console.log('Fetched article content:', fetchedArticle.acf['main-text']);
+        const strippedContent = stripHtmlTags(fetchedArticle.acf['main-text']);
+        console.log('Stripped article content:', strippedContent);
         setArticle({
           ...fetchedArticle,
           formattedDate: formatDate(fetchedArticle.date),
         });
-
-        if (fetchedArticle.acf && fetchedArticle.acf.image) {
-          console.log('OG Image URL:', fetchedArticle.acf.image);
-        } else {
-          console.warn('OG Image URL is missing or invalid.');
-        }
       } catch (error) {
         console.error(error);
       }
@@ -109,8 +102,6 @@ const ArticlePage = ({ params }) => {
       const doc = parser.parseFromString(article.acf['main-text'], 'text/html');
       const paragraphs = doc.querySelectorAll('p');
 
-      
-  
       paragraphs.forEach(paragraph => {
         const aTags = paragraph.querySelectorAll('a');
         if (aTags.length >= 2) {
@@ -123,10 +114,10 @@ const ArticlePage = ({ params }) => {
           paragraph.innerHTML = newContent.join(' ');
         }
       });
-  
+
       const updatedHTML = doc.body.innerHTML;
       articleContent.innerHTML = DOMPurify.sanitize(updatedHTML);
-  
+
       const sanitizedLinks = articleContent.querySelectorAll('a');
       sanitizedLinks.forEach(link => {
         link.addEventListener('click', (event) => {
@@ -136,9 +127,6 @@ const ArticlePage = ({ params }) => {
       });
     }
   }, [article]);
-  
-  
-  
 
   if (!isMounted || !article) {
     return <img src="/images/loader.svg" alt="Loading" />;
@@ -155,7 +143,6 @@ const ArticlePage = ({ params }) => {
         <meta property="og:type" content="article" />
         <meta property="og:title" content={article.title.rendered} />
         <meta property="og:description" content={stripHtmlTags(article.acf['main-text']).slice(0, 150)} />
-
         <meta property="og:image" content={ogImage} />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
