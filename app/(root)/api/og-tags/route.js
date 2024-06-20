@@ -1,3 +1,5 @@
+// app/(root)/api/og-tags/route.js
+
 import { NextResponse } from 'next/server';
 
 export async function GET(req) {
@@ -30,7 +32,7 @@ export async function GET(req) {
 
     const stripHtmlTags = (str) => {
       if (!str) return '';
-      return str.replace(/<[^>]*>/g, '');
+      return str.replace(/<[^>]+>/g, '');  // Updated regex to strip all HTML tags and attributes
     };
 
     const rawDescription = article.acf['main-text'];

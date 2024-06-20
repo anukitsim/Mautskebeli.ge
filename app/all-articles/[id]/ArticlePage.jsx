@@ -1,3 +1,5 @@
+// all-articles/[id]/ArticlePage.jsx
+
 "use client";
 
 import { useEffect, useState, useRef, useCallback } from 'react';
@@ -33,7 +35,7 @@ const ArticlePage = ({ params }) => {
 
   const stripHtmlTags = (str) => {
     if (!str) return '';
-    return str.replace(/<[^>]*>/g, '');
+    return str.replace(/<[^>]+>/g, '');  // Updated regex to strip all HTML tags and attributes
   };
 
   useEffect(() => {
