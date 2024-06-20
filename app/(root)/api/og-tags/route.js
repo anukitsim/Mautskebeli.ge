@@ -31,7 +31,7 @@ export async function GET(req) {
 
     // Function to strip HTML tags
     const stripHtmlTags = (str) => {
-      return str.replace(/<[^>]*>?/gm, '');
+      return str ? str.replace(/<[^>]*>?/gm, '') : '';
     };
 
     const ogTags = {
