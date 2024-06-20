@@ -5,6 +5,7 @@ export const runtime = 'edge';
 export default function handler(req) {
   const { searchParams } = new URL(req.url);
   const title = searchParams.get('title') || 'Default Title';
+  const imageUrl = searchParams.get('image') || 'https://mautskebeli.ge/api/og?title=Default%20Title';
 
   return new ImageResponse(
     (
@@ -12,7 +13,8 @@ export default function handler(req) {
         style={{
           fontSize: 60,
           color: 'white',
-          background: 'black',
+          background: `url(${imageUrl}) no-repeat center center`,
+          backgroundSize: 'cover',
           width: '100%',
           height: '100%',
           padding: '40px',

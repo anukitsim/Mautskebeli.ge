@@ -1,10 +1,9 @@
-"use client"
+"use client";
 
 import { useEffect, useState, useRef, useCallback } from 'react';
 import Image from 'next/image';
 import Head from 'next/head';
 import DOMPurify from 'dompurify';
-import { usePathname } from 'next/navigation';
 import moment from 'moment';
 import 'moment/locale/ka';
 import { FacebookShareButton, FacebookIcon, TwitterShareButton, TwitterIcon } from 'next-share';
@@ -29,13 +28,13 @@ const ArticlePage = ({ params }) => {
   const [showScrollButton, setShowScrollButton] = useState(false);
   const shareOptionsRef = useRef(null);
   const footerRef = useRef(null);
-  const pathname = usePathname();
+  const { id } = params;
 
   useEffect(() => {
     setIsMounted(true);
     const getArticle = async () => {
       try {
-        const fetchedArticle = await fetchArticle(params.id);
+        const fetchedArticle = await fetchArticle(id);
         setArticle({
           ...fetchedArticle,
           formattedDate: formatDate(fetchedArticle.date),
@@ -50,8 +49,10 @@ const ArticlePage = ({ params }) => {
         console.error(error);
       }
     };
-    getArticle();
-  }, [params.id]);
+    if (id) {
+      getArticle();
+    }
+  }, [id]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -95,7 +96,7 @@ const ArticlePage = ({ params }) => {
   }
 
   const articleUrl = `https://www.mautskebeli.ge/all-articles/${article.id}`;
-  const ogImage = article.acf.image ? article.acf.image : '/images/og-logo.jpg';
+  const ogImage = article.acf.image ? article.acf.image : '/images/default-og-image.jpg';
 
   return (
     <>
@@ -104,7 +105,7 @@ const ArticlePage = ({ params }) => {
         <meta property="og:url" content={articleUrl} />
         <meta property="og:type" content="article" />
         <meta property="og:title" content={article.title.rendered} />
-        <meta property="og:description" content={article.acf.description} />
+        <meta property="og:description" content={article.acf['main-text'].slice(0, 150)} />
         <meta property="og:image" content={ogImage} />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
