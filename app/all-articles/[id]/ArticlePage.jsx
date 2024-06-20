@@ -33,12 +33,12 @@ const ArticlePage = ({ params }) => {
   const { id } = params;
 
   const stripHtmlTags = (str) => {
-    if (!str) return '';
-    const tmp = document.createElement('div');
-    tmp.innerHTML = str;
-    return tmp.textContent || tmp.innerText || '';
-  };
-  
+  if (!str) return '';
+  const tmp = document.createElement('div');
+  tmp.innerHTML = str;
+  return tmp.textContent || tmp.innerText || '';
+};
+
 
   useEffect(() => {
     setIsMounted(true);
