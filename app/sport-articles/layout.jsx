@@ -14,6 +14,9 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
+      <head>
+      <link rel="icon" href="/favicon.ico" />
+      </head>
       <body className='bg-[#AD88C6]'>
       <MenuProvider>
           <div className="sticky top-0 z-50">

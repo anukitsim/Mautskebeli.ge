@@ -103,7 +103,7 @@ const SportNavigation = ({ onVideoSelect }) => {
           <Link href="/text">ტექსტი</Link>
           <Link href="/podcast">პოდკასტი</Link>
           <Link href="/sporti" className='text-white'>სპორტი</Link>
-          <Link href="/about-us">ჩვენს შესახებ</Link>
+          <Link href="/about-us">ჩვენ შესახებ</Link>
         </ul>
         <div className="sm:hidden z-50">
           <button onClick={toggleSearch} className="mr-7">
@@ -129,7 +129,7 @@ const SportNavigation = ({ onVideoSelect }) => {
           <Link href="/text">ტექსტი</Link>
           <Link href="/podcast">პოდკასტი</Link>
           <Link href="#">სპორტი</Link>
-          <Link href="#">ჩვენს შესახებ</Link>
+          <Link href="#"> შესახებ</Link>
           </div>
           <button onClick={toggleCategories} className="text-white ml-7 text-[15px] mt-2  mb-4 flex items-center gap-2">
             კატეგორიები

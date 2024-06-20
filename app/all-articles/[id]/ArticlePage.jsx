@@ -8,6 +8,7 @@ import moment from 'moment';
 import 'moment/locale/ka';
 import { FacebookShareButton, FacebookIcon, TwitterShareButton, TwitterIcon } from 'next-share';
 
+
 async function fetchArticle(id) {
   const res = await fetch(`https://mautskebeli.wpenginepowered.com/wp-json/wp/v2/article/${id}?acf_format=standard&_fields=id,title,acf,date`);
   if (!res.ok) {
@@ -28,6 +29,7 @@ const ArticlePage = ({ params }) => {
   const [showScrollButton, setShowScrollButton] = useState(false);
   const shareOptionsRef = useRef(null);
   const footerRef = useRef(null);
+  const articleContentRef = useRef(null);
   const { id } = params;
 
   useEffect(() => {
@@ -91,6 +93,32 @@ const ArticlePage = ({ params }) => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  useEffect(() => {
+    if (article && articleContentRef.current) {
+      const articleContent = articleContentRef.current;
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(article.acf['main-text'], 'text/html');
+      const links = doc.querySelectorAll('a');
+
+      links.forEach(link => {
+        link.setAttribute('target', '_blank');
+        link.setAttribute('rel', 'noopener noreferrer');
+        link.classList.add('scale-on-hover');
+      });
+
+      const updatedHTML = doc.body.innerHTML;
+      articleContent.innerHTML = DOMPurify.sanitize(updatedHTML);
+
+      const sanitizedLinks = articleContent.querySelectorAll('a');
+      sanitizedLinks.forEach(link => {
+        link.addEventListener('click', (event) => {
+          event.preventDefault();
+          window.open(link.href, '_blank', 'noopener,noreferrer');
+        });
+      });
+    }
+  }, [article]);
+
   if (!isMounted || !article) {
     return <img src="/images/loader.svg" alt="Loading" />;
   }
@@ -119,7 +147,7 @@ const ArticlePage = ({ params }) => {
             <h2 className="font-noto-sans-georgian text-[16px] sm:text-[24px] font-extrabold text-[#AD88C6] leading-normal mb-5">{article.acf['ავტორი']}</h2>
             <p className="text-[#474F7A] font-semibold pb-10">{article.formattedDate}</p>
           </div>
-          <div className="text-[#474F7A] text-wrap w-full font-noto-sans-georgian text-[14px] sm:text-[16px] font-normal lg:text-justify leading-[30px] sm:leading-[35px] tracking-[0.32px]" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(article.acf['main-text']) }}></div>
+          <div ref={articleContentRef} className="article-content text-[#474F7A] text-wrap w-full font-noto-sans-georgian text-[14px] sm:text-[16px] font-normal lg:text-justify leading-[30px] sm:leading-[35px] tracking-[0.32px]"></div>
           <div className="flex flex-wrap gap-4 mt-10">
             <button onClick={() => setShowShareOptions(true)} className="bg-[#FECE27] text-[#474F7A] pl-[18px] pr-[18px] pt-[4px] pb-[4px] text-[16px] font-seibold rounded flex gap-[12px] items-center justify-center">
               <Image src="/images/share.png" alt="share icon" width={24} height={24} />

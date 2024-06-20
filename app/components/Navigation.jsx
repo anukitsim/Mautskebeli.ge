@@ -42,7 +42,7 @@ const Navigation = ({ onVideoSelect }) => {
           <Link href="/text">ტექსტი</Link>
           <Link href="/podcast">პოდკასტი</Link>
           <Link href="/sporti">სპორტი</Link>
-          <Link href="/about-us">ჩვენს შესახებ</Link>
+          <Link href="/about-us">ჩვენ შესახებ</Link>
         </ul>
         <Search isSearchOpen={isSearchOpen} setIsSearchOpen={setIsSearchOpen} />
         <div className={`${isMenuOpen ? "fixed" : "hidden"} top-32 left-0 h-full w-full bg-[#AD88C6] p-4 sm:hidden z-50 overflow-y-auto`}>
@@ -51,7 +51,7 @@ const Navigation = ({ onVideoSelect }) => {
             <Link href="/text">ტექსტი</Link>
             <Link href="/podcast">პოდკასტი</Link>
             <Link href="/sporti">სპორტი</Link>
-            <Link href="/about-us">ჩვენს შესახებ</Link>
+            <Link href="/about-us">ჩვენ შესახებ</Link>
             <button onClick={toggleCategories} className="text-white text-[15px]  flex items-center gap-2">
               კატეგორიები
               <svg

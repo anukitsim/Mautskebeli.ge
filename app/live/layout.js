@@ -14,6 +14,9 @@ import Footer from "../components/Footer";
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
+      <head>
+      <link rel="icon" href="/favicon.ico" />
+      </head>
       <body>
         <MenuProvider>
           <div className="sticky top-0 z-50">

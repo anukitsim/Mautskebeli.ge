@@ -6,6 +6,9 @@ import "../../style/globals.css"
 export default function RootLayout({ children, pageMeta }) {
   return (
     <html lang="en">
+      <head>
+      <link rel="icon" href="/favicon.ico" />
+      </head>
       <Head>
         <title>{pageMeta?.title || "Default Title"}</title>
         <meta name="description" content={pageMeta?.description || "Default description"} />

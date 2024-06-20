@@ -819,3 +819,12 @@ input[type="range"]::-moz-focus-outer {
   }
 }
 
+/* Ensure this is in your CSS file */
+a.scale-on-hover {
+  transition: transform 0.3s ease !important;
+}
+
+a.scale-on-hover:hover {
+  color: #8C74B2;
+  
+}

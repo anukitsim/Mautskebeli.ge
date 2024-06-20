@@ -67,7 +67,7 @@ const Footer = () => {
         </div>
         <div className="h-full w-1/3 flex flex-col gap-[18px]">
           <h1 className="text-[#AD88C6] text-[16px] font-bold">ნავიგაცია</h1>
-          <Link href="/about-us" className="text-[#474F7A]">ჩვენს შესახებ</Link>
+          <Link href="/about-us" className="text-[#474F7A]">ჩვენ შესახებ</Link>
           
           <Link href="/all-videos" className="text-[#474F7A]">ვიდეოები</Link>
           <Link href="/text" className="text-[#474F7A]">ტექსტი</Link>
@@ -288,7 +288,7 @@ const Footer = () => {
           <h1 className="text-white text-[15px] font-bold">ნავიგაცია</h1>
           <div className="flex gap-[42px]">
             <div className="flex flex-col gap-[12px] text-[#474F7A] text-[15px]">
-            <Link href="/about-us">ჩვენს შესახებ</Link>
+            <Link href="/about-us">ჩვენ შესახებ</Link>
           
           <Link href="/all-videos">ვიდეოები</Link>
           <Link href="/text">ტექსტი</Link>

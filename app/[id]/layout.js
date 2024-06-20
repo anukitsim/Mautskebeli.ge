@@ -80,6 +80,9 @@ export default function RootLayout({ children }) {
         <meta name="twitter:image" content="https://www.mautskebeli.ge/images/og-logo.jpg" />
         <meta name="twitter:image:width" content="800" />
         <meta name="twitter:image:height" content="600" />
+      
+      <link rel="icon" href="/favicon.ico" />
+     
       </head>
       <body>
         <MenuProvider>
