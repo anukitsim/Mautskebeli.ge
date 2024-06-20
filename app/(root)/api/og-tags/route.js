@@ -32,11 +32,7 @@ export async function GET(req) {
     // Function to strip HTML tags and handle missing data-fusion-font attribute
     const stripHtmlTags = (str) => {
       if (!str) return '';
-      if (str.includes('data-fusion-font="true"')) {
-        return str.replace(/<[^>]*>?/gm, '');
-      } else {
-        return str.replace(/<\/?p[^>]*>/gm, '');
-      }
+      return str.replace(/<\/?[^>]+(>|$)/g, ''); // Strips all HTML tags
     };
 
     const ogTags = {
