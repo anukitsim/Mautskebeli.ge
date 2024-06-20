@@ -30,14 +30,21 @@ export async function GET(req) {
 
     const stripHtmlTags = (str) => {
       if (!str) return '';
-      return str.replace(/<\/?[^>]+(>|$)/g, '');
+      return str.replace(/<\/?[^>]+(>|$)/g, ''); // Strips all HTML tags
     };
+
+    let imageUrl = article.acf.image ? article.acf.image : '/images/og-logo.jpg';
+
+    // Ensure the image URL is in a supported format
+    if (imageUrl.endsWith('.avif')) {
+      imageUrl = imageUrl.replace('.avif', '.png');
+    }
 
     const ogTags = {
       title: article.title.rendered,
       description: article.acf['main-text'] ? stripHtmlTags(article.acf['main-text']).slice(0, 150) : '',
       url: `https://www.mautskebeli.ge/all-articles/${article.id}`,
-      image: article.acf.image ? article.acf.image : '/images/og-logo.jpg',
+      image: imageUrl,
     };
 
     console.log('Generated OG tags:', ogTags);
