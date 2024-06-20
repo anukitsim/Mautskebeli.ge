@@ -36,7 +36,7 @@ const HomePagePodcast = () => {
       </section>
 
       {/* Mobile Banner */}
-      <section className="relative mt-[31px] w-full lg:hidden">
+      <section className="relative mt-[101px] w-full lg:hidden">
         <div className="relative w-full">
           <Link href='/podcast'>
             <Image
@@ -50,7 +50,7 @@ const HomePagePodcast = () => {
             />
           </Link>
         </div>
-        <div className="absolute top-0 right-5 flex justify-center items-center">
+        <div className="absolute top-10 right-5 flex justify-center items-center">
           <Link
             href="https://www.youtube.com/playlist?list=PL8wF1aEA4P8NJZUazilLH7ES-T-RQd3Cy"
             target="_blank"
