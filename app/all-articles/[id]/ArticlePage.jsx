@@ -146,10 +146,11 @@ const ArticlePage = ({ params }) => {
         <meta property="og:url" content={articleUrl} />
         <meta property="og:type" content="article" />
         <meta property="og:title" content={article.title.rendered} />
-        <meta property="og:description" content={article.acf['main-text'].slice(0, 150)} />
+        <meta property="og:description" content={article.acf['main-text'].replace(/<\/?[^>]+(>|$)/g, '').slice(0, 150)} />
         <meta property="og:image" content={ogImage} />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
+        <meta property="fb:app_id" content="YOUR_FB_APP_ID" />
       </Head>
 
       <section className="w-full mx-auto mt-10 px-4 lg:px-0 overflow-x-hidden relative">

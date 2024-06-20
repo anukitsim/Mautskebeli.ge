@@ -21,18 +21,16 @@ export async function GET(req) {
     }
 
     const article = await res.json();
-    console.log('Fetched article:', article); // Log the fetched article for debugging
+    console.log('Fetched article:', article);
 
-    // Ensure acf fields exist
     if (!article.acf) {
       console.error('ACF fields missing in article:', article);
       return NextResponse.json({ error: 'ACF fields missing in article' }, { status: 500 });
     }
 
-    // Function to strip HTML tags and handle missing data-fusion-font attribute
     const stripHtmlTags = (str) => {
       if (!str) return '';
-      return str.replace(/<\/?[^>]+(>|$)/g, ''); // Strips all HTML tags
+      return str.replace(/<[^>]*>/g, '').replace(/<\/?p[^>]*>/g, ''); // Strips all HTML tags and specific <p> tags
     };
 
     const ogTags = {
@@ -42,7 +40,7 @@ export async function GET(req) {
       image: article.acf.image ? article.acf.image : '/images/og-logo.jpg',
     };
 
-    console.log('Generated OG tags:', ogTags); // Log the OG tags for debugging
+    console.log('Generated OG tags:', ogTags);
 
     return NextResponse.json(ogTags);
 
