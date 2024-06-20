@@ -29,9 +29,14 @@ export async function GET(req) {
       return NextResponse.json({ error: 'ACF fields missing in article' }, { status: 500 });
     }
 
-    // Function to strip HTML tags
+    // Function to strip HTML tags and handle missing data-fusion-font attribute
     const stripHtmlTags = (str) => {
-      return str ? str.replace(/<[^>]*>?/gm, '') : '';
+      if (!str) return '';
+      if (str.includes('data-fusion-font="true"')) {
+        return str.replace(/<[^>]*>?/gm, '');
+      } else {
+        return str.replace(/<\/?p[^>]*>/gm, '');
+      }
     };
 
     const ogTags = {

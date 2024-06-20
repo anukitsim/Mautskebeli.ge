@@ -37,6 +37,7 @@ const ArticlePage = ({ params }) => {
     const getArticle = async () => {
       try {
         const fetchedArticle = await fetchArticle(id);
+        console.log(fetchedArticle.acf['main-text']);
         setArticle({
           ...fetchedArticle,
           formattedDate: formatDate(fetchedArticle.date),
