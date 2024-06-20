@@ -1,5 +1,4 @@
-// app/all-articles/[id]/ArticlePage.jsx
-'use client';
+"use client"
 
 import { useEffect, useState, useRef, useCallback } from 'react';
 import Image from 'next/image';
@@ -96,7 +95,7 @@ const ArticlePage = ({ params }) => {
   }
 
   const articleUrl = `https://www.mautskebeli.ge/all-articles/${article.id}`;
-  const ogImage = article.acf.image;
+  const ogImage = article.acf.image ? `http://localhost:3000/api/og?title=${encodeURIComponent(article.title.rendered)}` : '/images/default-og-image.jpg';
 
   return (
     <>
@@ -105,9 +104,8 @@ const ArticlePage = ({ params }) => {
         <meta property="og:url" content={articleUrl} />
         <meta property="og:type" content="article" />
         <meta property="og:title" content={article.title.rendered} />
-        <meta property="og:description" content={article.acf.title} />
+        <meta property="og:description" content={article.acf.description} />
         <meta property="og:image" content={ogImage} />
-        <meta property="og:image:alt" content={article.title.rendered} />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
       </Head>
@@ -115,7 +113,7 @@ const ArticlePage = ({ params }) => {
       <section className="w-full mx-auto mt-10 px-4 lg:px-0 overflow-x-hidden relative">
         <div className="w-full lg:w-[54%] mx-auto bg-opacity-90 p-5 rounded-lg">
           <div className="w-full h-auto mb-5">
-            <Image src={ogImage} alt={article.title.rendered} width={800} height={450} style={{ objectFit: 'cover' }} className="rounded-lg w-full" />
+            <Image src={article.acf.image || '/images/default-og-image.jpg'} alt={article.title.rendered} width={800} height={450} style={{ objectFit: 'cover' }} className="rounded-lg w-full" />
             <h1 className="font-alk-tall-mtavruli text-[32px] sm:text-[64px] font-light leading-none text-[#474F7A] mt-[24px] mb-5">{article.title.rendered}</h1>
             <h2 className="font-noto-sans-georgian text-[16px] sm:text-[24px] font-extrabold text-[#AD88C6] leading-normal mb-5">{article.acf['ავტორი']}</h2>
             <p className="text-[#474F7A] font-semibold pb-10">{article.formattedDate}</p>
@@ -123,7 +121,7 @@ const ArticlePage = ({ params }) => {
           <div className="text-[#474F7A] text-wrap w-full font-noto-sans-georgian text-[14px] sm:text-[16px] font-normal lg:text-justify leading-[30px] sm:leading-[35px] tracking-[0.32px]" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(article.acf['main-text']) }}></div>
           <div className="flex flex-wrap gap-4 mt-10">
             <button onClick={() => setShowShareOptions(true)} className="bg-[#FECE27] text-[#474F7A] pl-[18px] pr-[18px] pt-[4px] pb-[4px] text-[16px] font-seibold rounded flex gap-[12px] items-center justify-center">
-              <Image src="/images/share.png" alt="share icon" width={24} height={24}/>
+              <Image src="/images/share.png" alt="share icon" width={24} height={24} />
             </button>
           </div>
           {showShareOptions && (
