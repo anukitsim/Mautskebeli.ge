@@ -134,11 +134,6 @@ const ArticlePage = ({ params }) => {
   const articleUrl = `https://www.mautskebeli.ge/all-articles/${article.id}`;
   const ogImage = article.acf.image ? article.acf.image : '/images/default-og-image.jpg';
 
-  const rawDescription = article.acf['main-text'];
-  const strippedDescription = stripHtmlTags(rawDescription).slice(0, 150);
-  const hasHtmlTags = /<[^>]+>/.test(rawDescription);
-  const description = hasHtmlTags ? `ავტორი: ${article.acf['ავტორი']}` : strippedDescription;
-
   return (
     <>
       <Head>
@@ -146,7 +141,7 @@ const ArticlePage = ({ params }) => {
         <meta property="og:url" content={articleUrl} />
         <meta property="og:type" content="article" />
         <meta property="og:title" content={article.title.rendered} />
-        <meta property="og:description" content={description} />
+        <meta property="og:description" content={article.acf['main-text']} />
         <meta property="og:image" content={ogImage} />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />

@@ -31,13 +31,11 @@ export async function GET(req) {
     const rawDescription = article.acf['main-text'];
     console.log('Raw Description:', rawDescription);
 
-    // Function to remove the first HTML tag and strip remaining tags
+    // Function to strip HTML tags
     const stripHtmlTags = (str) => {
       if (!str) return '';
       // Remove the first tag if it starts with a tag
-      if (str.startsWith('<')) {
-        str = str.replace(/<[^>]*>/, '');
-      }
+      str = str.replace(/^<[^>]+>/, '');
       // Remove all other HTML tags
       return str.replace(/<[^>]*>/g, '');
     };
