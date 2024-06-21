@@ -33,7 +33,7 @@ const ArticlePage = ({ params }) => {
 
   const stripHtmlTags = (str) => {
     if (!str) return '';
-    return str.replace(/<[^>]+>/g, '');  // Updated regex to strip all HTML tags and attributes
+    return str.replace(/<[^>]*>/g, '');
   };
 
   useEffect(() => {
@@ -134,7 +134,10 @@ const ArticlePage = ({ params }) => {
   const articleUrl = `https://www.mautskebeli.ge/all-articles/${article.id}`;
   const ogImage = article.acf.image ? article.acf.image : '/images/default-og-image.jpg';
 
-  console.log('Article URL:', articleUrl);  // Log the URL to ensure it's correct
+  const rawDescription = article.acf['main-text'];
+  const strippedDescription = stripHtmlTags(rawDescription).slice(0, 150);
+  const hasHtmlTags = /<[^>]+>/.test(rawDescription);
+  const description = hasHtmlTags ? `ავტორი: ${article.acf['ავტორი']}` : strippedDescription;
 
   return (
     <>
@@ -143,7 +146,7 @@ const ArticlePage = ({ params }) => {
         <meta property="og:url" content={articleUrl} />
         <meta property="og:type" content="article" />
         <meta property="og:title" content={article.title.rendered} />
-        <meta property="og:description" content={stripHtmlTags(article.acf['main-text']).slice(0, 150)} />
+        <meta property="og:description" content={description} />
         <meta property="og:image" content={ogImage} />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
@@ -153,14 +156,14 @@ const ArticlePage = ({ params }) => {
       <section className="w-full mx-auto mt-10 px-4 lg:px-0 overflow-x-hidden relative">
         <div className="w-full lg:w-[54%] mx-auto bg-opacity-90 p-5 rounded-lg">
           <div className="w-full h-auto mb-5">
-            <Image src={article.acf.image || '/images/default-og-image.jpg'} alt={article.title.rendered} width={800} height={450} style={{ objectFit: 'cover' }} className="rounded-lg w-full" priority />
+            <Image src={article.acf.image || '/images/default-og-image.jpg'} alt={article.title.rendered} width={800} height={450} style={{ objectFit: 'cover' }} className="rounded-lg w-full" />
             <h1 className="font-alk-tall-mtavruli text-[32px] sm:text-[64px] font-light leading-none text-[#474F7A] mt-[24px] mb-5">{article.title.rendered}</h1>
             <h2 className="font-noto-sans-georgian text-[16px] sm:text-[24px] font-extrabold text-[#AD88C6] leading-normal mb-5">{article.acf['ავტორი']}</h2>
             <p className="text-[#474F7A] font-semibold pb-10">{article.formattedDate}</p>
           </div>
           <div ref={articleContentRef} className="article-content text-[#474F7A] text-wrap w-full font-noto-sans-georgian text-[14px] sm:text-[16px] font-normal lg:text-justify leading-[30px] sm:leading-[35px] tracking-[0.32px]"></div>
           <div className="flex flex-wrap gap-4 mt-10">
-            <button onClick={() => setShowShareOptions(true)} className="bg-[#FECE27] text-[#474F7A] pl-[18px] pr-[18px] pt-[4px] pb-[4px] text-[16px] font-semibold rounded flex gap-[12px] items-center justify-center">
+            <button onClick={() => setShowShareOptions(true)} className="bg-[#FECE27] text-[#474F7A] pl-[18px] pr-[18px] pt-[4px] pb-[4px] text-[16px] font-seibold rounded flex gap-[12px] items-center justify-center">
               <Image src="/images/share.png" alt="share icon" width={24} height={24} />
             </button>
           </div>

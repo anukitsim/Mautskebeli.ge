@@ -31,7 +31,7 @@ export async function generateMetadata({ params }) {
     }
 
     const ogTags = await res.json();
-    console.log('OG Tags:', ogTags); // Log the OG tags for debugging
+    console.log('OG Tags:', ogTags);
 
     return {
       title: ogTags.title,

@@ -1,5 +1,3 @@
-// app/(root)/api/og-tags/route.js
-
 import { NextResponse } from 'next/server';
 
 export async function GET(req) {
@@ -30,19 +28,29 @@ export async function GET(req) {
       return NextResponse.json({ error: 'ACF fields missing in article' }, { status: 500 });
     }
 
+    const rawDescription = article.acf['main-text'];
+    console.log('Raw Description:', rawDescription);
+
+    // Function to remove the first HTML tag and strip remaining tags
     const stripHtmlTags = (str) => {
       if (!str) return '';
-      return str.replace(/<[^>]+>/g, '');  // Updated regex to strip all HTML tags and attributes
+      // Remove the first tag if it starts with a tag
+      if (str.startsWith('<')) {
+        str = str.replace(/<[^>]*>/, '');
+      }
+      // Remove all other HTML tags
+      return str.replace(/<[^>]*>/g, '');
     };
 
-    const rawDescription = article.acf['main-text'];
-    const strippedDescription = stripHtmlTags(rawDescription).slice(0, 150);
-    console.log('Raw Description:', rawDescription);
-    console.log('Stripped Description:', strippedDescription);
+    const cleanedDescription = stripHtmlTags(rawDescription);
+    console.log('Cleaned Description:', cleanedDescription);
+
+    const description = cleanedDescription.slice(0, 150);
+    console.log('Description:', description);
 
     const ogTags = {
       title: article.title.rendered,
-      description: strippedDescription,
+      description: description,
       url: `https://www.mautskebeli.ge/all-articles/${article.id}`,
       image: article.acf.image ? article.acf.image : '/images/og-logo.jpg',
     };
