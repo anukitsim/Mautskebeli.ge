@@ -31,19 +31,12 @@ const ArticlePage = ({ params }) => {
   const articleContentRef = useRef(null);
   const { id } = params;
 
-  const stripHtmlTags = (str) => {
-    if (!str) return '';
-    return str.replace(/<[^>]*>/g, '');
-  };
-
   useEffect(() => {
     setIsMounted(true);
     const getArticle = async () => {
       try {
         const fetchedArticle = await fetchArticle(id);
         console.log('Fetched article content:', fetchedArticle.acf['main-text']);
-        const strippedContent = stripHtmlTags(fetchedArticle.acf['main-text']);
-        console.log('Stripped article content:', strippedContent);
         setArticle({
           ...fetchedArticle,
           formattedDate: formatDate(fetchedArticle.date),

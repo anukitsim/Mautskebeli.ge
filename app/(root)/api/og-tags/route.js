@@ -31,24 +31,18 @@ export async function GET(req) {
     const rawDescription = article.acf['main-text'];
     console.log('Raw Description:', rawDescription);
 
-    // Function to strip HTML tags
+    // Manually strip HTML tags
     const stripHtmlTags = (str) => {
       if (!str) return '';
-      // Remove the first tag if it starts with a tag
-      str = str.replace(/^<[^>]+>/, '');
-      // Remove all other HTML tags
       return str.replace(/<[^>]*>/g, '');
     };
 
-    const cleanedDescription = stripHtmlTags(rawDescription);
+    const cleanedDescription = stripHtmlTags(rawDescription).slice(0, 150);
     console.log('Cleaned Description:', cleanedDescription);
-
-    const description = cleanedDescription.slice(0, 150);
-    console.log('Description:', description);
 
     const ogTags = {
       title: article.title.rendered,
-      description: description,
+      description: cleanedDescription,
       url: `https://www.mautskebeli.ge/all-articles/${article.id}`,
       image: article.acf.image ? article.acf.image : '/images/og-logo.jpg',
     };
