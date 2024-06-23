@@ -8,9 +8,7 @@ import Head from 'next/head';
 export const metadata = {
   title: "mautskebeli.ge",
   description: "მედია პლათფორმა მაუწყებელი",
-  icons: {
-    icon: "/images/og-logo.jpg",
-  },
+  
 };
 
 export default function RootLayout({ children }) {
