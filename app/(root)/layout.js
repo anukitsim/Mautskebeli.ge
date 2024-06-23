@@ -11,7 +11,7 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }) {
-  const homepageOgImage = 'https://imgur.com/a/tHzpkbT'; // Direct link to the image
+  const homepageOgImage = 'https://i.imgur.com/1DcKU3Q.jpg'; // Direct link to the image
 
   return (
     <html lang="en">
