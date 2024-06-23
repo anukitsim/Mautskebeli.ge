@@ -11,7 +11,7 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }) {
-  const homepageOgImage = 'https://mautskebeli.ge/static/images/og-logo.jpg'; // Specific image for homepage
+  const homepageOgImage = 'https://i.imgur.com/tHzpkbT.jpg'; // Direct link to the image
 
   return (
     <html lang="en">
@@ -24,6 +24,7 @@ export default function RootLayout({ children }) {
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
         <meta property="og:url" content="https://www.mautskebeli.ge/" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no" />
       </Head>
       <head>
         <link rel="icon" href="/favicon.ico" />
