@@ -11,7 +11,7 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }) {
-  const defaultOgImage = 'https://mautskebeli.ge/api/og?title=Default%20Title';
+  const homepageOgImage = 'https://mautskebeli.ge/static/images/og-logo.jpg'; // Specific image for homepage
 
   return (
     <html lang="en">
@@ -20,17 +20,16 @@ export default function RootLayout({ children }) {
         <meta name="description" content={metadata.description} />
         <meta property="og:title" content={metadata.title} />
         <meta property="og:description" content={metadata.description} />
-        <meta property="og:image" content={defaultOgImage} />
+        <meta property="og:image" content={homepageOgImage} />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
+        <meta property="og:url" content="https://www.mautskebeli.ge/" />
       </Head>
       <head>
-      <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href="/favicon.ico" />
       </head>
       <body>
-       
         {children}
-      
       </body>
     </html>
   );
