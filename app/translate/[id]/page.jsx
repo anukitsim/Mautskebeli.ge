@@ -20,7 +20,7 @@ export async function generateMetadata({ params }) {
           url: `https://www.mautskebeli.ge/translate/${id}`,
           images: [
             {
-              url: '/images/default-og-image.jpg',
+              url: '/images/og-logo.jpg',
               width: 1200,
               height: 630,
             },
@@ -61,7 +61,7 @@ export async function generateMetadata({ params }) {
         url: `https://www.mautskebeli.ge/translate/${id}`,
         images: [
           {
-            url: '/images/default-og-image.jpg',
+            url: '/images/og-logo.jpg',
             width: 1200,
             height: 630,
           },
@@ -71,6 +71,7 @@ export async function generateMetadata({ params }) {
     };
   }
 }
+
 
 const NoSSRArticlePage = dynamic(() => import('./TargmaniPage'), { ssr: false });
 

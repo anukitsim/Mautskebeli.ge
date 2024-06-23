@@ -125,7 +125,7 @@ const TargmaniPage = ({ params }) => {
   }
 
   const articleUrl = `https://www.mautskebeli.ge/translate/${article.id}`;
-  const ogImage = article.acf.image ? article.acf.image : '/images/default-og-image.jpg';
+  const ogImage = article.acf.image ? article.acf.image : '/images/og-logo.jpg';
 
   // Sanitize the description
   const sanitizeDescription = (html) => {
@@ -144,11 +144,12 @@ const TargmaniPage = ({ params }) => {
         <meta property="og:type" content="article" />
         <meta property="og:title" content={article.title.rendered} />
         <meta property="og:description" content={ogDescription} />
-        <meta property="og:image" content={ogImage} />
+        <meta property="og:image:secure_ur" content={ogImage} />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
         <meta property="og:image:type" content="image/png" />
-        <meta property="fb:app_id" content="480323335835739" />
+        <meta property="fb:app_id" content="2191957607826649" />
+        <meta property="og:image:alt" content="mautskebeli image" />
       </Head>
 
       <section className="w-full mx-auto mt-10 px-4 lg:px-0 overflow-x-hidden relative">
