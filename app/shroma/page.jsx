@@ -7,8 +7,8 @@ import Navigation from "../components/Navigation";
 import { MenuProvider } from "../context/MenuContext";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
-
-
+import moment from 'moment';
+import 'moment/locale/ka';
 
 const PlayButton = ({ onClick }) => (
   <img
@@ -28,7 +28,12 @@ const extractVideoId = (videoUrl) => {
   return match ? match[1] : null;
 };
 
-const VideoCard = ({ videoId, acf, onSelect }) => {
+const formatDate = (dateString) => {
+  moment.locale('ka');
+  return moment(dateString).format('LL');
+};
+
+const VideoCard = ({ videoId, acf, onSelect, date }) => {
   const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
 
   return (
@@ -51,6 +56,7 @@ const VideoCard = ({ videoId, acf, onSelect }) => {
       >
         {acf && acf.title ? acf.title : "No title available"}
       </p>
+     
     </div>
   );
 };
@@ -65,6 +71,7 @@ function ShromaVideos() {
     title: "",
     description: "",
   });
+  const [activeVideoDate, setActiveVideoDate] = useState("");
   const [lastSelectedVideoId, setLastSelectedVideoId] = useState(null);
   const [customPlayerKey, setCustomPlayerKey] = useState(0);
   const shareOptionsRef = useRef(null);
@@ -109,7 +116,7 @@ function ShromaVideos() {
         const initialVideoId = searchParams.get("videoId") || extractVideoId(data[0]?.acf.video_url);
         const initialVideo = data.find(video => extractVideoId(video.acf.video_url) === initialVideoId);
         if (initialVideo) {
-          handleVideoSelect(initialVideoId, initialVideo.acf);
+          handleVideoSelect(initialVideoId, initialVideo.acf, initialVideo.date);
         }
       } catch (error) {
         console.error("Error fetching videos:", error);
@@ -128,9 +135,10 @@ function ShromaVideos() {
     }
   }, [activeVideoId, lastSelectedVideoId]);
 
-  const handleVideoSelect = (videoId, acf) => {
+  const handleVideoSelect = (videoId, acf, date) => {
     setActiveVideoId(videoId);
     setActiveVideoAcf(acf);
+    setActiveVideoDate(date);
     setCustomPlayerKey((prevKey) => prevKey + 1);
     router.push(`?videoId=${videoId}`, undefined, { shallow: true });
     setCurrentUrl(window.location.href);
@@ -171,10 +179,15 @@ function ShromaVideos() {
             <>
               <div ref={videoPlayerRef} className="relative mt-[74px]" style={{ zIndex: 10 }}>
                 <CustomYoutubePlayer key={customPlayerKey} videoId={activeVideoId} />
+               
                 <div className="mx-auto lg:mt-[7%] lg:w-10/12 mt-[100%] sm:w-full flex flex-col gap-[23px] pl-5 pr-5">
+                <p className="text-[16px] text-[#474F7A] font-semibold">
+                    {activeVideoDate ? formatDate(activeVideoDate) : ""}
+                  </p>
                   <h2 className="text-[32px] text-[#474F7A] font-bold">
                     {activeVideoAcf.title}
                   </h2>
+                 
                   <div className="flex lg:flex-row flex-col gap-2 mt-2">
                     <a
                       href={`https://www.youtube.com/watch?v=${activeVideoId}`}
@@ -276,6 +289,7 @@ function ShromaVideos() {
                     videoId={extractVideoId(video.acf.video_url)}
                     acf={video.acf}
                     onSelect={handleVideoSelect}
+                    date={video.date}
                   />
                 ))}
               </div>
@@ -287,6 +301,7 @@ function ShromaVideos() {
                       videoId={extractVideoId(video.acf.video_url)}
                       acf={video.acf}
                       onSelect={handleVideoSelect}
+                      date={video.date}
                     />
                   ))}
                 </div>
