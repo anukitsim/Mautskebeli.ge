@@ -11,7 +11,7 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }) {
-  const defaultOgImage = 'https://mautskebeli.ge/api/og?title=Default%20Title';
+  const defaultOgImage = 'https://mautskebeli.ge/images/og-logo.jpg';
 
   return (
     <html lang="en">
