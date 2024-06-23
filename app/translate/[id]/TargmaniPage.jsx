@@ -147,7 +147,8 @@ const TargmaniPage = ({ params }) => {
         <meta property="og:image" content={ogImage} />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
-        <meta property="fb:app_id" content="YOUR_FB_APP_ID" />
+        <meta property="og:image:type" content="image/png" />
+        <meta property="fb:app_id" content="480323335835739" />
       </Head>
 
       <section className="w-full mx-auto mt-10 px-4 lg:px-0 overflow-x-hidden relative">
