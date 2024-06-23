@@ -23,14 +23,10 @@ export default function RootLayout({ children }) {
         <meta property="og:image" content={defaultOgImage} />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
+        <link rel="icon" href="/favicon.ico" />
       </Head>
-      <head>
-      <link rel="icon" href="/favicon.ico" />
-      </head>
       <body>
-       
         {children}
-      
       </body>
     </html>
   );
