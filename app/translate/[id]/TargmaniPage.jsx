@@ -21,7 +21,7 @@ function formatDate(dateString) {
   return moment(dateString).format('LL');
 }
 
-const ArticlePage = ({ params }) => {
+const TargmaniPage = ({ params }) => {
   const [article, setArticle] = useState(null);
   const [isMounted, setIsMounted] = useState(false);
   const [showShareOptions, setShowShareOptions] = useState(false);
@@ -192,4 +192,4 @@ const ArticlePage = ({ params }) => {
   );
 };
 
-export default ArticlePage;
+export default TargmaniPage;

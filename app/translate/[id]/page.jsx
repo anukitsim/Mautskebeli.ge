@@ -4,7 +4,7 @@ export async function generateMetadata({ params }) {
   const { id } = params;
 
   try {
-    const apiUrl = `https://www.mautskebeli.ge/api/og-tags?id=${id}`;
+    const apiUrl = `https://www.mautskebeli.ge/api/translate-og?id=${id}`;
     console.log(`Fetching OG tags from: ${apiUrl}`);
 
     const res = await fetch(apiUrl);
