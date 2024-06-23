@@ -8,12 +8,9 @@ import Head from 'next/head';
 export const metadata = {
   title: "mautskebeli.ge",
   description: "მედია პლათფორმა მაუწყებელი",
-  
 };
 
 export default function RootLayout({ children }) {
- 
-
   return (
     <html lang="en">
       <Head>
@@ -21,10 +18,12 @@ export default function RootLayout({ children }) {
         <meta name="description" content={metadata.description} />
         <meta property="og:title" content={metadata.title} />
         <meta property="og:description" content={metadata.description} />
-        <meta property="og:image" content="https://mautskebeli.ge/images/og-logo.jpg" />
-          <meta property="og:image:width" content="1200" />
-          <meta property="og:image:height" content="630" />
-          <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no" />
+        <meta property="og:image" content="https://www.mautskebeli.ge/images/og-logo.jpg" />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:image:type" content="image/jpeg" />
+        <meta property="og:image:alt" content="Mautskebeli Logo" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <body>
