@@ -9,7 +9,7 @@ import 'moment/locale/ka';
 import { FacebookShareButton, FacebookIcon, TwitterShareButton, TwitterIcon } from 'next-share';
 
 async function fetchArticle(id) {
-  const res = await fetch(`https://mautskebeli.wpenginepowered.com/wp-json/wp/v2/article/${id}?acf_format=standard&_fields=id,title,acf,date`);
+  const res = await fetch(`https://mautskebeli.wpenginepowered.com/wp-json/wp/v2/article/${id}?acf_format=standard&_fields=id,title,acf,date&_=${new Date().getTime()}`);
   if (!res.ok) {
     throw new Error('Failed to fetch article');
   }
@@ -127,7 +127,6 @@ const ArticlePage = ({ params }) => {
   const articleUrl = `https://www.mautskebeli.ge/all-articles/${article.id}`;
   const ogImage = article.acf.image ? article.acf.image : '/images/default-og-image.jpg';
 
-  // Sanitize the description
   const sanitizeDescription = (html) => {
     const doc = new DOMParser().parseFromString(html, 'text/html');
     return doc.body.textContent || "";
