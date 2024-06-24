@@ -1,5 +1,4 @@
 "use client";
-
 import { useEffect, useState, useRef, useCallback } from 'react';
 import Image from 'next/image';
 import Head from 'next/head';
@@ -36,7 +35,6 @@ const ArticlePage = ({ params }) => {
     const getArticle = async () => {
       try {
         const fetchedArticle = await fetchArticle(id);
-        console.log('Fetched article content:', fetchedArticle.acf['main-text']);
         setArticle({
           ...fetchedArticle,
           formattedDate: formatDate(fetchedArticle.date),
@@ -90,25 +88,7 @@ const ArticlePage = ({ params }) => {
   useEffect(() => {
     if (article && articleContentRef.current) {
       const articleContent = articleContentRef.current;
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(article.acf['main-text'], 'text/html');
-      const paragraphs = doc.querySelectorAll('p');
-
-      paragraphs.forEach(paragraph => {
-        const aTags = paragraph.querySelectorAll('a');
-        if (aTags.length >= 2) {
-          const newContent = [];
-          for (let i = 0; i < aTags.length; i += 2) {
-            const linkNumber = aTags[i].outerHTML;
-            const linkText = aTags[i + 1].outerHTML;
-            newContent.push(`<span class="no-break">${linkNumber} ${linkText}</span>`);
-          }
-          paragraph.innerHTML = newContent.join(' ');
-        }
-      });
-
-      const updatedHTML = doc.body.innerHTML;
-      articleContent.innerHTML = DOMPurify.sanitize(updatedHTML);
+      articleContent.innerHTML = DOMPurify.sanitize(article.acf['main-text']);
 
       const sanitizedLinks = articleContent.querySelectorAll('a');
       sanitizedLinks.forEach(link => {
