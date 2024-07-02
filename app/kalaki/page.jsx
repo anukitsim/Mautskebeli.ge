@@ -56,9 +56,7 @@ const VideoCard = ({ videoId, acf, onSelect, date }) => {
       >
         {acf && acf.title ? acf.title : "No title available"}
       </p>
-      <p className="text-sm text-center text-white">
-        {date ? formatDate(date) : "No date available"}
-      </p>
+      
     </div>
   );
 };
