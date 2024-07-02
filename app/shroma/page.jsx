@@ -40,14 +40,14 @@ const VideoCard = ({ videoId, acf, onSelect, date }) => {
     <div
       className="relative flex flex-col items-center w-full max-w-[248px] p-2.5 gap-2 mx-auto my-2 bg-[#AD88C6] rounded-lg cursor-pointer"
       style={{ height: "206px" }}
-      onClick={() => onSelect(videoId, acf)}
+      onClick={() => onSelect(videoId, acf, date)}
     >
       <div
         className="w-full h-40 bg-cover bg-center rounded-lg"
         style={{ backgroundImage: `url(${thumbnailUrl})` }}
       >
         <div className="absolute inset-0 flex items-center justify-center">
-          <PlayButton onClick={() => onSelect(videoId, acf)} />
+          <PlayButton onClick={() => onSelect(videoId, acf, date)} />
         </div>
       </div>
       <p
@@ -56,12 +56,36 @@ const VideoCard = ({ videoId, acf, onSelect, date }) => {
       >
         {acf && acf.title ? acf.title : "No title available"}
       </p>
-     
+      <p className="text-sm text-center text-white">
+        {date ? formatDate(date) : "No date available"}
+      </p>
     </div>
   );
 };
 
-function ShromaVideos() {
+const fetchYoutubeVideoDetails = async (videoId, apiKey) => {
+  const cachedDate = localStorage.getItem(videoId);
+  if (cachedDate) {
+    return cachedDate;
+  }
+
+  try {
+    const response = await fetch(
+      `https://www.googleapis.com/youtube/v3/videos?id=${videoId}&part=snippet&key=${apiKey}`
+    );
+    const data = await response.json();
+    if (data.items && data.items.length > 0) {
+      const publishedAt = data.items[0].snippet.publishedAt;
+      localStorage.setItem(videoId, publishedAt);
+      return publishedAt;
+    }
+  } catch (error) {
+    console.error(`Failed to fetch YouTube video details for ${videoId}:`, error);
+  }
+  return null;
+};
+
+function XelovnebaVideos() {
   const [videos, setVideos] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
@@ -112,11 +136,27 @@ function ShromaVideos() {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
-        setVideos(data);
+
+        const apiKey = "AIzaSyDd4yHryI5WLPLNjpKsiuU1bYHnBgcK_u8";
+
+        const videosWithDates = await Promise.all(
+          data.map(async (video) => {
+            const videoId = extractVideoId(video.acf.video_url);
+            const youtubeDate = await fetchYoutubeVideoDetails(videoId, apiKey);
+            return {
+              ...video,
+              youtubeDate,
+              videoId,
+            };
+          })
+        );
+
+        setVideos(videosWithDates);
+
         const initialVideoId = searchParams.get("videoId") || extractVideoId(data[0]?.acf.video_url);
-        const initialVideo = data.find(video => extractVideoId(video.acf.video_url) === initialVideoId);
+        const initialVideo = videosWithDates.find(video => video.videoId === initialVideoId);
         if (initialVideo) {
-          handleVideoSelect(initialVideoId, initialVideo.acf, initialVideo.date);
+          handleVideoSelect(initialVideoId, initialVideo.acf, initialVideo.youtubeDate);
         }
       } catch (error) {
         console.error("Error fetching videos:", error);
@@ -179,15 +219,13 @@ function ShromaVideos() {
             <>
               <div ref={videoPlayerRef} className="relative mt-[74px]" style={{ zIndex: 10 }}>
                 <CustomYoutubePlayer key={customPlayerKey} videoId={activeVideoId} />
-               
                 <div className="mx-auto lg:mt-[7%] lg:w-10/12 mt-[100%] sm:w-full flex flex-col gap-[23px] pl-5 pr-5">
-                <p className="text-[16px] text-[#474F7A] font-semibold">
+                  <p className="text-[16px] text-[#474F7A] font-semibold">
                     {activeVideoDate ? formatDate(activeVideoDate) : ""}
                   </p>
                   <h2 className="text-[32px] text-[#474F7A] font-bold">
                     {activeVideoAcf.title}
                   </h2>
-                 
                   <div className="flex lg:flex-row flex-col gap-2 mt-2">
                     <a
                       href={`https://www.youtube.com/watch?v=${activeVideoId}`}
@@ -248,12 +286,11 @@ function ShromaVideos() {
                               Twitter
                             </button>
                           </div>
-                         
                         </div>
                       </div>
                     )}
                   </div>
-                  <p className="text-[16px] text-[#474F7A] font-llight">
+                  <p className="text-[16px] text-[#474F7A] font-light">
                     {activeVideoAcf.description}
                   </p>
                 </div>
@@ -286,10 +323,10 @@ function ShromaVideos() {
                 {paginatedVideos.map((video) => (
                   <VideoCard
                     key={video.id}
-                    videoId={extractVideoId(video.acf.video_url)}
+                    videoId={video.videoId}
                     acf={video.acf}
                     onSelect={handleVideoSelect}
-                    date={video.date}
+                    date={video.youtubeDate}  // Ensure date is passed here
                   />
                 ))}
               </div>
@@ -298,10 +335,10 @@ function ShromaVideos() {
                   {paginatedVideos.map((video) => (
                     <VideoCard
                       key={video.id}
-                      videoId={extractVideoId(video.acf.video_url)}
+                      videoId={video.videoId}
                       acf={video.acf}
                       onSelect={handleVideoSelect}
-                      date={video.date}
+                      date={video.youtubeDate}  // Ensure date is passed here
                     />
                   ))}
                 </div>
@@ -314,14 +351,14 @@ function ShromaVideos() {
   );
 }
 
-function WrappedShromaVideos() {
+function WrappedXelovnebaVideos() {
   return (
     <Suspense fallback={<div> <img src="/images/loader.svg" /></div>}>
-      <ShromaVideos />
+      <XelovnebaVideos />
     </Suspense>
   );
 }
 
 export default function Page() {
-  return <WrappedShromaVideos />;
+  return <WrappedXelovnebaVideos />;
 }
