@@ -1,6 +1,5 @@
 import dynamic from 'next/dynamic';
 
-
 export async function generateMetadata({ params }) {
   const { id } = params;
 
@@ -74,6 +73,7 @@ export async function generateMetadata({ params }) {
   }
 }
 
+// Ensure the correct case-sensitive path and file name
 const NoSSRArticlePage = dynamic(() => import('./ColumnPage'), { ssr: false });
 
 const Page = ({ params }) => {
