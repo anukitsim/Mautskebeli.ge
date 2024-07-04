@@ -74,7 +74,7 @@ export async function generateMetadata({ params }) {
 }
 
 // Ensure the correct case-sensitive path and file name
-const NoSSRArticlePage = dynamic(() => import('./ColumnPage'), { ssr: false });
+const NoSSRArticlePage = dynamic(() => import('./columnPage'), { ssr: false });
 
 const Page = ({ params }) => {
   return <NoSSRArticlePage params={params} />;
