@@ -1,5 +1,6 @@
 import dynamic from 'next/dynamic';
 
+
 export async function generateMetadata({ params }) {
   const { id } = params;
 
