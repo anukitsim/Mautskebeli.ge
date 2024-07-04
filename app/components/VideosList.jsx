@@ -5,11 +5,12 @@ import Modal from "react-modal";
 import Image from "next/image";
 import CustomYoutubePlayer from "./CustomYoutube";
 import Link from "next/link";
+import moment from 'moment';
 
 const PlayButton = ({ onClick }) => (
   <img
     src="/images/card-play-button.png"
-    alt="playbutton"
+    alt="play button"
     width={42}
     height={42}
     onClick={onClick}
@@ -28,6 +29,28 @@ const getThumbnailUrl = (videoId) => {
   return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
 };
 
+const fetchYoutubeVideoDetails = async (videoId, apiKey) => {
+  const cachedDate = localStorage.getItem(videoId);
+  if (cachedDate) {
+    return cachedDate;
+  }
+
+  try {
+    const response = await fetch(
+      `https://www.googleapis.com/youtube/v3/videos?id=${videoId}&part=snippet&key=${apiKey}`
+    );
+    const data = await response.json();
+    if (data.items && data.items.length > 0) {
+      const publishedAt = data.items[0].snippet.publishedAt;
+      localStorage.setItem(videoId, publishedAt);
+      return publishedAt;
+    }
+  } catch (error) {
+    console.error(`Failed to fetch YouTube video details for ${videoId}:`, error);
+  }
+  return null;
+};
+
 // Mapping of post types to URL-friendly versions
 const postTypeUrlMap = {
   'kalaki': 'qalaqi',
@@ -35,7 +58,7 @@ const postTypeUrlMap = {
   'mecniereba': 'mecniereba',
   'medicina': 'medicina',
   'msoflio': 'msoflio',
-  'saxli': 'saxli-yvelas', 
+  'saxli': 'saxli-yvelas',
   'shroma': 'shroma',
   'xelovneba': 'xelovneba'
 };
@@ -87,13 +110,27 @@ function VideosList({ endpoint, title }) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
-      const videos = data.map(video => ({
-        post_id: video.post_id,
-        title: video.title,
-        videoId: extractVideoId(video.video_url),
-        post_type: video.post_type // Ensure that post_type is correctly passed
+      const apiKey = "AIzaSyDd4yHryI5WLPLNjpKsiuU1bYHnBgcK_u8"; // Your YouTube API key here
+
+      const videos = await Promise.all(data.map(async video => {
+        const videoId = extractVideoId(video.video_url);
+        let uploadDate = localStorage.getItem(videoId);
+        if (!uploadDate) {
+          uploadDate = await fetchYoutubeVideoDetails(videoId, apiKey);
+          localStorage.setItem(videoId, uploadDate);
+        }
+        return {
+          post_id: video.post_id,
+          title: video.title,
+          videoId,
+          post_type: video.post_type,
+          uploadDate
+        };
       }));
-      console.log('Fetched videos:', videos.length, videos); 
+
+      // Sort videos by upload date in descending order (newest first)
+      videos.sort((a, b) => moment(b.uploadDate) - moment(a.uploadDate));
+
       setVideos(videos);
       setError(null);
     } catch (error) {
