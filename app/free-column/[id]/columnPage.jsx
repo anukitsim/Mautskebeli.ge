@@ -159,11 +159,11 @@ const ColumnPage = ({ params }) => {
           <div className="w-full h-auto mb-5">
             <Image src={article.acf.image || '/images/default-og-image.jpg'} alt={article.title.rendered} width={800} height={450} style={{ objectFit: 'cover' }} className="rounded-lg w-full" />
             <h1 className="font-alk-tall-mtavruli text-[32px] sm:text-[64px] font-light leading-none text-[#474F7A] mt-[24px] mb-5">{article.title.rendered}</h1>
-            {article.acf['author'] && (
-              <h3 className="font-noto-sans-georgian text-[16px] sm:text-[24px] font-extrabold text-[#AD88C6] leading-normal mb-5">{article.acf['author']}</h3>
+            {article.acf['ავტორი'] && (
+              <h3 className="font-noto-sans-georgian text-[16px] sm:text-[24px] font-extrabold text-[#AD88C6] leading-normal mb-5">{article.acf['ავტორი']}</h3>
             )}
-            {article.acf['translator'] && (
-              <h2 className="font-noto-sans-georgian text-[14px] sm:text-[20px] text-[#AD88C6] leading-normal mb-5">{article.acf['translator']}</h2>
+            {article.acf['მთარგმნელი'] && (
+              <h2 className="font-noto-sans-georgian text-[14px] sm:text-[20px] text-[#AD88C6] leading-normal mb-5">{article.acf['მთარგმნელი']}</h2>
             )}
             <p className="text-[#474F7A] font-semibold pb-10">{article.formattedDate}</p>
           </div>
