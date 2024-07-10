@@ -1,4 +1,4 @@
-"use client";
+'use client';
 import { useEffect, useState, useRef, useCallback } from 'react';
 import Image from 'next/image';
 import Head from 'next/head';
@@ -8,7 +8,7 @@ import 'moment/locale/ka';
 import { FacebookShareButton, FacebookIcon, TwitterShareButton, TwitterIcon } from 'next-share';
 
 async function fetchArticle(id) {
-  const res = await fetch(`https://mautskebeli.wpenginepowered.com/wp-json/wp/v2/mau-books/${id}?acf_format=standard&_fields=id,title,acf,date&_=${new Date().getTime()}`);
+  const res = await fetch(`https://mautskebeli.wpenginepowered.com/wp-json/wp/v2/mau-books/${id}?acf_format=standard&_fields=id,acf,date&_=${new Date().getTime()}`);
   if (!res.ok) {
     throw new Error('Failed to fetch article');
   }
@@ -117,11 +117,11 @@ const BookPage = ({ params }) => {
   return (
     <>
       <Head>
-        <title>{article.title.rendered}</title>
+        <title>{article.acf.title}</title>
         <meta name="description" content={ogDescription} />
         <meta property="og:url" content={articleUrl} />
         <meta property="og:type" content="article" />
-        <meta property="og:title" content={article.title.rendered} />
+        <meta property="og:title" content={article.acf.title} />
         <meta property="og:description" content={ogDescription} />
         <meta property="og:image" content={ogImage} />
         <meta property="og:image:width" content="1200" />
@@ -132,10 +132,17 @@ const BookPage = ({ params }) => {
       <section className="w-full mx-auto mt-10 px-4 lg:px-0 overflow-x-hidden relative">
         <div className="w-full lg:w-[54%] mx-auto bg-opacity-90 p-5 rounded-lg">
           <div className="w-full h-auto mb-5">
-            <Image src={article.acf.image || '/images/default-og-image.jpg'} alt={article.title.rendered} width={800} height={450} style={{ objectFit: 'cover' }} className="rounded-lg w-full" />
-            <h1 className="font-alk-tall-mtavruli text-[32px] sm:text-[64px] font-light leading-none text-[#474F7A] mt-[24px] mb-5">{article.title.rendered}</h1>
-            <h3 className="font-alk-tall-mtavruli text-[32px] sm:text-[34px] font-light leading-wide text-[#474F7A] mt-[24px] mb-5">{article.acf.sub_title}</h3>
-            <h2 className="font-noto-sans-georgian text-[16px] sm:text-[24px] font-extrabold text-[#AD88C6] leading-normal mb-5">{article.acf['ავტორი']}</h2>
+            <Image src={article.acf.image || '/images/default-og-image.jpg'} alt={article.acf.title} width={800} height={450} style={{ objectFit: 'cover' }} className="rounded-lg w-full" />
+            <h1 className="font-alk-tall-mtavruli text-[32px] sm:text-[64px] font-light leading-none text-[#474F7A] mt-[24px] mb-2">{article.acf.title}</h1>
+            {article.acf.sub_title && (
+              <h3 className="font-alk-tall-mtavruli text-[24px] sm:text-[32px] font-light leading-none text-[#474F7A] mt-[12px] mb-2">{article.acf.sub_title}</h3>
+            )}
+            {article.acf['author'] && (
+              <h3 className="font-noto-sans-georgian text-[16px] sm:text-[24px] font-extrabold text-[#AD88C6] leading-normal mb-2">{article.acf['author']}</h3>
+            )}
+            {article.acf['რეცენზიის_ავტორი'] && (
+              <h3 className="font-noto-sans-georgian text-[16px] sm:text-[24px] font-extrabold text-[#AD88C6] leading-normal mb-5">{article.acf['რეცენზიის_ავტორი']}</h3>
+            )}
             <p className="text-[#474F7A] font-semibold pb-10">{article.formattedDate}</p>
           </div>
           <div ref={articleContentRef} className="article-content text-[#474F7A] text-wrap w-full font-noto-sans-georgian text-[14px] sm:text-[16px] font-normal lg:text-justify leading-[30px] sm:leading-[35px] tracking-[0.32px]"></div>
@@ -149,10 +156,10 @@ const BookPage = ({ params }) => {
               <div ref={shareOptionsRef} className="rounded-lg p-6 w-80" style={{ backgroundColor: "rgba(0, 0, 0, 0.30)" }}>
                 <h2 className="text-xl text-white font-bold mb-4">გააზიარე</h2>
                 <div className="flex items-center pt-7 gap-5">
-                  <FacebookShareButton url={articleUrl} quote={article.title.rendered}>
+                  <FacebookShareButton url={articleUrl} quote={article.acf.title}>
                     <FacebookIcon size={44} round={true} />
                   </FacebookShareButton>
-                  <TwitterShareButton url={articleUrl} title={article.title.rendered}>
+                  <TwitterShareButton url={articleUrl} title={article.acf.title}>
                     <TwitterIcon size={44} round={true} />
                   </TwitterShareButton>
                 </div>
