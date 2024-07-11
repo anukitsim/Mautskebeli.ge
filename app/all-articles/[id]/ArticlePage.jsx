@@ -126,7 +126,7 @@ const ArticlePage = ({ params }) => {
         <meta property="og:image" content={ogImage} />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
-        <meta property="fb:app_id" content="YOUR_FB_APP_ID" />
+        <meta property="fb:app_id" content="2191957607826649" />
       </Head>
 
       <section className="w-full mx-auto mt-10 px-4 lg:px-0 overflow-x-hidden relative">
