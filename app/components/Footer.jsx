@@ -52,18 +52,18 @@ const Footer = () => {
         <div className="h-full w-1/2 flex flex-col gap-[18px]">
           <h1 className="text-[#AD88C6] text-[16px] font-bold">კონტაქტი</h1>
           <div className="flex gap-[10px] text-[#474F7A] text-[16px]">
-            <Image src="/images/mail.png" alt="mail" width={0} height={0} style={{ width: "auto", height: "20px" }} />
+            <Image src="/images/mail.svg" alt="mail" width={0} height={0} style={{ width: "auto", height: "20px" }} />
             <a href="mailto:platformforsj@gmail.com" className="text-[16px]">platformforsj@gmail.com</a>
           </div>
           <div className="flex gap-[10px] text-[#474F7A] text-[16px]">
-            <Image src="/images/phone.png" alt="phone" width={0} height={0} style={{ width: "auto", height: "20px" }} />
+            <Image src="/images/phone.svg" alt="phone" width={0} height={0} style={{ width: "auto", height: "20px" }} />
             <a href="tel:+995574831085" className="text-[16px]">+995 574 83 10 85</a>
           </div>
           <div className="flex gap-[10px] text-[#474F7A]">
-            <Image src="/images/loacation.png" alt="location" width={0} height={0} style={{ width: 'auto', height: '20px' }} />
+            <Image src="/images/location.svg" alt="location" width={0} height={0} style={{ width: 'auto', height: '20px' }} />
             <a href="https://www.google.com/maps/search/?api=1&query=Kostava+30,+Batumi" target="_blank" className="text-[16px] whitespace-nowrap">ბათუმი, კოსტავას 30</a>
           </div>
-          <Image src="/images/logo.png" alt="logo" width={116} height={32} className="mt-[32px]" />
+          <Image src="/images/logo.svg" alt="logo" width={116} height={32} className="mt-[32px]" />
         </div>
         <div className="h-full w-1/3 flex flex-col gap-[18px]">
           <h1 className="text-[#AD88C6] text-[16px] font-bold">ნავიგაცია</h1>
@@ -78,27 +78,27 @@ const Footer = () => {
         <h1 className="text-[#AD88C6] text-[16px] font-bold">გამოგვიწერე</h1>
       
         <Link href='https://www.facebook.com/mautskebeli.ge' target='_blank' className="flex gap-[10px] text-[16px] text-[#474F7A]">
-            <Image src="/images/facebook.png" alt="mail" width={20} height={20} />
+            <Image src="/images/fb.svg" alt="mail" width={20} height={20} />
             <span>Facebook</span>
           </Link>
           <Link href='https://www.youtube.com/@mautskebeli' target='_blank' className="flex gap-[10px] text-[16px] text-[#474F7A]">
-            <Image src="/images/footer-youtube.png" alt="mail" width={20} height={20} />
+            <Image src="/images/yt.svg" alt="mail" width={20} height={20} />
             <span>YouTube</span>
           </Link>
           <Link href='https://www.instagram.com/mautskebeli.ge/' target='_blank' className="flex gap-[16px] text-[#474F7A]">
-            <Image src="/images/instagram.png" alt="mail" width={20} height={20} />
+            <Image src="/images/instagram.svg" alt="mail" width={20} height={20} />
             <span className="text-[16px] whitespace-nowrap">Instagram</span>
           </Link>
           <Link href='https://www.tiktok.com/@mautskebeli.ge' target='_blank' className="flex gap-[16px] text-[16px] text-[#474F7A]">
-            <Image src="/images/tiktok.png" alt="mail" width={20} height={20} />
+            <Image src="/images/tiktok.svg" alt="mail" width={20} height={20} />
             <span>TikTok</span>
           </Link>
           <Link href='https://x.com/mautskebeli' target='_blank' className="flex gap-[16px] text-[#474F7A] text-[16px]">
-            <Image src="/images/twitter.png" alt="mail" width={20} height={20} />
+            <Image src="/images/x.svg" alt="mail" width={20} height={20} />
             <span>X Twitter</span>
           </Link>
           <div className="flex gap-[10px] text-[16px] text-[#474F7A]">
-            <Image src="/images/telegram.png" alt="mail" width={20} height={20} />
+            <Image src="/images/telegram.svg" alt="mail" width={20} height={20} />
             <span>Telegram</span>
           </div>
      
@@ -148,7 +148,7 @@ const Footer = () => {
             <div className="flex justify-center items-center ml-2">
               {/* Adjust width and height as per your image's aspect ratio */}
               <Image
-                src="/images/top.png"
+                src="/images/top.svg"
                 alt="Scroll to top"
                 width={0}
                 height={0}
@@ -170,11 +170,11 @@ const Footer = () => {
             <a href="mailto:platformforsj@gmail.com" className="text-[16px]">platformforsj@gmail.com</a>
           </div>
           <div className="flex gap-[10px]  text-[#474F7A] text-[15px]">
-            <Image src="/images/phone.png" alt="phone" width={0} height={0} style={{ width: "auto", height: "20px" }} />
+            <Image src="/images/phone.svg" alt="phone" width={0} height={0} style={{ width: "auto", height: "20px" }} />
             <a href="tel:+995574831085" className="text-[16px]">+995 574 83 10 85</a>
           </div>
           <div className="flex gap-[10px]  text-[#474F7A] text-[15px]">
-            <Image src="/images/loacation.png" alt="location" width={0} height={0} style={{ width: 'auto', height: '20px' }} />
+            <Image src="/images/location.svg" alt="location" width={0} height={0} style={{ width: 'auto', height: '20px' }} />
             <a href="https://www.google.com/maps/search/?api=1&query=Kostava+30,+Batumi" target="_blank" className="text-[16px] whitespace-nowrap">ბათუმი, კოსტავას 30</a>
           </div>
         </div>
@@ -309,7 +309,7 @@ const Footer = () => {
               <div className="flex justify-center items-center ml-2">
                 {/* Adjust width and height as per your image's aspect ratio */}
                 <Image
-                  src="/images/top.png"
+                  src="/images/top.svg"
                   alt="Scroll to top"
                   width={20}
                   height={20}

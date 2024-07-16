@@ -63,7 +63,7 @@ const Search = ({ isSearchOpen, setIsSearchOpen }) => {
     <>
       <div className="sm:hidden z-50">
         <button onClick={() => setIsSearchOpen(!isSearchOpen)} className="mr-7">
-          <Image src="/images/Search.png" alt="Search" width={25} height={25} />
+          <Image src="/images/Search.svg" alt="Search" width={25} height={25} />
         </button>
       </div>
       <div className={`${isSearchOpen ? 'flex' : 'hidden'} absolute top-full right-5 mt-1 mr-4 bg-white p-2 rounded-md shadow-lg z-40`}>
@@ -75,12 +75,12 @@ const Search = ({ isSearchOpen, setIsSearchOpen }) => {
           onChange={(e) => setSearchQuery(e.target.value)}
         />
         <button onClick={handleSearch} type="submit" className="p-2">
-          <Image src="/images/Search.png" alt="Search" width={20} height={20} />
+          <Image src="/images/Search.svg" alt="Search" width={20} height={20} />
         </button>
       </div>
       <form onSubmit={handleSearch} className="hidden sm:flex items-center gap-2.5 bg-white rounded h-9 md:w-[340px]">
         <button type="submit" className="p-2 bg-white rounded-full">
-          <img src="/images/Search.png" alt="Search" width={20} height={20} />
+          <img src="/images/Search.svg" alt="Search" width={20} height={20} />
         </button>
         <input
           type="text"

@@ -8,7 +8,7 @@ const Header = () => {
       <div className="w-10/12 h-1/2 mx-auto mt-5 flex justify-between items-center">
       <Link href='/'>
       <Image
-          src="/images/logo.png"
+          src="/images/logo-good.svg"
           alt="logo"
           width={116}
           height={32}
@@ -19,7 +19,7 @@ const Header = () => {
         <div className="flex gap-8">
           <Link href="/live" className="flex gap-2.5 text-xs justify-center items-center">
             <Image
-              src="/images/pirdapiri-eteri.png"
+              src="/images/pirdapiri-eteri.svg"
               alt="Live"
               width={20}
               height={20}

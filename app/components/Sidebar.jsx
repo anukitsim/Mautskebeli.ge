@@ -11,12 +11,12 @@ const Sidebar = () => {
       }}
     >
       <Link href="/shroma" className="flex flex-row gap-3">
-        <Image src="/images/shroma.png" alt="shroma" width={0} height={0} style={{ width: 'auto', height: '20px' }} />
+        <Image src="/images/shroma.svg" alt="shroma" width={0} height={0} style={{ width: 'auto', height: '20px' }} />
         <span className="text-[#222] text-[15px]">შრომა</span>
       </Link>
       <Link href="/mecniereba" className="flex flex-row gap-3">
         <Image
-          src="/images/mecniereba.png"
+          src="/images/mecniereba.svg"
           alt="mecniereba"
           width={0}
           height={0}
@@ -26,7 +26,7 @@ const Sidebar = () => {
       </Link>
       <Link href="/ekonomika" className="flex flex-row gap-3">
         <Image
-          src="/images/ekonomika.png"
+          src="/images/ekonomika.svg"
           alt="ekonomika"
           width={0}
           height={0}
@@ -36,7 +36,7 @@ const Sidebar = () => {
       </Link>
       <Link href="/medicina" className="flex flex-row gap-3">
         <Image
-          src="/images/medicina.png"
+          src="/images/medicina.svg"
           alt="medicina"
           width={0}
           height={0}
@@ -46,7 +46,7 @@ const Sidebar = () => {
       </Link>
       <Link href="/xelovneba" className="flex flex-row gap-3">
         <Image
-          src="/images/xelovneba.png"
+          src="/images/xelovneba.svg"
           alt="xelovneba"
           width={0}
           height={0}
@@ -56,7 +56,7 @@ const Sidebar = () => {
       </Link>
       <Link href="/kalaki" className="flex flex-row gap-3">
         <Image
-          src="/images/qalaqi.png"
+          src="/images/qalaqi.svg"
           alt="qalaqi"
           width={0}
           height={0}
@@ -66,7 +66,7 @@ const Sidebar = () => {
       </Link>
       <Link href="/resursebi" className="flex flex-row gap-3">
         <Image
-          src="/images/msoplio.png"
+          src="/images/resursebi.svg"
           alt="msoplio"
           width={0}
           height={0}
@@ -76,7 +76,7 @@ const Sidebar = () => {
       </Link>
       <Link href="/msoflio" className="flex flex-row gap-3">
         <Image
-          src="/images/saxli-yvelas.png"
+          src="/images/msoflio.svg"
           alt="msoflio"
           width={0}
           height={0}
@@ -86,7 +86,7 @@ const Sidebar = () => {
       </Link>
       <Link href="/saxli" className="flex flex-row gap-3">
         <Image
-          src="/images/bechduri.png"
+          src="/images/saxli.svg"
           alt="`saxli`-yvelas"
           width={0}
           height={0}
