@@ -254,7 +254,7 @@ const MainNews = () => {
           className="absolute left-5 top-1/2 -translate-y-1/2 z-20"
         >
           <Image
-            src="/images/arrow-left.png"
+            src="/images/arrow-left.svg"
             alt="Previous"
             width={50}
             height={50}
@@ -265,7 +265,7 @@ const MainNews = () => {
           className="absolute right-5 top-1/2 -translate-y-1/2 z-20"
         >
           <Image
-            src="/images/arrow-right.png"
+            src="/images/arrow-right.svg"
             alt="Next"
             width={50}
             height={50}
