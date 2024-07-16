@@ -224,12 +224,14 @@ const MainNews = () => {
               <Image
                 src={slide.image}
                 alt={slide.title}
-                fill
+                width={1920} // Adjust based on the original image width
+  height={1080} // Adjust based on the original image height
                 sizes="(max-width: 768px) 100vw, 50vw"
                 style={{ objectFit: "cover" }}
                 priority={index === currentSlide}
                 loading={index === currentSlide ? "eager" : "lazy"}
                 quality={100}
+                layout="responsive"
               />
               <div className="absolute bottom-12 left-7 text-white">
                 <h2 className="bg-[#FECE27] text-[#474F7A] rounded-[4px] pl-[8px] pr-[8px] pt-[4px] pb-[4px] text-[12px] font-extrabold">

@@ -8,7 +8,7 @@ import Link from "next/link";
 
 const PlayButton = ({ onClick }) => (
   <img
-    src="/images/card-play-button.png"
+    src="/images/card-play-button.svg"
     alt="play button"
     width={42}
     height={42}

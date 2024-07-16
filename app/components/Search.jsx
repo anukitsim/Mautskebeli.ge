@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 
 const PlayButton = ({ onClick }) => (
   <Image
-    src="/images/card-play-button.png"
+    src="/images/card-play-button.svg"
     alt="playbutton"
     width={42}
     height={42}

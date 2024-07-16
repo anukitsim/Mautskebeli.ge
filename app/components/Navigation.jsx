@@ -65,12 +65,12 @@ const Navigation = ({ onVideoSelect }) => {
             </button>
             <ul className={`${isCategoriesOpen ? "block" : "hidden"} flex flex-col gap-4 pl-4`}>
             <Link href="/shroma" className="flex flex-row gap-3">
-              <Image src="/images/shroma-white.png" alt="shroma" width={0} height={0} style={{ width: 'auto', height: '20px' }} />
+              <Image src="/images/shroma-white.svg" alt="shroma" width={0} height={0} style={{ width: 'auto', height: '20px' }} />
               <span className="text-white text-[15px]">შრომა</span>
             </Link>
             <Link href="/mecniereba-white" className="flex flex-row gap-3">
               <Image
-                src="/images/mecniereba-white.png"
+                src="/images/mecniereba-white.svg"
                 alt="mecniereba"
                 width={0}
                 height={0}
@@ -80,7 +80,7 @@ const Navigation = ({ onVideoSelect }) => {
             </Link>
             <Link href="/ekonomika" className="flex flex-row gap-3">
               <Image
-                src="/images/ekonomika-white.png"
+                src="/images/ekonomika-white.svg"
                 alt="ekonomika"
                 width={0}
                 height={0}
@@ -90,7 +90,7 @@ const Navigation = ({ onVideoSelect }) => {
             </Link>
             <Link href="/medicina" className="flex flex-row gap-3">
               <Image
-                src="/images/medicina-white.png"
+                src="/images/medicina-white.svg"
                 alt="medicina"
                 width={0}
                 height={0}
@@ -100,7 +100,7 @@ const Navigation = ({ onVideoSelect }) => {
             </Link>
             <Link href="/xelovneba" className="flex flex-row gap-3">
               <Image
-                src="/images/xelovneba-white.png"
+                src="/images/xelovneba-white.svg"
                 alt="xelovneba"
                 width={0}
                 height={0}
@@ -110,7 +110,7 @@ const Navigation = ({ onVideoSelect }) => {
             </Link>
             <Link href="/kalaki" className="flex flex-row gap-3">
               <Image
-                src="/images/kalaki-white.png"
+                src="/images/kalaki-white.svg"
                 alt="qalaqi"
                 width={0}
                 height={0}
@@ -120,7 +120,7 @@ const Navigation = ({ onVideoSelect }) => {
             </Link>
             <Link href="/resursebi" className="flex flex-row gap-3">
               <Image
-                src="/images/resursebi-white.png"
+                src="/images/resursebi-white.svg"
                 alt="resursebi"
                 width={0}
                 height={0}
@@ -130,7 +130,7 @@ const Navigation = ({ onVideoSelect }) => {
             </Link>
             <Link href="/msoflio" className="flex flex-row gap-3">
               <Image
-                src="/images/msoflio-white.png"
+                src="/images/msoflio-white.svg"
                 alt="msoflio"
                 width={0}
                 height={0}
@@ -140,7 +140,7 @@ const Navigation = ({ onVideoSelect }) => {
             </Link>
             <Link href="/saxli" className="flex flex-row gap-3">
               <Image
-                src="/images/saxli-white.png"
+                src="/images/saxli-white.svg"
                 alt="saxli-yvelas"
                 width={0}
                 height={0}

@@ -12,7 +12,7 @@ import 'moment/locale/ka';
 
 const PlayButton = ({ onClick }) => (
   <img
-    src="/images/card-play-button.png"
+    src="/images/card-play-button.svg"
     alt="play button"
     width={42}
     height={42}
@@ -299,7 +299,7 @@ function XelovnebaVideos() {
                   disabled={currentPage === 1}
                 >
                   <img
-                    src="/images/videos-left.png"
+                    src="/images/videos-left.svg"
                     alt="playbutton"
                     width={32}
                     height={32}
@@ -310,7 +310,7 @@ function XelovnebaVideos() {
                   disabled={endIndex >= videos.length}
                 >
                   <img
-                    src="/images/videos-right.png"
+                    src="/images/videos-right.svg"
                     alt="playbutton"
                     width={32}
                     height={32}

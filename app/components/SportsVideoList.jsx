@@ -7,7 +7,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 
 const PlayButton = ({ onClick }) => (
   <img
-    src="/images/card-play-button.png"
+    src="/images/card-play-button.svg"
     alt="play button"
     width={42}
     height={42}
@@ -36,7 +36,7 @@ const VideoCard = ({ videoId, acf, onSelect }) => {
         className="w-full h-40 bg-cover bg-center rounded-lg"
         style={{ backgroundImage: `url(${thumbnailUrl})` }}
       >
-        <div className="absolute inset-0 flex items-center justify-center">
+        <div className="absolute inset-0 bottom-10 flex items-center justify-center">
           <PlayButton onClick={() => onSelect(videoId, acf)} />
         </div>
       </div>
@@ -249,7 +249,7 @@ function ShromaVideos() {
                   disabled={currentPage === 1}
                 >
                   <img
-                    src="/images/videos-left.png"
+                    src="/images/videos-left.svg"
                     alt="playbutton"
                     width={32}
                     height={32}
@@ -260,7 +260,7 @@ function ShromaVideos() {
                   disabled={endIndex >= videos.length}
                 >
                   <img
-                    src="/images/videos-right.png"
+                    src="/images/videos-right.svg"
                     alt="playbutton"
                     width={32}
                     height={32}

@@ -2,7 +2,7 @@
 
 const PlayButton = ({ onClick }) => (
   <img
-    src="/images/card-play-button.png"
+    src="/images/card-play-button.svg"
     alt="playbutton"
     width={42}
     height={42}

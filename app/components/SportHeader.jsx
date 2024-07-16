@@ -8,7 +8,7 @@ const SportHeader = () => {
       <div className="w-10/12 h-1/2 mx-auto mt-5 flex justify-between items-center">
       <Link href='/'>
       <Image
-          src="/images/sport-logo.png"
+          src="/images/sport-logo.svg"
           alt="logo"
           width={116}
           height={32}

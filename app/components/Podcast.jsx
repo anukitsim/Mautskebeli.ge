@@ -7,7 +7,7 @@ import Image from "next/image";
 
 const PlayButton = ({ onClick }) => (
   <img
-    src="/images/card-play-button.png"
+    src="/images/card-play-button.svg"
     alt="play button"
     width={42}
     height={42}
@@ -270,7 +270,7 @@ const Podcast = () => {
                 className=" rounded-lg mx-2"
               >
                  <img
-                    src="/images/videos-left.png"
+                    src="/images/videos-left.svg"
                     alt="playbutton"
                     width={32}
                     height={32}
@@ -282,7 +282,7 @@ const Podcast = () => {
                 className=" rounded-lg mx-2"
               >
                   <img
-                    src="/images/videos-right.png"
+                    src="/images/videos-right.svg"
                     alt="playbutton"
                     width={32}
                     height={32}

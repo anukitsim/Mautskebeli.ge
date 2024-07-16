@@ -56,7 +56,7 @@ const HomePagePodcast = () => {
             target="_blank"
           >
             <Image
-              src="/images/youtube-banner.png"
+              src="/images/.png"
               alt="youtube"
               width={558}
               height={184}

@@ -166,7 +166,7 @@ const Footer = () => {
         <div className="flex flex-col justify-center items-center gap-[18px]">
           <h1 className="text-white text-[15px] font-bold">კონტაქტი</h1>
           <div className="flex gap-[10px]  text-[#474F7A] text-[15px]">
-            <Image src="/images/mail.png" alt="mail" width={0} height={0} style={{ width: "auto", height: "20px" }} />
+            <Image src="/images/mail.svg" alt="mail" width={0} height={0} style={{ width: "auto", height: "20px" }} />
             <a href="mailto:platformforsj@gmail.com" className="text-[16px]">platformforsj@gmail.com</a>
           </div>
           <div className="flex gap-[10px]  text-[#474F7A] text-[15px]">
@@ -183,7 +183,7 @@ const Footer = () => {
           <div className="flex gap-[16px] text-[#474F7A]">
             <Link  href='https://www.facebook.com/mautskebeli.ge' target='_blank' className="flex gap-[6px] text-[16px]">
               <Image
-                src="/images/facebook-mobile.png"
+                src="/images/facebook-mobile.svg"
                 alt="mail"
                 width={0}
                 height={0}
@@ -193,7 +193,7 @@ const Footer = () => {
             </Link>
             <Link href='https://www.youtube.com/@mautskebeli' target='_blank' className="flex gap-[6px] text-[16px]">
               <Image
-                src="/images/youtube-mobile.png"
+                src="/images/youtube-mobile.svg"
                 alt="mail"
                 width={0}
                 height={0}
@@ -203,7 +203,7 @@ const Footer = () => {
             </Link>
             <Link href='https://www.instagram.com/mautskebeli.ge/' target='_blank' className="flex gap-[6px] text-[16px]">
               <Image
-                src="/images/instagram-mobile.png"
+                src="/images/instagram-mobile.svg"
                 alt="mail"
                 width={0}
                 height={0}
@@ -215,7 +215,7 @@ const Footer = () => {
           <div className="flex gap-[16px] text-[#474F7A]">
             <Link href='https://www.tiktok.com/@mautskebeli.ge' target='_blank' className="flex gap-[6px] text-[16px]">
               <Image
-                src="/images/tiktok-mobile.png"
+                src="/images/tiktok-mobile.svg"
                 alt="mail"
                 width={0}
                 height={0}
@@ -225,7 +225,7 @@ const Footer = () => {
             </Link>
             <Link href='https://x.com/mautskebeli' target='_blank' className="flex gap-[6px] text-[16px]">
               <Image
-                src="/images/twitter-mobile.png"
+                src="/images/twitter-mobile.svg"
                 alt="mail"
                 width={0}
                 height={0}
@@ -235,7 +235,7 @@ const Footer = () => {
             </Link>
             <div className="flex gap-[6px] text-[16px]">
               <Image
-                src="/images/telegram-mobile.png"
+                src="/images/telegram-mobile.svg"
                 alt="mail"
                 width={0}
                 height={0}

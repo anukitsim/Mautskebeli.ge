@@ -206,14 +206,14 @@ const SearchResults = ({ searchQuery }) => {
                 disabled={currentVideoPage === 1}
                 className="bg-white rounded-full p-2"
               >
-                <Image src="/images/videos-left.png" alt="Previous" width={32} height={32} />
+                <Image src="/images/videos-left.svg" alt="Previous" width={32} height={32} />
               </button>
               <button
                 onClick={() => handleVideoPageChange(currentVideoPage + 1)}
                 disabled={videoEndIndex >= videoResults.length}
                 className="bg-white rounded-full p-2"
               >
-                <Image src="/images/videos-right.png" alt="Next" width={32} height={32} />
+                <Image src="/images/videos-right.svg" alt="Next" width={32} height={32} />
               </button>
             </div>
           </div>
@@ -252,14 +252,14 @@ const SearchResults = ({ searchQuery }) => {
                 disabled={currentArticlePage === 1}
                 className="bg-white rounded-full p-2"
               >
-                <Image src="/images/videos-left.png" alt="Previous" width={32} height={32} />
+                <Image src="/images/videos-left.svg" alt="Previous" width={32} height={32} />
               </button>
               <button
                 onClick={() => handleArticlePageChange(currentArticlePage + 1)}
                 disabled={articleEndIndex >= articleResults.length}
                 className="bg-white rounded-full p-2"
               >
-                <Image src="/images/videos-right.png" alt="Next" width={32} height={32} />
+                <Image src="/images/videos-right.svg" alt="Next" width={32} height={32} />
               </button>
             </div>
           </div>

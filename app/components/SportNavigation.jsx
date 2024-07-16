@@ -231,7 +231,7 @@ const SportNavigation = ({ onVideoSelect }) => {
         </div>
         <form onSubmit={handleSearch} className="hidden sm:flex items-center gap-2.5 bg-[#AD88C6] rounded h-9 md:w-[340px]">
           <button type="submit" className="p-2 bg-[#AD88C6] rounded-full">
-            <Image src="/images/search-yellow.png" alt="Search" width={20} height={20} />
+            <Image src="/images/search-yellow.svg" alt="Search" width={20} height={20} />
           </button>
           <input
             type="text"
