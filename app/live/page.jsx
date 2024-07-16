@@ -12,7 +12,7 @@ const page = () => {
               width={270}
               height={180}
             />
-            <p>მაუწყებელი პოდკასი</p>
+            <p>მაუწყებელი პოდკასტი</p>
         </Link>
         <Link href='/facebook-live' className='lg:w-4/12 w-full hover:scale-105 h-[280px] flex-col rounded-[16px] border border-[#E0DBE8] flex justify-center items-center'>
         <Image
@@ -21,7 +21,7 @@ const page = () => {
               width={270}
               height={180}
             />
-             <p>მაუწყებელი ფეისბუკი</p>
+             <p>მაუწყებელი ფეისბუქი</p>
         </Link>
     </section>
     </>
