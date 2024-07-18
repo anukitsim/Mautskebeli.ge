@@ -57,6 +57,10 @@ const BulletsNavigation = ({ slides, currentSlide, onSelectSlide }) => {
   );
 };
 
+const customLoader = ({ src, width, quality }) => {
+  return `${src}?w=${width}&q=${quality || 100}`;
+};
+
 const MainNews = () => {
   const [slides, setSlides] = useState([]);
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -168,6 +172,7 @@ const MainNews = () => {
               }`}
             >
               <Image
+                loader={customLoader}
                 src={slide.image}
                 alt={slide.title}
                 layout="fill"
@@ -223,6 +228,7 @@ const MainNews = () => {
               }`}
             >
               <Image
+                loader={customLoader}
                 src={slide.image}
                 alt={slide.title}
                 width={1920}
