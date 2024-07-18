@@ -374,7 +374,7 @@ const SearchResults = ({ searchQuery }) => {
       )}
 
       {videoResults.length === 0 && articleResults.length === 0 && (
-        <p className="mt-4">No results found.</p>
+        <p className="mt-4"></p>
       )}
     </div>
   );

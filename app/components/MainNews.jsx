@@ -170,11 +170,12 @@ const MainNews = () => {
               <Image
                 src={slide.image}
                 alt={slide.title}
-                fill
+                layout="fill"
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 style={{ objectFit: "cover" }}
                 priority={index === currentSlide}
                 loading={index === currentSlide ? "eager" : "lazy"}
+                quality={100}
               />
               <div className="absolute bottom-5 left-5 text-white">
                 <h2 className="text-[#FECE27] text-[20px] font-extrabold">
@@ -224,8 +225,8 @@ const MainNews = () => {
               <Image
                 src={slide.image}
                 alt={slide.title}
-                width={1920} // Adjust based on the original image width
-  height={1080} // Adjust based on the original image height
+                width={1920}
+                height={1080}
                 sizes="(max-width: 768px) 100vw, 50vw"
                 style={{ objectFit: "cover" }}
                 priority={index === currentSlide}

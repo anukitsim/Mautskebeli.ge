@@ -62,14 +62,16 @@ const Search = ({ isSearchOpen, setIsSearchOpen }) => {
   return (
     <>
       <div className="sm:hidden z-50">
-        <button onClick={() => setIsSearchOpen(!isSearchOpen)} className="mr-7">
-          <Image src="/images/Search.svg" alt="Search" width={25} height={25} />
-        </button>
+      {!isSearchOpen && (
+          <button onClick={() => setIsSearchOpen(!isSearchOpen)} className="mr-7">
+            <Image src="/images/Search.svg" alt="Search" width={25} height={25} />
+          </button>
+        )}
       </div>
-      <div className={`${isSearchOpen ? 'flex' : 'hidden'} absolute top-full right-5 mt-1 mr-4 bg-white p-2 rounded-md shadow-lg z-40`}>
+      <div className={`${isSearchOpen ? 'flex' : 'hidden'} absolute top-[-5px] right-5 mt-1 mr-4 bg-white p-2 rounded-md shadow-lg z-40`}>
         <input
           type="text"
-          placeholder="Search..."
+          placeholder=""
           className="text-black outline-none px-2"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
