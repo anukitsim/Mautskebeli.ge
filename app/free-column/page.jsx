@@ -67,7 +67,7 @@ const AllArticlesList = () => {
                   {article.title.rendered}
                 </h2>
                 <span className="text-[#8D91AB] text-sm sm:text-base font-bold">
-                  {truncateText(article.acf.title, 10)}
+                {article.acf['ავტორი']}
                 </span>
                 <div className="flex flex-col justify-end items-end mt-4 sm:mt-6">
                   <span className="text-sm sm:text-base text-[#AD88C6]">

@@ -1,10 +1,17 @@
-"use client"
+"use client";
 
 import React, { useEffect, useState, useCallback } from "react";
 import Modal from "react-modal";
 import Image from "next/image";
 import CustomYoutubePlayer from "./CustomYoutube";
 import Link from "next/link";
+
+// Utility function to decode HTML entities
+const decodeHtmlEntities = (text) => {
+  const textArea = document.createElement('textarea');
+  textArea.innerHTML = text;
+  return textArea.value;
+};
 
 const PlayButton = ({ onClick }) => (
   <img
@@ -56,7 +63,7 @@ const VideoCard = ({ videoId, caption, onSelect, postType }) => {
         </div>
       </div>
       <Link href={videoPageUrl} className="text-white text-sm font-semibold cursor-pointer">
-        {caption}
+        {decodeHtmlEntities(caption)}
       </Link>
     </div>
   );

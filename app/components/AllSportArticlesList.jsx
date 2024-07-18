@@ -92,7 +92,7 @@ const AllArticlesPage = () => {
                       {article.title.rendered}
                     </h2>
                     <span className="text-[#8D91AB] text-[14px] font-bold">
-                      {truncateText(article.acf.title, 10)}
+                    {article.acf['ავტორი']}
                     </span>
                     <p className="text-sm pt-[18px]" style={{ color: '#000' }}>
                       {truncateText(stripHtml(article.acf['main-text']), 30)}

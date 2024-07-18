@@ -38,7 +38,7 @@ const AlbumSlider = ({ message, post }) => {
         ))}
         <div className="absolute w-full flex justify-between items-center px-4">
           <Image
-            src="/images/arrow-left.png"
+            src="/images/arrow-left.svg"
             alt="left arrow"
             width={56}
             height={56}
@@ -46,7 +46,7 @@ const AlbumSlider = ({ message, post }) => {
             className="cursor-pointer"
           />
           <Image
-            src="/images/arrow-right.png"
+            src="/images/arrow-right.svg"
             alt="right arrow"
             width={56}
             height={56}
