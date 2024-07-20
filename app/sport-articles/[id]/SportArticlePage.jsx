@@ -5,10 +5,11 @@ import Image from 'next/image';
 import Head from 'next/head';
 import DOMPurify from 'dompurify';
 import { usePathname } from 'next/navigation';
+import { FacebookShareButton, FacebookIcon, TwitterShareButton, TwitterIcon } from 'next-share';
 
 async function fetchArticle(id) {
   const res = await fetch(
-    `https://mautskebeli.wpenginepowered.com/wp-json/wp/v2/sport-article/${id}?acf_format=standard&_fields=id,title,acf,date`
+    `https://mautskebeli.wpenginepowered.com/wp-json/wp/v2/sport-article/${id}?acf_format=standard&_fields=id,title,acf,date&_=${new Date().getTime()}` // Adding timestamp to bypass cache
   );
   if (!res.ok) {
     throw new Error('Failed to fetch article');
@@ -34,6 +35,7 @@ const SportArticlePage = ({ params }) => {
     const getArticle = async () => {
       try {
         const fetchedArticle = await fetchArticle(params.id);
+        console.log('Fetched article:', fetchedArticle); // Logging fetched data
         const updatedContent = {
           ...fetchedArticle,
           acf: {
@@ -57,14 +59,14 @@ const SportArticlePage = ({ params }) => {
       const documentHeight = document.documentElement.scrollHeight;
       const footerHeight = footerRef.current?.offsetHeight || 0;
       const bottomThreshold = documentHeight - (footerHeight + windowHeight * 2);
-  
+
       if (scrollY > scrollThreshold && scrollY < bottomThreshold) {
         setShowScrollButton(true);
       } else {
         setShowScrollButton(false);
       }
     };
-  
+
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -86,32 +88,35 @@ const SportArticlePage = ({ params }) => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const shareOnFacebook = () => {
-    const currentUrl = window.location.href;
-    window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(currentUrl)}`, '_blank');
-  };
-
-  const shareOnTwitter = () => {
-    const currentUrl = window.location.href;
-    const text = encodeURIComponent(article.title.rendered);
-    window.open(`https://twitter.com/intent/tweet?text=${text}&url=${encodeURIComponent(currentUrl)}`, '_blank');
-  };
-
   if (!isMounted || !article) {
     return <img src="/images/loader.svg" alt="Loading" />;
   }
 
-  const currentUrl = `https://mautskebeli-ge-4bpc.vercel.app${pathname}`;
+  const articleUrl = `https://www.mautskebeli.ge/sport-articles/${article.id}`;
+  const ogImage = article.acf.image ? article.acf.image : '/images/default-og-image.jpg';
+
+  const sanitizeDescription = (html) => {
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    return doc.body.textContent || "";
+  };
+
+  const ogDescription = sanitizeDescription(article.acf['main-text']).slice(0, 150);
 
   return (
     <>
       <Head>
         <title>{article.title.rendered}</title>
+        <meta name="description" content={ogDescription} />
+        <meta property="og:url" content={articleUrl} />
+        <meta property="og:type" content="article" />
         <meta property="og:title" content={article.title.rendered} />
-        <meta property="og:description" content={article.acf['main-text'].substring(0, 200)} />
-        <meta property="og:image" content={article.acf.image} />
-        <meta property="og:url" content={currentUrl} />
+        <meta property="og:description" content={ogDescription} />
+        <meta property="og:image" content={ogImage} />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="fb:app_id" content="2191957607826649" />
       </Head>
+
       <section className="w-full mx-auto mt-10 px-4 lg:px-0 overflow-x-hidden relative">
         <div className="w-full lg:w-[54%] mx-auto bg-opacity-90 p-5 rounded-lg">
           <div className="w-full h-auto mb-5">
@@ -145,22 +150,19 @@ const SportArticlePage = ({ params }) => {
                 width={24}
                 height={24}
               />
-              გაზიარება
             </button>
           </div>
           {showShareOptions && (
             <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
               <div ref={shareOptionsRef} className="rounded-lg p-6 w-80" style={{ backgroundColor: "rgba(0, 0, 0, 0.30)" }}>
                 <h2 className="text-xl text-white font-bold mb-4">გააზიარე</h2>
-                <div className="flex items-center pt-7 gap-5 ">
-                  <button onClick={shareOnFacebook} className="text-left text-white">
-                    <Image src="/images/facebook.svg" alt="facebook share" width={44} height={44} />
-                    Facebook
-                  </button>
-                  <button onClick={shareOnTwitter} className="text-left text-white">
-                    <Image src="/images/twitter.svg" alt="twitter share" width={44} height={44} />
-                    Twitter
-                  </button>
+                <div className="flex items-center pt-7 gap-5">
+                  <FacebookShareButton url={articleUrl} quote={article.title.rendered}>
+                    <FacebookIcon size={44} round={true} />
+                  </FacebookShareButton>
+                  <TwitterShareButton url={articleUrl} title={article.title.rendered}>
+                    <TwitterIcon size={44} round={true} />
+                  </TwitterShareButton>
                 </div>
               </div>
             </div>

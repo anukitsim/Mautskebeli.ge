@@ -48,6 +48,12 @@ const AllArticlesPage = () => {
     }
   };
 
+  const refreshArticles = async () => {
+    localStorage.removeItem(CACHE_KEY);
+    localStorage.removeItem(CACHE_TIMESTAMP_KEY);
+    await fetchArticles();
+  };
+
   useEffect(() => {
     const loadArticles = async () => {
       const cachedArticles = JSON.parse(localStorage.getItem(CACHE_KEY));
@@ -68,6 +74,9 @@ const AllArticlesPage = () => {
     <section className="mx-auto flex flex-col overflow-hidden">
       <div className="w-full sm:w-11/12 md:w-10/12 lg:w-10/12 xl:w-9/12 mx-auto">
         <p className="text-[#474F7A] text-[24px] font-bold mt-5 lg:mt-20 pl-4 lg:pl-2">ყველა სტატია</p>
+        <button onClick={refreshArticles} className="mb-5 p-2 bg-[#AD88C6] text-white rounded">
+          Refresh Articles
+        </button>
         {loading ? (
           <div className="flex justify-center items-center mt-10">
             <img src="/images/loader.svg" alt="Loading" />
@@ -92,7 +101,7 @@ const AllArticlesPage = () => {
                       {article.title.rendered}
                     </h2>
                     <span className="text-[#8D91AB] text-[14px] font-bold">
-                    {article.acf['ავტორი']}
+                      {article.acf['ავტორი']}
                     </span>
                     <p className="text-sm pt-[18px]" style={{ color: '#000' }}>
                       {truncateText(stripHtml(article.acf['main-text']), 30)}

@@ -30,9 +30,9 @@ const YellowFacebookNews = async ({ currentPostId }) => {
   return (
     <>
       <div className="w-full sm:w-10/12 flex items-center justify-between lg:mt-20 mt-[10px] mx-auto pl-10 pr- lg:pl-2 lg:pr-2">
-        <p className="text-[#474F7A] text-[24px] font-bold">ბოლო ამბები</p>
+        <p className="text-[#474F7A] text-[24px] mt-10 font-bold">ბოლო ამბები</p>
       </div>
-      <div className="flex flex-col md:flex-row gap-20 pb-6 items-start w-10/12 mx-auto lg:mt-10 mt-[350px]">
+      <div className="flex flex-col md:flex-row gap-20 pb-6 items-start w-10/12 mx-auto lg:mt-10 mt-[50px]">
         {filteredPosts.slice(0, 3).map((post, index) => (
           <Link
             href={`/facebook-post/${latestPosts.findIndex(p => p === post) + 1}`}

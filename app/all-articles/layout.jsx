@@ -9,7 +9,7 @@ export const metadata = {
   title: "mautskebeli.ge",
   description: "მედია პლათფორმა მაუწყებელი",
   ogImage: "https://mautskebeli.ge/api/og?title=Default%20Title",
-  metadataBase: new URL('https://www.mautskebeli.ge'), // Set your base URL here
+  metadataBase: new URL('https://www.mautskebeli.ge'), 
 };
 
 export default function RootLayout({ children }) {

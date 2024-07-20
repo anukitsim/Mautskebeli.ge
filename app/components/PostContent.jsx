@@ -56,8 +56,8 @@ const PostContent = ({ post, error }) => {
   }
 
   return (
-    <div className="bg-[#FECE27] min-h-screen flex items-center justify-center w-full">
-      <div className="bg-[#FECE27] mt-10 rounded-lg shadow-lg p-6 flex flex-col lg:flex-row w-full h-full">
+    <div className=" min-h-screen flex items-center justify-center w-full">
+      <div className=" mt-10 rounded-lg shadow-lg p-6 flex flex-col lg:flex-row w-full h-full">
         <div className="lg:w-1/2 h-full sm:w-[100vw] flex items-center justify-center">
           {post.attachments && post.attachments.data && post.attachments.data[0].type === 'album' ? (
             <AlbumSlider message={post.message} post={post} />
