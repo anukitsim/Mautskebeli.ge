@@ -838,3 +838,24 @@ a.scale-on-hover:hover {
 .no-break {
   white-space: nowrap;
 }
+
+
+/* styles.css */
+
+.facebook-news-container {
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
+  overflow-x: auto;
+}
+
+@media (max-width: 768px) {
+  .facebook-post {
+    flex: 0 0 auto;
+    min-width: 300px; /* Adjust based on design requirements */
+  }
+
+  .facebook-news-container {
+    flex-wrap: nowrap;
+  }
+}
