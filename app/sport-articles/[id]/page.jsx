@@ -72,6 +72,7 @@ export async function generateMetadata({ params }) {
   }
 }
 
+
 const NoSSRArticlePage = dynamic(() => import('./SportArticlePage'), { ssr: false });
 
 const Page = ({ params }) => {
