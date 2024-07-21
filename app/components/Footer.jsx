@@ -63,7 +63,7 @@ const Footer = () => {
             <Image src="/images/location.svg" alt="location" width={20} height={20} objectFit="contain" />
             <a href="https://www.google.com/maps/search/?api=1&query=Kostava+30,+Batumi" target="_blank" className="text-[16px] whitespace-nowrap">ბათუმი, კოსტავას 30</a>
           </div>
-          <Image src="/images/logo.svg" alt="logo" width={116} height={32} className="mt-[32px]" />
+          <Image src="/images/IMG_0311.svg" alt="logo" width={116} height={32} className="mt-[32px]" />
         </div>
         <div className="h-full w-1/3 flex flex-col gap-[18px]">
           <h1 className="text-[#AD88C6] text-[16px] font-bold">ნავიგაცია</h1>
