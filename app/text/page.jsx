@@ -8,7 +8,7 @@ const page = () => {
       <section className='w-10/12 mx-auto flex flex-wrap gap-[20px] justify-center mt-[100px]'>
         <Link href='all-articles' className='w-full md:w-5/12 hover:scale-105 h-[280px] flex-col rounded-[16px] border border-[#E0DBE8] flex justify-center items-center'>
           <Image
-            src="/images/articles.jpg"
+            src="/images/articles.png"
             alt="donation"
             width={270}
             height={180}
@@ -17,7 +17,7 @@ const page = () => {
         </Link>
         <Link href='/translate' className='w-full md:w-5/12 hover:scale-105 h-[280px] flex-col rounded-[16px] border border-[#E0DBE8] flex justify-center items-center'>
           <Image
-            src="/images/targmani.jpg"
+            src="/images/targmani.png"
             alt="donation"
             width={270}
             height={180}
@@ -26,7 +26,7 @@ const page = () => {
         </Link>
         <Link href='/books' className='w-full md:w-5/12 hover:scale-105 h-[280px] rounded-[16px] border border-[#E0DBE8] flex flex-col justify-center items-center'>
           <Image
-            src="/images/wignebi.jpg"
+            src="/images/wignebi-art.png"
             alt="donation"
             width={270}
             height={180}
@@ -35,7 +35,7 @@ const page = () => {
         </Link>
         <Link href='/free-column' className='w-full md:w-5/12 hover:scale-105 h-[280px] rounded-[16px] border border-[#E0DBE8] flex flex-col justify-center items-center'>
           <Image
-            src="/images/sveti.jpg"
+            src="/images/sveti.png"
             alt="donation"
             width={270}
             height={180}

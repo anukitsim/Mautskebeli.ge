@@ -7,7 +7,7 @@ const page = () => {
     <section className='w-10/12 mx-auto flex lg:flex-row flex-col justify-center gap-[20px] mt-[100px]'>
        <Link href='/podcast' className='lg:w-4/12 w-full hover:scale-105 h-[280px] rounded-[16px] border border-[#E0DBE8] flex flex-col justify-center items-center'>
         <Image
-              src="/images/podcast.jpg"
+              src="/images/podcast.png"
               alt="donation"
               width={270}
               height={180}
@@ -16,7 +16,7 @@ const page = () => {
         </Link>
         <Link href='/facebook-live' className='lg:w-4/12 w-full hover:scale-105 h-[280px] flex-col rounded-[16px] border border-[#E0DBE8] flex justify-center items-center'>
         <Image
-              src="/images/fb-live.jpg"
+              src="/images/fb-live.png"
               alt="donation"
               width={270}
               height={180}
