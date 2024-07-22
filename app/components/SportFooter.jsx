@@ -63,7 +63,10 @@ const SportFooter = () => {
             <Image src="/images/location-white.svg" alt="location" width={0} height={0} style={{ width: 'auto', height: '20px' }} />
             <a href="https://www.google.com/maps/search/?api=1&query=Kostava+30,+Batumi" target="_blank" className="text-[16px] whitespace-nowrap">ბათუმი, კოსტავას 30</a>
           </div>
+          <Link href='/'>
           <Image src="/images/sport-logo-white.svg" alt="logo" width={116} height={32} className="mt-[32px]" />
+          </Link>
+        
         </div>
         <div className="h-full w-1/3 flex flex-col gap-[18px]">
           <h1 className="text-[#FECE27] text-[16px] font-bold">ნავიგაცია</h1>
