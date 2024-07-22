@@ -114,11 +114,14 @@ const MainNews = () => {
           return videoDetail || post;
         });
 
+        // Limit to the latest 3 slides
+        const limitedSlides = updatedSlides.slice(0, 3);
+
         // Cache the slides in local storage
-        localStorage.setItem("cachedSlides", JSON.stringify(updatedSlides));
-        setSlides(updatedSlides);
+        localStorage.setItem("cachedSlides", JSON.stringify(limitedSlides));
+        setSlides(limitedSlides);
         setLoading(false);
-        console.log("Slides state after fetch:", updatedSlides); // Added debug log
+        console.log("Slides state after fetch:", limitedSlides); // Added debug log
       } catch (error) {
         console.error("Error fetching data:", error);
       }

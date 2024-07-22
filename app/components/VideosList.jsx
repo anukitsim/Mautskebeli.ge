@@ -30,11 +30,6 @@ const getThumbnailUrl = (videoId) => {
 };
 
 const fetchYoutubeVideoDetails = async (videoId, apiKey) => {
-  const cachedDate = localStorage.getItem(videoId);
-  if (cachedDate) {
-    return cachedDate;
-  }
-
   try {
     const response = await fetch(
       `https://www.googleapis.com/youtube/v3/videos?id=${videoId}&part=snippet&key=${apiKey}`
@@ -42,7 +37,6 @@ const fetchYoutubeVideoDetails = async (videoId, apiKey) => {
     const data = await response.json();
     if (data.items && data.items.length > 0) {
       const publishedAt = data.items[0].snippet.publishedAt;
-      localStorage.setItem(videoId, publishedAt);
       return publishedAt;
     }
   } catch (error) {
@@ -51,24 +45,32 @@ const fetchYoutubeVideoDetails = async (videoId, apiKey) => {
   return null;
 };
 
-// Mapping of post types to URL-friendly versions
 const postTypeUrlMap = {
-  'kalaki': 'qalaqi',
+  'kalaki': 'kalaki',
   'main': 'main',
   'mecniereba': 'mecniereba',
   'medicina': 'medicina',
   'msoflio': 'msoflio',
   'saxli': 'saxli-yvelas',
   'shroma': 'shroma',
-  'xelovneba': 'xelovneba'
+  'xelovneba': 'xelovneba',
+  'resursebi': 'resursebi',
+  'ekonomika': 'ekonomika'
+};
+
+// Utility function to decode HTML entities
+const decodeHtmlEntities = (text) => {
+  const textArea = document.createElement('textarea');
+  textArea.innerHTML = text;
+  return textArea.value;
 };
 
 const VideoCard = ({ videoId, caption, onSelect, postType }) => {
   const thumbnailUrl = getThumbnailUrl(videoId);
-  const postTypeUrl = postTypeUrlMap[postType] || postType; // Map the post type to URL-friendly version
+  const postTypeUrl = postTypeUrlMap[postType] || postType;
 
   const handlePlayClick = (e) => {
-    e.stopPropagation(); // Prevent the card click from propagating
+    e.stopPropagation();
     onSelect(videoId);
   };
 
@@ -90,7 +92,7 @@ const VideoCard = ({ videoId, caption, onSelect, postType }) => {
         </div>
       </div>
       <Link href={videoPageUrl} className="text-white text-sm font-semibold cursor-pointer">
-        {caption}
+        {decodeHtmlEntities(caption)}
       </Link>
     </div>
   );
@@ -114,11 +116,8 @@ function VideosList({ endpoint, title }) {
 
       const videos = await Promise.all(data.map(async video => {
         const videoId = extractVideoId(video.video_url);
-        let uploadDate = localStorage.getItem(videoId);
-        if (!uploadDate) {
-          uploadDate = await fetchYoutubeVideoDetails(videoId, apiKey);
-          localStorage.setItem(videoId, uploadDate);
-        }
+        let uploadDate = await fetchYoutubeVideoDetails(videoId, apiKey);
+        localStorage.setItem(videoId, uploadDate);
         return {
           post_id: video.post_id,
           title: video.title,
@@ -129,7 +128,7 @@ function VideosList({ endpoint, title }) {
       }));
 
       // Sort videos by upload date in descending order (newest first)
-      videos.sort((a, b) => moment(b.uploadDate) - moment(a.uploadDate));
+      videos.sort((a, b) => new Date(b.uploadDate) - new Date(a.uploadDate));
 
       setVideos(videos);
       setError(null);
@@ -175,9 +174,9 @@ function VideosList({ endpoint, title }) {
               <div key={video.post_id} className="px-2 w-full">
                 <VideoCard
                   videoId={video.videoId}
-                  caption={video.title}
+                  caption={decodeHtmlEntities(video.title)}
                   onSelect={handleVideoSelect}
-                  postType={video.post_type} // Ensure post_type is passed correctly
+                  postType={video.post_type}
                 />
               </div>
             ))}
@@ -188,9 +187,9 @@ function VideosList({ endpoint, title }) {
                 <div key={video.post_id} className="inline-block px-2 w-[248px]">
                   <VideoCard
                     videoId={video.videoId}
-                    caption={video.title}
+                    caption={decodeHtmlEntities(video.title)}
                     onSelect={handleVideoSelect}
-                    postType={video.post_type} // Ensure post_type is passed correctly
+                    postType={video.post_type}
                   />
                 </div>
               ))}

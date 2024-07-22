@@ -39,7 +39,7 @@ const VideoCard = ({ videoId, caption, onSelect, postType }) => {
   const thumbnailUrl = getThumbnailUrl(videoId);
 
   const handlePlayClick = (e) => {
-    e.stopPropagation(); // Prevent the card click from propagating
+    e.stopPropagation();
     onSelect(videoId);
   };
 
@@ -70,30 +70,33 @@ const VideoCard = ({ videoId, caption, onSelect, postType }) => {
 };
 
 function HomePageVideos() {
-  const [randomVideos, setRandomVideos] = useState([]);
+  const [latestVideos, setLatestVideos] = useState([]);
   const [selectedVideoId, setSelectedVideoId] = useState(null);
   const [modalIsOpen, setModalIsOpen] = useState(false);
 
   useEffect(() => {
     if (document.getElementById('__next')) {
-      Modal.setAppElement('#__next'); // Setting the app element
+      Modal.setAppElement('#__next');
     }
   }, []);
 
-  const fetchRandomVideos = async () => {
+  const fetchLatestVideos = async () => {
     const endpoint = "https://mautskebeli.wpenginepowered.com/wp-json/wp/v2/";
+    const postTypes = [
+      "mecniereba",
+      "medicina",
+      "msoflio",
+      "saxli",
+      "kalaki",
+      "shroma",
+      "xelovneba",
+      "resursebi",
+      "ekonomika"
+    ];
+
     try {
-      const postTypes = [
-        "mecniereba",
-        "medicina",
-        "msoflio",
-        "saxli",
-        "kalaki",
-        "shroma",
-        "xelovneba",
-      ];
       const requests = postTypes.map((postType) =>
-        fetch(`${endpoint}${postType}?per_page=4&orderby=date&order=desc`)
+        fetch(`${endpoint}${postType}?per_page=4&orderby=date&order=desc&_=${new Date().getTime()}`)
       );
       const responses = await Promise.all(requests);
       const videos = await Promise.all(
@@ -105,18 +108,29 @@ function HomePageVideos() {
           }
         })
       );
+
       const allVideos = videos.flat().map(video => ({
         ...video,
-        post_type: video.type // Ensure that post_type is correctly passed
-      })).slice(0, 4);
-      setRandomVideos(allVideos);
+        post_type: video.type
+      }));
+
+      const sortedVideos = allVideos.sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 4);
+      
+      localStorage.setItem('cachedVideos', JSON.stringify(sortedVideos));
+      setLatestVideos(sortedVideos);
     } catch (error) {
       console.error("Error fetching videos:", error);
     }
   };
 
   useEffect(() => {
-    fetchRandomVideos();
+    const cachedVideos = JSON.parse(localStorage.getItem('cachedVideos'));
+
+    if (cachedVideos) {
+      setLatestVideos(cachedVideos);
+    }
+
+    fetchLatestVideos();
   }, []);
 
   const handleVideoSelect = useCallback((videoId) => {
@@ -134,7 +148,6 @@ function HomePageVideos() {
   }, []);
 
   const handleModalClick = useCallback((e) => {
-    // Close modal if clicked outside the video container
     closeModal();
   }, [closeModal]);
 
@@ -146,20 +159,20 @@ function HomePageVideos() {
       </div>
       <div className="flex sm:hidden overflow-x-auto hide-scroll-bar pl-2 mt-5">
         <div className="flex">
-          {randomVideos.map((video) => (
+          {latestVideos.map((video) => (
             <div key={video.id} className="inline-block px-2 w-[248px]">
               <VideoCard
                 videoId={extractVideoId(video.acf.video_url)}
                 caption={video.title.rendered}
                 onSelect={handleVideoSelect}
-                postType={video.post_type} // Passing post_type correctly
+                postType={video.post_type}
               />
             </div>
           ))}
         </div>
       </div>
       <section className="lg:flex hidden w-10/12 mt-5 gap-[20px] mx-auto">
-        {randomVideos.map((video) => (
+        {latestVideos.map((video) => (
           <div
             key={video.id}
             className="px-2 w-full sm:w-1/2 md:w-1/3 lg:w-1/4"
@@ -168,7 +181,7 @@ function HomePageVideos() {
               videoId={extractVideoId(video.acf.video_url)}
               caption={video.title.rendered}
               onSelect={handleVideoSelect}
-              postType={video.post_type} // Ensuring post_type is passed correctly
+              postType={video.post_type}
             />
           </div>
         ))}
@@ -184,10 +197,9 @@ function HomePageVideos() {
             overlay: {
               zIndex: 1000,
               backgroundColor: "rgba(0, 0, 0, 0.75)",
-             
             },
             content: {
-              outline: 'none' // Remove outline from modal content
+              outline: 'none'
             }
           }}
         >
