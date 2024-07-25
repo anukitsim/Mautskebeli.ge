@@ -115,7 +115,7 @@ const MainNews = () => {
         });
 
         // Limit to the latest 3 slides
-        const limitedSlides = updatedSlides.slice(0, 4);
+        const limitedSlides = updatedSlides.slice(0, 5);
 
         // Cache the slides in local storage
         localStorage.setItem("cachedSlides", JSON.stringify(limitedSlides));
@@ -185,11 +185,11 @@ const MainNews = () => {
                 loading={index === currentSlide ? "eager" : "lazy"}
                 quality={100}
               />
-              <div className="absolute bottom-5 bg-black bg-opacity-30 left-5 text-white">
-                <h2 className="text-[#FECE27] text-[20px] font-extrabold">
+              <div className="absolute bottom-5 bg-[#474F7A] bg-opacity-50 w-full  text-white">
+                <h2 className="text-[#FECE27] pl-5 text-[20px] font-extrabold">
                    მთავარი ამბები
                 </h2>
-                <p className="text-[#FFF]  tracking-normal pt-[10px] font-alk-tall-mtavruli lg:text-[72px] sm:text-[30px] font-light leading-none [text-edge:cap] [leading-trim:both]">
+                <p className="text-[#FFF] pl-5  tracking-normal pt-[10px] font-alk-tall-mtavruli lg:text-[72px] sm:text-[30px] font-light leading-none [text-edge:cap] [leading-trim:both]">
                   {slide.title.split(" ").slice(0, 7).join(" ")}
                   {slide.title.split(" ").length > 7 && "..."}
                 </p>
