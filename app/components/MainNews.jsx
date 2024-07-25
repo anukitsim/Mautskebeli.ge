@@ -115,7 +115,7 @@ const MainNews = () => {
         });
 
         // Limit to the latest 3 slides
-        const limitedSlides = updatedSlides.slice(0, 3);
+        const limitedSlides = updatedSlides.slice(0, 4);
 
         // Cache the slides in local storage
         localStorage.setItem("cachedSlides", JSON.stringify(limitedSlides));
