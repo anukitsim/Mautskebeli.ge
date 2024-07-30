@@ -29,6 +29,14 @@ body {
   font-family: "Noto Sans Georgian", sans-serif;
 }
 
+
+::selection {
+  background-color: #8C74B2; /* Purple color */
+  color: #fff; /* White text color */
+}
+
+
+
 .video-container {
   position: relative;
   width: 100%; /* Adjust the width as needed */
