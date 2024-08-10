@@ -106,7 +106,9 @@ const ArticlePage = ({ params }) => {
   }
 
   const articleUrl = `https://www.mautskebeli.ge/all-articles/${article.id}`;
-  const ogImage = article.acf.image ? article.acf.image : '/images/default-og-image.jpg';
+  const ogImage = article.acf.image
+  ? `${article.acf.image}?cb=${new Date().getTime()}`
+  : '/images/default-og-image.jpg';
 
   const sanitizeDescription = (html) => {
     const doc = new DOMParser().parseFromString(html, 'text/html');
@@ -117,19 +119,19 @@ const ArticlePage = ({ params }) => {
 
   return (
     <>
-    <Head>
-      <title>{article.title.rendered}</title>
-      <meta name="description" content={ogDescription} />
-      <meta property="og:url" content={articleUrl} />
-      <meta property="og:type" content="article" />
-      <meta property="og:title" content={article.title.rendered} />
-      <meta property="og:description" content={ogDescription} />
-      <meta property="og:image" content={ogImage} />
-      <meta property="og:image:width" content="1200" />
-      <meta property="og:image:height" content="630" />
-      <meta property="fb:app_id" content="2191957607826649" />
-      <meta property="og:image:alt" content={article.title.rendered} />
-    </Head>
+   <Head>
+    <title>{article.title.rendered}</title>
+    <meta name="description" content={ogDescription} />
+    <meta property="og:url" content={articleUrl} />
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content={article.title.rendered} />
+    <meta property="og:description" content={ogDescription} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="fb:app_id" content="2191957607826649" />
+    <meta property="og:image:alt" content={article.title.rendered} />
+  </Head>
 
     <section className="w-full mx-auto mt-10 px-4 lg:px-0 overflow-x-hidden relative">
       <div className="w-full lg:w-[54%] mx-auto bg-opacity-90 p-5 rounded-lg">

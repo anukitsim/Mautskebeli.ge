@@ -7,13 +7,16 @@ export default function handler(req) {
   const title = searchParams.get('title') || 'Default Title';
   const imageUrl = searchParams.get('image') || 'https://mautskebeli.ge/api/og?title=Default%20Title';
 
+  // Generate a cache-busting parameter based on timestamp
+  const cacheBuster = new Date().getTime();
+
   return new ImageResponse(
     (
       <div
         style={{
           fontSize: 60,
           color: 'white',
-          background: `url(${encodeURIComponent(imageUrl)}) no-repeat center center`,
+          background: `url(${encodeURIComponent(imageUrl)}?cb=${cacheBuster}) no-repeat center center`,
           backgroundSize: 'cover',
           width: '100%',
           height: '100%',
