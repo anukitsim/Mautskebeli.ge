@@ -68,7 +68,7 @@ const Navigation = ({ onVideoSelect }) => {
               <Image src="/images/shroma-white.svg" alt="shroma" width={0} height={0} style={{ width: 'auto', height: '20px' }} />
               <span className="text-white text-[15px]">შრომა</span>
             </Link>
-            <Link href="/mecniereba-white" className="flex flex-row gap-3">
+            <Link href="/mecniereba" className="flex flex-row gap-3">
               <Image
                 src="/images/mecniereba-white.svg"
                 alt="mecniereba"

@@ -10,6 +10,23 @@ import { useRouter, useSearchParams } from "next/navigation";
 import moment from 'moment';
 import 'moment/locale/ka';
 
+// Utility functions to detect iOS and Safari
+const isIOS = () => {
+  return (
+    typeof window !== "undefined" &&
+    /iPad|iPhone|iPod/.test(navigator.platform) &&
+    navigator.userAgent.includes("Safari") &&
+    !navigator.userAgent.includes("Chrome")
+  );
+};
+
+const isSafari = () => {
+  return (
+    typeof window !== "undefined" &&
+    /^((?!chrome|android).)*safari/i.test(navigator.userAgent)
+  );
+};
+
 const PlayButton = ({ onClick }) => (
   <img
     src="/images/card-play-button.svg"
@@ -56,7 +73,7 @@ const VideoCard = ({ videoId, acf, onSelect, date }) => {
       >
         {acf && acf.title ? acf.title : "No title available"}
       </p>
-     
+      
     </div>
   );
 };
@@ -102,6 +119,8 @@ function XelovnebaVideos() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [currentUrl, setCurrentUrl] = useState('');
+
+  const isSafariIOS = isIOS() && isSafari();
 
   const shareOnFacebook = () => {
     const youtubeUrl = `https://www.youtube.com/watch?v=${activeVideoId}`;
@@ -215,9 +234,16 @@ function XelovnebaVideos() {
         ) : (
           videos.length > 0 && (
             <>
-              <div ref={videoPlayerRef} className="relative mt-[74px]" style={{ zIndex: 10 }}>
+              <div
+                ref={videoPlayerRef}
+                className="relative"
+                style={{
+                  zIndex: 10,
+                  marginTop: isSafariIOS ? "54px" : "74px", // Adjust this value as necessary
+                }}
+              >
                 <CustomYoutubePlayer key={customPlayerKey} videoId={activeVideoId} />
-                <div className="mx-auto lg:mt-[7%] lg:w-10/12 mt-[100%] sm:w-full flex flex-col gap-[23px] pl-5 pr-5">
+                <div className="mx-auto lg:mt-[7%] lg:w-10/12 mt-[50px] sm:w-full flex flex-col gap-[23px] pl-5 pr-5">
                   <p className="text-[16px] text-[#474F7A] font-semibold">
                     {activeVideoDate ? formatDate(activeVideoDate) : ""}
                   </p>
