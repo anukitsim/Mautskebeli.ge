@@ -330,6 +330,8 @@ export default function CustomYoutubePlayer({
         className="video-container js-media-container js-video-container"
         style={{
           ...style,
+          height: "100%",
+          position: "relative", 
           boxShadow: "10px 10px 30px 10px #767676",
         }}
       >
