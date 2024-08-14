@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 
-const AllArticlesList = () => {
+const MauBooksPage = () => {
   const [articles, setArticles] = useState([]);
 
   const stripHtml = (html) => {
@@ -44,47 +44,46 @@ const AllArticlesList = () => {
   }, []);
 
   return (
-    <section className="mx-auto] flex flex-col">
-      <div className="w-full sm:w-10/12 flex items-center justify-between lg:mt-20 mt-[42px] mx-auto pl-4 pr-4 lg:pl-2 lg:pr-2">
-        <p className="text-[#474F7A] text-[24px] font-bold">მაუწყებელი წიგნები</p>
-      </div>
-      <div className="w-10/12 mx-auto grid gap-5 mt-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
-        {articles.map(article => (
-          <Link href={`/books/${article.id}`} passHref key={article.id}>
-            <div className="article bg-[#F6F4F8] rounded-tl-[10px] rounded-tr-[10px] border border-[#B6A8CD] overflow-hidden">
-              <div className="article-image-container relative w-full h-[200px]">
-                <Image
-                  src={article.acf.image || '/images/default-image.png'}
-                  alt="article-cover"
-                  fill
-                  sizes="(max-width: 768px) 100vw, 33vw"
-                  style={{ objectFit: 'cover' }}
-                  className="article-image"
-                />
-              </div>
-              <div className="p-[18px]">
-                <h2 className="text-[20px] font-bold mb-2" style={{ color: '#474F7A' }}>
-                  {article.title.rendered}
-                </h2>
-                <span className="text-[#8D91AB] text-[14px] font-bold">
-                {article.acf['ავტორი']}
-                </span>
-              
-                <div className="flex flex-col justify-end pt-[30px] items-end">
-                  <span className="text-[15px] text-[#AD88C6]">
-                    {article.acf.translator} 
+    <section className="mx-auto flex flex-col overflow-hidden">
+      <div className="w-full sm:w-11/12 md:w-10/12 lg:w-10/12 xl:w-9/12 mx-auto">
+        <p className="text-[#474F7A] text-[24px] font-bold mt-5 lg:mt-20 pl-4 lg:pl-2">მაუწყებელი წიგნები</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mt-5 mx-4 lg:mx-0">
+          {articles.map(article => (
+            <Link href={`/books/${article.id}`} passHref key={article.id}>
+              <div className="bg-[#F6F4F8] rounded-tl-[10px] rounded-tr-[10px] border border-[#B6A8CD] overflow-hidden cursor-pointer">
+                <div className="relative w-full h-[200px]">
+                  <Image
+                    src={article.acf.image || '/images/default-image.png'}
+                    alt="article-cover"
+                    layout="fill"
+                    objectFit="cover"
+                    className="article-image"
+                    onError={(e) => { e.target.onerror = null; e.target.src = '/images/default-image.png'; }}
+                  />
+                </div>
+                <div className="p-[18px]">
+                  <h2 className="text-[20px] font-bold mb-2" style={{ color: '#474F7A' }}>
+                    {article.title.rendered}
+                  </h2>
+                  <span className="text-[#8D91AB] text-[14px] font-bold">
+                    {article.acf['ავტორი']}
                   </span>
-                  <button className="text-white text-[12px] mt-[16px] bg-[#AD88C6] rounded-[6px] pt-[10px] pb-[10px] pl-[12px] pr-[12px]">
-                    ნახეთ სრულად
-                  </button>
+                  <div className="flex flex-col justify-end pt-[30px] items-end">
+                    <span className="text-[15px] text-[#AD88C6]">
+                      {article.acf.translator} 
+                    </span>
+                    <button className="text-white text-[12px] mt-[16px] bg-[#AD88C6] rounded-[6px] pt-[10px] pb-[10px] pl-[12px] pr-[12px]">
+                      ნახეთ სრულად
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          </Link>
-        ))}
+            </Link>
+          ))}
+        </div>
       </div>
     </section>
   );
 };
 
-export default AllArticlesList;
+export default MauBooksPage;

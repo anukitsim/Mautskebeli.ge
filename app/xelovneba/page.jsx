@@ -10,6 +10,18 @@ import { useRouter, useSearchParams } from "next/navigation";
 import moment from 'moment';
 import 'moment/locale/ka';
 
+
+const categories = [
+  { name: "შრომა", path: "/shroma" },
+  { name: "მეცნიერება", path: "/mecniereba" },
+  { name: "ეკონომიკა", path: "/ekonomika" },
+  { name: "მედიცინა", path: "/medicina" },
+  { name: "ხელოვნება", path: "/xelovneba" },
+  { name: "ქალაქი", path: "/kalaki" },
+  { name: "მსოფლიო", path: "/msoflio" },
+  { name: "სახლი ყველას", path: "/saxli" },
+];
+
 // Utility functions to detect iOS and Safari
 const isIOS = () => {
   return (
@@ -229,6 +241,8 @@ function XelovnebaVideos() {
   const startIndex = endIndex - 16;
   const paginatedVideos = videos.slice(startIndex, endIndex);
 
+
+  const currentCategory = "ხელოვნება"; 
   
 
   return (
@@ -252,7 +266,22 @@ function XelovnebaVideos() {
                   marginTop: isSafariIOS ? "54px" : "74px", // Adjust this value as necessary
                 }}
               >
-                 <h1 className="text-[#474F7A] text-[24px] font-bold mt-5 lg:mt-20 pl-4 mb-10 lg:ml-36 lg:pl-2 ">ხელოვნება</h1>
+                 <div className="lg:flex hidden justify-start  rounded-md space-x-6 px-24 gap-5 py-4 mb-10 mt-[-25px] w-10/12 mx-auto bg-[#AD88C6]">
+               
+                  {categories.map((category) => (
+                    <a
+                      key={category.name}
+                      href={category.path}
+                      className={`text-md  text-[#474F7A] ${
+                        category.name === currentCategory
+                          ? "text-white font-bold"
+                          : "text-[#474F7A]  hover:scale-110"
+                      }`}
+                    >
+                      {category.name}
+                    </a>
+                  ))}
+                </div>
 
                 <CustomYoutubePlayer key={customPlayerKey} videoId={activeVideoId} />
                 <div className="mx-auto lg:mt-[7%] lg:w-10/12 mt-[50px] sm:w-full flex flex-col gap-[23px] pl-5 pr-5">

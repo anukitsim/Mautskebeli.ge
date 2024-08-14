@@ -9,6 +9,15 @@ import 'moment/locale/ka';
 import { FacebookShareButton, FacebookIcon, TwitterShareButton, TwitterIcon } from 'next-share';
 
 
+const categories = [
+  { name: "სტატიები", path: "/all-articles" },
+  { name: "თარგმანი", path: "/translate" },
+  { name: "მაუწყებელი წიგნები", path: "/books" },
+  { name: "თავისუფალი სვეტი", path: "/free-column" },
+
+];
+
+
 async function fetchArticle(id) {
   const res = await fetch(`https://mautskebeli.wpenginepowered.com/wp-json/wp/v2/article/${id}?acf_format=standard&_fields=id,title,acf,date&_=${new Date().getTime()}`);
   if (!res.ok) {
@@ -127,6 +136,8 @@ const ArticlePage = ({ params }) => {
 
   const ogDescription = sanitizeDescription(article.acf['main-text']).slice(0, 150);
 
+  const currentCategory = "სტატიები"; 
+
   return (
     <>
    <Head>
@@ -145,6 +156,22 @@ const ArticlePage = ({ params }) => {
 
     <section className="w-full mx-auto mt-10 px-4 lg:px-0 overflow-x-hidden relative">
       <div className="w-full lg:w-[60%] mx-auto bg-opacity-90 p-5 rounded-lg">
+      <div className="lg:flex hidden justify-start rounded-md space-x-6 px-20 gap-10 py-4 mt-[-12px] mb-10 font-noto-sans-georgian w-full mx-auto bg-[#AD88C6]">
+               
+               {categories.map((category) => (
+                 <a
+                   key={category.name}
+                   href={category.path}
+                   className={`text-sm  text-[#474F7A] ${
+                     category.name === currentCategory
+                       ? "text-white font-bold"
+                       : "text-[#474F7A]  hover:scale-110"
+                   }`}
+                 >
+                   {category.name}
+                 </a>
+               ))}
+             </div>
         <div className="w-full h-auto mb-5">
           <Image src={article.acf.image || '/images/default-og-image.jpg'} alt={article.title.rendered} width={800} height={450} style={{ objectFit: 'cover' }} className="rounded-lg w-full" />
           <h1 className="font-alk-tall-mtavruli text-[32px] sm:text-[64px] font-light leading-none text-[#474F7A] mt-[24px] mb-5">{article.title.rendered}</h1>
