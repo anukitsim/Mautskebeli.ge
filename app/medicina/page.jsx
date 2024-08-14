@@ -242,6 +242,7 @@ function XelovnebaVideos() {
                   marginTop: isSafariIOS ? "54px" : "74px", // Adjust this value as necessary
                 }}
               >
+                                 <h1 className="text-[#474F7A] text-[24px] font-bold mt-5 lg:mt-20 pl-4 mb-10 lg:ml-36 lg:pl-2 ">მედიცინა</h1>
                 <CustomYoutubePlayer key={customPlayerKey} videoId={activeVideoId} />
                 <div className="mx-auto lg:mt-[7%] lg:w-10/12 mt-[50px] sm:w-full flex flex-col gap-[23px] pl-5 pr-5">
                   <p className="text-[16px] text-[#474F7A] font-semibold">

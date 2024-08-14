@@ -78,6 +78,8 @@ const VideoCard = ({ videoId, acf, onSelect, date }) => {
   );
 };
 
+
+
 const fetchYoutubeVideoDetails = async (videoId, apiKey) => {
   const cachedDate = localStorage.getItem(videoId);
   if (cachedDate) {
@@ -99,6 +101,11 @@ const fetchYoutubeVideoDetails = async (videoId, apiKey) => {
   }
   return null;
 };
+
+
+
+
+
 
 function XelovnebaVideos() {
   const [videos, setVideos] = useState([]);
@@ -222,6 +229,8 @@ function XelovnebaVideos() {
   const startIndex = endIndex - 16;
   const paginatedVideos = videos.slice(startIndex, endIndex);
 
+  
+
   return (
     <>
       <MenuProvider>
@@ -229,6 +238,7 @@ function XelovnebaVideos() {
         <Navigation onVideoSelect={handleVideoSelect} />
       </MenuProvider>
       <div>
+       
         {loading ? (
           <img src="/images/loader.svg" />
         ) : (
@@ -242,6 +252,8 @@ function XelovnebaVideos() {
                   marginTop: isSafariIOS ? "54px" : "74px", // Adjust this value as necessary
                 }}
               >
+                 <h1 className="text-[#474F7A] text-[24px] font-bold mt-5 lg:mt-20 pl-4 mb-10 lg:ml-36 lg:pl-2 ">ხელოვნება</h1>
+
                 <CustomYoutubePlayer key={customPlayerKey} videoId={activeVideoId} />
                 <div className="mx-auto lg:mt-[7%] lg:w-10/12 mt-[50px] sm:w-full flex flex-col gap-[23px] pl-5 pr-5">
                   <p className="text-[16px] text-[#474F7A] font-semibold">

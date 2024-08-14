@@ -1,14 +1,20 @@
 "use client";
 
-import React, { useEffect, useState, useRef, Suspense, useCallback } from "react";
+import React, {
+  useEffect,
+  useState,
+  useRef,
+  Suspense,
+  useCallback,
+} from "react";
 import CustomYoutubePlayer from "../components/CustomYoutube";
 import Header from "../components/Header";
 import Navigation from "../components/Navigation";
 import { MenuProvider } from "../context/MenuContext";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
-import moment from 'moment';
-import 'moment/locale/ka';
+import moment from "moment";
+import "moment/locale/ka";
 
 // Utility functions to detect iOS and Safari
 const isIOS = () => {
@@ -46,8 +52,8 @@ const extractVideoId = (videoUrl) => {
 };
 
 const formatDate = (dateString) => {
-  moment.locale('ka');
-  return moment(dateString).format('LL');
+  moment.locale("ka");
+  return moment(dateString).format("LL");
 };
 
 const VideoCard = ({ videoId, acf, onSelect, date }) => {
@@ -73,7 +79,6 @@ const VideoCard = ({ videoId, acf, onSelect, date }) => {
       >
         {acf && acf.title ? acf.title : "No title available"}
       </p>
-      
     </div>
   );
 };
@@ -95,7 +100,10 @@ const fetchYoutubeVideoDetails = async (videoId, apiKey) => {
       return publishedAt;
     }
   } catch (error) {
-    console.error(`Failed to fetch YouTube video details for ${videoId}:`, error);
+    console.error(
+      `Failed to fetch YouTube video details for ${videoId}:`,
+      error
+    );
   }
   return null;
 };
@@ -118,13 +126,15 @@ function XelovnebaVideos() {
   const videoPlayerRef = useRef(null);
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [currentUrl, setCurrentUrl] = useState('');
+  const [currentUrl, setCurrentUrl] = useState("");
 
   const isSafariIOS = isIOS() && isSafari();
 
   const shareOnFacebook = () => {
     const youtubeUrl = `https://www.youtube.com/watch?v=${activeVideoId}`;
-    const shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(youtubeUrl)}`;
+    const shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+      youtubeUrl
+    )}`;
     window.open(shareUrl, "_blank");
   };
 
@@ -170,10 +180,17 @@ function XelovnebaVideos() {
 
         setVideos(videosWithDates);
 
-        const initialVideoId = searchParams.get("videoId") || extractVideoId(data[0]?.acf.video_url);
-        const initialVideo = videosWithDates.find(video => video.videoId === initialVideoId);
+        const initialVideoId =
+          searchParams.get("videoId") || extractVideoId(data[0]?.acf.video_url);
+        const initialVideo = videosWithDates.find(
+          (video) => video.videoId === initialVideoId
+        );
         if (initialVideo) {
-          handleVideoSelect(initialVideoId, initialVideo.acf, initialVideo.youtubeDate);
+          handleVideoSelect(
+            initialVideoId,
+            initialVideo.acf,
+            initialVideo.youtubeDate
+          );
         }
       } catch (error) {
         console.error("Error fetching videos:", error);
@@ -202,7 +219,10 @@ function XelovnebaVideos() {
   };
 
   const handleClickOutside = useCallback((event) => {
-    if (shareOptionsRef.current && !shareOptionsRef.current.contains(event.target)) {
+    if (
+      shareOptionsRef.current &&
+      !shareOptionsRef.current.contains(event.target)
+    ) {
       setShowShareOptions(false);
     }
   }, []);
@@ -242,7 +262,13 @@ function XelovnebaVideos() {
                   marginTop: isSafariIOS ? "54px" : "74px", // Adjust this value as necessary
                 }}
               >
-                <CustomYoutubePlayer key={customPlayerKey} videoId={activeVideoId} />
+                <h1 className="text-[#474F7A] text-[24px] font-bold mt-5 lg:mt-20 pl-4 mb-10 lg:ml-36 lg:pl-2 ">
+                  სახლი ყველას
+                </h1>
+                <CustomYoutubePlayer
+                  key={customPlayerKey}
+                  videoId={activeVideoId}
+                />
                 <div className="mx-auto lg:mt-[7%] lg:w-10/12 mt-[50px] sm:w-full flex flex-col gap-[23px] pl-5 pr-5">
                   <p className="text-[16px] text-[#474F7A] font-semibold">
                     {activeVideoDate ? formatDate(activeVideoDate) : ""}
@@ -279,8 +305,22 @@ function XelovnebaVideos() {
                       გაზიარება
                     </button>
                     {showShareOptions && (
-                      <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 1000 }} className="bg-gray-800 bg-opacity-50 flex items-center justify-center">
-                        <div ref={shareOptionsRef} className="rounded-lg p-6 w-80" style={{backgroundColor: "rgba(0, 0, 0, 0.30)",}}>
+                      <div
+                        style={{
+                          position: "fixed",
+                          top: 0,
+                          left: 0,
+                          right: 0,
+                          bottom: 0,
+                          zIndex: 1000,
+                        }}
+                        className="bg-gray-800 bg-opacity-50 flex items-center justify-center"
+                      >
+                        <div
+                          ref={shareOptionsRef}
+                          className="rounded-lg p-6 w-80"
+                          style={{ backgroundColor: "rgba(0, 0, 0, 0.30)" }}
+                        >
                           <h2 className="text-xl text-white font-bold mb-4">
                             გააზიარე
                           </h2>
@@ -350,7 +390,7 @@ function XelovnebaVideos() {
                     videoId={video.videoId}
                     acf={video.acf}
                     onSelect={handleVideoSelect}
-                    date={video.youtubeDate}  // Ensure date is passed here
+                    date={video.youtubeDate} // Ensure date is passed here
                   />
                 ))}
               </div>
@@ -362,7 +402,7 @@ function XelovnebaVideos() {
                       videoId={video.videoId}
                       acf={video.acf}
                       onSelect={handleVideoSelect}
-                      date={video.youtubeDate}  // Ensure date is passed here
+                      date={video.youtubeDate} // Ensure date is passed here
                     />
                   ))}
                 </div>
@@ -377,7 +417,14 @@ function XelovnebaVideos() {
 
 function WrappedXelovnebaVideos() {
   return (
-    <Suspense fallback={<div> <img src="/images/loader.svg" /></div>}>
+    <Suspense
+      fallback={
+        <div>
+          {" "}
+          <img src="/images/loader.svg" />
+        </div>
+      }
+    >
       <XelovnebaVideos />
     </Suspense>
   );
