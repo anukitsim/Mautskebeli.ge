@@ -46,7 +46,10 @@ const AllArticlesList = () => {
   return (
     <section className="mx-auto flex flex-col overflow-hidden">
       <div className="w-full sm:w-11/12 md:w-10/12 lg:w-10/12 xl:w-9/12 mx-auto">
-        <p className="text-[#474F7A] text-[24px] font-bold mt-5 lg:mt-20 pl-4 lg:pl-2">თარგმანი</p>
+        <p className="text-[#474F7A] text-[24px] font-bold mt-5 lg:mt-14 pl-4 lg:pl-2">თარგმანი</p>
+        <p className='text-[#8D91AB] text-[14px] font-bold pl-2 pt-5 w-9/12 text-justify mb-10'>„მაუწყებელი“ ისწრაფვის პოლიტიკურად მნიშვნელოვანი ცოდნის გავრცელების ხელშეწყობისკენ და გთავაზობთ ანალიტიკური სტატიებისა და წიგნების ქართულ თარგმანს.  
+
+        </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mt-5 mx-4 lg:mx-0">
           {articles.map(article => (
             <Link href={`/translate/${article.id}`} passHref key={article.id}>

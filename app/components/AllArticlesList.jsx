@@ -67,7 +67,9 @@ const AllArticlesList = () => {
   return (
     <section className="mx-auto flex flex-col overflow-hidden">
       <div className="w-full sm:w-11/12 md:w-10/12 lg:w-10/12 xl:w-9/12 mx-auto">
-        <p className="text-[#474F7A] text-[24px] font-bold mt-5 lg:mt-20 pl-4 lg:pl-2">ყველა სტატია</p>
+        <p className="text-[#474F7A] text-[24px] font-bold mt-5 lg:mt-14 pl-4 lg:pl-2">სტატიები</p>
+        <p className='text-[#8D91AB] text-[14px] font-bold pl-2 pt-5 w-9/12 text-justify mb-10'>„მაუწყებელი“ მიზნად ისახავს საზოგადოებრივად მნიშვნელოვანი, მაგრამ პოლიტიკური დღის წესრიგის მიერ უგულებელყოფილი საკითხების წინ წამოწევას და გთავაზობთ ანალიტიკურ სტატიებს, სადაც სიღრმისეულად, მრავალშრიანად და ჩაგრულთა პერსპექტივიდანაა დანახული ქვეყანაში მიმდინარე მწვავე სოციალური, კულტურული და ეკონომიკური პროცესები.
+        </p>
         {loading ? (
           <div className="flex justify-center items-center mt-10">
             <img src="/images/loader.svg" alt="Loading" />
