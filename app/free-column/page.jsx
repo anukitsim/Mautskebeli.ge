@@ -51,7 +51,7 @@ const ColumnPage = () => {
         <p className="text-[#474F7A] text-[24px] font-bold mt-5 lg:mt-14 pl-4 lg:pl-2">
           თავისუფალი სვეტი
         </p>
-        <p className="text-[#8D91AB] text-[14px] font-bold pl-2 pt-5 w-9/12 text-justify mb-10">
+        <p className="text-[#8D91AB] text-wrap pl-4 text-[14px] font-bold lg:pl-2 pt-5 w-11/12 lg:w-9/12 lg:text-justify mb-10">
           ფართო, ინკლუზიური და რადიკალური დემოკრატიის იდეის კრიზისის ფონზე,
           „მაუწებელი“ მიზნად ისახავს მხარი დაუჭიროს ადგილობრივი ხმების
           გაჟღერებას და თავისუფალ პლატფორმას უთმობს ავტორებს,
