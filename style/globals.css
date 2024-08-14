@@ -30,40 +30,17 @@ body {
 }
 
 
-p::selection, h1::selection, h2::selection, h3::selection, span::selection {
-  background-color: #8C74B2;
-  color: #fff;
+::selection {
+  background-color: #8C74B2; /* Default Purple color */
+  color: #fff; /* White text color */
 }
 
-body, html, .container, .wrapper, .header, .footer, .video-container {
-  background-color: transparent !important; /* Ensure transparency to avoid large blocks being selected */
+/* Apply selection styling to .sport-text and all its children */
+.sport-text::selection,
+.sport-text *::selection {
+  background-color: #FECE27;
+  color: white;
 }
-
-.container, .wrapper, .section {
-  overflow: visible; /* Temporarily set to visible to test if overflow is causing issues */
-}
-
-
-@media screen and (-webkit-min-device-pixel-ratio:0) {
-  *::selection {
-    background-color: #8C74B2;
-    color: #fff;
-  }
-  
-  /* Force background transparency */
-  body, html, .container, .wrapper {
-    background-color: transparent;
-  }
-}
-
-
-
-@media screen and (-webkit-min-device-pixel-ratio:0) {
-  * {
-    -webkit-user-select: text;
-  }
-}
-
 
 
 .video-container {

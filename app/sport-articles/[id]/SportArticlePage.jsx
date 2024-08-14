@@ -117,7 +117,7 @@ const SportArticlePage = ({ params }) => {
         <meta property="fb:app_id" content="2191957607826649" />
       </Head>
 
-      <section className="w-full mx-auto mt-10 px-4 lg:px-0 overflow-x-hidden relative">
+      <section className="w-full bg-white mx-auto  px-4 lg:px-0 overflow-x-hidden relative">
         <div className="w-full lg:w-[54%] mx-auto bg-opacity-90 p-5 rounded-lg">
           <div className="w-full h-auto mb-5">
             <Image
@@ -128,15 +128,15 @@ const SportArticlePage = ({ params }) => {
               style={{ objectFit: 'cover' }}
               className="rounded-lg w-full"
             />
-            <h1 className="font-alk-tall-mtavruli text-[32px] sm:text-[64px] font-light leading-none text-[#474F7A] mt-[24px] mb-5">
+            <h1 className="font-alk-tall-mtavruli sport-text text-[32px] sm:text-[64px] font-light leading-none text-[#474F7A] mt-[24px] mb-5">
               {article.title.rendered}
             </h1>
-            <h2 className="font-noto-sans-georgian text-[16px] sm:text-[24px] font-extrabold text-[#474F7A] leading-normal mb-5">
+            <h2 className="font-noto-sans-georgian sport-text text-[16px] sm:text-[24px] font-extrabold text-[#474F7A] leading-normal mb-5">
               {article.acf['ავტორი']}
             </h2>
           </div>
           <div
-            className="text-[#474F7A] text-wrap w-full font-noto-sans-georgian text-[14px] sm:text-[16px] font-normal lg:text-justify leading-[30px] sm:leading-[35px] tracking-[0.32px]"
+            className="text-[#474F7A] sport-text text-wrap w-full font-noto-sans-georgian text-[14px] sm:text-[16px] font-normal lg:text-justify leading-[30px] sm:leading-[35px] tracking-[0.32px]"
             dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(article.acf['main-text']) }}
           ></div>
           <div className="flex flex-wrap gap-4 mt-10">
