@@ -8,6 +8,7 @@ import moment from 'moment';
 import 'moment/locale/ka';
 import { FacebookShareButton, FacebookIcon, TwitterShareButton, TwitterIcon } from 'next-share';
 
+
 async function fetchArticle(id) {
   const res = await fetch(`https://mautskebeli.wpenginepowered.com/wp-json/wp/v2/article/${id}?acf_format=standard&_fields=id,title,acf,date&_=${new Date().getTime()}`);
   if (!res.ok) {
@@ -91,6 +92,15 @@ const ArticlePage = ({ params }) => {
       const articleContent = articleContentRef.current;
       articleContent.innerHTML = DOMPurify.sanitize(article.acf['main-text']);
 
+      // Apply styles for blockquotes
+      const blockquotes = articleContent.querySelectorAll('blockquote');
+      blockquotes.forEach(blockquote => {
+        blockquote.style.marginLeft = '20px';
+        blockquote.style.marginRight = '20px';
+        blockquote.style.paddingLeft = '20px';
+        blockquote.style.borderLeft = '5px solid #ccc'; // Example style
+      });
+
       const sanitizedLinks = articleContent.querySelectorAll('a');
       sanitizedLinks.forEach(link => {
         link.addEventListener('click', (event) => {
@@ -134,7 +144,7 @@ const ArticlePage = ({ params }) => {
   </Head>
 
     <section className="w-full mx-auto mt-10 px-4 lg:px-0 overflow-x-hidden relative">
-      <div className="w-full lg:w-[54%] mx-auto bg-opacity-90 p-5 rounded-lg">
+      <div className="w-full lg:w-[60%] mx-auto bg-opacity-90 p-5 rounded-lg">
         <div className="w-full h-auto mb-5">
           <Image src={article.acf.image || '/images/default-og-image.jpg'} alt={article.title.rendered} width={800} height={450} style={{ objectFit: 'cover' }} className="rounded-lg w-full" />
           <h1 className="font-alk-tall-mtavruli text-[32px] sm:text-[64px] font-light leading-none text-[#474F7A] mt-[24px] mb-5">{article.title.rendered}</h1>
