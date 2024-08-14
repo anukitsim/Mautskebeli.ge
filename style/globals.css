@@ -35,6 +35,27 @@ body {
   color: #fff; /* White text color */
 }
 
+::-moz-selection {
+  background-color: #8C74B2; /* Purple color for Firefox */
+  color: #fff; /* White text color */
+}
+
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+  ::selection {
+    background-color: #8C74B2;
+    color: #fff;
+  }
+  body, html {
+    background-color: transparent;
+  }
+}
+
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+  * {
+    -webkit-user-select: text;
+  }
+}
+
 
 
 .video-container {
@@ -866,18 +887,5 @@ a.scale-on-hover:hover {
   .facebook-news-container {
     flex-wrap: nowrap;
   }
-}
-
-.clip-path-arrow {
-  clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 50%, calc(100% - 20px) 100%, 0 100%);
-}
-
-.clip-path-arrow {
-  display: inline-block;
-  padding: 10px 20px;
-  margin-right: 10px;
-  background-color: white;
-  text-decoration: none;
-  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
