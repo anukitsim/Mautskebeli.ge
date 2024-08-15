@@ -6,8 +6,8 @@ import Footer from "../components/Footer";
 import Head from 'next/head';
 
 export const metadata = {
-  title: "mautskebeli.ge",
-  description: "მედია პლათფორმა მაუწყებელი",
+  title: "მაუწყებელი",
+  description: "მედია პლათფორმა მაუწყებელი, სტატიები, თარგმანი, მაუწყებელი წიგნები, თავისუფალი სვეტი",
   ogImage: "https://mautskebeli.ge/api/og?title=Default%20Title",
   metadataBase: new URL('https://www.mautskebeli.ge'), 
 };

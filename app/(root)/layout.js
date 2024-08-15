@@ -6,7 +6,7 @@ import Footer from "../components/Footer";
 import Head from 'next/head';
 
 export const metadata = {
-  title: "mautskebeli.ge",
+  title: "მაუწყებელი",
   description: "მედია პლათფორმა მაუწყებელი",
 };
 
