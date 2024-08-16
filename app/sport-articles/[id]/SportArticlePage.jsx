@@ -114,7 +114,7 @@ const SportArticlePage = ({ params }) => {
         <meta property="og:image" content={ogImage} />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
-        <meta property="fb:app_id" content="2191957607826649" />
+        <meta property="fb:app_id" content="1819807585106457" />
       </Head>
 
       <section className="w-full bg-white mx-auto  px-4 lg:px-0 overflow-x-hidden relative">
