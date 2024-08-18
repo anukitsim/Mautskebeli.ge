@@ -26,8 +26,8 @@ export async function generateMetadata({ params }) {
             },
           ],
           type: 'article',
-          app_id: '1819807585106457',
         },
+        additionalMetaTags: [{ property: 'fb:app_id', content: '1819807585106457' }],
       };
     }
 
@@ -49,8 +49,8 @@ export async function generateMetadata({ params }) {
           },
         ],
         type: 'article',
-        app_id: '1819807585106457',
       },
+      additionalMetaTags: [{ property: 'fb:app_id', content: '1819807585106457' }],
     };
   } catch (error) {
     console.error('Unexpected error fetching metadata:', error);
@@ -69,11 +69,12 @@ export async function generateMetadata({ params }) {
           },
         ],
         type: 'article',
-        app_id: '1819807585106457',
       },
+      additionalMetaTags: [{ property: 'fb:app_id', content: '1819807585106457' }],
     };
   }
 }
+
 
 const NoSSRArticlePage = dynamic(() => import('./ArticlePage'), { ssr: false });
 
