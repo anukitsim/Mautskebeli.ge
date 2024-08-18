@@ -26,6 +26,7 @@ export async function generateMetadata({ params }) {
             },
           ],
           type: 'article',
+          app_id: '1819807585106457',
         },
       };
     }
@@ -48,6 +49,7 @@ export async function generateMetadata({ params }) {
           },
         ],
         type: 'article',
+        app_id: '1819807585106457',
       },
     };
   } catch (error) {
@@ -67,6 +69,7 @@ export async function generateMetadata({ params }) {
           },
         ],
         type: 'article',
+        app_id: '1819807585106457',
       },
     };
   }
