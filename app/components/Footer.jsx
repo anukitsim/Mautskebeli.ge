@@ -157,7 +157,7 @@ const Footer = () => {
 
       {/* Mobile screen Footer */}
       <footer className="flex lg:hidden bg-[#AD88C6] flex-col justify-center mt-[42px] gap-[32px] items-center">
-        <Image src="/images/white-logo.svg" alt="logo" width={116} height={32} className="mt-[32px]" />
+        <Image src="/images/footer-logo-good.svg" alt="logo" width={116} height={32} className="mt-[32px]" />
         <div className="flex flex-col justify-center items-center gap-[18px]">
           <h1 className="text-white text-[15px] font-bold">კონტაქტი</h1>
           <div className="flex gap-[10px]  text-[#474F7A] text-[15px]">
