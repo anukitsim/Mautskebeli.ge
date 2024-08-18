@@ -2,6 +2,7 @@ import dynamic from 'next/dynamic';
 
 export async function generateMetadata({ params }) {
   const { id } = params;
+  console.log(`generateMetadata called with id: ${id}`);
 
   try {
     const apiUrl = `https://www.mautskebeli.ge/api/og-tags?id=${id}`;
@@ -32,9 +33,9 @@ export async function generateMetadata({ params }) {
     }
 
     const ogTags = await res.json();
-    console.log('OG Tags:', ogTags);
+    console.log('OG Tags fetched successfully:', ogTags);
 
-    return {
+    const metadata = {
       title: ogTags.title,
       description: ogTags.description,
       openGraph: {
@@ -52,6 +53,10 @@ export async function generateMetadata({ params }) {
       },
       additionalMetaTags: [{ property: 'fb:app_id', content: '1819807585106457' }],
     };
+
+    console.log('Returning metadata:', metadata);
+    return metadata;
+
   } catch (error) {
     console.error('Unexpected error fetching metadata:', error);
     return {
@@ -75,11 +80,11 @@ export async function generateMetadata({ params }) {
   }
 }
 
-
-const NoSSRArticlePage = dynamic(() => import('./ArticlePage'), { ssr: false });
+const ArticlePage = dynamic(() => import('./ArticlePage'), { ssr: false });
 
 const Page = ({ params }) => {
-  return <NoSSRArticlePage params={params} />;
+  console.log('Rendering Page component with params:', params);
+  return <ArticlePage params={params} />;
 };
 
 export default Page;

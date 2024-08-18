@@ -9,7 +9,7 @@ const AllVideosPage = () => {
     <div>
       <VideosList 
         endpoint="https://mautskebeli.wpenginepowered.com/wp-json/wp/v2/acf-fields"
-        title="ყველა ვიდეო" // This means "All Videos" in Georgian
+        title="ყველა ვიდეო" 
       />
     </div>
   );

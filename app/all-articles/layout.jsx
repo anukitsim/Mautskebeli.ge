@@ -5,38 +5,58 @@ import { MenuProvider } from "@/app/context/MenuContext";
 import Footer from "../components/Footer";
 import Head from 'next/head';
 
-export const metadata = {
-  title: "მაუწყებელი",
-  description: "მედია პლათფორმა მაუწყებელი, სტატიები, თარგმანი, მაუწყებელი წიგნები, თავისუფალი სვეტი",
-  ogImage: "https://mautskebeli.ge/api/og?title=Default%20Title",
-  metadataBase: new URL('https://www.mautskebeli.ge'), 
-};
+export default function RootLayout({ children, metadata }) {
+  // Provide default values for metadata
+  const defaultMetadata = {
+    title: "Default Title",
+    description: "Default description",
+    openGraph: {
+      title: "Default OG Title",
+      description: "Default OG Description",
+      images: [
+        {
+          url: "/default-og-image.jpg",
+          width: 1200,
+          height: 630,
+        },
+      ],
+      url: "https://www.mautskebeli.ge",
+      type: "website",
+    },
+    additionalMetaTags: [],
+  };
 
-export default function RootLayout({ children }) {
+  const finalMetadata = metadata || defaultMetadata;
+
   return (
     <html lang="en">
-      <Head>
-        <title>{metadata.title}</title>
-        <meta name="description" content={metadata.description} />
-        <meta property="og:title" content={metadata.title} />
-        <meta property="og:description" content={metadata.description} />
-        <meta property="og:image" content={metadata.ogImage} />
-        <meta property="og:image:width" content="1200" />
-        <meta property="og:image:height" content="630" />
-        <meta property="og:image:alt" content={metadata.title} />
-        <meta property="fb:app_id" content="1819807585106457" />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+     <Head>
+     {console.log(finalMetadata.additionalMetaTags)}  
+      <title>{finalMetadata.title}</title>
+      <meta name="description" content={finalMetadata.description} />
+      <meta property="og:title" content={finalMetadata.openGraph.title} />
+      <meta property="og:description" content={finalMetadata.openGraph.description} />
+      <meta property="og:image" content={finalMetadata.openGraph.images[0].url} />
+      <meta property="og:image:width" content={finalMetadata.openGraph.images[0].width} />
+      <meta property="og:image:height" content={finalMetadata.openGraph.images[0].height} />
+      <meta property="og:url" content={finalMetadata.openGraph.url} />
+      <meta property="og:type" content={finalMetadata.openGraph.type} />
+      {finalMetadata.additionalMetaTags?.map(tag => (
+        <meta key={tag.property} property={tag.property} content={tag.content} />
+      ))}
+      <link rel="icon" href="/favicon.ico" />
+    </Head>
+
       <body>
         <MenuProvider>
           <div className="sticky top-0 z-50">
             <Header />
             <Navigation />
           </div>
-        {children}
-        <div className="mt-40">
-          <Footer />
-        </div>
+          {children}
+          <div className="mt-40">
+            <Footer />
+          </div>
         </MenuProvider>
       </body>
     </html>

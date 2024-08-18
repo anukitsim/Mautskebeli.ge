@@ -88,10 +88,10 @@ const HomePageRcheuli = () => {
 
   return (
     <>
-      <div className="w-10/12 flex justify-between mx-auto mt-[102px] lg:mt-[69px]">
-        <p className="text-[#474F7A] text-[24px] font-bold rounded-t-lg md:rounded-t-none lg:rounded-none">მაუწყებელი გირჩევთ</p>
+      <div className="w-10/12 mx-auto mt-5 lg:mt-14">
+      <p className="text-[#474F7A] text-[24px] font-bold ml-[-20px] lg:ml-0 mt-20">მაუწყებელი გირჩევთ</p>
       </div>
-      <div className="flex lg:hidden overflow-x-auto hide-scroll-bar pl-2 mt-[42px]">
+      <div className="flex lg:hidden overflow-x-auto hide-scroll-bar pl-2 mt-6 ml-4">
         <div className="flex">
           {posts.map((post, index) => (
             <div key={index} className="inline-block px-2 w-[248px]">
@@ -116,7 +116,7 @@ const HomePageRcheuli = () => {
           ))}
         </div>
       </div>
-      <section className="lg:flex hidden w-10/12 mt-[69px] gap-[20px] mx-auto">
+      <section className="lg:flex hidden w-10/12 mt-5 gap-[20px] mx-auto">
         {posts.map((post, index) => (
           <div key={index} className="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 flex flex-col">
             <Link href={constructUrl(post)}>

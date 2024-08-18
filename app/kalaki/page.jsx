@@ -18,9 +18,11 @@ const categories = [
   { name: "მედიცინა", path: "/medicina" },
   { name: "ხელოვნება", path: "/xelovneba" },
   { name: "ქალაქი", path: "/kalaki" },
+  { name: "რესურსები", path: "/resursebi" },
   { name: "მსოფლიო", path: "/msoflio" },
   { name: "სახლი ყველას", path: "/saxli" },
 ];
+
 // Utility functions to detect iOS and Safari
 const isIOS = () => {
   return (
@@ -265,23 +267,22 @@ function XelovnebaVideos() {
                   marginTop: isSafariIOS ? "54px" : "74px", // Adjust this value as necessary
                 }}
               >
-                 <div className="lg:flex hidden justify-start  rounded-md space-x-6 px-24 gap-5 py-4 mb-10 mt-[-25px] w-10/12 mx-auto bg-[#AD88C6]">
+                 <div className="lg:flex hidden justify-start text-nowrap rounded-md space-x-6 px-10 gap-5 py-4 mb-10 mt-[-25px] w-10/12 mx-auto bg-[#AD88C6]">
                
-                  {categories.map((category) => (
-                    <a
-                      key={category.name}
-                      href={category.path}
-                      className={`text-md  text-[#474F7A] ${
-                        category.name === currentCategory
-                          ? "text-white font-bold"
-                          : "text-[#474F7A]  hover:scale-110"
-                      }`}
-                    >
-                      {category.name}
-                    </a>
-                  ))}
-                </div>
-
+               {categories.map((category) => (
+                 <a
+                   key={category.name}
+                   href={category.path}
+                   className={`text-md  text-[#474F7A] ${
+                     category.name === currentCategory
+                       ? "font-bold"
+                       : "text-[#474F7A]  hover:scale-110"
+                   }`}
+                 >
+                   {category.name}
+                 </a>
+               ))}
+             </div>
                 <CustomYoutubePlayer key={customPlayerKey} videoId={activeVideoId} />
                 <div className="mx-auto lg:mt-[7%] lg:w-10/12 mt-[50px] sm:w-full flex flex-col gap-[23px] pl-5 pr-5">
                   <p className="text-[16px] text-[#474F7A] font-semibold">
