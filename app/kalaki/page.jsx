@@ -10,7 +10,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import moment from 'moment';
 import 'moment/locale/ka';
 
-
 const categories = [
   { name: "შრომა", path: "/shroma" },
   { name: "მეცნიერება", path: "/mecniereba" },
@@ -91,8 +90,6 @@ const VideoCard = ({ videoId, acf, onSelect, date }) => {
   );
 };
 
-
-
 const fetchYoutubeVideoDetails = async (videoId, apiKey) => {
   const cachedDate = localStorage.getItem(videoId);
   if (cachedDate) {
@@ -115,10 +112,38 @@ const fetchYoutubeVideoDetails = async (videoId, apiKey) => {
   return null;
 };
 
+const fetchAllVideos = async () => {
+  const perPage = 100;
+  let allVideos = [];
+  let page = 1;
+  let morePages = true;
 
+  while (morePages) {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/wp/v2/kalaki?per_page=${perPage}&page=${page}`
+      );
 
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
 
+      const data = await response.json();
 
+      if (data.length < perPage) {
+        morePages = false;
+      }
+
+      allVideos = [...allVideos, ...data];
+      page++;
+    } catch (error) {
+      console.error("Error fetching videos:", error);
+      morePages = false;
+    }
+  }
+
+  return allVideos;
+};
 
 function XelovnebaVideos() {
   const [videos, setVideos] = useState([]);
@@ -166,14 +191,7 @@ function XelovnebaVideos() {
     const fetchVideos = async () => {
       setLoading(true);
       try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/wp/v2/kalaki?per_page=100`
-        );
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
-
+        const data = await fetchAllVideos();
         const apiKey = "AIzaSyDd4yHryI5WLPLNjpKsiuU1bYHnBgcK_u8";
 
         const videosWithDates = await Promise.all(
@@ -242,9 +260,7 @@ function XelovnebaVideos() {
   const startIndex = endIndex - 16;
   const paginatedVideos = videos.slice(startIndex, endIndex);
 
-
   const currentCategory = "ქალაქი"; 
-  
 
   return (
     <>
@@ -253,7 +269,6 @@ function XelovnebaVideos() {
         <Navigation onVideoSelect={handleVideoSelect} />
       </MenuProvider>
       <div>
-       
         {loading ? (
           <img src="/images/loader.svg" />
         ) : (
@@ -267,22 +282,21 @@ function XelovnebaVideos() {
                   marginTop: isSafariIOS ? "54px" : "74px", // Adjust this value as necessary
                 }}
               >
-                 <div className="lg:flex hidden justify-start text-nowrap rounded-md space-x-6 px-10 gap-5 py-4 mb-10 mt-[-25px] w-10/12 mx-auto bg-[#AD88C6]">
-               
-               {categories.map((category) => (
-                 <a
-                   key={category.name}
-                   href={category.path}
-                   className={`text-md  text-[#474F7A] ${
-                     category.name === currentCategory
-                       ? "font-bold"
-                       : "text-[#474F7A]  hover:scale-110"
-                   }`}
-                 >
-                   {category.name}
-                 </a>
-               ))}
-             </div>
+                <div className="lg:flex hidden justify-start text-nowrap rounded-md space-x-6 px-10 gap-5 py-4 mb-10 mt-[-25px] w-10/12 mx-auto bg-[#AD88C6]">
+                  {categories.map((category) => (
+                    <a
+                      key={category.name}
+                      href={category.path}
+                      className={`text-md  text-[#474F7A] ${
+                        category.name === currentCategory
+                          ? "font-bold"
+                          : "text-[#474F7A]  hover:scale-110"
+                      }`}
+                    >
+                      {category.name}
+                    </a>
+                  ))}
+                </div>
                 <CustomYoutubePlayer key={customPlayerKey} videoId={activeVideoId} />
                 <div className="mx-auto lg:mt-[7%] lg:w-10/12 mt-[50px] sm:w-full flex flex-col gap-[23px] pl-5 pr-5">
                   <p className="text-[16px] text-[#474F7A] font-semibold">

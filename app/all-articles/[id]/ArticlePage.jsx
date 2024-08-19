@@ -50,6 +50,7 @@ const ArticlePage = ({ params }) => {
           ...fetchedArticle,
           formattedDate: formatDate(fetchedArticle.date),
         });
+        console.log("Article data set in state:", { ...fetchedArticle, formattedDate: formatDate(fetchedArticle.date) });
       } catch (error) {
         console.error("Error fetching article:", error);
       }
@@ -58,6 +59,15 @@ const ArticlePage = ({ params }) => {
       getArticle();
     }
   }, [id]);
+
+  useEffect(() => {
+    if (article) {
+      console.log("Confirming metadata for article includes fb:app_id:", {
+        title: article.title.rendered,
+        fb_app_id: '1819807585106457'
+      });
+    }
+  }, [article]);
 
   useEffect(() => {
     const handleScroll = () => {

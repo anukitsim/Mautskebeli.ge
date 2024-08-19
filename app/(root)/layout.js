@@ -21,6 +21,7 @@ export default function RootLayout({ children }) {
         <meta property="og:title" content={metadata.title} />
         <meta property="og:description" content={metadata.description} />
         <meta property="og:image" content={defaultOgImage} />
+        <meta property="fb:app_id" content="1819807585106457" />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
       </Head>

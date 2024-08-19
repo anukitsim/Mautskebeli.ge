@@ -120,6 +120,39 @@ const fetchYoutubeVideoDetails = async (videoId, apiKey) => {
   return null;
 };
 
+const fetchAllVideos = async () => {
+  const perPage = 100;
+  let allVideos = [];
+  let page = 1;
+  let morePages = true;
+
+  while (morePages) {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/wp/v2/xelovneba?per_page=${perPage}&page=${page}`
+      );
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+
+      if (data.length < perPage) {
+        morePages = false;
+      }
+
+      allVideos = [...allVideos, ...data];
+      page++;
+    } catch (error) {
+      console.error("Error fetching videos:", error);
+      morePages = false;
+    }
+  }
+
+  return allVideos;
+};
+
 function XelovnebaVideos() {
   const [videos, setVideos] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -168,14 +201,7 @@ function XelovnebaVideos() {
     const fetchVideos = async () => {
       setLoading(true);
       try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/wp/v2/xelovneba?per_page=100`
-        );
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
-
+        const data = await fetchAllVideos();
         const apiKey = "AIzaSyDd4yHryI5WLPLNjpKsiuU1bYHnBgcK_u8";
 
         const videosWithDates = await Promise.all(
@@ -276,22 +302,21 @@ function XelovnebaVideos() {
                   marginTop: isSafariIOS ? "54px" : "74px", // Adjust this value as necessary
                 }}
               >
-                 <div className="lg:flex hidden justify-start text-nowrap rounded-md space-x-6 px-10 gap-5 py-4 mb-10 mt-[-25px] w-10/12 mx-auto bg-[#AD88C6]">
-               
-               {categories.map((category) => (
-                 <a
-                   key={category.name}
-                   href={category.path}
-                   className={`text-md  text-[#474F7A] ${
-                     category.name === currentCategory
-                       ? "font-bold"
-                       : "text-[#474F7A]  hover:scale-110"
-                   }`}
-                 >
-                   {category.name}
-                 </a>
-               ))}
-             </div>
+                <div className="lg:flex hidden justify-start text-nowrap rounded-md space-x-6 px-10 gap-5 py-4 mb-10 mt-[-25px] w-10/12 mx-auto bg-[#AD88C6]">
+                  {categories.map((category) => (
+                    <a
+                      key={category.name}
+                      href={category.path}
+                      className={`text-md  text-[#474F7A] ${
+                        category.name === currentCategory
+                          ? "font-bold"
+                          : "text-[#474F7A]  hover:scale-110"
+                      }`}
+                    >
+                      {category.name}
+                    </a>
+                  ))}
+                </div>
 
                 <CustomYoutubePlayer
                   key={customPlayerKey}

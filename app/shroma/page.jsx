@@ -10,7 +10,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import moment from 'moment';
 import 'moment/locale/ka';
 
-
 const categories = [
   { name: "შრომა", path: "/shroma" },
   { name: "მეცნიერება", path: "/mecniereba" },
@@ -86,12 +85,9 @@ const VideoCard = ({ videoId, acf, onSelect, date }) => {
       >
         {acf && acf.title ? acf.title : "No title available"}
       </p>
-      
     </div>
   );
 };
-
-
 
 const fetchYoutubeVideoDetails = async (videoId, apiKey) => {
   const cachedDate = localStorage.getItem(videoId);
@@ -115,10 +111,38 @@ const fetchYoutubeVideoDetails = async (videoId, apiKey) => {
   return null;
 };
 
+const fetchAllVideos = async () => {
+  const perPage = 100;
+  let allVideos = [];
+  let page = 1;
+  let morePages = true;
 
+  while (morePages) {
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/wp/v2/shroma?per_page=${perPage}&page=${page}`
+      );
 
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
 
+      const data = await response.json();
 
+      if (data.length < perPage) {
+        morePages = false;
+      }
+
+      allVideos = [...allVideos, ...data];
+      page++;
+    } catch (error) {
+      console.error("Error fetching videos:", error);
+      morePages = false;
+    }
+  }
+
+  return allVideos;
+};
 
 function XelovnebaVideos() {
   const [videos, setVideos] = useState([]);
@@ -166,14 +190,7 @@ function XelovnebaVideos() {
     const fetchVideos = async () => {
       setLoading(true);
       try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/wp/v2/shroma?per_page=100`
-        );
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
-
+        const data = await fetchAllVideos();
         const apiKey = "AIzaSyDd4yHryI5WLPLNjpKsiuU1bYHnBgcK_u8";
 
         const videosWithDates = await Promise.all(
@@ -242,9 +259,7 @@ function XelovnebaVideos() {
   const startIndex = endIndex - 16;
   const paginatedVideos = videos.slice(startIndex, endIndex);
 
-
   const currentCategory = "შრომა"; 
-  
 
   return (
     <>
@@ -253,7 +268,6 @@ function XelovnebaVideos() {
         <Navigation onVideoSelect={handleVideoSelect} />
       </MenuProvider>
       <div>
-       
         {loading ? (
           <img src="/images/loader.svg" />
         ) : (
@@ -268,21 +282,20 @@ function XelovnebaVideos() {
                 }}
               >
                 <div className="lg:flex hidden justify-start text-nowrap rounded-md space-x-6 px-10 gap-5 py-4 mb-10 mt-[-25px] w-10/12 mx-auto bg-[#AD88C6]">
-               
-               {categories.map((category) => (
-                 <a
-                   key={category.name}
-                   href={category.path}
-                   className={`text-md  text-[#474F7A] ${
-                     category.name === currentCategory
-                       ? "font-bold"
-                       : "text-[#474F7A]  hover:scale-110"
-                   }`}
-                 >
-                   {category.name}
-                 </a>
-               ))}
-             </div>
+                  {categories.map((category) => (
+                    <a
+                      key={category.name}
+                      href={category.path}
+                      className={`text-md  text-[#474F7A] ${
+                        category.name === currentCategory
+                          ? "font-bold"
+                          : "text-[#474F7A]  hover:scale-110"
+                      }`}
+                    >
+                      {category.name}
+                    </a>
+                  ))}
+                </div>
 
                 <CustomYoutubePlayer key={customPlayerKey} videoId={activeVideoId} />
                 <div className="mx-auto lg:mt-[7%] lg:w-10/12 mt-[50px] sm:w-full flex flex-col gap-[23px] pl-5 pr-5">
@@ -321,8 +334,22 @@ function XelovnebaVideos() {
                       გაზიარება
                     </button>
                     {showShareOptions && (
-                      <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 1000 }} className="bg-gray-800 bg-opacity-50 flex items-center justify-center">
-                        <div ref={shareOptionsRef} className="rounded-lg p-6 w-80" style={{backgroundColor: "rgba(0, 0, 0, 0.30)",}}>
+                      <div
+                        style={{
+                          position: "fixed",
+                          top: 0,
+                          left: 0,
+                          right: 0,
+                          bottom: 0,
+                          zIndex: 1000,
+                        }}
+                        className="bg-gray-800 bg-opacity-50 flex items-center justify-center"
+                      >
+                        <div
+                          ref={shareOptionsRef}
+                          className="rounded-lg p-6 w-80"
+                          style={{ backgroundColor: "rgba(0, 0, 0, 0.30)" }}
+                        >
                           <h2 className="text-xl text-white font-bold mb-4">
                             გააზიარე
                           </h2>
