@@ -151,6 +151,7 @@ const ArticlePage = ({ params }) => {
     <>
       <Head>
         <title>{article.title.rendered}</title>
+        <meta property="fb:app_id" content="1819807585106457" />
         <meta name="description" content={ogDescription} />
         <meta property="og:url" content={articleUrl} />
         <meta property="og:type" content="article" />
@@ -159,7 +160,7 @@ const ArticlePage = ({ params }) => {
         <meta property="og:image" content={ogImage} />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
-        <meta property="fb:app_id" content="1819807585106457" />
+        
         <meta property="og:image:alt" content={article.title.rendered} />
       </Head>
 
