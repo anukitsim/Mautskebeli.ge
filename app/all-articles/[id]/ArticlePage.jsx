@@ -60,56 +60,15 @@ const ArticlePage = ({ params }) => {
     }
   }, [id]);
 
-  useEffect(() => {
-    if (article) {
-      console.log("Confirming metadata for article includes fb:app_id:", {
-        title: article.title.rendered,
-        fb_app_id: '1819807585106457'
-      });
-    }
-  }, [article]);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollY = window.scrollY;
-      const scrollThreshold = 2000;
-      const windowHeight = window.innerHeight;
-      const documentHeight = document.documentElement.scrollHeight;
-      const footerHeight = footerRef.current?.offsetHeight || 0;
-      const bottomThreshold = documentHeight - (footerHeight + windowHeight * 2);
-
-      if (scrollY > scrollThreshold && scrollY < bottomThreshold) {
-        setShowScrollButton(true);
-      } else {
-        setShowScrollButton(false);
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  const handleClickOutside = useCallback((event) => {
-    if (showShareOptions && shareOptionsRef.current && !shareOptionsRef.current.contains(event.target)) {
-      setShowShareOptions(false);
-    }
-  }, [showShareOptions]);
-
-  useEffect(() => {
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [handleClickOutside]);
-
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
+  // Sanitize and set article content when article is loaded
   useEffect(() => {
     if (article && articleContentRef.current) {
       const articleContent = articleContentRef.current;
-      articleContent.innerHTML = DOMPurify.sanitize(article.acf['main-text']);
+      const sanitizedContent = DOMPurify.sanitize(article.acf['main-text']);
+
+      // Setting innerHTML directly is generally safe here due to the use of DOMPurify
+      articleContent.innerHTML = sanitizedContent;
+
       console.log("Article content sanitized and set.");
 
       // Apply styles for blockquotes
@@ -118,7 +77,7 @@ const ArticlePage = ({ params }) => {
         blockquote.style.marginLeft = '20px';
         blockquote.style.marginRight = '20px';
         blockquote.style.paddingLeft = '20px';
-        blockquote.style.borderLeft = '5px solid #ccc'; // Example style
+        blockquote.style.borderLeft = '5px solid #ccc';
       });
 
       const sanitizedLinks = articleContent.querySelectorAll('a');
@@ -131,6 +90,7 @@ const ArticlePage = ({ params }) => {
     }
   }, [article]);
 
+  // Only proceed if article is loaded
   if (!isMounted || !article) {
     return <img src="/images/loader.svg" alt="Loading" />;
   }
@@ -145,24 +105,22 @@ const ArticlePage = ({ params }) => {
 
   const ogDescription = sanitizeDescription(article.acf['main-text']).slice(0, 150);
 
-  const currentCategory = "სტატიები";
-
   return (
     <>
-      <Head>
-        <title>{article.title.rendered}</title>
-        <meta property="fb:app_id" content="1819807585106457" />
-        <meta name="description" content={ogDescription} />
-        <meta property="og:url" content={articleUrl} />
-        <meta property="og:type" content="article" />
-        <meta property="og:title" content={article.title.rendered} />
-        <meta property="og:description" content={ogDescription} />
-        <meta property="og:image" content={ogImage} />
-        <meta property="og:image:width" content="1200" />
-        <meta property="og:image:height" content="630" />
-        
-        <meta property="og:image:alt" content={article.title.rendered} />
-      </Head>
+     <Head>
+  <title>{article.title.rendered}</title>
+  <meta property="fb:app_id" content="1819807585106457" />
+  <meta name="description" content={ogDescription} />
+  <meta property="og:url" content={articleUrl} />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content={article.title.rendered} />
+  <meta property="og:description" content={ogDescription} />
+  <meta property="og:image" content={ogImage} />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content={article.title.rendered} />
+</Head>
+
 
       <section className="w-full mx-auto mt-10 px-4 lg:px-0 overflow-x-hidden relative">
         <div className="w-full lg:w-[60%] mx-auto bg-opacity-90 p-5 rounded-lg">
@@ -172,7 +130,7 @@ const ArticlePage = ({ params }) => {
                 key={category.name}
                 href={category.path}
                 className={`text-sm  text-[#474F7A] ${
-                  category.name === currentCategory ? "text-white font-bold" : "text-[#474F7A] hover:scale-110"
+                  category.name === "სტატიები" ? "text-white font-bold" : "text-[#474F7A] hover:scale-110"
                 }`}
               >
                 {category.name}
@@ -186,6 +144,7 @@ const ArticlePage = ({ params }) => {
             <h2 className="font-noto-sans-georgian text-[16px] sm:text-[24px] font-extrabold text-[#AD88C6] leading-normal mb-5">{article.acf['ავტორი']}</h2>
             <p className="text-[#474F7A] font-semibold pb-10">{article.formattedDate}</p>
           </div>
+          {/* Ensure that the article content is rendered */}
           <div ref={articleContentRef} className="article-content text-[#474F7A] text-wrap w-full font-noto-sans-georgian text-[14px] sm:text-[16px] font-normal lg:text-justify leading-[30px] sm:leading-[35px] tracking-[0.32px]"></div>
           <div className="flex flex-wrap gap-4 mt-10">
             <button onClick={() => setShowShareOptions(true)} className="bg-[#FECE27] text-[#474F7A] pl-[18px] pr-[18px] pt-[4px] pb-[4px] text-[16px] font-seibold rounded flex gap-[12px] items-center justify-center">
