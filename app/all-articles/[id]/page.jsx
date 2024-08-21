@@ -31,6 +31,7 @@ export async function generateMetadata({ params }) {
 
     const metadata = {
       title: ogTags.title || 'Default Title',
+      app_id: "1819807585106457",
       description: ogTags.description || 'Default description',
       openGraph: {
         title: ogTags.title || 'Default Title',
@@ -52,6 +53,7 @@ export async function generateMetadata({ params }) {
   } catch (error) {
     return {
       title: 'Default Title',
+      app_id: "1819807585106457",
       description: 'Default description',
       openGraph: {
         title: 'Default Title',

@@ -23,6 +23,7 @@ export async function generateMetadata({ params }) {
       width: 800,
       height: 600,
     },
+    
   ];
 
   if (articleId) {

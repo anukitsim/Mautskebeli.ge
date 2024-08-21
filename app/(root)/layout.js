@@ -8,6 +8,8 @@ import Head from 'next/head';
 export const metadata = {
   title: "მაუწყებელი",
   description: "მედია პლათფორმა მაუწყებელი",
+  app_id: "1819807585106457"
+
 };
 
 export default function RootLayout({ children }) {
