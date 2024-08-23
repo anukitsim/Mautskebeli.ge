@@ -42,20 +42,29 @@ const HomePageStatiebi = () => {
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-  
-        const rawData = await response.text(); // Fetch as text to manually handle JSON
-        // Decode JSON safely
-        const data = JSON.parse(rawData.replace(/\\u/g, '')); // Removing potentially problematic Unicode escape sequences
-  
+
+        const rawData = await response.text();
+        
+        // Attempt to sanitize and parse JSON
+        const sanitizedData = rawData.replace(/\\u/g, ''); // Remove problematic Unicode escapes
+        const data = JSON.parse(sanitizedData);
+
         const sortedArticles = data.sort((a, b) => new Date(b.date) - new Date(a.date));
+        
         const lastThreeArticles = sortedArticles.slice(0, 3).map(article => ({
           ...article,
           title: {
             ...article.title,
             rendered: decodeHTMLEntities(article.title.rendered) // Decode HTML entities in titles
+          },
+          acf: {
+            ...article.acf,
+            'main-text': decodeHTMLEntities(article.acf['main-text']), // Decode HTML entities in main text
+            'ავტორი': decodeHTMLEntities(article.acf['ავტორი']), // Decode HTML entities in author field
+            'translator': decodeHTMLEntities(article.acf['translator']), // Decode HTML entities in translator field
           }
         }));
-  
+
         // Verify image URLs and retry if necessary
         for (let article of lastThreeArticles) {
           if (article.acf.image && !(await verifyImageUrl(article.acf.image))) {
@@ -76,16 +85,15 @@ const HomePageStatiebi = () => {
             }, 5000); // Retry after 5 seconds
           }
         }
-  
+
         setArticles(lastThreeArticles);
       } catch (error) {
         console.error('Error fetching articles:', error);
       }
     };
-  
+
     fetchArticles();
   }, []);
-
 
   return (
     <section className="mx-auto mt-[110px] flex flex-col">
@@ -100,7 +108,7 @@ const HomePageStatiebi = () => {
           }
 
           .article:not(:first-child){
-            flex: 0 0 100%
+            flex: 0 0 100%;
           }
 
           .article {
@@ -115,7 +123,6 @@ const HomePageStatiebi = () => {
       <div className="w-10/12 mx-auto flex articles-container overflow-x-auto mt-5 flex-row gap-5">
         {articles.map(article => {
           const imageUrl = article.acf.image ? article.acf.image : '/images/default-image.png';
-          console.log(`Article ID: ${article.id}, Image URL: ${imageUrl}`); // Debugging log
           return (
             <Link href={`/all-articles/${article.id}`} passHref key={article.id}>
               <div className="article bg-[#F6F4F8] rounded-tl-[10px] rounded-tr-[10px] border border-[#B6A8CD] overflow-hidden" style={{ minWidth: '300px' }}>
@@ -135,7 +142,7 @@ const HomePageStatiebi = () => {
                     {article.title.rendered}
                   </h2>
                   <span className="text-[#8D91AB] text-[14px] font-bold">
-                  {article.acf['ავტორი']}
+                    {article.acf['ავტორი']}
                   </span>
                   <p className="text-sm pt-[18px]" style={{ color: '#000' }}>
                     {truncateText(stripHtml(article.acf['main-text']), 30)}
