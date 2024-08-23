@@ -48,9 +48,7 @@ const ArticlePage = ({ params }) => {
     setIsMounted(true);
     const getArticle = async () => {
       try {
-        console.log("Fetching article with ID:", id);
         const fetchedArticle = await fetchArticle(id);
-        console.log("Article fetched successfully:", fetchedArticle);
         setArticle({
           ...fetchedArticle,
           title: {
@@ -59,7 +57,6 @@ const ArticlePage = ({ params }) => {
           },
           formattedDate: formatDate(fetchedArticle.date),
         });
-        console.log("Article data set in state:", { ...fetchedArticle, formattedDate: formatDate(fetchedArticle.date) });
       } catch (error) {
         console.error("Error fetching article:", error);
       }
@@ -75,8 +72,6 @@ const ArticlePage = ({ params }) => {
       const sanitizedContent = DOMPurify.sanitize(article.acf['main-text']);
 
       articleContent.innerHTML = sanitizedContent;
-
-      console.log("Article content sanitized and set.");
 
       const blockquotes = articleContent.querySelectorAll('blockquote');
       blockquotes.forEach(blockquote => {
@@ -96,6 +91,30 @@ const ArticlePage = ({ params }) => {
     }
   }, [article]);
 
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollY = window.scrollY;
+      const scrollThreshold = 2000;
+      const windowHeight = window.innerHeight;
+      const documentHeight = document.documentElement.scrollHeight;
+      const footerHeight = footerRef.current?.offsetHeight || 0;
+      const bottomThreshold = documentHeight - (footerHeight + windowHeight * 2);
+
+      if (scrollY > scrollThreshold && scrollY < bottomThreshold) {
+        setShowScrollButton(true);
+      } else {
+        setShowScrollButton(false);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   if (!isMounted || !article) {
     return <img src="/images/loader.svg" alt="Loading" />;
   }
@@ -113,19 +132,18 @@ const ArticlePage = ({ params }) => {
   return (
     <>
      <Head>
-  <title>{article.title.rendered}</title>
-  <meta property="fb:app_id" content="1819807585106457" />
-  <meta name="description" content={ogDescription} />
-  <meta property="og:url" content={articleUrl} />
-  <meta property="og:type" content="article" />
-  <meta property="og:title" content={article.title.rendered} />
-  <meta property="og:description" content={ogDescription} />
-  <meta property="og:image" content={ogImage} />
-  <meta property="og:image:width" content="1200" />
-  <meta property="og:image:height" content="630" />
-  <meta property="og:image:alt" content={article.title.rendered} />
-</Head>
-
+        <title>{article.title.rendered}</title>
+        <meta property="fb:app_id" content="1819807585106457" />
+        <meta name="description" content={ogDescription} />
+        <meta property="og:url" content={articleUrl} />
+        <meta property="og:type" content="article" />
+        <meta property="og:title" content={article.title.rendered} />
+        <meta property="og:description" content={ogDescription} />
+        <meta property="og:image" content={ogImage} />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:image:alt" content={article.title.rendered} />
+     </Head>
 
       <section className="w-full mx-auto mt-10 px-4 lg:px-0 overflow-x-hidden relative">
         <div className="w-full lg:w-[60%] mx-auto bg-opacity-90 p-5 rounded-lg">
@@ -149,7 +167,6 @@ const ArticlePage = ({ params }) => {
             <h2 className="font-noto-sans-georgian text-[16px] sm:text-[24px] font-extrabold text-[#AD88C6] leading-normal mb-5">{article.acf['ავტორი']}</h2>
             <p className="text-[#474F7A] font-semibold pb-10">{article.formattedDate}</p>
           </div>
-          {/* Ensure that the article content is rendered */}
           <div ref={articleContentRef} className="article-content text-[#474F7A] text-wrap w-full font-noto-sans-georgian text-[14px] sm:text-[16px] font-normal lg:text-justify leading-[30px] sm:leading-[35px] tracking-[0.32px]"></div>
           <div className="flex flex-wrap gap-4 mt-10">
             <button onClick={() => setShowShareOptions(true)} className="bg-[#FECE27] text-[#474F7A] pl-[18px] pr-[18px] pt-[4px] pb-[4px] text-[16px] font-seibold rounded flex gap-[12px] items-center justify-center">
