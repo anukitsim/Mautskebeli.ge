@@ -131,19 +131,23 @@ const ArticlePage = ({ params }) => {
 
   return (
     <>
-     <Head>
-        <title>{article.title.rendered}</title>
-        <meta property="fb:app_id" content="1819807585106457" />
-        <meta name="description" content={ogDescription} />
-        <meta property="og:url" content={articleUrl} />
-        <meta property="og:type" content="article" />
-        <meta property="og:title" content={article.title.rendered} />
-        <meta property="og:description" content={ogDescription} />
-        <meta property="og:image" content={ogImage} />
-        <meta property="og:image:width" content="1200" />
-        <meta property="og:image:height" content="630" />
-        <meta property="og:image:alt" content={article.title.rendered} />
-     </Head>
+    <Head>
+  <title>{article.title.rendered}</title>
+  <meta property="fb:app_id" content="1819807585106457" />
+  <meta name="description" content={ogDescription} />
+  <meta property="og:url" content={articleUrl} />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content={article.title.rendered} />
+  <meta property="og:description" content={ogDescription} />
+  <meta property="og:image" content={ogImage} />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:site_name" content="Mautskebeli" />
+  <meta property="og:locale" content="ka_GE" />
+  <meta property="article:publisher" content="100041686795244" />
+  <meta property="og:image:alt" content={article.title.rendered} />
+</Head>
+
 
       <section className="w-full mx-auto mt-10 px-4 lg:px-0 overflow-x-hidden relative">
         <div className="w-full lg:w-[60%] mx-auto bg-opacity-90 p-5 rounded-lg">
