@@ -85,7 +85,7 @@ const HomePageStatiebi = () => {
   
     fetchArticles();
   }, []);
-  
+
 
   return (
     <section className="mx-auto mt-[110px] flex flex-col">
