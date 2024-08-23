@@ -38,10 +38,15 @@ const HomePageStatiebi = () => {
     const fetchArticles = async () => {
       try {
         const response = await fetch(`https://mautskebeli.wpenginepowered.com/wp-json/wp/v2/article?acf_format=standard&_fields=id,title,acf,date&_=${new Date().getTime()}`);
+        
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-        const data = await response.json();
+  
+        const rawData = await response.text(); // Fetch as text to manually handle JSON
+        // Decode JSON safely
+        const data = JSON.parse(rawData.replace(/\\u/g, '')); // Removing potentially problematic Unicode escape sequences
+  
         const sortedArticles = data.sort((a, b) => new Date(b.date) - new Date(a.date));
         const lastThreeArticles = sortedArticles.slice(0, 3).map(article => ({
           ...article,
@@ -50,7 +55,7 @@ const HomePageStatiebi = () => {
             rendered: decodeHTMLEntities(article.title.rendered) // Decode HTML entities in titles
           }
         }));
-
+  
         // Verify image URLs and retry if necessary
         for (let article of lastThreeArticles) {
           if (article.acf.image && !(await verifyImageUrl(article.acf.image))) {
@@ -71,15 +76,16 @@ const HomePageStatiebi = () => {
             }, 5000); // Retry after 5 seconds
           }
         }
-
+  
         setArticles(lastThreeArticles);
       } catch (error) {
         console.error('Error fetching articles:', error);
       }
     };
-
+  
     fetchArticles();
   }, []);
+  
 
   return (
     <section className="mx-auto mt-[110px] flex flex-col">
