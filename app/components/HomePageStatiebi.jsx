@@ -20,6 +20,11 @@ const HomePageStatiebi = () => {
     return text;
   };
 
+  const decodeHTMLEntities = (str) => {
+    const doc = new DOMParser().parseFromString(str, "text/html");
+    return doc.documentElement.textContent;
+  };
+
   const verifyImageUrl = async (url) => {
     try {
       const response = await fetch(url, { method: 'HEAD' });
@@ -38,7 +43,13 @@ const HomePageStatiebi = () => {
         }
         const data = await response.json();
         const sortedArticles = data.sort((a, b) => new Date(b.date) - new Date(a.date));
-        const lastThreeArticles = sortedArticles.slice(0, 3);
+        const lastThreeArticles = sortedArticles.slice(0, 3).map(article => ({
+          ...article,
+          title: {
+            ...article.title,
+            rendered: decodeHTMLEntities(article.title.rendered) // Decode HTML entities in titles
+          }
+        }));
 
         // Verify image URLs and retry if necessary
         for (let article of lastThreeArticles) {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef, useCallback } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import Image from 'next/image';
 import Head from 'next/head';
 import DOMPurify from 'dompurify';
@@ -29,6 +29,11 @@ function formatDate(dateString) {
   return moment(dateString).format('LL');
 }
 
+function decodeHTMLEntities(str) {
+  const doc = new DOMParser().parseFromString(str, "text/html");
+  return doc.documentElement.textContent;
+}
+
 const ArticlePage = ({ params }) => {
   const [article, setArticle] = useState(null);
   const [isMounted, setIsMounted] = useState(false);
@@ -48,6 +53,10 @@ const ArticlePage = ({ params }) => {
         console.log("Article fetched successfully:", fetchedArticle);
         setArticle({
           ...fetchedArticle,
+          title: {
+            ...fetchedArticle.title,
+            rendered: decodeHTMLEntities(fetchedArticle.title.rendered),
+          },
           formattedDate: formatDate(fetchedArticle.date),
         });
         console.log("Article data set in state:", { ...fetchedArticle, formattedDate: formatDate(fetchedArticle.date) });
@@ -60,18 +69,15 @@ const ArticlePage = ({ params }) => {
     }
   }, [id]);
 
-  // Sanitize and set article content when article is loaded
   useEffect(() => {
     if (article && articleContentRef.current) {
       const articleContent = articleContentRef.current;
       const sanitizedContent = DOMPurify.sanitize(article.acf['main-text']);
 
-      // Setting innerHTML directly is generally safe here due to the use of DOMPurify
       articleContent.innerHTML = sanitizedContent;
 
       console.log("Article content sanitized and set.");
 
-      // Apply styles for blockquotes
       const blockquotes = articleContent.querySelectorAll('blockquote');
       blockquotes.forEach(blockquote => {
         blockquote.style.marginLeft = '20px';
@@ -90,7 +96,6 @@ const ArticlePage = ({ params }) => {
     }
   }, [article]);
 
-  // Only proceed if article is loaded
   if (!isMounted || !article) {
     return <img src="/images/loader.svg" alt="Loading" />;
   }

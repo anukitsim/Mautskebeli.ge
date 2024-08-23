@@ -25,6 +25,11 @@ const AllArticlesList = () => {
     return text;
   };
 
+  const decodeHTMLEntities = (str) => {
+    const doc = new DOMParser().parseFromString(str, "text/html");
+    return doc.documentElement.textContent;
+  };
+
   const fetchArticles = async (page = 1, articles = []) => {
     try {
       const response = await fetch(`https://mautskebeli.wpenginepowered.com/wp-json/wp/v2/article?acf_format=standard&_fields=id,title,acf,date&per_page=20&page=${page}&_=${new Date().getTime()}`);
@@ -32,7 +37,13 @@ const AllArticlesList = () => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
-      const newArticles = [...articles, ...data];
+      const newArticles = [...articles, ...data.map(article => ({
+        ...article,
+        title: {
+          ...article.title,
+          rendered: decodeHTMLEntities(article.title.rendered) // Ensure titles are decoded
+        }
+      }))];
       
       if (data.length === 20) {
         return fetchArticles(page + 1, newArticles);
@@ -61,6 +72,10 @@ const AllArticlesList = () => {
       }
     };
 
+    // Clear the cache to ensure updated titles are fetched
+    localStorage.removeItem(CACHE_KEY);
+    localStorage.removeItem(CACHE_TIMESTAMP_KEY);
+
     loadArticles();
   }, []);
 
@@ -68,7 +83,8 @@ const AllArticlesList = () => {
     <section className="mx-auto flex flex-col overflow-hidden">
       <div className="w-full sm:w-11/12 md:w-10/12 lg:w-10/12 xl:w-9/12 mx-auto">
         <p className="text-[#474F7A] text-[24px] font-bold mt-5 lg:mt-14 pl-4 lg:pl-2">სტატიები</p>
-        <p className='text-[#8D91AB] text-wrap pl-4 text-[14px] font-bold lg:pl-2 pt-5 w-11/12 lg:w-9/12 lg:text-justify mb-10'>„მაუწყებელი“ მიზნად ისახავს საზოგადოებრივად მნიშვნელოვანი, მაგრამ პოლიტიკური დღის წესრიგის მიერ უგულებელყოფილი საკითხების წინ წამოწევას და გთავაზობთ ანალიტიკურ სტატიებს, სადაც სიღრმისეულად, მრავალშრიანად და ჩაგრულთა პერსპექტივიდანაა დანახული ქვეყანაში მიმდინარე მწვავე სოციალური, კულტურული და ეკონომიკური პროცესები.
+        <p className='text-[#8D91AB] text-wrap pl-4 text-[14px] font-bold lg:pl-2 pt-5 w-11/12 lg:w-9/12 lg:text-justify mb-10'>
+          „მაუწყებელი“ მიზნად ისახავს საზოგადოებრივად მნიშვნელოვანი, მაგრამ პოლიტიკური დღის წესრიგის მიერ უგულებელყოფილი საკითხების წინ წამოწევას და გთავაზობთ ანალიტიკურ სტატიებს, სადაც სიღრმისეულად, მრავალშრიანად და ჩაგრულთა პერსპექტივიდანაა დანახული ქვეყანაში მიმდინარე მწვავე სოციალური, კულტურული და ეკონომიკური პროცესები.
         </p>
         {loading ? (
           <div className="flex justify-center items-center mt-10">
@@ -94,7 +110,7 @@ const AllArticlesList = () => {
                       {article.title.rendered}
                     </h2>
                     <span className="text-[#8D91AB] text-[14px] font-bold">
-                    {article.acf['ავტორი']}
+                      {article.acf['ავტორი']}
                     </span>
                     <p className="text-sm pt-[18px]" style={{ color: '#000' }}>
                       {truncateText(stripHtml(article.acf['main-text']), 30)}
