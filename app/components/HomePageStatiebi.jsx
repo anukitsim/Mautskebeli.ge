@@ -131,9 +131,6 @@ const HomePageStatiebi = () => {
                     {truncateText(stripHtml(article.acf['main-text']), 30)}
                   </p>
                   <div className="flex flex-col justify-end pt-[30px] items-end">
-                    <span className="text-[15px] text-[#AD88C6]">
-                      {article.acf.translator} 
-                    </span>
                     <button className="text-white text-[12px] mt-[16px] bg-[#AD88C6] rounded-[6px] pt-[10px] pb-[10px] pl-[12px] pr-[12px]">
                       ნახეთ სრულად
                     </button>
