@@ -44,10 +44,14 @@ const HomePageStatiebi = () => {
         }
 
         const rawData = await response.text();
-        
-        // Attempt to sanitize and parse JSON
-        const sanitizedData = rawData.replace(/\\u/g, ''); // Remove problematic Unicode escapes
-        const data = JSON.parse(sanitizedData);
+        // Attempt to parse the JSON safely
+        let data;
+        try {
+          data = JSON.parse(rawData);
+        } catch (jsonError) {
+          console.error('Error parsing JSON:', jsonError);
+          return;
+        }
 
         const sortedArticles = data.sort((a, b) => new Date(b.date) - new Date(a.date));
         
@@ -64,27 +68,6 @@ const HomePageStatiebi = () => {
             'translator': decodeHTMLEntities(article.acf['translator']), // Decode HTML entities in translator field
           }
         }));
-
-        // Verify image URLs and retry if necessary
-        for (let article of lastThreeArticles) {
-          if (article.acf.image && !(await verifyImageUrl(article.acf.image))) {
-            console.warn(`Image not available immediately: ${article.acf.image}`);
-            setTimeout(async () => {
-              if (await verifyImageUrl(article.acf.image)) {
-                console.log(`Image now available: ${article.acf.image}`);
-                setArticles((prevArticles) =>
-                  prevArticles.map((prevArticle) =>
-                    prevArticle.id === article.id
-                      ? { ...prevArticle, acf: { ...prevArticle.acf, image: article.acf.image } }
-                      : prevArticle
-                  )
-                );
-              } else {
-                console.error(`Image still not available: ${article.acf.image}`);
-              }
-            }, 5000); // Retry after 5 seconds
-          }
-        }
 
         setArticles(lastThreeArticles);
       } catch (error) {
@@ -132,7 +115,7 @@ const HomePageStatiebi = () => {
                     alt="article-cover"
                     fill
                     sizes="(max-width: 768px) 100vw, 33vw"
-                    style={{ objectFit: 'cover' }}
+                    style={{ objectFit: 'cover', width: 'auto', height: 'auto' }} // Correct usage in Next.js 13
                     className="article-image"
                     priority
                   />
