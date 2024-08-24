@@ -7,11 +7,11 @@ import Image from 'next/image';
 const AllArticlesList = () => {
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [fetching, setFetching] = useState(true);
+  const [fetching, setFetching] = useState(true); // Separate state for fetching data
 
   const CACHE_KEY = 'cachedArticles';
   const CACHE_TIMESTAMP_KEY = 'cacheTimestamp';
-  const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+  const CACHE_DURATION = 60 * 60 * 1000; // 1 hour
 
   const stripHtml = (html) => {
     const doc = new DOMParser().parseFromString(html, 'text/html');
@@ -81,12 +81,6 @@ const AllArticlesList = () => {
     loadArticles();
   }, [fetchArticles]);
 
-  const handleRefresh = async () => {
-    localStorage.removeItem(CACHE_KEY);
-    localStorage.removeItem(CACHE_TIMESTAMP_KEY);
-    await fetchArticles();
-  };
-
   return (
     <section className="mx-auto flex flex-col overflow-hidden">
       <div className="w-full sm:w-11/12 md:w-10/12 lg:w-10/12 xl:w-9/12 mx-auto">
@@ -99,49 +93,44 @@ const AllArticlesList = () => {
             <img src="/images/loader.svg" alt="Loading" />
           </div>
         ) : (
-          <>
-            <button onClick={handleRefresh} className="bg-blue-500 text-white px-4 py-2 rounded mb-5">
-              Refresh Articles
-            </button>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mt-5 mx-4 lg:mx-0">
-              {articles.map(article => (
-                <Link href={`/all-articles/${article.id}`} passHref key={article.id}>
-                  <div className="bg-[#F6F4F8] rounded-tl-[10px] rounded-tr-[10px] border border-[#B6A8CD] overflow-hidden cursor-pointer">
-                    <div className="relative w-full h-[200px]">
-                      <Image
-                        src={article.acf.image || '/images/default-image.png'}
-                        alt="article-cover"
-                        layout="fill"
-                        objectFit="cover"
-                        className="article-image"
-                        loading="lazy"
-                        onError={(e) => { e.target.onerror = null; e.target.src = '/images/default-image.png'; }}
-                      />
-                    </div>
-                    <div className="p-[18px]">
-                      <h2 className="text-[20px] font-bold mb-2" style={{ color: '#474F7A' }}>
-                        {article.title.rendered}
-                      </h2>
-                      <span className="text-[#8D91AB] text-[14px] font-bold">
-                        {article.acf['ავტორი']}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mt-5 mx-4 lg:mx-0">
+            {articles.map(article => (
+              <Link href={`/all-articles/${article.id}`} passHref key={article.id}>
+                <div className="bg-[#F6F4F8] rounded-tl-[10px] rounded-tr-[10px] border border-[#B6A8CD] overflow-hidden cursor-pointer">
+                  <div className="relative w-full h-[200px]">
+                    <Image
+                      src={article.acf.image || '/images/default-image.png'}
+                      alt="article-cover"
+                      layout="fill"
+                      objectFit="cover"
+                      className="article-image"
+                      loading="lazy"
+                      onError={(e) => { e.target.onerror = null; e.target.src = '/images/default-image.png'; }}
+                    />
+                  </div>
+                  <div className="p-[18px]">
+                    <h2 className="text-[20px] font-bold mb-2" style={{ color: '#474F7A' }}>
+                      {article.title.rendered}
+                    </h2>
+                    <span className="text-[#8D91AB] text-[14px] font-bold">
+                      {article.acf['ავტორი']}
+                    </span>
+                    <p className="text-sm pt-[18px]" style={{ color: '#000' }}>
+                      {truncateText(stripHtml(article.acf['main-text']), 30)}
+                    </p>
+                    <div className="flex flex-col justify-end pt-[30px] items-end">
+                      <span className="text-[15px] text-[#AD88C6]">
+                        {article.acf.translator} 
                       </span>
-                      <p className="text-sm pt-[18px]" style={{ color: '#000' }}>
-                        {truncateText(stripHtml(article.acf['main-text']), 30)}
-                      </p>
-                      <div className="flex flex-col justify-end pt-[30px] items-end">
-                        <span className="text-[15px] text-[#AD88C6]">
-                          {article.acf.translator} 
-                        </span>
-                        <button className="text-white text-[12px] mt-[16px] bg-[#AD88C6] rounded-[6px] pt-[10px] pb-[10px] pl-[12px] pr-[12px]">
-                          ნახეთ სრულად
-                        </button>
-                      </div>
+                      <button className="text-white text-[12px] mt-[16px] bg-[#AD88C6] rounded-[6px] pt-[10px] pb-[10px] pl-[12px] pr-[12px]">
+                        ნახეთ სრულად
+                      </button>
                     </div>
                   </div>
-                </Link>
-              ))}
-            </div>
-          </>
+                </div>
+              </Link>
+            ))}
+          </div>
         )}
       </div>
     </section>
