@@ -38,7 +38,16 @@ const AllArticlesList = () => {
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      const data = await response.json();
+
+      const responseText = await response.text(); // Read response as text first
+      let data;
+      try {
+        data = JSON.parse(responseText); // Attempt to parse JSON
+      } catch (jsonError) {
+        console.error('Failed to parse JSON:', jsonError);
+        return; // Stop processing if JSON is invalid
+      }
+
       const newArticles = [
         ...accumulatedArticles,
         ...data.map(article => ({
@@ -49,10 +58,12 @@ const AllArticlesList = () => {
           }
         }))
       ];
-      
+
       if (data.length === 20) {
+        // Continue fetching next page
         return fetchArticles(page + 1, newArticles);
       } else {
+        // No more articles to fetch
         setArticles(newArticles);
         localStorage.setItem(CACHE_KEY, JSON.stringify(newArticles));
         localStorage.setItem(CACHE_TIMESTAMP_KEY, Date.now().toString());
@@ -74,7 +85,7 @@ const AllArticlesList = () => {
         setArticles(cachedArticles);
         setFetching(false);
       } else {
-        await fetchArticles();
+        await fetchArticles(); // Start fetching from the first page
       }
     };
 
