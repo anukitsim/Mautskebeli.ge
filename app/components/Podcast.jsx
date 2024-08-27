@@ -5,6 +5,23 @@ import CustomYoutubePlayer from "./CustomYoutube";
 import { useSearchParams, useRouter } from "next/navigation";
 import Image from "next/image";
 
+// Utility functions to detect iOS and Safari
+const isIOS = () => {
+  return (
+    typeof window !== "undefined" &&
+    /iPad|iPhone|iPod/.test(navigator.platform) &&
+    navigator.userAgent.includes("Safari") &&
+    !navigator.userAgent.includes("Chrome")
+  );
+};
+
+const isSafari = () => {
+  return (
+    typeof window !== "undefined" &&
+    /^((?!chrome|android).)*safari/i.test(navigator.userAgent)
+  );
+};
+
 const PlayButton = ({ onClick }) => (
   <img
     src="/images/card-play-button.svg"
@@ -71,6 +88,7 @@ const Podcast = () => {
 
   const mainVideoRef = useRef(null);
   const router = useRouter();
+  const isSafariIOS = isIOS() && isSafari();
 
   const handleVideoCardClick = (videoId) => {
     setSelectedVideoId(videoId);
@@ -176,7 +194,7 @@ const Podcast = () => {
 
   if (loading) {
     return (
-      <div>
+      <div className="flex justify-center items-center h-screen">
         <Image src="/images/loader.svg" alt="loading" width={120} height={120} />
       </div>
     );
@@ -200,8 +218,8 @@ const Podcast = () => {
   );
 
   return (
-  
-      <div>
+    <>
+      <div className="w-full px-4">
         {videos.length > 0 && (
           <>
             {isLive && selectedVideoId === liveStream?.id && (
@@ -210,19 +228,15 @@ const Podcast = () => {
               </h1>
             )}
 
-            <div ref={mainVideoRef} className='p-[74px]'>
+            <div ref={mainVideoRef} className="ml-[-5%] pt-3">
               <CustomYoutubePlayer
                 key={customPlayerKey}
-                videoId={
-                  selectedVideoId ? selectedVideoId : videos[0].id
-                }
+                videoId={selectedVideoId ? selectedVideoId : videos[0].id}
                 onClose={() => setSelectedVideoId("")}
                 videoData={videos.find((video) => video.id === selectedVideoId)}
-                style={{ width: "100%", height: "500px" }}
-                customOverlayStyle={{ height: "35%", top: "65%" }}
               />
             </div>
-            <div className="mx-auto lg:mt-0 mt-[130%] lg:w-10/12 sm:w-full flex flex-col gap-[23px] pl-5 pr-5">
+            <div className="mx-auto lg:mt-20 mt-[30px] lg:w-10/12 w-full flex flex-col gap-[23px] lg:px-2">
               <h2 className="text-[32px] text-[#474F7A] font-bold">
                 {videos.find((video) => video.id === selectedVideoId)?.snippet
                   .title || ""}
@@ -263,34 +277,34 @@ const Podcast = () => {
                   </button>
                 </a>
               </div>
-              <div className="flex justify-end mt-4">
+            </div>
+            <div className="flex justify-end mt-4 lg:pr-14">
               <button
                 onClick={handlePreviousPage}
                 disabled={currentPage === 1}
-                className=" rounded-lg mx-2"
+                className="rounded-lg mx-2"
               >
-                 <img
-                    src="/images/videos-left.svg"
-                    alt="playbutton"
-                    width={32}
-                    height={32}
-                  />
+                <img
+                  src="/images/videos-left.svg"
+                  alt="playbutton"
+                  width={32}
+                  height={32}
+                />
               </button>
               <button
                 onClick={handleNextPage}
                 disabled={currentPage * videosPerPage >= videos.length}
-                className=" rounded-lg mx-2"
+                className="rounded-lg mx-2"
               >
-                  <img
-                    src="/images/videos-right.svg"
-                    alt="playbutton"
-                    width={32}
-                    height={32}
-                  />
+                <img
+                  src="/images/videos-right.svg"
+                  alt="playbutton"
+                  width={32}
+                  height={32}
+                />
               </button>
             </div>
-            </div>
-            <div className="w-10/12  mx-auto lg:grid hidden grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 px-2 my-4">
+            <div className="w-full mx-auto lg:grid hidden grid-cols-1  lg:grid-cols-4 gap-4 px-2 my-4">
               {paginatedVideos.map((video) => (
                 <VideoCard
                   key={video.id}
@@ -300,7 +314,7 @@ const Podcast = () => {
                 />
               ))}
             </div>
-            <div className="flex sm:hidden mt-10 overflow-x-auto hide-scroll-bar pl-2 pr-2">
+            <div className="flex lg:hidden mt-10 overflow-x-auto hide-scroll-bar pl-2 pr-2">
               <div className="flex gap-4">
                 {paginatedVideos.map((video) => (
                   <VideoCard
@@ -312,11 +326,10 @@ const Podcast = () => {
                 ))}
               </div>
             </div>
-            
           </>
         )}
       </div>
-
+    </>
   );
 };
 

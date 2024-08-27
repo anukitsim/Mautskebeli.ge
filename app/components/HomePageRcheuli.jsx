@@ -102,7 +102,7 @@ const HomePageRcheuli = () => {
                     alt={post.title}
                     fill
                     style={{ objectFit: 'cover' }}
-                    sizes="(max-width: 768px) 100vw, 50vw"
+                    sizes="(max-width: 768px) 100vw, 50vw)"
                     priority={index === 0}
                   />
                 </div>

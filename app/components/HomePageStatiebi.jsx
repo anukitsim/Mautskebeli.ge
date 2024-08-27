@@ -115,7 +115,7 @@ const HomePageStatiebi = () => {
                     alt="article-cover"
                     fill
                     sizes="(max-width: 768px) 100vw, 33vw"
-                    style={{ objectFit: 'cover', width: 'auto', height: 'auto' }} // Correct usage in Next.js 13
+                    style={{ objectFit: 'cover'}} // Correct usage in Next.js 13
                     className="article-image"
                     priority
                   />
