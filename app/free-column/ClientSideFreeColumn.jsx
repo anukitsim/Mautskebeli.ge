@@ -5,8 +5,40 @@ import Link from "next/link";
 import Image from "next/image";
 import useSWRInfinite from 'swr/infinite';
 
+// Utility function to decode HTML entities
+const decodeHTMLEntities = (text) => {
+  if (typeof window === 'undefined') {
+    return text.replace(/&#8211;/g, '–').replace(/&#8230;/g, '...'); // Server-side fallback
+  } else {
+    const textarea = document.createElement('textarea');
+    textarea.innerHTML = text;
+    return textarea.value;
+  }
+};
+
+// Helper function to strip HTML and truncate text
+const stripHtml = (html) => {
+  if (typeof window !== 'undefined') {
+    const doc = new DOMParser().parseFromString(html, "text/html");
+    return doc.body.textContent || "";
+  } else {
+    return html.replace(/<[^>]+>/g, ''); // Remove tags for server-side
+  }
+};
+
+const truncateText = (text, limit) => {
+  const words = text.split(" ");
+  if (words.length > limit) {
+    return words.slice(0, limit).join(" ") + "...";
+  }
+  return text;
+};
+
 export default function ClientSideFreeColumn({ initialArticles }) {
   const loadMoreRef = useRef(null);
+
+  // State to store processed articles
+  const [processedArticles, setProcessedArticles] = useState(initialArticles || []);
 
   // Use SWR for infinite scrolling
   const fetcher = (url) => fetch(url).then(res => res.json());
@@ -17,42 +49,35 @@ export default function ClientSideFreeColumn({ initialArticles }) {
   };
 
   const { data, error, size, setSize, isValidating } = useSWRInfinite(getKey, fetcher, {
-    revalidateOnFocus: true, // Refetch when the page comes back into focus
-    refreshInterval: 60000,  // Auto-refetch every 60 seconds
+    revalidateOnFocus: true,
+    refreshInterval: 60000,
   });
 
-  // Combine server-side articles with SWR articles (pagination)
-  const articles = data ? [].concat(...data) : initialArticles;
+  // Safeguard: Ensure articles is always an array
+  const articles = Array.isArray(data) ? [].concat(...data) : initialArticles || [];
 
-  // State to store stripped and truncated articles (only applied on client-side)
-  const [processedArticles, setProcessedArticles] = useState(initialArticles);
+  // Track previous processed articles to prevent infinite updates
+  const previousArticlesRef = useRef(processedArticles);
 
-  // Client-side HTML stripping and text truncation
+  // Process the articles (decode entities, strip HTML, and truncate text)
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const stripHtml = (html) => {
-        const doc = new DOMParser().parseFromString(html, "text/html");
-        return doc.body.textContent || "";
-      };
-
-      const truncateText = (text, limit) => {
-        const words = text.split(" ");
-        if (words.length > limit) {
-          return words.slice(0, limit).join(" ") + "...";
-        }
-        return text;
-      };
-
-      // Process the articles: strip HTML and truncate text
-      const processed = articles.map(article => ({
+    if (Array.isArray(articles)) {
+      const processed = articles.map((article) => ({
         ...article,
+        title: {
+          rendered: decodeHTMLEntities(article.title.rendered) // Decode the title
+        },
         acf: {
           ...article.acf,
-          ['main-text']: truncateText(stripHtml(article.acf?.['main-text'] || ''), 30) // Strip and truncate
-        }
+          ['main-text']: truncateText(decodeHTMLEntities(stripHtml(article.acf?.['main-text'] || '')), 30),
+        },
       }));
 
-      setProcessedArticles(processed); // Store the processed articles in state
+      // Only update the state if processed articles differ from previous ones
+      if (JSON.stringify(previousArticlesRef.current) !== JSON.stringify(processed)) {
+        setProcessedArticles(processed);
+        previousArticlesRef.current = processed;
+      }
     }
   }, [articles]);
 
@@ -63,12 +88,10 @@ export default function ClientSideFreeColumn({ initialArticles }) {
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting && !isValidating) {
-          setSize(size + 1); // Load the next page of articles
+          setSize(size + 1);
         }
       },
-      {
-        rootMargin: '200px', // Load more articles before reaching the bottom
-      }
+      { rootMargin: '200px' }
     );
 
     observer.observe(loadMoreRef.current);
@@ -97,14 +120,14 @@ export default function ClientSideFreeColumn({ initialArticles }) {
           მოვლენებზე სტატიების გამოქვეყნება.
         </p>
 
-        {/* Show loader only when no articles are loaded yet */}
+        {/* Initial Loading */}
         {isValidating && processedArticles.length === 0 ? (
           <div className="flex justify-center items-center mt-10">
             <img src="/images/loader.svg" alt="Loading" /> {/* Custom loader */}
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mt-5 mx-4 lg:mx-0">
-            {processedArticles.map((article) => (
+            {Array.isArray(processedArticles) && processedArticles.length > 0 && processedArticles.map((article) => (
               <Link href={`/free-column/${article.id}`} passHref key={article.id}>
                 <div className="bg-[#F6F4F8] rounded-tl-[10px] rounded-tr-[10px] border border-[#B6A8CD] overflow-hidden cursor-pointer">
                   <div className="relative w-full h-[200px]">
@@ -122,11 +145,8 @@ export default function ClientSideFreeColumn({ initialArticles }) {
                     />
                   </div>
                   <div className="p-[18px]">
-                    <h2
-                      className="text-[20px] font-bold mb-2"
-                      style={{ color: "#474F7A" }}
-                    >
-                      {article.title?.rendered || "Untitled"} {/* Handle missing title */}
+                    <h2 className="text-[20px] font-bold mb-2" style={{ color: "#474F7A" }}>
+                      {article.title?.rendered || 'Untitled Article'}
                     </h2>
                     <span className="text-[#8D91AB] text-[14px] font-bold">
                       {article.acf?.["ავტორი"] || "Unknown Author"} {/* Handle missing author */}
