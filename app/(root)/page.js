@@ -1,5 +1,6 @@
 
-  import FacebookNews from "../components/FacebookNews";
+  import DonationPopup from "../components/DonationPopup";
+import FacebookNews from "../components/FacebookNews";
   import Footer from "../components/Footer";
   import Header from "../components/Header";
   import HomePagePodcast from "../components/HomePagePodcast";
