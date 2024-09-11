@@ -1,5 +1,3 @@
-// app/translate/ClientSideTranslate.jsx (Client Component)
-
 'use client'; // Enable React hooks in this component
 
 import React, { useState, useEffect, useRef } from "react";
@@ -26,18 +24,37 @@ export default function ClientSideTranslate({ initialArticles }) {
   // Combine server-side articles with SWR articles (pagination)
   const articles = data ? [].concat(...data) : initialArticles;
 
-  const stripHtml = (html) => {
-    const doc = new DOMParser().parseFromString(html, "text/html");
-    return doc.body.textContent || "";
-  };
+  // State to store stripped and truncated articles (only applied on client-side)
+  const [processedArticles, setProcessedArticles] = useState(initialArticles);
 
-  const truncateText = (text, limit) => {
-    const words = text.split(" ");
-    if (words.length > limit) {
-      return words.slice(0, limit).join(" ") + "...";
+  // Client-side HTML stripping and text truncation
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const stripHtml = (html) => {
+        const doc = new DOMParser().parseFromString(html, 'text/html');
+        return doc.body.textContent || '';
+      };
+
+      const truncateText = (text, limit) => {
+        const words = text.split(' ');
+        if (words.length > limit) {
+          return words.slice(0, limit).join(' ') + '...';
+        }
+        return text;
+      };
+
+      // Process the articles: strip HTML and truncate text
+      const processed = articles.map(article => ({
+        ...article,
+        acf: {
+          ...article.acf,
+          ['main-text']: truncateText(stripHtml(article.acf?.['main-text'] || ''), 30) // Strip and truncate
+        }
+      }));
+
+      setProcessedArticles(processed); // Store the processed articles in state
     }
-    return text;
-  };
+  }, [articles]);
 
   // Infinite scrolling logic
   useEffect(() => {
@@ -78,14 +95,14 @@ export default function ClientSideTranslate({ initialArticles }) {
           თარგმანს.
         </p>
 
-        {/* Show loader only when no articles are loaded yet */}
-        {isValidating && articles.length === 0 ? (
+        {/* Initial Loading */}
+        {isValidating && processedArticles.length === 0 ? (
           <div className="flex justify-center items-center mt-10">
             <img src="/images/loader.svg" alt="Loading" /> {/* Custom loader */}
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mt-5 mx-4 lg:mx-0">
-            {articles.map((article) => (
+            {processedArticles.map((article) => (
               <Link href={`/translate/${article.id}`} passHref key={article.id}>
                 <div className="bg-[#F6F4F8] rounded-tl-[10px] rounded-tr-[10px] border border-[#B6A8CD] overflow-hidden cursor-pointer">
                   <div className="relative w-full h-[200px]">
@@ -107,13 +124,13 @@ export default function ClientSideTranslate({ initialArticles }) {
                       className="text-[20px] font-bold mb-2"
                       style={{ color: "#474F7A" }}
                     >
-                      {article.title.rendered}
+                      {article.title?.rendered || 'Untitled Article'} {/* Handle missing title */}
                     </h2>
                     <span className="text-[#8D91AB] text-[14px] font-bold">
                       {article.acf?.["მთარგმნელი"] || "Unknown"} {/* Handle missing translator */}
                     </span>
                     <p className="text-sm pt-[18px]" style={{ color: "#000" }}>
-                      {truncateText(stripHtml(article.acf?.["main-text"] || ""), 30)}
+                      {article.acf?.['main-text']}
                     </p>
                     <div className="flex flex-col justify-end pt-[30px] items-end">
                       <button className="text-white text-[12px] mt-[16px] bg-[#AD88C6] rounded-[6px] pt-[10px] pb-[10px] pl-[12px] pr-[12px]">
@@ -128,7 +145,7 @@ export default function ClientSideTranslate({ initialArticles }) {
         )}
 
         {/* Infinite Scrolling Loader */}
-        {isValidating && articles.length > 0 && (
+        {isValidating && processedArticles.length > 0 && (
           <div ref={loadMoreRef} className="h-10 w-full flex justify-center items-center">
             <img src="/images/loader.svg" alt="Loading more articles" />
           </div>
