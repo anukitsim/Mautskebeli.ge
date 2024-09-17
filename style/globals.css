@@ -876,3 +876,18 @@ a.scale-on-hover:hover {
   }
 }
 
+
+/* Ensure default link styles inside the article content */
+.article-content a {
+  color: #0000EE; /* Standard blue link color */
+  text-decoration: underline; /* Underline links by default */
+}
+
+.article-content a:visited {
+  color: #551A8B; /* Purple for visited links */
+}
+
+.article-content a:hover {
+  color: #8C74B2; /* Hover color, optional customization */
+}
+

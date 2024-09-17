@@ -75,13 +75,13 @@ const ArticlePage = ({ params }) => {
     if (article && articleContentRef.current) {
       const articleContent = articleContentRef.current;
       const sanitizedContent = DOMPurify.sanitize(article.acf['main-text'], {
-        ALLOWED_TAGS: ['p', 'br', 'ul', 'ol', 'li', 'blockquote', 'a', 'strong', 'em', 'img'],  // Include img tag
-        ALLOWED_ATTR: ['src', 'alt', 'title', 'width', 'height'],  // Allow necessary attributes for images
+        ALLOWED_TAGS: ['p', 'br', 'ul', 'ol', 'li', 'blockquote', 'a', 'strong', 'em', 'img', 'span', 'div'],  // Allow span and div as well for styling
+        ALLOWED_ATTR: ['src', 'alt', 'title', 'width', 'height', 'style'],  // Allow style attribute to retain inline CSS like font size
       });
-      
-
+  
       articleContent.innerHTML = sanitizedContent;
-
+  
+      // Handle blockquote styles
       const blockquotes = articleContent.querySelectorAll("blockquote");
       blockquotes.forEach((blockquote) => {
         blockquote.style.marginLeft = "20px";
@@ -89,7 +89,8 @@ const ArticlePage = ({ params }) => {
         blockquote.style.paddingLeft = "20px";
         blockquote.style.borderLeft = "5px solid #ccc";
       });
-
+  
+      // Handle links in the content
       const sanitizedLinks = articleContent.querySelectorAll("a");
       sanitizedLinks.forEach((link) => {
         link.addEventListener("click", (event) => {
@@ -99,6 +100,8 @@ const ArticlePage = ({ params }) => {
       });
     }
   }, [article]);
+  
+  
 
   useEffect(() => {
     const handleScroll = () => {

@@ -16,7 +16,7 @@ export default function Home() {
     <MenuProvider>
       <main className="min-h-screen">
         {/* Add DonationPopup here */}
-        <DonationPopup />
+        {/* <DonationPopup /> */}
 
         <div className="sticky top-0 z-50">
           <Header />
