@@ -17,7 +17,7 @@ const Header = () => {
       </Link>
        
         <div className="flex gap-8">
-        {/* <Link href="/donation" className="flex gap-2.5 text-xs justify-center items-center">
+        <Link href="/donation" className="flex gap-2.5 text-xs justify-center items-center">
             <Image
               src="/images/donation.svg"
               alt="Live"
@@ -26,7 +26,7 @@ const Header = () => {
             />
            
             <span className="hidden sm:inline text-[#474F7A]">დონაცია</span>
-          </Link> */}
+          </Link>
          
           <Link href="/live" className="flex gap-2.5 text-xs justify-center items-center">
             <Image

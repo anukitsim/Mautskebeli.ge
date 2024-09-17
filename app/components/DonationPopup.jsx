@@ -36,9 +36,9 @@ const DonationPopup = () => {
   if (!showDonationPopup) return null;
 
   return (
-    <div className="donation-modal-overlay">
+    <div className="donation-modal-overlay fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div
-        className="donation-modal relative bg-[url('/images/ილუსტრაცია.png')] w-[280px] h-[320px] bg-contain flex flex-col items-center justify-center gap-[32px]"
+        className="donation-modal relative bg-[url('/images/donation.png')] w-[280px] h-[320px] bg-contain flex flex-col items-center justify-center gap-[32px]"
         ref={donationModalRef}
       >
         {showCloseButton && (

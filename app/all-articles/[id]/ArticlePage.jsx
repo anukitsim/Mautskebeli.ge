@@ -75,8 +75,10 @@ const ArticlePage = ({ params }) => {
     if (article && articleContentRef.current) {
       const articleContent = articleContentRef.current;
       const sanitizedContent = DOMPurify.sanitize(article.acf['main-text'], {
-        ALLOWED_TAGS: ['p', 'br', 'ul', 'ol', 'li', 'blockquote', 'a', 'strong', 'em'],  // Allow ul, ol, li
+        ALLOWED_TAGS: ['p', 'br', 'ul', 'ol', 'li', 'blockquote', 'a', 'strong', 'em', 'img'],  // Include img tag
+        ALLOWED_ATTR: ['src', 'alt', 'title', 'width', 'height'],  // Allow necessary attributes for images
       });
+      
 
       articleContent.innerHTML = sanitizedContent;
 
