@@ -74,7 +74,9 @@ const ArticlePage = ({ params }) => {
   useEffect(() => {
     if (article && articleContentRef.current) {
       const articleContent = articleContentRef.current;
-      const sanitizedContent = DOMPurify.sanitize(article.acf["main-text"]);
+      const sanitizedContent = DOMPurify.sanitize(article.acf['main-text'], {
+        ALLOWED_TAGS: ['p', 'br', 'ul', 'ol', 'li', 'blockquote', 'a', 'strong', 'em'],  // Allow ul, ol, li
+      });
 
       articleContent.innerHTML = sanitizedContent;
 
@@ -272,6 +274,8 @@ const ArticlePage = ({ params }) => {
         )}
         <footer ref={footerRef} className="h-[100px]"></footer>
       </section>
+
+     
     </>
   );
 };

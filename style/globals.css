@@ -30,6 +30,8 @@ body {
 }
 
 
+
+
 ::selection {
   background-color: #8C74B2; /* Default Purple color */
   color: #fff; /* White text color */

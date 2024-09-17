@@ -80,7 +80,9 @@ const MainNews = () => {
           throw new Error("Network response was not ok");
         }
         let data = await response.json();
-        console.log("Fetched data:", data); // Debug log
+
+        // Sort posts by date to ensure we get the last uploaded
+        data.sort((a, b) => new Date(b.date) - new Date(a.date));
 
         // Fetch additional details for video posts
         const videoDetailsPromises = data
@@ -115,42 +117,48 @@ const MainNews = () => {
           return videoDetail || post;
         });
 
-        // Limit to the latest 3 slides
+        // Limit to the latest 5 uploaded slides
         const limitedSlides = updatedSlides.slice(0, 5);
 
-        // Cache the slides in local storage
-        localStorage.setItem("cachedSlides", JSON.stringify(limitedSlides));
         setSlides(limitedSlides);
         setLoading(false);
-        console.log("Slides state after fetch:", limitedSlides); // Added debug log
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     };
 
-    // Check if there are cached slides
-    const cachedSlides = localStorage.getItem("cachedSlides");
-    if (cachedSlides) {
-      setSlides(JSON.parse(cachedSlides));
-      setLoading(false);
-
-      // Fetch the latest data in the background and update the state
-      fetchSlides();
-    } else {
-      fetchSlides();
-    }
+    fetchSlides();
   }, []);
 
+  // Keyboard navigation event handler
   useEffect(() => {
-    console.log("Slides state updated:", slides); // Debug log
-  }, [slides]);
+    const handleKeyDown = (event) => {
+      if (event.key === "ArrowLeft") {
+        prevSlide();
+      } else if (event.key === "ArrowRight") {
+        nextSlide();
+      }
+    };
+
+    // Attach the event listener for keydown events
+    window.addEventListener("keydown", handleKeyDown);
+
+    // Clean up the event listener on component unmount
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [currentSlide, slides.length]); // Re-run effect if currentSlide or slides.length changes
 
   const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % slides.length);
+    if (slides.length > 0) {
+      setCurrentSlide((prev) => (prev + 1) % slides.length);
+    }
   };
 
   const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
+    if (slides.length > 0) {
+      setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
+    }
   };
 
   const selectSlide = (index) => {
@@ -182,13 +190,13 @@ const MainNews = () => {
                 layout="fill"
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 style={{ objectFit: "cover" }}
-                priority={index === currentSlide}
-                loading={index === currentSlide ? "eager" : "lazy"}
+                priority={index === 0} // Preload the first image
+                loading={index === 0 ? "eager" : "lazy"} // Lazy load the rest
                 quality={100}
               />
               <div className="absolute bottom-5 bg-[#474F7A] bg-opacity-50 w-full  text-white">
                 <h2 className="text-[#FECE27] pl-5 text-[20px] font-extrabold">
-                   მთავარი ამბები
+                  მთავარი ამბები
                 </h2>
                 <p className="text-[#FFF] pl-5  tracking-normal pt-[10px] font-alk-tall-mtavruli lg:text-[72px] sm:text-[30px] font-light leading-none [text-edge:cap] [leading-trim:both]">
                   {slide.title.split(" ").slice(0, 7).join(" ")}
@@ -239,14 +247,14 @@ const MainNews = () => {
                 height={1080}
                 sizes="(max-width: 768px) 100vw, 50vw"
                 style={{ objectFit: "cover" }}
-                priority={index === currentSlide}
-                loading={index === currentSlide ? "eager" : "lazy"}
+                priority={index === 0} // Preload the first image
+                loading={index === 0 ? "eager" : "lazy"} // Lazy load the rest
                 quality={100}
                 layout="responsive"
               />
               <div className="absolute bottom-12 left-7 text-white">
                 <h2 className="bg-[#FECE27] text-[#474F7A] rounded-[4px] pl-[8px] pr-[8px] pt-[4px] pb-[4px] text-[12px] font-extrabold">
-                 მთავარი ამბები
+                  მთავარი ამბები
                 </h2>
                 <p className="text-[#FFF] tracking-wider pt-[10px] font-alk-tall-mtavruli lg:text-[72px] sm:text-[75px] font-light leading-none [text-edge:cap] [leading-trim:both]">
                   {slide.title.split(" ").slice(0, 7).join(" ")}
