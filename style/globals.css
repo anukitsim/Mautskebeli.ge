@@ -881,6 +881,7 @@ a.scale-on-hover:hover {
 .article-content a {
   color: #0000EE; /* Standard blue link color */
   text-decoration: underline; /* Underline links by default */
+  cursor: pointer;
 }
 
 .article-content a:visited {

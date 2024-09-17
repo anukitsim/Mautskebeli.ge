@@ -74,32 +74,33 @@ const ArticlePage = ({ params }) => {
   useEffect(() => {
     if (article && articleContentRef.current) {
       const articleContent = articleContentRef.current;
+  
+      // Step 1: Sanitize content but allow necessary attributes
       const sanitizedContent = DOMPurify.sanitize(article.acf['main-text'], {
-        ALLOWED_TAGS: ['p', 'br', 'ul', 'ol', 'li', 'blockquote', 'a', 'strong', 'em', 'img', 'span', 'div'],  // Allow span and div as well for styling
-        ALLOWED_ATTR: ['src', 'alt', 'title', 'width', 'height', 'style'],  // Allow style attribute to retain inline CSS like font size
+        ALLOWED_TAGS: ['p', 'br', 'ul', 'ol', 'li', 'blockquote', 'a', 'strong', 'em', 'img', 'span', 'div'],
+        ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'width', 'height', 'style', 'target', 'rel'],  // Ensure 'href' is allowed
+        ALLOWED_URI_REGEXP: /^https?:\/\//i // Allow proper HTTP/HTTPS links only
       });
   
       articleContent.innerHTML = sanitizedContent;
   
-      // Handle blockquote styles
-      const blockquotes = articleContent.querySelectorAll("blockquote");
-      blockquotes.forEach((blockquote) => {
-        blockquote.style.marginLeft = "20px";
-        blockquote.style.marginRight = "20px";
-        blockquote.style.paddingLeft = "20px";
-        blockquote.style.borderLeft = "5px solid #ccc";
-      });
+      // Step 2: Log the href attribute of all links to check their values
+      const links = articleContent.querySelectorAll('a');
+      links.forEach((link) => {
+        const href = link.getAttribute('href');
+        console.log('Link Href:', href);  // Log the href for debugging
   
-      // Handle links in the content
-      const sanitizedLinks = articleContent.querySelectorAll("a");
-      sanitizedLinks.forEach((link) => {
-        link.addEventListener("click", (event) => {
-          event.preventDefault();
-          window.open(link.href, "_blank", "noopener,noreferrer");
-        });
+        // Ensure all links open in a new tab by adding target="_blank" and rel="noopener noreferrer"
+        if (href && href !== '') {
+          link.setAttribute('target', '_blank');
+          link.setAttribute('rel', 'noopener noreferrer');
+        }
       });
     }
   }, [article]);
+  
+  
+  
   
   
 
