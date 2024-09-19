@@ -62,11 +62,12 @@ export default function ClientSideTranslate({ initialArticles }) {
       const processed = articles.map((article) => ({
         ...article,
         title: {
-          rendered: decodeHTMLEntities(article.title.rendered) // Decode the title
+          rendered: article?.title?.rendered ? decodeHTMLEntities(article.title.rendered) : 'Untitled', // Decode the title if it exists
         },
         acf: {
           ...article.acf,
           ['main-text']: truncateText(decodeHTMLEntities(stripHtml(article.acf?.['main-text'] || '')), 30),
+          'author': article.acf?.['ავტორი'] || "Unknown", // Handle missing author with fallback to "Unknown"
         },
       }));
 
@@ -147,7 +148,7 @@ export default function ClientSideTranslate({ initialArticles }) {
                       {article.title?.rendered || 'Untitled Article'} {/* Handle missing title */}
                     </h2>
                     <span className="text-[#8D91AB] text-[14px] font-bold">
-                      {article.acf?.["მთარგმნელი"] || "Unknown"} {/* Handle missing translator */}
+                      {article.acf?.["ავტორი"] || "Unknown"} {/* Handle missing author */}
                     </span>
                     <p className="text-sm pt-[18px]" style={{ color: "#000" }}>
                       {article.acf?.['main-text']}

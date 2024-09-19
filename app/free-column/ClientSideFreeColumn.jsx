@@ -65,7 +65,8 @@ export default function ClientSideFreeColumn({ initialArticles }) {
       const processed = articles.map((article) => ({
         ...article,
         title: {
-          rendered: decodeHTMLEntities(article.title.rendered) // Decode the title
+          // Optional chaining to check if `article.title` and `article.title.rendered` exist
+          rendered: article?.title?.rendered ? decodeHTMLEntities(article.title.rendered) : 'Untitled Article', // Provide fallback if title is missing
         },
         acf: {
           ...article.acf,
@@ -146,7 +147,7 @@ export default function ClientSideFreeColumn({ initialArticles }) {
                   </div>
                   <div className="p-[18px]">
                     <h2 className="text-[20px] font-bold mb-2" style={{ color: "#474F7A" }}>
-                      {article.title?.rendered || 'Untitled Article'}
+                      {article.title?.rendered || 'Untitled Article'} {/* Safeguard for missing title */}
                     </h2>
                     <span className="text-[#8D91AB] text-[14px] font-bold">
                       {article.acf?.["ავტორი"] || "Unknown Author"} {/* Handle missing author */}
