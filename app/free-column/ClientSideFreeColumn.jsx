@@ -7,14 +7,20 @@ import useSWRInfinite from 'swr/infinite';
 
 // Utility function to decode HTML entities
 const decodeHTMLEntities = (text) => {
+  if (!text) return ''; // Safeguard for null or undefined texts
+
+  // Server-side fallback or client-side handling
   if (typeof window === 'undefined') {
-    return text.replace(/&#8211;/g, '–').replace(/&#8230;/g, '...'); // Server-side fallback
+    return text.replace(/&#8211;/g, '–')
+               .replace(/&#8230;/g, '...')
+               .replace(/\\u[\dA-F]{4}/gi, decodeURIComponent); // Attempt to decode Unicode escapes
   } else {
     const textarea = document.createElement('textarea');
     textarea.innerHTML = text;
     return textarea.value;
   }
 };
+
 
 // Helper function to strip HTML and truncate text
 const stripHtml = (html) => {
@@ -41,7 +47,19 @@ export default function ClientSideFreeColumn({ initialArticles }) {
   const [processedArticles, setProcessedArticles] = useState(initialArticles || []);
 
   // Use SWR for infinite scrolling
-  const fetcher = (url) => fetch(url).then(res => res.json());
+  const fetcher = async (url) => {
+    try {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`Failed to fetch data: ${res.statusText}`);
+  
+      const data = await res.json();
+      return data;
+    } catch (error) {
+      console.error("Error parsing JSON:", error);
+      return []; // Return an empty array to prevent further breakage
+    }
+  };
+  
 
   const getKey = (pageIndex, previousPageData) => {
     if (previousPageData && !previousPageData.length) return null; // No more articles to load
