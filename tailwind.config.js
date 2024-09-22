@@ -28,7 +28,11 @@ module.exports = {
       lineHeight: {
         'extra-loose': '2.5',  // Custom line height
       },
+     
     },
+    plugins: [
+      require('@tailwindcss/typography'),
+    ],
     
   },
   plugins: [],
