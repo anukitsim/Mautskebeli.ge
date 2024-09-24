@@ -5,15 +5,14 @@ import Link from "next/link";
 import Image from "next/image";
 import useSWRInfinite from 'swr/infinite';
 
-// Utility function to decode HTML entities safely
+// Utility function to decode HTML entities safely (runs only on the client)
 const decodeHTMLEntities = (text) => {
-  if (typeof window === 'undefined') {
-    return text.replace(/&#8211;/g, '–').replace(/&#8230;/g, '...'); // Server-side fallback
-  } else {
+  if (typeof window !== 'undefined') {
     const textarea = document.createElement('textarea');
     textarea.innerHTML = text;
     return textarea.value;
   }
+  return text.replace(/&#8211;/g, '–').replace(/&#8230;/g, '...'); // Server-side fallback
 };
 
 // Helper function to strip HTML and truncate text
@@ -21,12 +20,12 @@ const stripHtml = (html) => {
   if (typeof window !== 'undefined') {
     const doc = new DOMParser().parseFromString(html, 'text/html');
     return doc.body.textContent || '';
-  } else {
-    return html.replace(/<[^>]+>/g, ''); // Remove tags for server-side
   }
+  return html.replace(/<[^>]+>/g, ''); // Server-side fallback to remove tags
 };
 
 const truncateText = (text, limit) => {
+  if (!text) return ''; // Prevent null or undefined errors
   const words = text.split(' ');
   if (words.length > limit) {
     return words.slice(0, limit).join(' ') + '...';
@@ -34,14 +33,17 @@ const truncateText = (text, limit) => {
   return text;
 };
 
-export default function ClientSideTranslate({ initialArticles }) {
+export default function ClientSideTranslate({ initialArticles = [] }) {
   const loadMoreRef = useRef(null);
 
   // State to store processed articles
-  const [processedArticles, setProcessedArticles] = useState(initialArticles || []);
+  const [processedArticles, setProcessedArticles] = useState(initialArticles);
 
   // Use SWR for infinite scrolling
-  const fetcher = (url) => fetch(url).then(res => res.json());
+  const fetcher = (url) => fetch(url).then(res => res.json()).catch((err) => {
+    console.error("Error fetching data:", err);
+    return []; // Fallback to empty array in case of an error
+  });
 
   const getKey = (pageIndex, previousPageData) => {
     if (previousPageData && !previousPageData.length) return null; // No more articles to load
@@ -53,8 +55,8 @@ export default function ClientSideTranslate({ initialArticles }) {
     refreshInterval: 60000,  // Auto-refetch every 60 seconds
   });
 
-  // Safeguard: Ensure articles is always an array
-  const articles = Array.isArray(data) ? [].concat(...data) : initialArticles || [];
+  // Ensure articles are always an array
+  const articles = Array.isArray(data) ? [].concat(...data) : initialArticles;
 
   // Process the articles (decode entities, strip HTML, and truncate text)
   useEffect(() => {
@@ -62,23 +64,17 @@ export default function ClientSideTranslate({ initialArticles }) {
       const processed = articles.map((article) => ({
         ...article,
         title: {
-          rendered: article?.title?.rendered ? decodeHTMLEntities(article.title.rendered) : 'Untitled', // Decode the title if it exists
+          rendered: article?.title?.rendered ? decodeHTMLEntities(article.title.rendered) : 'Untitled', // Decode title if exists
         },
         acf: {
           ...article.acf,
           ['main-text']: truncateText(decodeHTMLEntities(stripHtml(article.acf?.['main-text'] || '')), 30),
-          'author': article.acf?.['ავტორი'] || "Unknown", // Handle missing author with fallback to "Unknown"
+          'author': article.acf?.['ავტორი'] || "Unknown", // Handle missing author with fallback
         },
       }));
 
-      // Debounce state update to avoid infinite re-renders
-      const timeout = setTimeout(() => {
-        if (JSON.stringify(processedArticles) !== JSON.stringify(processed)) {
-          setProcessedArticles(processed);
-        }
-      }, 100);
-
-      return () => clearTimeout(timeout);
+      // Update state if articles have changed
+      setProcessedArticles(processed);
     }
   }, [articles]);
 
@@ -106,6 +102,7 @@ export default function ClientSideTranslate({ initialArticles }) {
 
   // Handle errors
   if (error) return <div>Error loading articles.</div>;
+  if (!articles.length && !isValidating) return <div>No articles available.</div>;
 
   return (
     <section className="mx-auto flex flex-col overflow-hidden">
@@ -122,11 +119,11 @@ export default function ClientSideTranslate({ initialArticles }) {
         {/* Initial Loading */}
         {isValidating && processedArticles.length === 0 ? (
           <div className="flex justify-center items-center mt-10">
-            <img src="/images/loader.svg" alt="Loading" /> {/* Custom loader */}
+            <img src="/images/loader.svg" alt="Loading" />
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mt-5 mx-4 lg:mx-0">
-            {Array.isArray(processedArticles) && processedArticles.length > 0 && processedArticles.map((article) => (
+            {processedArticles.map((article) => (
               <Link href={`/translate/${article.id}`} passHref key={article.id}>
                 <div className="bg-[#F6F4F8] rounded-tl-[10px] rounded-tr-[10px] border border-[#B6A8CD] overflow-hidden cursor-pointer">
                   <div className="relative w-full h-[200px]">
@@ -145,10 +142,10 @@ export default function ClientSideTranslate({ initialArticles }) {
                   </div>
                   <div className="p-[18px]">
                     <h2 className="text-[20px] font-bold mb-2" style={{ color: "#474F7A" }}>
-                      {article.title?.rendered || 'Untitled Article'} {/* Handle missing title */}
+                      {article.title?.rendered || 'Untitled Article'}
                     </h2>
                     <span className="text-[#8D91AB] text-[14px] font-bold">
-                      {article.acf?.["ავტორი"] || "Unknown"} {/* Handle missing author */}
+                      {article.acf?.["ავტორი"] || "Unknown"}
                     </span>
                     <p className="text-sm pt-[18px]" style={{ color: "#000" }}>
                       {article.acf?.['main-text']}
