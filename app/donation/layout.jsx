@@ -3,7 +3,7 @@ import "../../style/globals.css";
 import React from "react";
 import Header from "../components/Header";
 import Navigation from "../components/Navigation";
-import { PayPalScriptProvider } from "@paypal/react-paypal-js";
+
 import { MenuProvider } from "../context/MenuContext";
 
 
@@ -22,13 +22,9 @@ export default function RootLayout({ children }) {
           <Navigation />
         </div>
         </MenuProvider>
-        <PayPalScriptProvider
-          options={{
-            "client-id": process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID,
-          }}
-        >
+       
           {children}
-        </PayPalScriptProvider>
+ 
       </body>
     </html>
   );

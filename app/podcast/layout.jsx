@@ -3,7 +3,7 @@ import "../../style/globals.css";
 import React from "react";
 import Header from "../components/Header";
 import Navigation from "../components/Navigation";
-import { PayPalScriptProvider } from "@paypal/react-paypal-js";
+
 import { MenuProvider } from "../context/MenuContext";
 import Footer from "../components/Footer";
 
