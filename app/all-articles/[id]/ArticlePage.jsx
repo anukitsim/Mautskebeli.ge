@@ -66,7 +66,7 @@ const ArticlePage = ({ params }) => {
 
   useEffect(() => {
     if (article) {
-      const sanitized = DOMPurify.sanitize(article.acf['main-text']);
+      let sanitized = DOMPurify.sanitize(article.acf['main-text']);
   
       // Parse the sanitized HTML
       const parser = new DOMParser();
@@ -77,7 +77,6 @@ const ArticlePage = ({ params }) => {
       links.forEach((link) => {
         const href = link.getAttribute('href');
         if (href) {
-          // Ignore links that start with '#' or are relative
           if (href.startsWith('#') || href.startsWith('/')) {
             // Internal link; do nothing
           } else {
@@ -94,6 +93,14 @@ const ArticlePage = ({ params }) => {
           }
         }
       });
+
+       // Handle blockquote indentation
+    const blockquotes = doc.querySelectorAll('blockquote');
+    blockquotes.forEach((blockquote) => {
+      blockquote.style.marginLeft = '20px'; // Adjust the margin for indentation
+      blockquote.style.paddingLeft = '15px'; // Optional padding
+      blockquote.style.borderLeft = '5px solid #ccc'; // Optional border style
+    });
   
       // Serialize back to a string
       const updatedContent = doc.body.innerHTML;
