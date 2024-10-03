@@ -16,7 +16,7 @@ const categories = [
 ];
 
 async function fetchArticle(id) {
-  const apiUrl = `https://mautskebeli.wpenginepowered.com/wp-json/wp/v2/article/${id}?acf_format=standard&_fields=id,title,acf,date&_=${new Date().getTime()}`;
+  const apiUrl = `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/wp/v2/article/${id}?acf_format=standard&_fields=id,title,acf,date&_=${new Date().getTime()}`;
   const res = await fetch(apiUrl);
   if (!res.ok) {
     throw new Error('Failed to fetch article');

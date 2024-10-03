@@ -45,8 +45,9 @@ export default function ClientSideArticles({ initialArticles }) {
 
   const getKey = (pageIndex, previousPageData) => {
     if (previousPageData && !previousPageData.length) return null; // No more articles to load
-    return `https://mautskebeli.wpenginepowered.com/wp-json/wp/v2/article?acf_format=standard&_fields=id,title,acf,date&per_page=10&page=${pageIndex + 1}`;
+    return `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/wp/v2/article?acf_format=standard&_fields=id,title,acf,date&per_page=10&page=${pageIndex + 1}`;
   };
+  
 
   const { data, error, size, setSize, isValidating } = useSWRInfinite(getKey, fetcher, {
     revalidateOnFocus: true,

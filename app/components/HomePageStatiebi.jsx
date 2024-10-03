@@ -25,15 +25,6 @@ const HomePageStatiebi = () => {
     return doc.documentElement.textContent;
   };
 
-  const verifyImageUrl = async (url) => {
-    try {
-      const response = await fetch(url, { method: 'HEAD' });
-      return response.ok;
-    } catch {
-      return false;
-    }
-  };
-
   useEffect(() => {
     const fetchArticles = async () => {
       try {
@@ -84,7 +75,50 @@ const HomePageStatiebi = () => {
         <p className="text-[#474F7A] text-[24px] font-bold">სტატიები</p>
         <Link href='/all-articles' className="text-[#474F7A] text-[14px] font-semibold">ნახე ყველა</Link>
       </div>
-      <div className="w-10/12 mx-auto grid grid-cols-1 sm:grid-cols-3 gap-5 mt-5">
+
+      {/* Horizontal scrolling section for mobile */}
+      <div className="flex lg:hidden overflow-x-auto space-x-4 pl-4 mt-5 no-scrollbar">
+        {articles.map(article => {
+          const imageUrl = article.acf.image ? article.acf.image : '/images/default-image.png';
+          return (
+            <Link href={`/all-articles/${article.id}`} passHref key={article.id}>
+              <div className="flex-none w-[300px] bg-[#F6F4F8] rounded-tl-[10px] rounded-tr-[10px] border border-[#B6A8CD] overflow-hidden flex flex-col">
+                <div className="relative w-full h-[200px]">
+                  <Image
+                    src={imageUrl}
+                    alt="article-cover"
+                    fill
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                    className="object-cover"
+                    priority
+                  />
+                </div>
+                <div className="p-4 flex flex-col justify-between flex-grow">
+                  <div>
+                    <h2 className="text-[16px] font-bold mb-2 text-[#474F7A]">
+                      {article.title.rendered}
+                    </h2>
+                    <span className="text-[#8D91AB] text-[14px] font-bold">
+                      {article.acf['ავტორი']}
+                    </span>
+                    <p className="text-sm pt-[18px] text-black">
+                      {truncateText(stripHtml(article.acf['main-text']), 20)}
+                    </p>
+                  </div>
+                  <div className="flex justify-end pt-4">
+                    <button className="text-white text-[12px] bg-[#AD88C6] rounded-[6px] py-2 px-4">
+                      ნახეთ სრულად
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </Link>
+          );
+        })}
+      </div>
+
+      {/* Grid for desktop screens */}
+      <div className="hidden lg:grid w-10/12 mx-auto grid grid-cols-1 sm:grid-cols-3 gap-5 mt-5">
         {articles.map(article => {
           const imageUrl = article.acf.image ? article.acf.image : '/images/default-image.png';
           return (

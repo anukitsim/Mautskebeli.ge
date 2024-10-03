@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React, { useEffect, useState, useCallback } from "react";
 import Modal from "react-modal";
@@ -35,12 +35,14 @@ const getThumbnailUrl = (videoId) => {
   return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
 };
 
-const VideoCard = ({ videoId, caption, onSelect, postType }) => {
+const VideoCard = ({ videoId, caption, onSelect, postType, isMobile }) => {
   const thumbnailUrl = getThumbnailUrl(videoId);
 
   const handlePlayClick = (e) => {
     e.stopPropagation();
-    onSelect(videoId);
+    if (!isMobile) {
+      onSelect(videoId);  // Show popup on desktop
+    }
   };
 
   const videoPageUrl = `/${postType}?videoId=${videoId}`;
@@ -52,7 +54,7 @@ const VideoCard = ({ videoId, caption, onSelect, postType }) => {
       <div
         className="relative w-full bg-cover bg-center rounded-lg"
         style={{ height: "70%" }}
-        onClick={handlePlayClick}
+        onClick={isMobile ? () => window.location.href = videoPageUrl : handlePlayClick}  // Open link directly on mobile
       >
         <div
           style={{ backgroundImage: `url(${thumbnailUrl})`, height: "100%" }}
@@ -73,11 +75,24 @@ function HomePageVideos() {
   const [latestVideos, setLatestVideos] = useState([]);
   const [selectedVideoId, setSelectedVideoId] = useState(null);
   const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     if (document.getElementById('__next')) {
       Modal.setAppElement('#__next');
     }
+
+    // Detect if it's mobile (you can adjust the width condition as necessary)
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);  // Treat as mobile if screen width <= 768px
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
   }, []);
 
   const fetchLatestVideos = async () => {
@@ -134,9 +149,11 @@ function HomePageVideos() {
   }, []);
 
   const handleVideoSelect = useCallback((videoId) => {
-    setSelectedVideoId(videoId);
-    setModalIsOpen(true);
-  }, []);
+    if (!isMobile) {
+      setSelectedVideoId(videoId);
+      setModalIsOpen(true);
+    }
+  }, [isMobile]);
 
   const closeModal = useCallback(() => {
     setModalIsOpen(false);
@@ -166,6 +183,7 @@ function HomePageVideos() {
                 caption={video.title.rendered}
                 onSelect={handleVideoSelect}
                 postType={video.post_type}
+                isMobile={isMobile}  // Pass isMobile flag
               />
             </div>
           ))}
@@ -182,11 +200,12 @@ function HomePageVideos() {
               caption={video.title.rendered}
               onSelect={handleVideoSelect}
               postType={video.post_type}
+              isMobile={isMobile}  // Pass isMobile flag
             />
           </div>
         ))}
       </section>
-      {selectedVideoId && (
+      {selectedVideoId && !isMobile && (
         <Modal
           isOpen={modalIsOpen}
           onRequestClose={closeModal}

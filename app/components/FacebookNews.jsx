@@ -27,7 +27,7 @@ const FacebookNews = async () => {
 
   return (
     <>
-      <div className="w-full sm:w-10/12 flex items-center justify-between lg:mt-20 mt-[350px] mx-auto pl-10 pr- lg:pl-2 lg:pr-2">
+      <div className="w-full sm:w-10/12 flex items-center justify-between lg:mt-20 mt-[250px] mx-auto pl-10 pr- lg:pl-2 lg:pr-2">
         <p className="text-[#474F7A] text-[24px] font-bold">ბოლო ამბები</p>
       </div>
       <div className="facebook-news-container w-10/12 mx-auto mt-5">
