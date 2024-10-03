@@ -88,10 +88,10 @@ const HomePageRcheuli = () => {
 
   return (
     <>
-      <div className="w-10/12 mx-auto mt-5 lg:mt-14">
-      <p className="text-[#474F7A] text-[24px] font-bold ml-[-20px] lg:ml-0 mt-20">მაუწყებელი გირჩევთ</p>
+      <div className="w-full  mt-5 lg:mt-14">
+      <p className="text-[#474F7A] text-[24px] font-bold lg:ml-0 mt-20">მაუწყებელი გირჩევთ</p>
       </div>
-      <div className="flex lg:hidden overflow-x-auto hide-scroll-bar pl-2 mt-6 ml-4">
+      <div className="flex lg:hidden overflow-x-auto hide-scroll-bar mt-6">
         <div className="flex">
           {posts.map((post, index) => (
             <div key={index} className="inline-block px-2 w-[248px]">
@@ -107,7 +107,7 @@ const HomePageRcheuli = () => {
                   />
                 </div>
               </Link>
-              <div className="w-full bg-[#AD88C6] h-10 lg:rounded-b-lg p-2">
+              <div className="w-full bg-[#AD88C6] h-10 lg:rounded-b-lg rounded-b-lg p-2">
                 <Link href={constructUrl(post)}>
                   <p className="text-white text-sm">{truncateTitle(post.title, 3)}</p>
                 </Link>
@@ -116,7 +116,7 @@ const HomePageRcheuli = () => {
           ))}
         </div>
       </div>
-      <section className="lg:flex hidden w-10/12 mt-5 gap-[20px] mx-auto">
+      <section className="lg:flex hidden w-full mt-5 gap-[20px] ">
         {posts.map((post, index) => (
           <div key={index} className="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 flex flex-col">
             <Link href={constructUrl(post)}>

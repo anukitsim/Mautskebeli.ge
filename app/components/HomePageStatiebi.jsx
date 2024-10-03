@@ -70,14 +70,14 @@ const HomePageStatiebi = () => {
   }, []);
 
   return (
-    <section className="mx-auto mt-[110px] flex flex-col">
-      <div className="w-full sm:w-10/12 flex items-center justify-between mx-auto px-4 lg:px-2">
+    <section className="mx-auto  flex flex-col">
+      <div className="w-full sm:w-full flex items-center justify-between mx-auto  lg:px-2">
         <p className="text-[#474F7A] text-[24px] font-bold">სტატიები</p>
         <Link href='/all-articles' className="text-[#474F7A] text-[14px] font-semibold">ნახე ყველა</Link>
       </div>
 
       {/* Horizontal scrolling section for mobile */}
-      <div className="flex lg:hidden overflow-x-auto space-x-4 pl-4 mt-5 no-scrollbar">
+      <div className="flex lg:hidden overflow-x-auto space-x-4  mt-5 no-scrollbar">
         {articles.map(article => {
           const imageUrl = article.acf.image ? article.acf.image : '/images/default-image.png';
           return (
@@ -118,7 +118,7 @@ const HomePageStatiebi = () => {
       </div>
 
       {/* Grid for desktop screens */}
-      <div className="hidden lg:grid w-10/12 mx-auto grid grid-cols-1 sm:grid-cols-3 gap-5 mt-5">
+      <div className="hidden lg:grid w-full mx-auto  grid-cols-1 sm:grid-cols-3 gap-5 mt-5">
         {articles.map(article => {
           const imageUrl = article.acf.image ? article.acf.image : '/images/default-image.png';
           return (

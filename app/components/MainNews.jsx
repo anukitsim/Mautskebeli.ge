@@ -254,10 +254,10 @@ const MainNews = () => {
         />
         {/* Updated styles for text overlay */}
         <div className="absolute bottom-0 bg-[#474F7A] bg-opacity-50 w-full text-white z-20">
-          <h2 className="text-[#FECE27] pl-5 text-[20px] font-extrabold">
+          <h2 className="text-[#FECE27] pl-5 text-[10px] pt-2 font-extrabold">
             მთავარი ამბები
           </h2>
-          <p className="text-[#FFF] pl-5 tracking-normal pt-[10px] pb-5 font-alk-tall-mtavruli sm:text-[50px] font-light leading-none [text-edge:cap] [leading-trim:both]">
+          <p className="text-[#FFF] pl-5 tracking-wider pt-[10px] pb-5 font-alk-tall-mtavruli sm:text-[100px] font-light leading-6 [text-edge:cap] [leading-trim:both]">
             {slide.title.split(" ").slice(0, 7).join(" ")}
             {slide.title.split(" ").length > 7 && "..."}
           </p>

@@ -5,7 +5,7 @@ const HomePagePodcast = () => {
   return (
     <>
       {/* Desktop Banner */}
-      <section className="relative mt-[97px] w-full hidden lg:block">
+      <section className="relative  w-full hidden lg:block">
         <div className="relative w-full">
           <Link href='/podcast'>
             <Image
@@ -36,7 +36,7 @@ const HomePagePodcast = () => {
       </section>
 
       {/* Mobile Banner */}
-      <section className="relative mt-[101px] w-full lg:hidden">
+      <section className="relative w-full lg:hidden">
         <div className="relative w-full">
           <Link href='/podcast'>
             <Image

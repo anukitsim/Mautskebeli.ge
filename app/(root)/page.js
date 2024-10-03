@@ -15,9 +15,6 @@ export default function Home() {
   return (
     <MenuProvider>
       <main className="min-h-screen">
-        {/* Add DonationPopup here */}
-        {/* <DonationPopup /> */}
-
         <div className="sticky top-0 z-50">
           <Header />
           <Navigation />
@@ -27,11 +24,33 @@ export default function Home() {
           <Sidebar />
           <MainNews />
         </div>
-        <FacebookNews />
-        <HomePageVideos />
-        <HomePageStatiebi />
+
+        <div className="container mx-auto">
+          {/* Facebook News Section */}
+          <section className="px-4 lg:px-8 mt-10">
+            <FacebookNews />
+          </section>
+
+          {/* Home Page Videos Section */}
+          <section className="px-4 lg:px-8 mt-10">
+            <HomePageVideos />
+          </section>
+
+          {/* Home Page Statiebi Section */}
+          <section className="px-4 lg:px-8 mt-10">
+            <HomePageStatiebi />
+          </section>
+        </div>
+
+        {/* Home Page Podcast Section (Full Width) */}
         <HomePagePodcast />
-        <HomePageRcheuli />
+
+        <div className="container mx-auto">
+          {/* Home Page Rcheuli Section */}
+          <section className="px-4 lg:px-8 mt-10">
+            <HomePageRcheuli />
+          </section>
+        </div>
 
         <Footer />
       </main>

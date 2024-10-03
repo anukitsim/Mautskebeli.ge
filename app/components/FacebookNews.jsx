@@ -27,10 +27,10 @@ const FacebookNews = async () => {
 
   return (
     <>
-      <div className="w-full sm:w-10/12 flex items-center justify-between lg:mt-20 mt-[250px] mx-auto pl-10 pr- lg:pl-2 lg:pr-2">
+      <div className="w-full sm:w-full flex items-center justify-between lg:mt-20 mt-[200px]    lg:pl-2 lg:pr-2">
         <p className="text-[#474F7A] text-[24px] font-bold">ბოლო ამბები</p>
       </div>
-      <div className="facebook-news-container w-10/12 mx-auto mt-5">
+      <div className="facebook-news-container w-full mx-auto mt-5">
         {latestPosts?.map((post, index) => (
           <Link
             href={`/facebook-post/${index + 1}`}

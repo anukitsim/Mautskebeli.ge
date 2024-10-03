@@ -170,11 +170,11 @@ function HomePageVideos() {
 
   return (
     <>
-      <div className="w-full sm:w-10/12 flex items-center justify-between lg:mt-20 mt-[42px] mx-auto pl-4 pr-4 lg:pl-2 lg:pr-2">
+      <div className="w-full sm:w-full flex items-center justify-between lg:mt-20 mt-[42px]    lg:pl-2 lg:pr-2">
         <p className="text-[#474F7A] text-[24px] font-bold">ვიდეო</p>
         <Link href='/all-videos' className="text-[#474F7A] text-[14px] font-semibold">ნახე ყველა</Link>
       </div>
-      <div className="flex sm:hidden overflow-x-auto hide-scroll-bar pl-2 mt-5">
+      <div className="flex sm:hidden overflow-x-auto gap-5 hide-scroll-bar  mt-5">
         <div className="flex">
           {latestVideos.map((video) => (
             <div key={video.id} className="inline-block px-2 w-[248px]">
@@ -189,7 +189,7 @@ function HomePageVideos() {
           ))}
         </div>
       </div>
-      <section className="lg:flex hidden w-10/12 mt-5 gap-[20px] mx-auto">
+      <section className="lg:flex hidden w-full mt-5 gap-[20px] mx-auto">
         {latestVideos.map((video) => (
           <div
             key={video.id}
