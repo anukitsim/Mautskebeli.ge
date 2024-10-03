@@ -1,3 +1,5 @@
+// app/all-articles/layout.jsx
+
 import "../../style/globals.css";
 import Header from "../components/Header";
 import Navigation from "../components/Navigation";
@@ -28,6 +30,18 @@ export default function RootLayout({ children, metadata }) {
 
   const finalMetadata = metadata || defaultMetadata;
 
+  // **Updated Code Starts Here**
+  // Replace the domain in og:image URLs to use the main domain
+  if (finalMetadata.openGraph && finalMetadata.openGraph.images) {
+    finalMetadata.openGraph.images = finalMetadata.openGraph.images.map((image) => {
+      return {
+        ...image,
+        url: image.url.replace('https://mautskebeli.wpenginepowered.com', 'https://www.mautskebeli.ge'),
+      };
+    });
+  }
+  // **Updated Code Ends Here**
+
   console.log("Rendering metadata in Head:", finalMetadata);
 
   return (
@@ -35,7 +49,7 @@ export default function RootLayout({ children, metadata }) {
       <Head>
         <title>{finalMetadata.title}</title>
         <meta name="description" content={finalMetadata.description} />
-        {finalMetadata.additionalMetaTags.map(tag => (
+        {finalMetadata.additionalMetaTags.map((tag) => (
           <meta key={tag.property} property={tag.property} content={tag.content} />
         ))}
         <meta property="og:url" content={finalMetadata.openGraph.url} />

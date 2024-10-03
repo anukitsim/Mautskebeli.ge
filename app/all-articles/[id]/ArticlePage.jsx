@@ -95,16 +95,16 @@ const ArticlePage = ({ params }) => {
       });
 
        // Handle blockquote indentation
-    const blockquotes = doc.querySelectorAll('blockquote');
-    blockquotes.forEach((blockquote) => {
-      blockquote.style.marginLeft = '20px'; // Adjust the margin for indentation
-      blockquote.style.paddingLeft = '15px'; // Optional padding
-      blockquote.style.borderLeft = '5px solid #ccc'; // Optional border style
-    });
-  
+      const blockquotes = doc.querySelectorAll('blockquote');
+      blockquotes.forEach((blockquote) => {
+        blockquote.style.marginLeft = '20px'; // Adjust the margin for indentation
+        blockquote.style.paddingLeft = '15px'; // Optional padding
+        blockquote.style.borderLeft = '5px solid #ccc'; // Optional border style
+      });
+    
       // Serialize back to a string
       const updatedContent = doc.body.innerHTML;
-  
+    
       setSanitizedContent(updatedContent);
     }
   }, [article]);
@@ -139,7 +139,13 @@ const ArticlePage = ({ params }) => {
   }
 
   const articleUrl = `https://www.mautskebeli.ge/all-articles/${article.id}`;
-  const ogImage = article.acf.image ? `${article.acf.image}?cb=${new Date().getTime()}` : '/images/default-og-image.jpg';
+
+  // **Updated Code Starts Here**
+  // Remove cache-busting query parameter and replace domain in image URL
+  const ogImage = article.acf.image
+    ? article.acf.image.replace('https://mautskebeli.wpenginepowered.com', 'https://www.mautskebeli.ge')
+    : '/images/default-og-image.jpg';
+  // **Updated Code Ends Here**
 
   const sanitizeDescription = (html) => {
     const doc = new DOMParser().parseFromString(html, 'text/html');
@@ -147,6 +153,13 @@ const ArticlePage = ({ params }) => {
   };
 
   const ogDescription = sanitizeDescription(article.acf['main-text']).slice(0, 150);
+
+  // **Updated Code Starts Here**
+  // Update article image URL to use the main domain
+  const articleImage = article.acf.image
+    ? article.acf.image.replace('https://mautskebeli.wpenginepowered.com', 'https://www.mautskebeli.ge')
+    : '/images/default-og-image.jpg';
+  // **Updated Code Ends Here**
 
   return (
     <>
@@ -184,7 +197,7 @@ const ArticlePage = ({ params }) => {
           </div>
           <div className="w-full h-auto mb-5">
             <Image
-              src={article.acf.image || '/images/default-og-image.jpg'}
+              src={articleImage}
               alt={article.title.rendered}
               width={800}
               height={450}
