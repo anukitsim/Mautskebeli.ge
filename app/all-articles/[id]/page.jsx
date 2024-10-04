@@ -1,4 +1,4 @@
-// all-articles/[id]/page.jsx
+// app/all-articles/[id]/page.jsx
 
 import ArticlePage from './ArticlePage';
 
@@ -6,7 +6,7 @@ export async function generateMetadata({ params }) {
   const { id } = params;
 
   try {
-    // Fetch the article data directly from your WordPress backend
+    // Fetch the article data from WordPress
     const apiUrl = `https://mautskebeli.wpenginepowered.com/wp-json/wp/v2/article/${id}?acf_format=standard&_fields=id,title,acf,date`;
     const res = await fetch(apiUrl);
 
@@ -24,10 +24,8 @@ export async function generateMetadata({ params }) {
 
     const ogDescription = sanitizeDescription(article.acf['main-text']);
 
-    // Ensure the OG image URL uses your main domain
-    const ogImageUrl = article.acf.image
-      ? article.acf.image.replace('mautskebeli.wpenginepowered.com', 'www.mautskebeli.ge')
-      : 'https://www.mautskebeli.ge/images/default-og-image.jpg';
+    // Use the original image URL from WordPress backend
+    const ogImageUrl = article.acf.image;
 
     return {
       title: article.title.rendered || 'Default Title',
@@ -81,4 +79,3 @@ const Page = ({ params }) => {
 };
 
 export default Page;
-  
