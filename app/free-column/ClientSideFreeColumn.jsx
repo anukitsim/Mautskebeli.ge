@@ -1,8 +1,8 @@
-'use client'; // Enable React hooks in this component
+'use client';
 
-import React, { useState, useEffect, useRef } from "react";
-import Link from "next/link";
-import Image from "next/image";
+import React, { useState, useEffect, useRef } from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
 import useSWRInfinite from 'swr/infinite';
 
 // Utility function to decode HTML entities
@@ -11,9 +11,10 @@ const decodeHTMLEntities = (text) => {
 
   // Server-side fallback or client-side handling
   if (typeof window === 'undefined') {
-    return text.replace(/&#8211;/g, '–')
-               .replace(/&#8230;/g, '...')
-               .replace(/\\u[\dA-F]{4}/gi, decodeURIComponent); // Attempt to decode Unicode escapes
+    return text
+      .replace(/&#8211;/g, '–')
+      .replace(/&#8230;/g, '...')
+      .replace(/\\u[\dA-F]{4}/gi, decodeURIComponent); // Attempt to decode Unicode escapes
   } else {
     const textarea = document.createElement('textarea');
     textarea.innerHTML = text;
@@ -21,21 +22,20 @@ const decodeHTMLEntities = (text) => {
   }
 };
 
-
 // Helper function to strip HTML and truncate text
 const stripHtml = (html) => {
   if (typeof window !== 'undefined') {
-    const doc = new DOMParser().parseFromString(html, "text/html");
-    return doc.body.textContent || "";
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    return doc.body.textContent || '';
   } else {
     return html.replace(/<[^>]+>/g, ''); // Remove tags for server-side
   }
 };
 
 const truncateText = (text, limit) => {
-  const words = text.split(" ");
+  const words = text.split(' ');
   if (words.length > limit) {
-    return words.slice(0, limit).join(" ") + "...";
+    return words.slice(0, limit).join(' ') + '...';
   }
   return text;
 };
@@ -51,15 +51,14 @@ export default function ClientSideFreeColumn({ initialArticles }) {
     try {
       const res = await fetch(url);
       if (!res.ok) throw new Error(`Failed to fetch data: ${res.statusText}`);
-  
+
       const data = await res.json();
       return data;
     } catch (error) {
-      console.error("Error parsing JSON:", error);
+      console.error('Error parsing JSON:', error);
       return []; // Return an empty array to prevent further breakage
     }
   };
-  
 
   const getKey = (pageIndex, previousPageData) => {
     if (previousPageData && !previousPageData.length) return null; // No more articles to load
@@ -84,7 +83,9 @@ export default function ClientSideFreeColumn({ initialArticles }) {
         ...article,
         title: {
           // Optional chaining to check if `article.title` and `article.title.rendered` exist
-          rendered: article?.title?.rendered ? decodeHTMLEntities(article.title.rendered) : 'Untitled Article', // Provide fallback if title is missing
+          rendered: article?.title?.rendered
+            ? decodeHTMLEntities(article.title.rendered)
+            : 'Untitled Article', // Provide fallback if title is missing
         },
         acf: {
           ...article.acf,
@@ -133,7 +134,7 @@ export default function ClientSideFreeColumn({ initialArticles }) {
         </p>
         <p className="text-[#8D91AB] text-wrap pl-4 text-[14px] font-bold lg:pl-2 pt-5 w-11/12 lg:w-9/12 lg:text-justify mb-10">
           ფართო, ინკლუზიური და რადიკალური დემოკრატიის იდეის კრიზისის ფონზე,
-          „მაუწებელი“ მიზნად ისახავს მხარი დაუჭიროს ადგილობრივი ხმების
+          „მაუწყებელი“ მიზნად ისახავს მხარი დაუჭიროს ადგილობრივი ხმების
           გაჟღერებას და თავისუფალ პლატფორმას უთმობს ავტორებს,
           რომელთაც სურთ სოციალურ-ეკონომიკურ საკითხებსა და ქვეყანაში მიმდინარე
           მოვლენებზე სტატიების გამოქვეყნება.
@@ -146,42 +147,47 @@ export default function ClientSideFreeColumn({ initialArticles }) {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mt-5 mx-4 lg:mx-0">
-            {Array.isArray(processedArticles) && processedArticles.length > 0 && processedArticles.map((article) => (
-              <Link href={`/free-column/${article.id}`} passHref key={article.id}>
-                <div className="bg-[#F6F4F8] rounded-tl-[10px] rounded-tr-[10px] border border-[#B6A8CD] overflow-hidden cursor-pointer">
-                  <div className="relative w-full h-[200px]">
-                    <Image
-                      src={article.acf?.image || "/images/default-image.png"} 
-                      alt="article-cover"
-                      fill
-                      style={{ objectFit: 'cover' }}
-                      className="article-image"
-                      loading="lazy"
-                      onError={(e) => {
-                        e.target.onerror = null;
-                        e.target.src = "/images/default-image.png";
-                      }}
-                    />
-                  </div>
-                  <div className="p-[18px]">
-                    <h2 className="text-[20px] font-bold mb-2" style={{ color: "#474F7A" }}>
-                      {article.title?.rendered || 'Untitled Article'} {/* Safeguard for missing title */}
-                    </h2>
-                    <span className="text-[#8D91AB] text-[14px] font-bold">
-                      {article.acf?.["ავტორი"] || "Unknown Author"} {/* Handle missing author */}
-                    </span>
-                    <p className="text-sm pt-[18px]" style={{ color: "#000" }}>
-                      {article.acf?.['main-text']}
-                    </p>
-                    <div className="flex flex-col justify-end pt-[30px] items-end">
-                      <button className="text-white text-[12px] mt-[16px] bg-[#AD88C6] rounded-[6px] pt-[10px] pb-[10px] pl-[12px] pr-[12px]">
-                        ნახეთ სრულად
-                      </button>
+            {Array.isArray(processedArticles) &&
+              processedArticles.length > 0 &&
+              processedArticles.map((article) => (
+                <Link href={`/free-column/${article.id}`} passHref key={article.id}>
+                  <div className="bg-[#F6F4F8] rounded-tl-[10px] rounded-tr-[10px] border border-[#B6A8CD] overflow-hidden cursor-pointer">
+                    <div className="relative w-full h-[200px]">
+                      <Image
+                        src={article.acf?.image || '/images/default-image.png'}
+                        alt="article-cover"
+                        fill
+                        style={{ objectFit: 'cover' }}
+                        className="article-image"
+                        loading="lazy"
+                        onError={(e) => {
+                          e.target.onerror = null;
+                          e.target.src = '/images/default-image.png';
+                        }}
+                      />
+                    </div>
+                    <div className="p-[18px]">
+                      <h2
+                        className="text-[20px] font-bold mb-2"
+                        style={{ color: '#474F7A' }}
+                      >
+                        {article.title?.rendered || 'Untitled Article'} {/* Safeguard for missing title */}
+                      </h2>
+                      <span className="text-[#8D91AB] text-[14px] font-bold">
+                        {article.acf?.['ავტორი'] || 'Unknown Author'} {/* Handle missing author */}
+                      </span>
+                      <p className="text-sm pt-[18px]" style={{ color: '#000' }}>
+                        {article.acf?.['main-text']}
+                      </p>
+                      <div className="flex flex-col justify-end pt-[30px] items-end">
+                        <button className="text-white text-[12px] mt-[16px] bg-[#AD88C6] rounded-[6px] pt-[10px] pb-[10px] pl-[12px] pr-[12px]">
+                          ნახეთ სრულად
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </Link>
-            ))}
+                </Link>
+              ))}
           </div>
         )}
 

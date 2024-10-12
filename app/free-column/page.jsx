@@ -3,7 +3,6 @@
 import ClientSideFreeColumn from './ClientSideFreeColumn'; // Import client component
 
 // Server-side function to fetch the initial articles
-// Server-side function to fetch the initial articles
 async function fetchInitialArticles() {
   try {
     const res = await fetch(
@@ -12,7 +11,7 @@ async function fetchInitialArticles() {
     if (!res.ok) {
       throw new Error('Failed to fetch articles');
     }
-    
+
     const data = await res.json();
     console.log('Fetched Data:', data); // Log the fetched data
     return data;
@@ -21,7 +20,6 @@ async function fetchInitialArticles() {
     throw error; // Re-throw error to be handled upstream
   }
 }
-
 
 // Server Component: Fetches data server-side and passes it to the client component
 export default async function FreeColumnPage() {
