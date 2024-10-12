@@ -1,8 +1,6 @@
 // app/free-column/[id]/page.jsx
 
-import ColumnPage from "./Columnpage";
-
-
+import ColumnPage from "./ColumnPage"; // Corrected import statement
 
 export async function generateMetadata({ params }) {
   const { id } = params;
