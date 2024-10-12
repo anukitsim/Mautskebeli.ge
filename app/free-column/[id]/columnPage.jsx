@@ -12,7 +12,6 @@ const categories = [
   { name: "თარგმანი", path: "/translate" },
   { name: "მაუწყებელი წიგნები", path: "/books" },
   { name: "თავისუფალი სვეტი", path: "/free-column" },
-
 ];
 
 async function fetchArticle(id) {
@@ -35,7 +34,6 @@ const ColumnPage = ({ params }) => {
   const [showScrollButton, setShowScrollButton] = useState(false);
   const shareOptionsRef = useRef(null);
   const footerRef = useRef(null);
-  const articleContentRef = useRef(null);
   const { id } = params;
 
   useEffect(() => {
@@ -57,81 +55,52 @@ const ColumnPage = ({ params }) => {
   }, [id]);
 
   useEffect(() => {
-    const handleScroll = () => {
-      const scrollY = window.scrollY;
-      const scrollThreshold = 2000;
-      const windowHeight = window.innerHeight;
-      const documentHeight = document.documentElement.scrollHeight;
-      const footerHeight = footerRef.current?.offsetHeight || 0;
-      const bottomThreshold = documentHeight - (footerHeight + windowHeight * 2);
+    if (article) {
+      let sanitized = DOMPurify.sanitize(article.acf['main-text']);
 
-      if (scrollY > scrollThreshold && scrollY < bottomThreshold) {
-        setShowScrollButton(true);
-      } else {
-        setShowScrollButton(false);
-      }
-    };
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(sanitized, 'text/html');
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+      // External links behavior
+      const links = doc.querySelectorAll('a');
+      links.forEach((link) => {
+        const href = link.getAttribute('href');
+        if (href) {
+          if (href.startsWith('#') || href.startsWith('/')) {
+            // Internal link; do nothing
+          } else {
+            try {
+              const linkUrl = new URL(href, window.location.origin);
+              if (linkUrl.origin !== window.location.origin) {
+                // External link
+                link.setAttribute('target', '_blank');
+                link.setAttribute('rel', 'noopener noreferrer');
+              }
+            } catch (e) {
+              // If URL parsing fails, treat as internal link
+            }
+          }
+        }
+      });
 
-  const handleClickOutside = useCallback((event) => {
-    if (showShareOptions && shareOptionsRef.current && !shareOptionsRef.current.contains(event.target)) {
-      setShowShareOptions(false);
+      // Blockquote styling
+      const blockquotes = doc.querySelectorAll('blockquote');
+      blockquotes.forEach((blockquote) => {
+        blockquote.style.marginLeft = '20px';
+        blockquote.style.paddingLeft = '15px';
+        blockquote.style.borderLeft = '5px solid #ccc';
+      });
+
+      setArticle((prevArticle) => ({
+        ...prevArticle,
+        sanitizedContent: doc.body.innerHTML,
+      }));
     }
-  }, [showShareOptions]);
-
-  useEffect(() => {
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [handleClickOutside]);
+  }, [article]);
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
-
-  useEffect(() => {
-    if (article && articleContentRef.current) {
-      const articleContent = articleContentRef.current;
-      articleContent.innerHTML = DOMPurify.sanitize(article.acf['main-text']);
-
-      // Apply styles for blockquotes
-      const blockquotes = articleContent.querySelectorAll('blockquote');
-      blockquotes.forEach(blockquote => {
-        blockquote.style.marginLeft = '20px';
-        blockquote.style.marginRight = '20px';
-        blockquote.style.paddingLeft = '20px';
-        blockquote.style.borderLeft = '5px solid #ccc'; // Example style
-      });
-
-      const sanitizedLinks = articleContent.querySelectorAll('a');
-      sanitizedLinks.forEach(link => {
-        link.addEventListener('click', (event) => {
-          event.preventDefault();
-          window.open(link.href, '_blank', 'noopener,noreferrer');
-        });
-      });
-    }
-  }, [article]);
-
-
-  useEffect(() => {
-    if (article && articleContentRef.current) {
-      const articleContent = articleContentRef.current;
-      articleContent.innerHTML = DOMPurify.sanitize(article.acf['main-text']);
-
-      const sanitizedLinks = articleContent.querySelectorAll('a');
-      sanitizedLinks.forEach(link => {
-        link.addEventListener('click', (event) => {
-          event.preventDefault();
-          window.open(link.href, '_blank', 'noopener,noreferrer');
-        });
-      });
-    }
-  }, [article]);
 
   if (!isMounted || !article) {
     return <img src="/images/loader.svg" alt="Loading" />;
@@ -146,8 +115,6 @@ const ColumnPage = ({ params }) => {
   };
 
   const ogDescription = sanitizeDescription(article.acf['main-text']).slice(0, 150);
-
-  const currentCategory = "თავისუფალი სვეტი"; 
 
   return (
     <>
@@ -173,7 +140,7 @@ const ColumnPage = ({ params }) => {
                    key={category.name}
                    href={category.path}
                    className={`text-sm  text-[#474F7A] ${
-                     category.name === currentCategory
+                     category.name === "თავისუფალი სვეტი"
                        ? "text-white font-bold"
                        : "text-[#474F7A]  hover:scale-110"
                    }`}
@@ -191,7 +158,10 @@ const ColumnPage = ({ params }) => {
             )}
             <p className="text-[#474F7A] font-semibold pb-10">{article.formattedDate}</p>
           </div>
-          <div ref={articleContentRef} className="article-content text-[#474F7A] text-wrap w-full font-noto-sans-georgian text-[14px] sm:text-[16px] font-normal lg:text-justify leading-[30px] sm:leading-[35px] tracking-[0.32px]"></div>
+          <div
+            className="prose article-content text-[#474F7A] font-noto-sans-georgian text-[14px] sm:text-[16px] font-normal lg:text-justify leading-[30px] sm:leading-[35px] tracking-[0.32px]"
+            dangerouslySetInnerHTML={{ __html: article.sanitizedContent }}
+          ></div>
           <div className="flex flex-wrap gap-4 mt-10">
             <button onClick={() => setShowShareOptions(true)} className="bg-[#FECE27] text-[#474F7A] pl-[18px] pr-[18px] pt-[4px] pb-[4px] text-[16px] font-seibold rounded flex gap-[12px] items-center justify-center">
               <Image src="/images/share.png" alt="share icon" width={24} height={24} />

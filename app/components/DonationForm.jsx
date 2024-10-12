@@ -1,7 +1,34 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
+import { useSearchParams } from "next/navigation";
+
+// Function to handle payment status by querying the backend
+const handlePaymentStatus = async (orderId) => {
+  try {
+    const response = await fetch(
+      "https://mautskebeli.wpenginepowered.com/wp-json/wp/v2/verify-payment-status",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ orderId }),
+      }
+    );
+
+    const result = await response.json();
+    console.log("Payment Verification Result:", result); // Add this line for debugging
+    if (result.status === "Succeeded") {
+      alert("Payment succeeded!");
+    } else {
+      alert("Payment failed.");
+    }
+  } catch (error) {
+    console.error("Error capturing payment status:", error);
+  }
+};
 
 const Modal = ({ show, handleClose, handleConfirm }) => {
   if (!show) return null;
@@ -36,7 +63,6 @@ const Modal = ({ show, handleClose, handleConfirm }) => {
 };
 
 const DonationForm = () => {
-  // Set default donation amount to 5
   const [formData, setFormData] = useState({
     donationAmount: 5, // Default value set to 5
     donorName: "",
@@ -47,6 +73,17 @@ const DonationForm = () => {
 
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const searchParams = useSearchParams();
+
+  // Capture the orderId after the user is redirected from TBC payment page
+  useEffect(() => {
+    const orderId = searchParams.get("orderId");
+
+    if (orderId) {
+      // Call the function to check the payment status with orderId
+      handlePaymentStatus(orderId);
+    }
+  }, [searchParams]);
 
   // Handle form field updates
   const handleInputChange = (e) => {
@@ -54,7 +91,6 @@ const DonationForm = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-  // Increment donation amount
   const handleIncrement = () => {
     setFormData({
       ...formData,
@@ -62,7 +98,6 @@ const DonationForm = () => {
     });
   };
 
-  // Decrement donation amount
   const handleDecrement = () => {
     setFormData({
       ...formData,
@@ -73,10 +108,10 @@ const DonationForm = () => {
     });
   };
 
-  // Handle Recurring checkbox click
+  // Handle recurring payments checkbox
   const handleRecurringChange = (e) => {
     if (e.target.checked) {
-      setShowModal(true); // Show modal when the checkbox is checked
+      setShowModal(true); // Show modal if recurring payment is selected
     } else {
       setFormData({ ...formData, isRecurring: false });
     }
@@ -92,16 +127,15 @@ const DonationForm = () => {
     setShowModal(false);
   };
 
-  // Form submission for one-time or recurring donations
+  // Handle form submission for one-time or recurring donations
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Ensure that `donationAmount` is a number and other fields are trimmed strings
     const trimmedFormData = {
-      donationAmount: parseFloat(formData.donationAmount), // Convert to float
+      donationAmount: parseFloat(formData.donationAmount),
       donorName: formData.donorName.trim(),
       donorEmail: formData.donorEmail.trim(),
-      donorPhone: formData.donorPhone.trim() || undefined, // Optional field
+      donorPhone: formData.donorPhone.trim() || undefined,
       isRecurring: formData.isRecurring,
     };
 
@@ -114,7 +148,7 @@ const DonationForm = () => {
       return;
     }
 
-    setLoading(true);
+    setLoading(true); // Start loading
     try {
       const response = await fetch(
         "https://mautskebeli.wpenginepowered.com/wp-json/wp/v2/submit-donation/",
@@ -123,12 +157,12 @@ const DonationForm = () => {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(trimmedFormData), // Send the trimmed formData object to the backend
+          body: JSON.stringify(trimmedFormData),
         }
       );
 
       const responseData = await response.json();
-      setLoading(false);
+      setLoading(false); // End loading
 
       if (!response.ok) {
         console.error("Donation Failed:", responseData.message);
@@ -137,14 +171,14 @@ const DonationForm = () => {
         console.log("Donation Success:", responseData);
         if (responseData.paymentUrl) {
           window.location.href = responseData.paymentUrl; // Redirect to the payment URL
+        } else {
+          alert("Recurring donation setup successful, but no payment URL provided.");
         }
       }
     } catch (error) {
-      setLoading(false);
+      setLoading(false); // End loading on error
       console.error("Error submitting donation:", error);
-      alert(
-        "Error submitting donation: Please check the console for more details."
-      );
+      alert("An unexpected error occurred, please try again later.");
     }
   };
 
@@ -240,7 +274,7 @@ const DonationForm = () => {
         <button
           type="submit"
           className="bg-[#AD88C6] w-full text-white p-3 rounded-lg mt-4 hover:scale-105 transition-colors duration-300"
-          disabled={loading}
+          disabled={loading} // Button disabled while loading
         >
           {loading ? "მუშავდება.." : "გადახდა"}
         </button>
