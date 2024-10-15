@@ -4,8 +4,29 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 
+// Custom PaymentMessage component to show the payment result
+const PaymentMessage = ({ message, isError, onClose }) => {
+  if (!message) return null;
+
+  return (
+    <div
+      className={`fixed top-4 left-1/2 transform -translate-x-1/2 px-4 py-2 rounded shadow-lg ${
+        isError ? "bg-red-500 text-white" : "bg-green-500 text-white"
+      }`}
+    >
+      <span>{message}</span>
+      <button
+        onClick={onClose}
+        className="ml-4 text-white font-semibold border-none bg-transparent"
+      >
+        ✖
+      </button>
+    </div>
+  );
+};
+
 // Function to handle payment status by querying the backend
-const handlePaymentStatus = async (orderId) => {
+const handlePaymentStatus = async (orderId, setPaymentMessage, setIsError) => {
   try {
     const response = await fetch(
       "https://mautskebeli.wpenginepowered.com/wp-json/wp/v2/verify-payment-status",
@@ -19,14 +40,16 @@ const handlePaymentStatus = async (orderId) => {
     );
 
     const result = await response.json();
-    console.log("Payment Verification Result:", result); // Add this line for debugging
     if (result.status === "Succeeded") {
-      alert("Payment succeeded!");
+      setPaymentMessage("Payment succeeded!");
+      setIsError(false);
     } else {
-      alert("Payment failed.");
+      setPaymentMessage("Payment failed.");
+      setIsError(true);
     }
   } catch (error) {
-    console.error("Error capturing payment status:", error);
+    setPaymentMessage("Error capturing payment status.");
+    setIsError(true);
   }
 };
 
@@ -73,6 +96,9 @@ const DonationForm = () => {
 
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [paymentMessage, setPaymentMessage] = useState(""); // New state for payment message
+  const [isError, setIsError] = useState(false); // State to differentiate success/error message
+
   const searchParams = useSearchParams();
 
   // Capture the orderId after the user is redirected from TBC payment page
@@ -81,7 +107,7 @@ const DonationForm = () => {
 
     if (orderId) {
       // Call the function to check the payment status with orderId
-      handlePaymentStatus(orderId);
+      handlePaymentStatus(orderId, setPaymentMessage, setIsError);
     }
   }, [searchParams]);
 
@@ -127,59 +153,60 @@ const DonationForm = () => {
     setShowModal(false);
   };
 
-  // Handle form submission for one-time or recurring donations
-  const handleSubmit = async (e) => {
-    e.preventDefault();
 
-    const trimmedFormData = {
+ // Handle form submission for one-time or recurring donations
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  const trimmedFormData = {
       donationAmount: parseFloat(formData.donationAmount),
       donorName: formData.donorName.trim(),
       donorEmail: formData.donorEmail.trim(),
       donorPhone: formData.donorPhone.trim() || undefined,
       isRecurring: formData.isRecurring,
-    };
+  };
 
-    if (
-      isNaN(trimmedFormData.donationAmount) ||
-      !trimmedFormData.donorName ||
-      !trimmedFormData.donorEmail
-    ) {
+  if (isNaN(trimmedFormData.donationAmount) || !trimmedFormData.donorName || !trimmedFormData.donorEmail) {
       alert("Please fill out all required fields before submitting.");
       return;
-    }
+  }
 
-    setLoading(true); // Start loading
-    try {
+  setLoading(true);
+  try {
       const response = await fetch(
-        "https://mautskebeli.wpenginepowered.com/wp-json/wp/v2/submit-donation/",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(trimmedFormData),
-        }
+          "https://mautskebeli.wpenginepowered.com/wp-json/wp/v2/submit-donation/",
+          {
+              method: "POST",
+              headers: {
+                  "Content-Type": "application/json",
+              },
+              body: JSON.stringify(trimmedFormData),
+          }
       );
 
       const responseData = await response.json();
-      setLoading(false); // End loading
+      setLoading(false);
 
       if (!response.ok) {
-        console.error("Donation Failed:", responseData.message);
-        alert("Failed to process donation: " + responseData.message);
+          console.error("Donation Failed:", responseData.message);
+          alert("Failed to process donation: " + responseData.message);
       } else {
-        console.log("Donation Success:", responseData);
-        if (responseData.paymentUrl) {
-          window.location.href = responseData.paymentUrl; // Redirect to the payment URL
-        } else {
-          alert("Recurring donation setup successful, but no payment URL provided.");
-        }
+          console.log("Donation Success:", responseData);
+          if (responseData.paymentUrl) {
+              window.location.href = responseData.paymentUrl; // Redirect to the payment URL
+          } else {
+              alert("Recurring donation setup successful, but no payment URL provided.");
+          }
       }
-    } catch (error) {
-      setLoading(false); // End loading on error
+  } catch (error) {
+      setLoading(false);
       console.error("Error submitting donation:", error);
-      alert("An unexpected error occurred, please try again later.");
-    }
+      alert("Error submitting donation: Please check the console for more details.");
+  }
+};
+
+  const closePaymentMessage = () => {
+    setPaymentMessage(""); // Close the payment message
   };
 
   return (
@@ -193,6 +220,13 @@ const DonationForm = () => {
         />
         <h1 className="text-[18px] font-semibold">დონაცია</h1>
       </div>
+
+      {/* Payment Message Component */}
+      <PaymentMessage
+        message={paymentMessage}
+        isError={isError}
+        onClose={closePaymentMessage}
+      />
 
       <form
         onSubmit={handleSubmit}

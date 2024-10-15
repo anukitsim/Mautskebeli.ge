@@ -57,7 +57,7 @@ const PostPage = () => {
                 alt={post.acf.title}
                 fill
                 priority
-                style={{ objectFit: 'cover' }}
+                style={{ : 'cover' }}
                 className="rounded-lg"
               />
               <h1 className="absolute bottom-0 left-0 w-full bg-opacity-75 text-[#FECE27] text-2xl md:text-3xl font-bold p-4">
