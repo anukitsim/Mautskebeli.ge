@@ -74,7 +74,7 @@ const Modal = ({ show, handleClose, handleConfirm }) => {
             გათიშვა
           </button>
           <button
-            className="bg-[#AD88C6] text-white p-2 rounded hover:bg-purple-700"
+            className="bg-[#AD88C6] text-white p-2 rounded hover:bg-purple-500"
             onClick={handleConfirm}
           >
             ვადასტურებ
