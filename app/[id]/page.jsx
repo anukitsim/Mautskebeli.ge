@@ -52,14 +52,15 @@ const PostPage = () => {
         <div className="relative w-full mb-5 h-64 sm:h-96">
           {post.acf.image && (
             <>
-              <Image
-                src={post.acf.image}
-                alt={post.acf.title}
-                fill
-                priority
-                style={{ 'cover' }}
-                className="rounded-lg"
-              />
+           <Image
+  src={post.acf.image}
+  alt={post.acf.title}
+  fill
+  priority
+  style={{ objectFit: 'cover' }} // Correct style property
+  className="rounded-lg"
+/>
+
               <h1 className="absolute bottom-0 left-0 w-full bg-opacity-75 text-[#FECE27] text-2xl md:text-3xl font-bold p-4">
                 {post.title.rendered}
               </h1>
