@@ -108,12 +108,13 @@ const DonationForm = () => {
   // Capture the orderId after the user is redirected from TBC payment page
   useEffect(() => {
     const orderId = searchParams.get("orderId");
-
+  
     if (orderId) {
       // Call the function to check the payment status with orderId
       handlePaymentStatus(orderId, setPaymentMessage, setIsError);
     }
   }, [searchParams]);
+  
 
   // Handle form field updates
   const handleInputChange = (e) => {
