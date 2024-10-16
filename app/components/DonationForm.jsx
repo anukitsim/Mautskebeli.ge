@@ -157,61 +157,60 @@ const DonationForm = () => {
     setShowModal(false);
   };
 
-
- // Handle form submission for one-time or recurring donations
- const handleSubmit = async (e) => {
+// Handle form submission for one-time or recurring donations
+const handleSubmit = async (e) => {
   e.preventDefault();
 
   const trimmedFormData = {
-      donationAmount: parseFloat(formData.donationAmount),
-      donorName: formData.donorName.trim(),
-      donorEmail: formData.donorEmail.trim(),
-      donorPhone: formData.donorPhone.trim() || undefined,
-      isRecurring: formData.isRecurring,
+    donationAmount: parseFloat(formData.donationAmount),
+    donorName: formData.donorName.trim(),
+    donorEmail: formData.donorEmail.trim(),
+    donorPhone: formData.donorPhone.trim() || undefined,
+    isRecurring: formData.isRecurring,
   };
 
   if (isNaN(trimmedFormData.donationAmount) || !trimmedFormData.donorName || !trimmedFormData.donorEmail) {
-      alert("Please fill out all required fields before submitting.");
-      return;
+    alert("Please fill out all required fields before submitting.");
+    return;
   }
 
   setLoading(true);
   try {
-      const response = await fetch(
-          "https://mautskebeli.wpenginepowered.com/wp-json/wp/v2/submit-donation/",
-          {
-              method: "POST",
-              headers: {
-                  "Content-Type": "application/json",
-              },
-              body: JSON.stringify(trimmedFormData),
-          }
-      );
-
-      const responseData = await response.json();
-      setLoading(false);
-
-      if (!response.ok) {
-          console.error("Donation Failed:", responseData.message);
-          alert("Failed to process donation: " + responseData.message);
-      } else {
-          console.log("Donation Success:", responseData);
-          if (responseData.paymentUrl) {
-              window.location.href = responseData.paymentUrl; // Redirect to the payment URL
-          } else {
-              if (formData.isRecurring) {
-                alert("Recurring donation setup successful, card will be saved for future transactions.");
-              } else {
-                alert("One-time donation completed successfully.");
-              }
-          }
+    const response = await fetch(
+      "https://mautskebeli.wpenginepowered.com/wp-json/wp/v2/submit-donation/",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(trimmedFormData),
       }
+    );
+
+    const responseData = await response.json();
+    setLoading(false);
+
+    if (!response.ok) {
+      console.error("Donation Failed:", responseData.message);
+      alert("Failed to process donation: " + responseData.message);
+    } else {
+      if (responseData.paymentUrl) {
+        window.location.href = responseData.paymentUrl; // Redirect to the payment URL
+      } else {
+        if (formData.isRecurring) {
+          alert("Recurring donation setup successful, card will be saved for future transactions.");
+        } else {
+          alert("One-time donation completed successfully.");
+        }
+      }
+    }
   } catch (error) {
-      setLoading(false);
-      console.error("Error submitting donation:", error);
-      alert("Error submitting donation: Please check the console for more details.");
+    setLoading(false);
+    console.error("Error submitting donation:", error);
+    alert("Error submitting donation: Please check the console for more details.");
   }
 };
+
 
   const closePaymentMessage = () => {
     setPaymentMessage(""); // Close the payment message
