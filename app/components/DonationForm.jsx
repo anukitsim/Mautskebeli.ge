@@ -41,7 +41,11 @@ const handlePaymentStatus = async (orderId, setPaymentMessage, setIsError) => {
 
     const result = await response.json();
     if (result.status === "Succeeded") {
-      setPaymentMessage("Payment succeeded!");
+      if (result.isRecurring) {
+        setPaymentMessage("Recurring donation succeeded! Your card has been saved for future donations.");
+      } else {
+        setPaymentMessage("One-time donation succeeded!");
+      }
       setIsError(false);
     } else {
       setPaymentMessage("Payment failed.");
@@ -195,7 +199,11 @@ const DonationForm = () => {
           if (responseData.paymentUrl) {
               window.location.href = responseData.paymentUrl; // Redirect to the payment URL
           } else {
-              alert("Recurring donation setup successful, but no payment URL provided.");
+              if (formData.isRecurring) {
+                alert("Recurring donation setup successful, card will be saved for future transactions.");
+              } else {
+                alert("One-time donation completed successfully.");
+              }
           }
       }
   } catch (error) {
