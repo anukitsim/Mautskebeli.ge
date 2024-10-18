@@ -42,8 +42,10 @@ export default function Home() {
           </section>
         </div>
 
-        {/* Home Page Podcast Section (Full Width) */}
-        <HomePagePodcast />
+       <div className="mt-10">
+       <HomePagePodcast />
+       </div>
+        
 
         <div className="container mx-auto">
           {/* Home Page Rcheuli Section */}

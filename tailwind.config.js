@@ -28,12 +28,10 @@ module.exports = {
       lineHeight: {
         'extra-loose': '2.5',  // Custom line height
       },
-     
     },
-    plugins: [
-      require('@tailwindcss/typography'),
-    ],
-    
   },
-  plugins: [],
+  plugins: [
+    require('@tailwindcss/typography'),
+    require('@tailwindcss/line-clamp'), // Added Line Clamp Plugin
+  ],
 };

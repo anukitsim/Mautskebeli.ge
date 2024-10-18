@@ -40,6 +40,10 @@ const handlePaymentStatus = async (orderId, setPaymentMessage, setIsError) => {
     );
 
     const result = await response.json();
+    
+    // Display result for debugging purposes
+    alert(JSON.stringify(result));  // This will show the entire response in a browser alert
+    
     if (result.status === "Succeeded") {
       if (result.isRecurring) {
         setPaymentMessage("Recurring donation succeeded! Your card has been saved for future donations.");
@@ -107,13 +111,14 @@ const DonationForm = () => {
 
   // Capture the orderId after the user is redirected from TBC payment page
   useEffect(() => {
-    const orderId = searchParams.get("orderId");
-  
-    if (orderId) {
-      // Call the function to check the payment status with orderId
-      handlePaymentStatus(orderId, setPaymentMessage, setIsError);
+    if (typeof window !== 'undefined') {
+      const orderId = new URLSearchParams(window.location.search).get('orderId');
+
+      if (orderId) {
+        handlePaymentStatus(orderId, setPaymentMessage, setIsError);
+      }
     }
-  }, [searchParams]);
+  }, []);
   
 
   // Handle form field updates

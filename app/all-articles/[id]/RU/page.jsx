@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import Image from 'next/image';
+import Head from 'next/head'; // Import for setting meta tags
 import DOMPurify from 'dompurify';
 import moment from 'moment';
 import 'moment/locale/ka';
@@ -20,10 +21,9 @@ const categories = [
   { name: 'თავისუფალი სვეტი', path: '/free-column' },
 ];
 
-// Force no caching and refetching the article data
 async function fetchArticle(id) {
   const apiUrl = `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/wp/v2/article/${id}?acf_format=standard&_fields=id,title,acf,date&_=${new Date().getTime()}`;
-  const res = await fetch(apiUrl, { cache: 'no-store' });
+  const res = await fetch(apiUrl);
   if (!res.ok) {
     throw new Error('Failed to fetch article');
   }
@@ -40,7 +40,7 @@ function decodeHTMLEntities(str) {
   return doc.documentElement.textContent;
 }
 
-const ArticlePage = ({ params }) => {
+const Language2Page = ({ params }) => {
   const [article, setArticle] = useState(null);
   const [isMounted, setIsMounted] = useState(false);
   const [showShareOptions, setShowShareOptions] = useState(false);
@@ -49,24 +49,19 @@ const ArticlePage = ({ params }) => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const router = useRouter();
   const { id } = params;
+  const modalRef = useRef(null); // Ref for the share modal
 
-  // Fetch article data on component mount
   useEffect(() => {
     setIsMounted(true);
     const getArticle = async () => {
       try {
         const fetchedArticle = await fetchArticle(id);
-
-        // Ensure correct fetched data for languages
-        console.log('Fetched Article:', fetchedArticle);
-        console.log('Language1:', fetchedArticle.acf.language1);
-        console.log('Language2:', fetchedArticle.acf.language2);
-
         setArticle({
           ...fetchedArticle,
+          // Use language2 fields here
           title: {
-            ...fetchedArticle.title,
-            rendered: decodeHTMLEntities(fetchedArticle.title.rendered),
+            ...fetchedArticle.acf,
+            rendered: decodeHTMLEntities(fetchedArticle.acf.language2_title),
           },
           formattedDate: formatDate(fetchedArticle.date),
         });
@@ -77,13 +72,33 @@ const ArticlePage = ({ params }) => {
     if (id) {
       getArticle();
     }
-  }, [id]); // Refetch when the article ID changes
+  }, [id]);
 
-  // Update content when article state is updated
   useEffect(() => {
     if (article) {
-      let sanitized = DOMPurify.sanitize(article.acf['main-text']);
-      setSanitizedContent(sanitized);
+      // Sanitize and parse the language2 main text
+      let sanitized = DOMPurify.sanitize(article.acf.language2_main_text);
+
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(sanitized, 'text/html');
+
+      const links = doc.querySelectorAll('a');
+      links.forEach((link) => {
+        const href = link.getAttribute('href');
+        if (href && !href.startsWith('/') && !href.startsWith('#')) {
+          link.setAttribute('target', '_blank');
+          link.setAttribute('rel', 'noopener noreferrer');
+        }
+      });
+
+      const blockquotes = doc.querySelectorAll('blockquote');
+      blockquotes.forEach((blockquote) => {
+        blockquote.style.marginLeft = '20px';
+        blockquote.style.paddingLeft = '15px';
+        blockquote.style.borderLeft = '5px solid #ccc';
+      });
+
+      setSanitizedContent(doc.body.innerHTML);
     }
   }, [article]);
 
@@ -107,18 +122,33 @@ const ArticlePage = ({ params }) => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Close the share modal when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (modalRef.current && !modalRef.current.contains(event.target)) {
+        setShowShareOptions(false);
+      }
+    };
+
+    if (showShareOptions) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showShareOptions]);
+
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Handle navigation between languages
+  // Function to handle navigation between languages
   const handleLanguageNavigation = (language) => {
     if (language === 'georgian') {
       router.push(`/all-articles/${id}`);
     } else if (language === 'language1') {
       router.push(`/all-articles/${id}/ENG`);
-    } else if (language === 'language2') {
-      router.push(`/all-articles/${id}/RU`);
     }
   };
 
@@ -126,11 +156,39 @@ const ArticlePage = ({ params }) => {
     return <img src="/images/loader.svg" alt="Loading" />;
   }
 
-  // Check if either language1 or language2 is true
-  const showLanguageDropdown = article.acf.language1 || article.acf.language2;
+  // Determine which language we're currently viewing
+  const currentLanguage = 'language2';
+
+  // Language dropdown options
+  const availableLanguages = [
+    { key: 'georgian', label: 'Грузинский ' },
+    { key: 'language1', label: 'Английский' },
+    { key: 'language2', label: 'Русский ' },
+  ];
+
+  // Check if either language1 or language2 exists
+  const showLanguageDropdown = article.acf.language1_title || article.acf.language2_title;
 
   return (
     <>
+      {/* Add meta tags dynamically for Russian */}
+      <Head>
+        <title>{article.acf.language2_title} - Russian Version</title>
+        <meta
+          name="description"
+          content={article.acf.language2_sub_title || 'An article in Russian.'}
+        />
+        <meta property="og:title" content={article.acf.language2_title} />
+        <meta property="og:description" content={article.acf.language2_sub_title} />
+        <meta
+          property="og:image"
+          content={article.acf.language2_image || '/images/default-og-image.jpg'}
+        />
+        <meta property="og:url" content={`https://www.mautskebeli.ge/all-articles/${article.id}/RU`} />
+        <meta name="twitter:title" content={article.acf.language2_title} />
+        <meta name="twitter:description" content={article.acf.language2_sub_title} />
+      </Head>
+
       <section className="w-full mx-auto mt-10 px-4 lg:px-0 overflow-x-hidden relative">
         <div className="w-full lg:w-[60%] mx-auto bg-opacity-90 p-5 rounded-lg">
           <div className="lg:flex hidden justify-start rounded-md space-x-6 px-20 gap-10 py-4 mt-[-12px] mb-10 font-noto-sans-georgian w-full mx-auto bg-[#AD88C6]">
@@ -150,71 +208,64 @@ const ArticlePage = ({ params }) => {
           </div>
           <div className="w-full h-auto mb-5">
             <Image
-              src={article.acf.image || '/images/default-og-image.jpg'}
+              src={article.acf.language2_image || '/images/default-og-image.jpg'}
               alt={article.title.rendered}
               width={800}
               height={450}
               style={{ objectFit: 'cover' }}
               className="rounded-lg w-full"
             />
-           {/* Language Dropdown (only if language1 or language2 is true) */}
+
+               {/* Language Dropdown (only if language1 or language2 is present) */}
 {showLanguageDropdown && (
   <div className="language-selector mt-4">
     <span
       className="cursor-pointer text-[#AD88C6] text-base font-bold"
       onClick={() => setDropdownOpen(!dropdownOpen)}
     >
-      აირჩიე ენა 
+      Выбрать язык
       <span className="ml-1 text-sm align-middle">
         {dropdownOpen ? '▼' : '▶'}
       </span>
     </span>
     {dropdownOpen && (
       <div className="flex gap-2 mt-2">
-        {['georgian', 'language1', 'language2'].map((language) => {
-          const availableLanguages = {
-            georgian: 'ქართული',
-            language1: 'ინგლისური',
-            language2: 'რუსული',
-          };
-          return (
-            <button
-              key={language}
-              onClick={() => handleLanguageNavigation(language)}
-              disabled={language === currentLanguage}
-              className={`px-4 py-2 rounded text-sm font-semibold ${
-                language === currentLanguage
-                  ? 'bg-gray-300 text-[#474F7A] cursor-not-allowed'
-                  : 'bg-[#AD88C6] text-[#474F7A] hover:bg-[#AD88C6]'
-              }`}
-            >
-              {availableLanguages[language]}
-            </button>
-          );
-        })}
+        {availableLanguages.map((language) => (
+          <button
+            key={language.key}
+            onClick={() => handleLanguageNavigation(language.key)}
+            disabled={language.key === currentLanguage}
+            className={`px-4 py-2 rounded text-sm font-semibold ${
+              language.key === currentLanguage
+                ? 'bg-gray-300 text-[#474F7A]  cursor-not-allowed'
+                : 'bg-[#AD88C6] text-[#474F7A]  hover:bg-[#AD88C6]'
+            }`}
+          >
+            {language.label}
+          </button>
+        ))}
       </div>
     )}
   </div>
 )}
 
-
             <h1 className="font-alk-tall-mtavruli text-[32px] sm:text-[64px] font-light leading-none text-[#474F7A] mt-[24px] mb-5">
               {article.title.rendered}
             </h1>
             <h3 className="font-alk-tall-mtavruli sm:text-[34px] lg:text-[34px] font-light leading-wide text-[#474F7A] mt-[24px] mb-5">
-              {article.acf.sub_title}
+              {article.acf.language2_sub_title}
             </h3>
             <h2 className="font-noto-sans-georgian text-[16px] sm:text-[24px] font-extrabold text-[#AD88C6] leading-normal mb-5">
-              {article.acf['ავტორი']}
+              {article.acf.language2_ავტორი}
             </h2>
             <p className="text-[#474F7A] font-semibold pb-10">
               {article.formattedDate}
             </p>
-            {article.acf.full_article_pdf && (
+            {article.acf.language2_pdf && (
               <p className="text-[#474F7A] font-semibold pb-10">
                 იხილეთ სტატიის{' '}
                 <a
-                  href={article.acf.full_article_pdf}
+                  href={article.acf.language2_pdf}
                   target="_blank"
                   rel="noopener noreferrer"
                   download
@@ -226,9 +277,8 @@ const ArticlePage = ({ params }) => {
             )}
           </div>
 
-         
           <div
-            className=" w-full article-content text-[#474F7A] font-noto-sans-georgian text-[14px] sm:text-[16px] font-normal lg:text-justify leading-[30px] sm:leading-[35px] tracking-[0.32px] mt-5"
+            className="prose article-content text-[#474F7A] font-noto-sans-georgian text-[14px] sm:text-[16px] font-normal lg:text-justify leading-[30px] sm:leading-[35px] tracking-[0.32px] mt-5"
             dangerouslySetInnerHTML={{ __html: sanitizedContent }}
           ></div>
 
@@ -249,19 +299,20 @@ const ArticlePage = ({ params }) => {
           {showShareOptions && (
             <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
               <div
+                ref={modalRef} // Reference to the modal
                 className="rounded-lg p-6 w-80"
                 style={{ backgroundColor: 'rgba(0, 0, 0, 0.30)' }}
               >
                 <h2 className="text-xl text-white font-bold mb-4">გააზიარე</h2>
                 <div className="flex items-center pt-7 gap-5">
                   <FacebookShareButton
-                    url={`https://www.mautskebeli.ge/all-articles/${article.id}`}
+                    url={`https://www.mautskebeli.ge/all-articles/${article.id}/RU`}
                     quote={article.title.rendered}
                   >
                     <FacebookIcon size={44} round={true} />
                   </FacebookShareButton>
                   <TwitterShareButton
-                    url={`https://www.mautskebeli.ge/all-articles/${article.id}`}
+                    url={`https://www.mautskebeli.ge/all-articles/${article.id}/RU`}
                     title={article.title.rendered}
                   >
                     <TwitterIcon size={44} round={true} />
@@ -292,12 +343,9 @@ const ArticlePage = ({ params }) => {
         .language-selector {
           margin-bottom: 20px;
         }
-        .dropdown-opened {
-          display: flex;
-        }
       `}</style>
     </>
   );
 };
 
-export default ArticlePage;
+export default Language2Page;
