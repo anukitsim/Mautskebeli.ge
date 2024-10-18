@@ -152,7 +152,7 @@ const ColumnPage = ({ article }) => {
           <p className="text-[#474F7A] font-semibold pb-10">{formattedDate}</p>
         </div>
         <div
-          className="prose article-content text-[#474F7A] font-noto-sans-georgian text-[14px] sm:text-[16px] font-normal lg:text-justify leading-[30px] sm:leading-[35px] tracking-[0.32px]"
+          className="article-content text-[#474F7A] font-noto-sans-georgian text-[14px] sm:text-[16px] font-normal lg:text-justify leading-[30px] sm:leading-[35px] tracking-[0.32px]"
           dangerouslySetInnerHTML={{ __html: sanitizedContent }}
         ></div>
         <div className="flex flex-wrap gap-4 mt-10">
