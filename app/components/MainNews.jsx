@@ -4,7 +4,6 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useMenu } from "../context/MenuContext";
-import AdjustableTitle from "./AdjustableTitle"; // Import the AdjustableTitle component
 
 const videoPostTypes = [
   "kalaki",
@@ -176,7 +175,6 @@ const MainNews = () => {
 
   return (
     <>
-      {/* Desktop Slider */}
       <section className="lg:block sm:hidden relative w-full h-auto rounded-[16px] bg-gradient-to-b from-black to-black via-transparent overflow-hidden">
         {slides.map((slide, index) => (
           <Link href={constructUrl(slide)} key={slide.id}>
@@ -196,18 +194,15 @@ const MainNews = () => {
                 loading={index === 0 ? "eager" : "lazy"} // Lazy load the rest
                 quality={100}
               />
-              <div className="absolute bottom-5 bg-[#474F7A] bg-opacity-50 w-full text-white">
-                <h2 className="text-[#FECE27] pl-5 text-[20px] font-extrabold">
-                  მთავარი ამბები
-                </h2>
-                {/* Replace existing <p> with AdjustableTitle */}
-                <AdjustableTitle
-                  text={slide.title}
-                  initialFontSize={95} // Adjust as needed
-                  minFontSize={50}     // Minimum font size
-                  className="text-[#FFF] pl-5 tracking-normal pt-[10px] font-alk-tall-mtavruli lg:text-[72px] sm:text-[30px] font-light leading-none [text-edge:cap] [leading-trim:both]"
-                />
-              </div>
+                <div className="absolute bottom-5 bg-[#474F7A] bg-opacity-50 w-full  text-white">
+                  <h2 className="text-[#FECE27] pl-5 text-[20px] font-extrabold">
+                    მთავარი ამბები
+                  </h2>
+                  <p className="text-[#FFF] pl-5  tracking-normal pt-[10px] font-alk-tall-mtavruli lg:text-[72px] sm:text-[30px] font-light leading-none [text-edge:cap] [leading-trim:both]">
+                    {slide.title.split(" ").slice(0, 7).join(" ")}
+                    {slide.title.split(" ").length > 7 && "..."}
+                  </p>
+                </div>
             </div>
           </Link>
         ))}
@@ -234,72 +229,68 @@ const MainNews = () => {
           />
         </button>
       </section>
-
-      {/* Mobile Slider */}
       <section
-        className={`lg:hidden absolute z-0 left-0 ${mobileSectionStyle} w-full h-[335px]`}
+  className={`lg:hidden absolute z-0 left-0 ${mobileSectionStyle} w-full h-[335px]`}
+>
+  {slides.map((slide, index) => (
+    <Link href={constructUrl(slide)} key={slide.id}>
+      <div
+        className={`absolute  transition-opacity duration-700 ease-in-out ${
+          index === currentSlide ? "opacity-100 z-10" : "opacity-0"
+        }`}
       >
-        {slides.map((slide, index) => (
-          <Link href={constructUrl(slide)} key={slide.id}>
-            <div
-              className={`absolute transition-opacity duration-700 ease-in-out ${
-                index === currentSlide ? "opacity-100 z-10" : "opacity-0"
-              }`}
-            >
-              <Image
-                loader={customLoader}
-                src={slide.image}
-                alt={slide.title}
-                width={1920}
-                height={1080}
-                sizes="(max-width: 768px) 100vw, 50vw"
-                style={{ objectFit: "cover" }}
-                priority={index === 0} // Preload the first image
-                loading={index === 0 ? "eager" : "lazy"} // Lazy load the rest
-                quality={100}
-                layout="responsive"
-              />
-              {/* Updated styles for text overlay */}
-              <div className="absolute bottom-0 bg-[#474F7A] bg-opacity-50 w-full text-white z-20">
-                <h2 className="text-[#FECE27] pl-5  pt-2 font-extrabold">
-                  მთავარი ambitebi
-                </h2>
-                {/* Replace existing <p> with AdjustableTitle */}
-                <AdjustableTitle
-                  text={slide.title}
-                  initialFontSize={20} // Adjust as needed for mobile
-                  minFontSize={60}      // Minimum font size for mobile
-                  className="text-[#FFF] pl-5 tracking-wider pt-[10px] pb-5 font-alk-tall-mtavruli sm:text-[100px] font-light leading-6 [text-edge:cap] [leading-trim:both]"
-                />
-              </div>
-            </div>
-          </Link>
-        ))}
+        <Image
+          loader={customLoader}
+          src={slide.image}
+          alt={slide.title}
+          width={1920}
+          height={1080}
+          sizes="(max-width: 768px) 100vw, 50vw"
+          style={{ objectFit: "cover" }}
+          priority={index === 0} // Preload the first image
+          loading={index === 0 ? "eager" : "lazy"} // Lazy load the rest
+          quality={100}
+          layout="responsive"
+        />
+        {/* Updated styles for text overlay */}
+        <div className="absolute bottom-0 bg-[#474F7A] bg-opacity-50 w-full text-white z-20">
+          <h2 className="text-[#FECE27] pl-5 text-[10px] pt-2 font-extrabold">
+            მთავარი ამბები
+          </h2>
+          <p className="text-[#FFF] pl-5 tracking-wider pt-[10px] pb-5 font-alk-tall-mtavruli sm:text-[100px] font-light leading-6 [text-edge:cap] [leading-trim:both]">
+            {slide.title.split(" ").slice(0, 7).join(" ")}
+            {slide.title.split(" ").length > 7 && "..."}
+          </p>
+        </div>
+      </div>
+    </Link>
+  ))}
 
-        {/* Updated positioning for arrows */}
-        <button
-          onClick={prevSlide}
-          className="absolute left-5 top-[25%] -translate-y-1/2 z-30"
-        >
-          <Image
-            src="/images/arrow-left.svg"
-            alt="Previous"
-            width={30}
-            height={30}
-          />
-        </button>
-        <button
-          onClick={nextSlide}
-          className="absolute right-5 top-[25%] -translate-y-1/2 z-30"
-        >
-          <Image
-            src="/images/arrow-right.svg"
-            alt="Next"
-            width={30}
-            height={30}
-          />
-        </button>
-      </section>
+  {/* Updated positioning for arrows */}
+  <button
+    onClick={prevSlide}
+    className="absolute left-5 top-[25%] -translate-y-1/2 z-30"
+  >
+    <Image
+      src="/images/arrow-left.svg"
+      alt="Previous"
+      width={50}
+      height={50}
+    />
+  </button>
+  <button
+    onClick={nextSlide}
+    className="absolute right-5 top-[25%] -translate-y-1/2 z-30"
+  >
+    <Image
+      src="/images/arrow-right.svg"
+      alt="Next"
+      width={50}
+      height={50}
+    />
+  </button>
+</section>
+
     </>
   );
 };
