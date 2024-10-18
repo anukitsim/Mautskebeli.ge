@@ -1,65 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Image from "next/image";
-import { useSearchParams } from "next/navigation";
-
-// Custom PaymentMessage component to show the payment result
-const PaymentMessage = ({ message, isError, onClose }) => {
-  if (!message) return null;
-
-  return (
-    <div
-      className={`fixed top-4 left-1/2 transform -translate-x-1/2 px-4 py-2 rounded shadow-lg ${
-        isError ? "bg-red-500 text-white" : "bg-green-500 text-white"
-      }`}
-    >
-      <span>{message}</span>
-      <button
-        onClick={onClose}
-        className="ml-4 text-white font-semibold border-none bg-transparent"
-      >
-        ✖
-      </button>
-    </div>
-  );
-};
-
-// Function to handle payment status by querying the backend
-const handlePaymentStatus = async (orderId, setPaymentMessage, setIsError) => {
-  try {
-    const response = await fetch(
-      "https://mautskebeli.wpenginepowered.com/wp-json/wp/v2/verify-payment-status",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ orderId }),
-      }
-    );
-
-    const result = await response.json();
-    
-    // Display result for debugging purposes
-    alert(JSON.stringify(result));  // This will show the entire response in a browser alert
-    
-    if (result.status === "Succeeded") {
-      if (result.isRecurring) {
-        setPaymentMessage("Recurring donation succeeded! Your card has been saved for future donations.");
-      } else {
-        setPaymentMessage("One-time donation succeeded!");
-      }
-      setIsError(false);
-    } else {
-      setPaymentMessage("Payment failed.");
-      setIsError(true);
-    }
-  } catch (error) {
-    setPaymentMessage("Error capturing payment status.");
-    setIsError(true);
-  }
-};
 
 const Modal = ({ show, handleClose, handleConfirm }) => {
   if (!show) return null;
@@ -104,22 +46,6 @@ const DonationForm = () => {
 
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
-  const [paymentMessage, setPaymentMessage] = useState(""); // New state for payment message
-  const [isError, setIsError] = useState(false); // State to differentiate success/error message
-
-  const searchParams = useSearchParams();
-
-  // Capture the orderId after the user is redirected from TBC payment page
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const orderId = new URLSearchParams(window.location.search).get('orderId');
-
-      if (orderId) {
-        handlePaymentStatus(orderId, setPaymentMessage, setIsError);
-      }
-    }
-  }, []);
-  
 
   // Handle form field updates
   const handleInputChange = (e) => {
@@ -163,63 +89,66 @@ const DonationForm = () => {
     setShowModal(false);
   };
 
-// Handle form submission for one-time or recurring donations
-const handleSubmit = async (e) => {
-  e.preventDefault();
+  // Handle form submission for one-time or recurring donations
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  const trimmedFormData = {
-    donationAmount: parseFloat(formData.donationAmount),
-    donorName: formData.donorName.trim(),
-    donorEmail: formData.donorEmail.trim(),
-    donorPhone: formData.donorPhone.trim() || undefined,
-    isRecurring: formData.isRecurring,
-  };
+    const trimmedFormData = {
+      donationAmount: parseFloat(formData.donationAmount),
+      donorName: formData.donorName.trim(),
+      donorEmail: formData.donorEmail.trim(),
+      donorPhone: formData.donorPhone.trim() || undefined,
+      isRecurring: formData.isRecurring,
+    };
 
-  if (isNaN(trimmedFormData.donationAmount) || !trimmedFormData.donorName || !trimmedFormData.donorEmail) {
-    alert("Please fill out all required fields before submitting.");
-    return;
-  }
+    if (
+      isNaN(trimmedFormData.donationAmount) ||
+      !trimmedFormData.donorName ||
+      !trimmedFormData.donorEmail
+    ) {
+      alert("Please fill out all required fields before submitting.");
+      return;
+    }
 
-  setLoading(true);
-  try {
-    const response = await fetch(
-      "https://mautskebeli.wpenginepowered.com/wp-json/wp/v2/submit-donation/",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(trimmedFormData),
-      }
-    );
+    setLoading(true);
+    try {
+      const response = await fetch(
+        "https://www.mautskebeli.ge/wp-json/wp/v2/submit-donation",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(trimmedFormData),
+        }
+      );
 
-    const responseData = await response.json();
-    setLoading(false);
+      const responseData = await response.json();
+      setLoading(false);
 
-    if (!response.ok) {
-      console.error("Donation Failed:", responseData.message);
-      alert("Failed to process donation: " + responseData.message);
-    } else {
-      if (responseData.paymentUrl) {
-        window.location.href = responseData.paymentUrl; // Redirect to the payment URL
+      if (!response.ok) {
+        console.error("Donation Failed:", responseData.message);
+        alert("Failed to process donation: " + responseData.message);
       } else {
-        if (formData.isRecurring) {
-          alert("Recurring donation setup successful, card will be saved for future transactions.");
+        if (responseData.paymentUrl) {
+          window.location.href = responseData.paymentUrl; // Redirect to the payment URL
         } else {
-          alert("One-time donation completed successfully.");
+          if (formData.isRecurring) {
+            alert(
+              "Recurring donation setup successful, card will be saved for future transactions."
+            );
+          } else {
+            alert("One-time donation completed successfully.");
+          }
         }
       }
+    } catch (error) {
+      setLoading(false);
+      console.error("Error submitting donation:", error);
+      alert(
+        "Error submitting donation: Please check the console for more details."
+      );
     }
-  } catch (error) {
-    setLoading(false);
-    console.error("Error submitting donation:", error);
-    alert("Error submitting donation: Please check the console for more details.");
-  }
-};
-
-
-  const closePaymentMessage = () => {
-    setPaymentMessage(""); // Close the payment message
   };
 
   return (
@@ -233,13 +162,6 @@ const handleSubmit = async (e) => {
         />
         <h1 className="text-[18px] font-semibold">დონაცია</h1>
       </div>
-
-      {/* Payment Message Component */}
-      <PaymentMessage
-        message={paymentMessage}
-        isError={isError}
-        onClose={closePaymentMessage}
-      />
 
       <form
         onSubmit={handleSubmit}
