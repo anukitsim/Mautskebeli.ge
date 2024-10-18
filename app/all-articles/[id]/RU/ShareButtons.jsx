@@ -1,4 +1,4 @@
-// app/all-articles/[id]/ENG/ShareButtons.jsx
+// app/all-articles/[id]/RU/ShareButtons.jsx
 
 'use client';
 
@@ -45,6 +45,7 @@ const ShareButtons = ({ articleId, title }) => {
             width={24}
             height={24}
           />
+         
         </button>
       </div>
 
@@ -55,16 +56,16 @@ const ShareButtons = ({ articleId, title }) => {
             className="rounded-lg p-6 w-80"
             style={{ backgroundColor: 'rgba(0, 0, 0, 0.30)' }}
           >
-            <h2 className="text-xl text-white font-bold mb-4"></h2>
+            <h2 className="text-xl text-white font-bold mb-4">Поделиться</h2>
             <div className="flex items-center pt-7 gap-5">
               <FacebookShareButton
-                url={`https://www.mautskebeli.ge/all-articles/${articleId}/ENG`}
+                url={`https://www.mautskebeli.ge/all-articles/${articleId}/RU`}
                 quote={title}
               >
                 <FacebookIcon size={44} round={true} />
               </FacebookShareButton>
               <TwitterShareButton
-                url={`https://www.mautskebeli.ge/all-articles/${articleId}/ENG`}
+                url={`https://www.mautskebeli.ge/all-articles/${articleId}/RU`}
                 title={title}
               >
                 <TwitterIcon size={44} round={true} />

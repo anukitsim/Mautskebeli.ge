@@ -11,15 +11,6 @@ export default function RootLayout({ children, metadata }) {
   const defaultMetadata = {
     title: "Default Title",
     description: "Default description",
-    openGraph: {
-      title: "Default OG Title",
-      description: "Default OG Description",
-      images: [
-        { url: "/default-og-image.jpg", width: 1200, height: 630 }
-      ],
-      url: "https://www.mautskebeli.ge",
-      type: "website",
-    },
     additionalMetaTags: [
       { property: 'fb:app_id', content: '1819807585106457' },
       { property: 'og:site_name', content: 'Mautskebeli' },
@@ -30,19 +21,7 @@ export default function RootLayout({ children, metadata }) {
 
   const finalMetadata = metadata || defaultMetadata;
 
-  // **Updated Code Starts Here**
-  // Replace the domain in og:image URLs to use the main domain
-  if (finalMetadata.openGraph && finalMetadata.openGraph.images) {
-    finalMetadata.openGraph.images = finalMetadata.openGraph.images.map((image) => {
-      return {
-        ...image,
-        url: image.url.replace('https://mautskebeli.wpenginepowered.com', 'https://www.mautskebeli.ge'),
-      };
-    });
-  }
-  // **Updated Code Ends Here**
-
-  console.log("Rendering metadata in Head:", finalMetadata);
+ 
 
   return (
     <html lang="en">
@@ -52,13 +31,7 @@ export default function RootLayout({ children, metadata }) {
         {finalMetadata.additionalMetaTags.map((tag) => (
           <meta key={tag.property} property={tag.property} content={tag.content} />
         ))}
-        <meta property="og:url" content={finalMetadata.openGraph.url} />
-        <meta property="og:type" content={finalMetadata.openGraph.type} />
-        <meta property="og:title" content={finalMetadata.openGraph.title} />
-        <meta property="og:description" content={finalMetadata.openGraph.description} />
-        <meta property="og:image" content={finalMetadata.openGraph.images[0].url} />
-        <meta property="og:image:width" content="1200" />
-        <meta property="og:image:height" content="630" />
+        {/* Removed OG meta tags from layout to prevent conflicts */}
       </Head>
       <body>
         <MenuProvider>
