@@ -1,60 +1,11 @@
 "use client";
 
-import React, { Suspense, useEffect, useState } from "react";
+import React, { Suspense } from "react";
 import DonationForm from "../components/DonationForm";
-import DonationResult from "../components/DonationResult"; // Import the new component
 import Image from "next/image";
 import Footer from "../components/Footer";
 
-const Page = () => {
-  const [showResult, setShowResult] = useState(false);
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const orderId = new URLSearchParams(window.location.search).get("orderId");
-      if (orderId) {
-        setShowResult(true);
-      }
-    }
-  }, []);
-
-  if (showResult) {
-    return (
-      <>
-        <section className="w-10/12 mx-auto lg:flex hidden gap-[20px] mt-[70px]">
-          <div className="sticky top-32 pt-[20px] self-start">
-            <Suspense fallback={<div>Loading donation result...</div>}>
-              <DonationResult />
-            </Suspense>
-          </div>
-          <div className="W-7/12 flex flex-col gap-[60px]">
-            {/* You can keep or modify the rest of your content as needed */}
-            <div>
-              <h1 className="font-tall-mtavruli text-6xl pl-5 font-normal text-blue-dark leading-normal mt-18 ">
-                <span className="text-[#AD88C6]">"მაუწყებელს"</span>
-                თქვენი მხარდაჭერა სჭირდება!
-              </h1>
-            </div>
-            {/* Rest of your content */}
-          </div>
-        </section>
-        {/* Mobile layout */}
-        <section className="block lg:hidden">
-          <div>
-            <Suspense fallback={<div>Loading donation result...</div>}>
-              <DonationResult />
-            </Suspense>
-          </div>
-          {/* Rest of your mobile content */}
-          <div className="W-full flex flex-col gap-[60px]">
-            {/* ... */}
-          </div>
-        </section>
-        <Footer />
-      </>
-    );
-  }
-
+const page = () => {
   return (
     <>
       <section className="w-10/12 mx-auto lg:flex hidden gap-[20px] mt-[70px]">
@@ -96,11 +47,41 @@ const Page = () => {
               />
             </div>
           </div>
-          {/* Rest of your content */}
-          {/* ... */}
+          <div className="flex flex-col gap-[24px]">
+            <h1 className="text-[#474F7A] text-[32px] font-extrabold">
+              მედიაპლატფორმის დინამიური მუშაობისთვის ბევრი რამ არის საჭირო:
+            </h1>
+            <p className="text-[#474F7A] text-[16px] font-normal ">
+              გადაღება, რედაქტირება, ავტორებთან კომუნიკაცია (მათი ჰონორარი),
+              ახალი ამბების მომზადება, ტრანსპორტირება, ტექნიკური განახლება და
+              ეს ყოველივე საჭიროა არა ერთხელ ან ორჯერ, არამედ მუდმივად
+            </p>
+            <p className="text-[#474F7A] text-[16px] font-normal ">
+              საერთაშორისო თუ ადგილობრივი ფონდებისგან მიღებული დაფინანსება
+              ღირსეული ანაზღაურებისთვის და სრულფასოვნად მუშაობისთვის არ კმარა.
+              უფრო მეტიც, ეს პროექტები ყოველთვის არ არის და თვეების განმავლობაში
+              ჩვენს ჟურნალისტებსა და ოპერატორებს ჰონორარისა თუ გადაადგილებისთვის
+              საჭირო თანხების გარეშე უწევთ მუშაობა
+            </p>
+          </div>
+          <div className="flex flex-col gap-[24px]">
+            <h1 className="text-[#474F7A] text-[32px] font-extrabოლd">
+              შეგიძლიათ ერთჯერადად ან ყოველთვიურად დაეხმაროთ "მაუწყებელს"
+            </h1>
+            <p className="text-[#474F7A] text-[16px] font-normal ">
+              იმისთვის, რომ უკეთ შევძლოთ მომავლის დაგეგმვა, სასურველია თუ
+              თქვენი დახმარების ფორმა ყოველთვიური იქნება. მინიმალური
+              მხარდაჭერაც კი ჩვენთვის უმნიშვნელოვანესია
+            </p>
+            <p className="text-[#474F7A] text-[16px] font-normal ">
+              Რესურსების გაზრდის შემთხვევაში, ჩვენ შევძლებთ უფრო მეტი და
+              საინტერესო რეპორტაჟისა და პუბლიკაციის მომზადებას, მეტი ავტორის
+              მოზიდვას, დოკუმენტური ფილმების გადაღებასა და ა.შ. შესაძლოა
+              ტელევიზიად ფორმირების დროც მოახლოვდეს
+            </p>
+          </div>
         </div>
       </section>
-      {/* Mobile layout */}
       <section className="block lg:hidden">
         <div>
           <Suspense fallback={<div>Loading donation form...</div>}>
@@ -108,8 +89,64 @@ const Page = () => {
           </Suspense>
         </div>
         <div className="W-full flex flex-col gap-[60px]">
-          {/* Rest of your mobile content */}
-          {/* ... */}
+          <div className="flex flex-col gap-[20px] w-full">
+            <div className=" flex gap-[24px] flex-col mt-5 text-[#474F7A] text-[16px] font-normal ">
+              <p>
+                "მაუწყებელი" უარს ამბობს თავის პლატფორმებზე განათავსოს
+                კომერციული რეკლამები, ვინაიდან გვჯერა, რომ მედია პოლიტიკურ
+                ინტერესებთან ერთად თავისუფალი უნდა იყოს კომერციული
+                ინტერესებისგანაც
+              </p>
+              <p>
+                გვჯერა, რომ მაშინ, როდესაც მედიასივრცე ოლიგარქების,
+                კორპორაციების, პარტიების დღის წესრიგით იმართება,
+                "მაუწყებლის" არსებობა და განვითარება ბევრი ადამიანისთვისაა
+                მნიშვნელოვანი
+              </p>
+            </div>
+            <div className="">
+              <Image
+                src="/images/tree.png"
+                alt="donation"
+                width={380}
+                height={266}
+                className="w-full"
+              />
+            </div>
+          </div>
+          <div className="flex flex-col gap-[24px]">
+            <h1 className="text-[#474F7A] text-[32px] font-extrabold">
+              მედიაპლატფორმის დინამიური მუშაობისთვის ბევრი რამ არის საჭირო:
+            </h1>
+            <p className="text-[#474F7A] text-[16px] font-normal ">
+              გადაღება, რედაქტირება, ავტორებთან კომუნიკაცია (მათი ჰონორარი),
+              ახალი ამბების მომზადება, ტრანსპორტირება, ტექნიკური განახლება და
+              ეს ყოველივე საჭიროა არა ერთხელ ან ორჯერ, არამედ მუდმივად
+            </p>
+            <p className="text-[#474F7A] text-[16px] font-normal ">
+              საერთაშორისო თუ ადგილობრივი ფონდებისგან მიღებული დაფინანსება
+              ღირსეული ანაზღაურებისთვის და სრულფასოვნად მუშაობისთვის არ კმარა.
+              უფრო მეტიც, ეს პროექტები ყოველთვის არ არის და თვეების განმავლობაში
+              ჩვენს ჟურნალისტებსა და ოპერატორებს ჰონორარისა თუ გადაადგილებისთვის
+              საჭირო თანხების გარეშე უწევთ მუშაობა
+            </p>
+          </div>
+          <div className="flex flex-col gap-[24px]">
+            <h1 className="text-[#474F7A] text-[32px] font-extrabold">
+              შეგიძლიათ ერთჯერადად ან ყოველთვიურად დაეხმაროთ "მაუწყებელს"
+            </h1>
+            <p className="text-[#474F7A] text-[16px] font-normal ">
+              იმისთვის, რომ უკეთ შევძლოთ მომავლის დაგეგმვა, სასურველია თუ
+              თქვენი დახმარების ფორმა ყოველთვიური იქნება. მინიმალური
+              მხარდაჭერაც კი ჩვენთვის უმნიშვნელოვანესია
+            </p>
+            <p className="text-[#474F7A] text-[16px] font-normal ">
+              Რესურსების გაზრდის შემთხვევაში, ჩვენ შევძლებთ უფრო მეტი და
+              საინტერესო რეპორტაჟისა და პუბლიკაციის მომზადებას, მეტი ავტორის
+              მოზიდვას, დოკუმენტური ფილმების გადაღებასა და ა.შ. შესაძლოა
+              ტელევიზიად ფორმირების დროც მოახლოვდეს
+            </p>
+          </div>
         </div>
       </section>
       <Footer />
@@ -117,4 +154,4 @@ const Page = () => {
   );
 };
 
-export default Page;
+export default page;
