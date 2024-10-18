@@ -29,7 +29,7 @@ const PaymentMessage = ({ message, isError, onClose }) => {
 const handlePaymentStatus = async (orderId, setPaymentMessage, setIsError) => {
   try {
     const response = await fetch(
-      "https://mautskebeli.wpenginepowered.com/wp-json/wp/v2/verify-payment-status",
+      "https://www.mautskebeli.ge/wp-json/wp/v2/verify-payment-status",
       {
         method: "POST",
         headers: {
@@ -39,27 +39,26 @@ const handlePaymentStatus = async (orderId, setPaymentMessage, setIsError) => {
       }
     );
 
+    if (!response.ok) {
+      throw new Error("Network response was not ok");
+    }
+
     const result = await response.json();
-    
-    // Display result for debugging purposes
-    alert(JSON.stringify(result));  // This will show the entire response in a browser alert
-    
+
     if (result.status === "Succeeded") {
-      if (result.isRecurring) {
-        setPaymentMessage("Recurring donation succeeded! Your card has been saved for future donations.");
-      } else {
-        setPaymentMessage("One-time donation succeeded!");
-      }
+      setPaymentMessage("Donation succeeded! Thank you for your contribution.");
       setIsError(false);
     } else {
       setPaymentMessage("Payment failed.");
       setIsError(true);
     }
   } catch (error) {
+    console.error("Error capturing payment status:", error);
     setPaymentMessage("Error capturing payment status.");
     setIsError(true);
   }
 };
+
 
 const Modal = ({ show, handleClose, handleConfirm }) => {
   if (!show) return null;
@@ -117,7 +116,8 @@ const DonationForm = () => {
       // Call the function to check the payment status with orderId
       handlePaymentStatus(orderId, setPaymentMessage, setIsError);
     }
-  }, [searchParams]);
+  }, [searchParams, handlePaymentStatus]);
+  
   
 
   // Handle form field updates
