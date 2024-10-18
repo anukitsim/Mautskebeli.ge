@@ -20,15 +20,15 @@ const categories = [
 
 async function fetchArticle(id) {
   const apiUrl = `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/wp/v2/article/${id}?acf_format=standard&_fields=id,title,acf,date&_=${new Date().getTime()}`;
-  
+
   try {
     const res = await fetch(apiUrl);
-    
+
     if (!res.ok) {
       console.error(`Failed to fetch article with id ${id}: ${res.status} ${res.statusText}`);
       return null;
     }
-    
+
     return res.json();
   } catch (error) {
     console.error(`Error fetching article with id ${id}:`, error);
@@ -77,6 +77,16 @@ function getSanitizedContent(content) {
   });
 }
 
+function extractDescription(content, wordLimit = 30) {
+  // Remove all HTML tags
+  const text = content.replace(/<[^>]*>/g, '');
+  // Split into words
+  const words = text.split(/\s+/);
+  // Take the first `wordLimit` words
+  const shortText = words.slice(0, wordLimit).join(' ');
+  return shortText + (words.length > wordLimit ? '...' : '');
+}
+
 export async function generateMetadata({ params }) {
   const { id } = params;
   const article = await fetchArticle(id);
@@ -85,12 +95,16 @@ export async function generateMetadata({ params }) {
     return {};
   }
 
+  // Sanitize the main text for metadata description
+  const sanitizedMainText = getSanitizedContent(article.acf['main-text']);
+  const description = extractDescription(sanitizedMainText, 30); // Adjust word limit as needed
+
   return {
     title: article.title.rendered,
-    description: article.acf.sub_title || 'An article.',
+    description: description || 'An article.',
     openGraph: {
       title: article.title.rendered,
-      description: article.acf.sub_title,
+      description: description,
       url: `https://www.mautskebeli.ge/all-articles/${article.id}`,
       images: [
         {
@@ -100,7 +114,7 @@ export async function generateMetadata({ params }) {
     },
     twitter: {
       title: article.title.rendered,
-      description: article.acf.sub_title,
+      description: description,
       images: [article.acf.image || '/images/default-og-image.jpg'],
     },
   };
@@ -143,7 +157,7 @@ const ArticlePage = async ({ params }) => {
   sanitizedContent = $.html();
 
   // Determine if the language dropdown should be shown
-  const showLanguageDropdown = article.acf.language1 || article.acf.language2;
+  const showLanguageDropdown = article.acf.language1 === true || article.acf.language2 === true;
 
   return (
     <section className="w-full mx-auto mt-10 px-4 lg:px-0 overflow-x-hidden relative">
