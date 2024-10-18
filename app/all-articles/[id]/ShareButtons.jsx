@@ -43,7 +43,7 @@ const ShareButtons = ({ articleId, title }) => {
             width={24}
             height={24}
           />
-          <span>გააზიარე</span>
+          
         </button>
       </div>
 
