@@ -37,6 +37,48 @@ function decodeHTMLEntities(str) {
   return decode(str);
 }
 
+// Function to sanitize content
+function getSanitizedContent(content) {
+  return sanitizeHtml(content, {
+    allowedTags: [
+      'b', 'i', 'em', 'strong', 'a', 'p', 'blockquote',
+      'ul', 'ol', 'li', 'br', 'span', 'h1', 'h2', 'h3',
+      'h4', 'h5', 'h6', 'img', 'code', 'pre'
+    ],
+    allowedAttributes: {
+      'a': ['href', 'target', 'rel'],
+      'img': ['src', 'alt', 'title', 'width', 'height'],
+      'span': ['style'],
+      'p': ['style'],
+      'blockquote': ['cite'],
+    },
+    allowedSchemes: ['http', 'https', 'mailto'],
+    allowedSchemesByTag: {
+      img: ['http', 'https', 'data'],
+    },
+    allowedStyles: {
+      '*': {
+        'color': [/^#[0-9a-fA-F]{3,6}$/],
+        'background-color': [/^#[0-9a-fA-F]{3,6}$/],
+        'font-weight': [/^bold$/],
+        'text-align': [/^(left|right|center|justify)$/],
+      },
+    },
+    allowVulnerableTags: false,
+  });
+}
+
+// Extract the first few words for the description
+function extractDescription(content, wordLimit = 30) {
+  // Remove all HTML tags
+  const text = content.replace(/<[^>]*>/g, '');
+  // Split into words
+  const words = text.split(/\s+/);
+  // Take the first `wordLimit` words
+  const shortText = words.slice(0, wordLimit).join(' ');
+  return shortText + (words.length > wordLimit ? '...' : '');
+}
+
 export async function generateMetadata({ params }) {
   const { id } = params;
   const article = await fetchArticle(id);
@@ -45,12 +87,16 @@ export async function generateMetadata({ params }) {
     return {};
   }
 
+  // Sanitize and extract description from the main article text
+  const sanitizedMainText = getSanitizedContent(article.acf.language2_main_text); // Sanitize the main text
+  const description = extractDescription(sanitizedMainText, 30); // Extract the first 30 words (adjust as needed)
+
   return {
-    title: `${article.acf.language2_title} - russian Version`,
-    description: article.acf.language2_sub_title || 'An article in russian.',
+    title: `${article.acf.language2_title} - Russian Version`,
+    description: description || 'An article in Russian.',
     openGraph: {
       title: article.acf.language2_title,
-      description: article.acf.language2_sub_title,
+      description: description,
       url: `https://www.mautskebeli.ge/all-articles/${article.id}/RU`,
       images: [
         {
@@ -60,7 +106,7 @@ export async function generateMetadata({ params }) {
     },
     twitter: {
       title: article.acf.language2_title,
-      description: article.acf.language2_sub_title,
+      description: description,
       images: [article.acf.language2_image || '/images/default-og-image.jpg'],
     },
   };
@@ -78,12 +124,8 @@ const Language2Page = async ({ params }) => {
   article.formattedDate = formatDate(article.date);
   article.title.rendered = decodeHTMLEntities(article.acf.language2_title);
 
-  // Sanitize and process the language1 main text
-  let sanitizedContent = sanitizeHtml(article.acf.language2_main_text, {
-    allowedTags: false, // Allow all tags
-    allowedAttributes: false, // Allow all attributes
-    // You can customize allowed tags and attributes as needed
-  });
+  // Sanitize and process the language2 main text
+  let sanitizedContent = getSanitizedContent(article.acf.language2_main_text);
 
   // Use cheerio to manipulate the HTML content
   const $ = load(sanitizedContent); // Updated code
