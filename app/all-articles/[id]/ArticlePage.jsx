@@ -100,7 +100,6 @@ const ArticlePage = ({ params }) => {
       setSanitizedContent(modifiedContent);
     }
   }, [article]);
-  
 
   useEffect(() => {
     const handleScroll = () => {
@@ -137,10 +136,31 @@ const ArticlePage = ({ params }) => {
     }
   };
 
+  // Function to close the share modal
+  const closeShareOptions = () => {
+    setShowShareOptions(false);
+  };
+
+  // Close modal on Escape key press
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        closeShareOptions();
+      }
+    };
+    if (showShareOptions) {
+      window.addEventListener('keydown', handleKeyDown);
+    } else {
+      window.removeEventListener('keydown', handleKeyDown);
+    }
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [showShareOptions]);
+
   if (!isMounted || !article) {
     return <img src="/images/loader.svg" alt="Loading" />;
   }
-
 
   const currentLanguage = 'georgian';
 
@@ -155,7 +175,6 @@ const ArticlePage = ({ params }) => {
             {categories.map((category) => (
               <a
                 key={category.name}
-                
                 href={category.path}
                 className={`text-sm text-[#474F7A] ${
                   category.name === 'სტატიები'
@@ -176,78 +195,76 @@ const ArticlePage = ({ params }) => {
               style={{ objectFit: 'cover' }}
               className="rounded-lg w-full"
             />
-           {/* Language Dropdown (only if language1 or language2 is true) */}
-{showLanguageDropdown && (
-  <div className="language-selector mt-4">
-    <span
-      className="cursor-pointer text-[#AD88C6] text-base font-bold"
-      onClick={() => setDropdownOpen(!dropdownOpen)}
-    >
-      აირჩიე ენა 
-      <span className="ml-1 text-sm align-middle">
-        {dropdownOpen ? '▼' : '▶'}
-      </span>
-    </span>
-    {dropdownOpen && (
-      <div className="flex gap-2 mt-2">
-        {['georgian', 'language1', 'language2'].map((language) => {
-          const availableLanguages = {
-            georgian: 'ქართული',
-            language1: 'ინგლისური',
-            language2: 'რუსული',
-          };
-          return (
-            <button
-              key={language}
-              onClick={() => handleLanguageNavigation(language)}
-              disabled={language === currentLanguage}
-              className={`px-4 py-2 rounded text-sm font-semibold ${
-                language === currentLanguage
-                  ? 'bg-gray-300 text-[#474F7A] cursor-not-allowed'
-                  : 'bg-[#AD88C6] text-[#474F7A] hover:bg-[#AD88C6]'
-              }`}
-            >
-              {availableLanguages[language]}
-            </button>
-          );
-        })}
-      </div>
-    )}
-  </div>
-)}
-
-
-            <h1 className="font-alk-tall-mtavruli text-[32px] sm:text-[64px] font-light leading-none text-[#474F7A] mt-[24px] mb-5">
-              {article.title.rendered}
-            </h1>
-            <h3 className="font-alk-tall-mtavruli sm:text-[34px] lg:text-[34px] font-light leading-wide text-[#474F7A] mt-[24px] mb-5">
-              {article.acf.sub_title}
-            </h3>
-            <h2 className="font-noto-sans-georgian text-[16px] sm:text-[24px] font-extrabold text-[#AD88C6] leading-normal mb-5">
-              {article.acf['ავტორი']}
-            </h2>
-            <p className="text-[#474F7A] font-semibold pb-10">
-              {article.formattedDate}
-            </p>
-            {article.acf.full_article_pdf && (
-              <p className="text-[#474F7A] font-semibold pb-10">
-                იხილეთ სტატიის{' '}
-                <a
-                  href={article.acf.full_article_pdf}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  download
-                  className="underline"
+            {/* Language Dropdown (only if language1 or language2 is true) */}
+            {showLanguageDropdown && (
+              <div className="language-selector mt-4">
+                <span
+                  className="cursor-pointer text-[#AD88C6] text-base font-bold"
+                  onClick={() => setDropdownOpen(!dropdownOpen)}
                 >
-                  პდფ ვერსია
-                </a>
-              </p>
+                  აირჩიე ენა 
+                  <span className="ml-1 text-sm align-middle">
+                    {dropdownOpen ? '▼' : '▶'}
+                  </span>
+                </span>
+                {dropdownOpen && (
+                  <div className="flex gap-2 mt-2">
+                    {['georgian', 'language1', 'language2'].map((language) => {
+                      const availableLanguages = {
+                        georgian: 'ქართული',
+                        language1: 'ინგლისური',
+                        language2: 'რუსული',
+                      };
+                      return (
+                        <button
+                          key={language}
+                          onClick={() => handleLanguageNavigation(language)}
+                          disabled={language === currentLanguage}
+                          className={`px-4 py-2 rounded text-sm font-semibold ${
+                            language === currentLanguage
+                              ? 'bg-gray-300 text-[#474F7A] cursor-not-allowed'
+                              : 'bg-[#AD88C6] text-[#474F7A] hover:bg-[#AD88C6]'
+                          }`}
+                        >
+                          {availableLanguages[language]}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
             )}
           </div>
 
-         
+          <h1 className="font-alk-tall-mtavruli text-[32px] sm:text-[64px] font-light leading-none text-[#474F7A] mt-[24px] mb-5">
+            {article.title.rendered}
+          </h1>
+          <h3 className="font-alk-tall-mtavruli sm:text-[34px] lg:text-[34px] font-light leading-wide text-[#474F7A] mt-[24px] mb-5">
+            {article.acf.sub_title}
+          </h3>
+          <h2 className="font-noto-sans-georgian text-[16px] sm:text-[24px] font-extrabold text-[#AD88C6] leading-normal mb-5">
+            {article.acf['ავტორი']}
+          </h2>
+          <p className="text-[#474F7A] font-semibold pb-10">
+            {article.formattedDate}
+          </p>
+          {article.acf.full_article_pdf && (
+            <p className="text-[#474F7A] font-semibold pb-10">
+              იხილეთ სტატიის{' '}
+              <a
+                href={article.acf.full_article_pdf}
+                target="_blank"
+                rel="noopener noreferrer"
+                download
+                className="underline"
+              >
+                პდფ ვერსია
+              </a>
+            </p>
+          )}
+
           <div
-            className=" w-full article-content text-[#474F7A] font-noto-sans-georgian text-[14px] sm:text-[16px] font-normal lg:text-justify leading-[30px] sm:leading-[35px] tracking-[0.32px] mt-5"
+            className="w-full article-content text-[#474F7A] font-noto-sans-georgian text-[14px] sm:text-[16px] font-normal lg:text-justify leading-[30px] sm:leading-[35px] tracking-[0.32px] mt-5"
             dangerouslySetInnerHTML={{ __html: sanitizedContent }}
           ></div>
 
@@ -262,15 +279,21 @@ const ArticlePage = ({ params }) => {
                 width={24}
                 height={24}
               />
+             
             </button>
           </div>
 
           {showShareOptions && (
-            <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
+            <div
+              className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center z-50"
+              onClick={closeShareOptions} // Close modal when clicking on the backdrop
+            >
               <div
-                className="rounded-lg p-6 w-80"
+                className="rounded-lg p-6 w-80 relative"
                 style={{ backgroundColor: 'rgba(0, 0, 0, 0.30)' }}
+                onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside the modal
               >
+               
                 <h2 className="text-xl text-white font-bold mb-4">გააზიარე</h2>
                 <div className="flex items-center pt-7 gap-5">
                   <FacebookShareButton
@@ -286,6 +309,8 @@ const ArticlePage = ({ params }) => {
                     <TwitterIcon size={44} round={true} />
                   </TwitterShareButton>
                 </div>
+               
+               
               </div>
             </div>
           )}
