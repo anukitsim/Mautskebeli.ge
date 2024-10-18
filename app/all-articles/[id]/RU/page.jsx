@@ -278,7 +278,7 @@ const Language2Page = ({ params }) => {
           </div>
 
           <div
-            className="prose article-content text-[#474F7A] font-noto-sans-georgian text-[14px] sm:text-[16px] font-normal lg:text-justify leading-[30px] sm:leading-[35px] tracking-[0.32px] mt-5"
+            className=" article-content text-[#474F7A] font-noto-sans-georgian text-[14px] sm:text-[16px] font-normal lg:text-justify leading-[30px] sm:leading-[35px] tracking-[0.32px] mt-5"
             dangerouslySetInnerHTML={{ __html: sanitizedContent }}
           ></div>
 

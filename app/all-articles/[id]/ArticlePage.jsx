@@ -79,13 +79,28 @@ const ArticlePage = ({ params }) => {
     }
   }, [id]); // Refetch when the article ID changes
 
-  // Update content when article state is updated
   useEffect(() => {
     if (article) {
-      let sanitized = DOMPurify.sanitize(article.acf['main-text']);
-      setSanitizedContent(sanitized);
+      // Sanitize the fetched content
+      let sanitized = DOMPurify.sanitize(article.acf['main-text'], { ADD_ATTR: ['target', 'rel'] });
+  
+      // Parse the sanitized HTML
+      const parser = new DOMParser();
+      const doc = parser.parseFromString(sanitized, 'text/html');
+  
+      // Find all anchor tags and add target="_blank" and rel="noopener noreferrer"
+      const anchors = doc.querySelectorAll('a');
+      anchors.forEach((anchor) => {
+        anchor.setAttribute('target', '_blank');
+        anchor.setAttribute('rel', 'noopener noreferrer');
+      });
+  
+      // Serialize the modified HTML back into a string
+      const modifiedContent = doc.body.innerHTML;
+      setSanitizedContent(modifiedContent);
     }
   }, [article]);
+  
 
   useEffect(() => {
     const handleScroll = () => {
@@ -126,6 +141,9 @@ const ArticlePage = ({ params }) => {
     return <img src="/images/loader.svg" alt="Loading" />;
   }
 
+
+  const currentLanguage = 'georgian';
+
   // Check if either language1 or language2 is true
   const showLanguageDropdown = article.acf.language1 || article.acf.language2;
 
@@ -137,6 +155,7 @@ const ArticlePage = ({ params }) => {
             {categories.map((category) => (
               <a
                 key={category.name}
+                
                 href={category.path}
                 className={`text-sm text-[#474F7A] ${
                   category.name === 'სტატიები'
