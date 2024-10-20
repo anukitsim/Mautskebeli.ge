@@ -6,13 +6,13 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 const LanguageDropdown = ({ id, currentLanguage }) => {
-  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(true);
   const router = useRouter();
 
   const availableLanguages = [
-    { key: 'georgian', label: 'Georgian' },
+    { key: 'georgian', label: 'ქართული' },
     { key: 'language1', label: 'English' },
-    { key: 'language2', label: 'Russian' },
+    { key: 'language2', label: 'Русский' },
   ];
 
   const handleLanguageNavigation = (language) => {
