@@ -1,16 +1,16 @@
 // app/cancel-recurring-payment/page.jsx
 
-"use client"
+"use client";
 
-import { useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation'; // Correct way in App Router
 import { useEffect, useState } from 'react';
 
-// Force dynamic rendering for this page
-export const dynamic = 'force-dynamic'; // Forces the page to be rendered dynamically
+export const dynamic = 'force-dynamic'; // Force dynamic rendering
 
 export default function CancelRecurringPayment() {
-  const router = useRouter();
-  const { recId, token } = router.query; // Extract recId and token from the query string
+  const searchParams = useSearchParams();
+  const recId = searchParams.get('recId');
+  const token = searchParams.get('token');
 
   const [status, setStatus] = useState('Processing your request...');
 
