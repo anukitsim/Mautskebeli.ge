@@ -16,9 +16,16 @@ function CancelRecurringPaymentContent() {
 
   useEffect(() => {
     if (recId && token) {
-      // Send the cancellation request to the WordPress API
-      fetch(`/api/cancel-recurring-payment?recId=${recId}&token=${token}`, {
+      // Send the cancellation request to the internal API route
+      fetch('/api/cancel-recurring-payment', {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          recId,  // Send recId in POST body
+          token,  // Send token in POST body
+        }),
       })
         .then(response => response.json())
         .then(data => {
