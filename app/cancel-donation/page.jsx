@@ -1,15 +1,16 @@
 // app/cancel-donation/page.jsx
 
-"use client"; 
+"use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import PaymentMessage from '../components/PaymentMessage';
 
 // Force dynamic rendering to prevent prerendering issues
 export const dynamic = "force-dynamic";
 
-const CancelDonation = () => {
+// Wrapper component that uses useSearchParams
+const CancelDonationWrapper = () => {
     const searchParams = useSearchParams();
     const recId = searchParams.get('recId');
     const [message, setMessage] = useState('');
@@ -63,6 +64,19 @@ const CancelDonation = () => {
         <div className="flex justify-center items-center h-screen">
             <PaymentMessage message={message} isError={isError} onClose={() => {}} />
         </div>
+    );
+};
+
+// Main component with Suspense boundary
+const CancelDonation = () => {
+    return (
+        <Suspense fallback={
+            <div className="flex justify-center items-center h-screen">
+                <p>Loading...</p>
+            </div>
+        }>
+            <CancelDonationWrapper />
+        </Suspense>
     );
 };
 
