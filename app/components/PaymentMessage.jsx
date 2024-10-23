@@ -7,7 +7,7 @@ const PaymentMessage = ({ message, isError, onClose }) => {
 
     return (
         <div
-            className={`fixed top-16 left-1/2 transform -translate-x-1/2 px-4 py-2 rounded shadow-lg z-60 ${
+            className={`fixed top-[50%] left-1/2 transform -translate-x-1/2 px-4 py-2 rounded shadow-lg z-60 ${
                 isError ? 'bg-red-500 text-white' : 'bg-green-500 text-white'
             }`}
         >
