@@ -2,12 +2,12 @@
 
 "use client";
 
-import { useSearchParams } from 'next/navigation'; // Correct way in App Router
-import { useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation'; // Use new hook for query params
+import { useEffect, useState, Suspense } from 'react';
 
-export const dynamic = 'force-dynamic'; // Force dynamic rendering
+export const dynamic = 'force-dynamic'; // Forces the page to be rendered dynamically
 
-export default function CancelRecurringPayment() {
+function CancelRecurringPaymentContent() {
   const searchParams = useSearchParams();
   const recId = searchParams.get('recId');
   const token = searchParams.get('token');
@@ -37,5 +37,13 @@ export default function CancelRecurringPayment() {
       <h1>Cancel Recurring Payment</h1>
       <p>{status}</p>
     </div>
+  );
+}
+
+export default function CancelRecurringPayment() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <CancelRecurringPaymentContent />
+    </Suspense>
   );
 }
