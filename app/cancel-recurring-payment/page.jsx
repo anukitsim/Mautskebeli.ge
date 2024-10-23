@@ -1,7 +1,12 @@
+// app/cancel-recurring-payment/page.jsx
+
 "use client"
 
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
+
+// Force dynamic rendering for this page
+export const dynamic = 'force-dynamic'; // Forces the page to be rendered dynamically
 
 export default function CancelRecurringPayment() {
   const router = useRouter();
