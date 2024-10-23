@@ -1,10 +1,13 @@
 // app/cancel-donation/page.jsx
 
-"use client";
+"use client"; 
 
 import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import PaymentMessage from '../components/PaymentMessage';
+
+// Force dynamic rendering to prevent prerendering issues
+export const dynamic = "force-dynamic";
 
 const CancelDonation = () => {
     const searchParams = useSearchParams();
@@ -17,7 +20,12 @@ const CancelDonation = () => {
         if (recId) {
             const cancelRecurringDonation = async () => {
                 try {
-                    const response = await fetch(`/api/cancel-recurring-payment?recId=${recId}`);
+                    const response = await fetch(`/api/cancel-recurring-payment?recId=${recId}`, {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                    });
                     const data = await response.json();
 
                     if (data.status === 'success') {
@@ -28,6 +36,7 @@ const CancelDonation = () => {
                         setIsError(true);
                     }
                 } catch (error) {
+                    console.error('Cancellation Error:', error);
                     setMessage('An error occurred while cancelling your donation.');
                     setIsError(true);
                 } finally {
