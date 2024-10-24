@@ -40,12 +40,12 @@ const handlePaymentStatus = async (orderId, setPaymentMessage, setIsError) => {
     );
 
     const result = await response.json();
-    
 
-    
     if (result.status === "Succeeded") {
       if (result.isRecurring) {
-        setPaymentMessage("Recurring donation succeeded! Your card has been saved for future donations.");
+        setPaymentMessage(
+          "Recurring donation succeeded! Your card has been saved for future donations."
+        );
       } else {
         setPaymentMessage("One-time donation succeeded!");
       }
@@ -68,10 +68,11 @@ const Modal = ({ show, handleClose, handleConfirm }) => {
       <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
         <h2 className="text-xl font-semibold mb-4">ყოველთვიური გადახდა</h2>
         <p className="mb-6">
-          ბარათის მონაცემები შეინახება და ყოველთვიურად ავტომატურად ჩამოგეჭრებათ
-          მითითებული თანხა. გადახდის დღემდე 2 დღით ადრე მიიღებთ გამაფრთხილებელ
-          შეტყობინებას ელექტრონული ფოსტის საშუალებით. გამოწერის გაუქმება
-          შეგიძლიათ ნებისმიერ დროს. თუკი ეთანმხებით დააჭიეთ ვადასტურებს
+          ბარათის მონაცემები შეინახება და ყოველთვიურად ავტომატურად
+          ჩამოგეჭრებათ მითითებული თანხა. გადახდის დღემდე 2 დღით ადრე
+          მიიღებთ გამაფრთხილებელ შეტყობინებას ელექტრონული ფოსტის საშუალებით.
+          გამოწერის გაუქმება შეგიძლიათ ნებისმიერ დროს. თუკი ეთანმხებით
+          დააჭირეთ ღილაკს - ვადასტურებ
         </p>
         <div className="flex justify-end gap-4">
           <button
@@ -81,7 +82,7 @@ const Modal = ({ show, handleClose, handleConfirm }) => {
             გათიშვა
           </button>
           <button
-            className="bg-[#AD88C6] text-white p-2 rounded hover:bg-purple-500"
+            className="bg-[#AD88C6] text-white p-2 rounded hover:bg-[#9B7EBD]"
             onClick={handleConfirm}
           >
             ვადასტურებ
@@ -105,19 +106,20 @@ const DonationForm = () => {
   const [showModal, setShowModal] = useState(false);
   const [paymentMessage, setPaymentMessage] = useState(""); // New state for payment message
   const [isError, setIsError] = useState(false); // State to differentiate success/error message
+  const [showTerms, setShowTerms] = useState(false); // State to show/hide terms
+  const [showPrivacy, setShowPrivacy] = useState(false); // State to show/hide privacy policy
 
   const searchParams = useSearchParams();
 
   // Capture the orderId after the user is redirected from TBC payment page
   useEffect(() => {
     const orderId = searchParams.get("orderId");
-  
+
     if (orderId) {
       // Call the function to check the payment status with orderId
       handlePaymentStatus(orderId, setPaymentMessage, setIsError);
     }
   }, [searchParams]);
-  
 
   // Handle form field updates
   const handleInputChange = (e) => {
@@ -161,60 +163,65 @@ const DonationForm = () => {
     setShowModal(false);
   };
 
-// Handle form submission for one-time or recurring donations
-const handleSubmit = async (e) => {
-  e.preventDefault();
+  // Handle form submission for one-time or recurring donations
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  const trimmedFormData = {
-    donationAmount: parseFloat(formData.donationAmount),
-    donorName: formData.donorName.trim(),
-    donorEmail: formData.donorEmail.trim(),
-    donorPhone: formData.donorPhone.trim() || undefined,
-    isRecurring: formData.isRecurring,
-  };
+    const trimmedFormData = {
+      donationAmount: parseFloat(formData.donationAmount),
+      donorName: formData.donorName.trim(),
+      donorEmail: formData.donorEmail.trim(),
+      donorPhone: formData.donorPhone.trim() || undefined,
+      isRecurring: formData.isRecurring,
+    };
 
-  if (isNaN(trimmedFormData.donationAmount) || !trimmedFormData.donorName || !trimmedFormData.donorEmail) {
-    alert("Please fill out all required fields before submitting.");
-    return;
-  }
+    if (
+      isNaN(trimmedFormData.donationAmount) ||
+      !trimmedFormData.donorName ||
+      !trimmedFormData.donorEmail
+    ) {
+      alert("Please fill out all required fields before submitting.");
+      return;
+    }
 
-  setLoading(true);
-  try {
-    const response = await fetch(
-      "https://mautskebeli.wpenginepowered.com/wp-json/wp/v2/submit-donation/",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(trimmedFormData),
-      }
-    );
+    setLoading(true);
+    try {
+      const response = await fetch(
+        "https://mautskebeli.wpenginepowered.com/wp-json/wp/v2/submit-donation/",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(trimmedFormData),
+        }
+      );
 
-    const responseData = await response.json();
-    setLoading(false);
+      const responseData = await response.json();
+      setLoading(false);
 
-    if (!response.ok) {
-      console.error("Donation Failed:", responseData.message);
-      alert("Failed to process donation: " + responseData.message);
-    } else {
-      if (responseData.paymentUrl) {
-        window.location.href = responseData.paymentUrl; // Redirect to the payment URL
+      if (!response.ok) {
+        console.error("Donation Failed:", responseData.message);
+        alert("Failed to process donation: " + responseData.message);
       } else {
-        if (formData.isRecurring) {
-          alert("Recurring donation setup successful, card will be saved for future transactions.");
+        if (responseData.paymentUrl) {
+          window.location.href = responseData.paymentUrl; // Redirect to the payment URL
         } else {
-          alert("One-time donation completed successfully.");
+          if (formData.isRecurring) {
+            alert(
+              "Recurring donation setup successful, card will be saved for future transactions."
+            );
+          } else {
+            alert("One-time donation completed successfully.");
+          }
         }
       }
+    } catch (error) {
+      setLoading(false);
+      console.error("Error submitting donation:", error);
+      alert("Error submitting donation: Please check the console for more details.");
     }
-  } catch (error) {
-    setLoading(false);
-    console.error("Error submitting donation:", error);
-    alert("Error submitting donation: Please check the console for more details.");
-  }
-};
-
+  };
 
   const closePaymentMessage = () => {
     setPaymentMessage(""); // Close the payment message
@@ -314,16 +321,64 @@ const handleSubmit = async (e) => {
           />
           ყოველთვიური გადახდა
         </label>
+{/* Submit button for processing the donation */}
+<button
+  type="submit"
+  className="bg-[#AD88C6] w-full text-white p-3 rounded-lg mt-4 hover:scale-105 transition-colors duration-300"
+  disabled={loading} // Button disabled while loading
+>
+  {loading ? "მუშავდება.." : "გადახდა"}
+</button>
 
-        {/* Submit button for processing the donation */}
-        <button
-          type="submit"
-          className="bg-[#AD88C6] w-full text-white p-3 rounded-lg mt-4 hover:scale-105 transition-colors duration-300"
-          disabled={loading} // Button disabled while loading
-        >
-          {loading ? "მუშავდება.." : "გადახდა"}
-        </button>
+{/* Terms of Service and Privacy Policy */}
+<div className="mt-4">
+  <p
+    className={`text-sm cursor-pointer ${
+      showTerms ? "text-[#AD88C6] font-bold" : "text-gray-600"
+    }`}
+    onClick={() => setShowTerms(!showTerms)}
+  >
+    {showTerms ? "დახურვა" : "მომსახურების პირობები"}
+  </p>
+  {showTerms && (
+    <div className="text-sm text-gray-700 mt-2">
+      <p><strong>მომსახურების პირობები:</strong></p>
+      <p>
+        1. დონაცია არის ნებაყოფლობითი და არ ექვემდებარება დაბრუნებას.<br />
+        2. შეგიძლიათ აირჩიოთ ერთჯერადი ან ყოველთვიური დონაცია.<br />
+        3. ყოველთვიური დონაცია ავტომატურად ჩამოიჭრება თქვენ მიერ მითითებული ბარათიდან ყოველთვიურად, ხოლო გადახდის წინ მიიღებთ ელფოსტაზე გამაფრთხილებელ შეტყობინებას.<br />
+        4. ყოველთვიური დონაციის გაუქმება შესაძლებელია ნებისმიერ დროს, გაუქმების ბმული გამოგეგზავნებათ ელ-ფოსტაზე.<br />
+        5. ყველა გადახდა უსაფრთხოდ მუშავდება TBC ბანკის სისტემებით. ჩვენ არ ვინახავთ ბარათის ინფორმაციას მონაცემთა ბაზაში.
+      </p>
+    </div>
+  )}
+
+  <p
+    className={`text-sm cursor-pointer mt-2 ${
+      showPrivacy ? "text-[#AD88C6] font-bold" : "text-gray-600"
+    }`}
+    onClick={() => setShowPrivacy(!showPrivacy)}
+  >
+    {showPrivacy ? "დახურვა" : "კონფიდენციალურობის პოლიტიკა"}
+  </p>
+  {showPrivacy && (
+    <div className="text-sm text-gray-700 mt-2">
+      <p><strong>კონფიდენციალურობის პოლიტიკა:</strong></p>
+      <p>
+        1. ჩვენ ვაგროვებთ მხოლოდ იმ მონაცემებს, რომლებიც საჭიროა ტრანზაქციის დასამუშავებლად: სახელი, ელფოსტა და (სურვილისამებრ) ტელეფონის ნომერი.<br />
+        2. თქვენი ბარათის მონაცემები უსაფრთხოდ მუშავდება TBC ბანკის მიერ. ჩვენ არ ვინახავთ ბარათის დეტალებს მონაცემთა ბაზაში.<br />
+        3. თქვენი მონაცემები არ გაიყიდება ან გადაეცემა მესამე მხარეებს სარეკლამო მიზნებისთვის.<br />
+        4. ყოველთვიური დონაციის შემთხვევაში, ბარათის ინფორმაცია ინახება ბანკის სისტემებში და გამოიყენება მომდევნო გადახდებისთვის.<br />
+        5. თქვენ გაქვთ უფლება მოითხოვოთ თქვენი მონაცემების წაშლა ან შეცვლა ნებისმიერ დროს.
+      </p>
+    </div>
+  )}
+</div>
+
+
       </form>
+
+    
 
       {/* Modal Popup */}
       <Modal
