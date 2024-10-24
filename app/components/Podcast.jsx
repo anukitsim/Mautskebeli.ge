@@ -223,7 +223,7 @@ const Podcast = () => {
         {videos.length > 0 && (
           <>
             {isLive && selectedVideoId === liveStream?.id && (
-              <h1 className="text-[#FECE27] text-[20px] font-extrabold mt-5 mb-4 animate-pulse">
+              <h1 className="text-[#FECE27] text-[20px] font-extrabold mt-5 ml-24 mb-4 animate-pulse">
                 პირდაპირი ეთერი
               </h1>
             )}
