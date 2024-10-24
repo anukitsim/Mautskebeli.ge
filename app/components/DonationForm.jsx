@@ -41,8 +41,7 @@ const handlePaymentStatus = async (orderId, setPaymentMessage, setIsError) => {
 
     const result = await response.json();
     
-    // Display result for debugging purposes
-    alert(JSON.stringify(result));  // This will show the entire response in a browser alert
+
     
     if (result.status === "Succeeded") {
       if (result.isRecurring) {
