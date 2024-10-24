@@ -28,7 +28,7 @@ const CancelDonationWrapper = () => {
                     const data = await response.json();
 
                     if (data.status === 'success') {
-                        setMessage('Your recurring donation has been successfully cancelled.');
+                        setMessage('ყოველთვიური დონაცია გაუქმებულია!');
                         setIsError(false);
                     } else {
                         setMessage(data.message || 'Failed to cancel your recurring donation.');
@@ -53,7 +53,7 @@ const CancelDonationWrapper = () => {
     if (loading) {
         return (
             <div className="flex justify-center items-center h-screen">
-                <p>Processing your request...</p>
+                <p>მოთხოვნა მუშავდება...</p>
             </div>
         );
     }
@@ -64,7 +64,6 @@ const CancelDonationWrapper = () => {
         </div>
     );
 };
-
 // Main component with Suspense boundary
 const CancelDonation = () => {
     return (
