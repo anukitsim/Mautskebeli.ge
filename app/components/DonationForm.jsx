@@ -373,6 +373,7 @@ const DonationForm = () => {
       </p>
     </div>
   )}
+  <p className="text-xs font-light text-gray-700 mt-10">მიმღები: შპს. მაუწყებელი 2021</p>
 </div>
 
 
