@@ -30,6 +30,7 @@ export default function Home() {
           <section className="px-4 lg:px-8 mt-10">
             <FacebookNews />
           </section>
+          <DonationPopup />
 
           {/* Home Page Videos Section */}
           <section className="px-4 lg:px-8 mt-10">
