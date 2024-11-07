@@ -1,5 +1,3 @@
-// app/translate/page.jsx (Server Component)
-
 import ClientSideTranslate from './ClientSideTranslate'; // Import client component
 
 // Server-side function to fetch the initial articles

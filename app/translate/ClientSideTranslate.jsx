@@ -1,11 +1,11 @@
-'use client'; // Enable React hooks in this component
+'use client';
 
-import React, { useState, useEffect, useRef } from "react";
-import Link from "next/link";
-import Image from "next/image";
+import React, { useState, useEffect, useRef } from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
 import useSWRInfinite from 'swr/infinite';
 
-// Utility function to decode HTML entities safely (runs only on the client)
+// Utility function to decode HTML entities safely
 const decodeHTMLEntities = (text) => {
   if (typeof window !== 'undefined') {
     const textarea = document.createElement('textarea');
@@ -25,7 +25,7 @@ const stripHtml = (html) => {
 };
 
 const truncateText = (text, limit) => {
-  if (!text) return ''; // Prevent null or undefined errors
+  if (!text) return '';
   const words = text.split(' ');
   if (words.length > limit) {
     return words.slice(0, limit).join(' ') + '...';
@@ -33,17 +33,12 @@ const truncateText = (text, limit) => {
   return text;
 };
 
-export default function ClientSideTranslate({ initialArticles = [] }) {
+export default function ClientSideTranslate({ initialArticles }) {
   const loadMoreRef = useRef(null);
-
-  // State to store processed articles
-  const [processedArticles, setProcessedArticles] = useState(initialArticles);
+  const [processedArticles, setProcessedArticles] = useState(initialArticles || []);
 
   // Use SWR for infinite scrolling
-  const fetcher = (url) => fetch(url).then(res => res.json()).catch((err) => {
-    console.error("Error fetching data:", err);
-    return []; // Fallback to empty array in case of an error
-  });
+  const fetcher = (url) => fetch(url).then((res) => res.json());
 
   const getKey = (pageIndex, previousPageData) => {
     if (previousPageData && !previousPageData.length) return null; // No more articles to load
@@ -51,12 +46,11 @@ export default function ClientSideTranslate({ initialArticles = [] }) {
   };
 
   const { data, error, size, setSize, isValidating } = useSWRInfinite(getKey, fetcher, {
-    revalidateOnFocus: true, // Refetch when the page comes back into focus
-    refreshInterval: 60000,  // Auto-refetch every 60 seconds
+    revalidateOnFocus: true,
+    refreshInterval: 60000,
   });
 
-  // Ensure articles are always an array
-  const articles = Array.isArray(data) ? [].concat(...data) : initialArticles;
+  const articles = Array.isArray(data) ? [].concat(...data) : initialArticles || [];
 
   // Process the articles (decode entities, strip HTML, and truncate text)
   useEffect(() => {
@@ -64,17 +58,17 @@ export default function ClientSideTranslate({ initialArticles = [] }) {
       const processed = articles.map((article) => ({
         ...article,
         title: {
-          rendered: article?.title?.rendered ? decodeHTMLEntities(article.title.rendered) : 'Untitled', // Decode title if exists
+          rendered: decodeHTMLEntities(article.title.rendered), // Decode the title
         },
         acf: {
           ...article.acf,
           ['main-text']: truncateText(decodeHTMLEntities(stripHtml(article.acf?.['main-text'] || '')), 30),
-          'author': article.acf?.['ავტორი'] || "Unknown", // Handle missing author with fallback
         },
       }));
 
-      // Update state if articles have changed
-      setProcessedArticles(processed);
+      if (JSON.stringify(processedArticles) !== JSON.stringify(processed)) {
+        setProcessedArticles(processed);
+      }
     }
   }, [articles]);
 
@@ -85,10 +79,10 @@ export default function ClientSideTranslate({ initialArticles = [] }) {
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting && !isValidating) {
-          setSize(size + 1); // Load the next page of articles
+          setSize(size + 1);
         }
       },
-      { rootMargin: '200px' } // Trigger loading more articles before reaching the bottom
+      { rootMargin: '200px' }
     );
 
     observer.observe(loadMoreRef.current);
@@ -102,7 +96,6 @@ export default function ClientSideTranslate({ initialArticles = [] }) {
 
   // Handle errors
   if (error) return <div>Error loading articles.</div>;
-  if (!articles.length && !isValidating) return <div>No articles available.</div>;
 
   return (
     <section className="mx-auto flex flex-col overflow-hidden">
@@ -111,9 +104,7 @@ export default function ClientSideTranslate({ initialArticles = [] }) {
           თარგმანი
         </p>
         <p className="text-[#8D91AB] text-wrap pl-4 text-[14px] font-bold lg:pl-2 pt-5 w-11/12 lg:w-9/12 lg:text-justify mb-10">
-          „მაუწყებელი“ ისწრაფვის პოლიტიკურად მნიშვნელოვანი ცოდნის გავრცელების
-          ხელშეწყობისკენ და გთავაზობთ ანალიტიკური სტატიებისა და წიგნების ქართულ
-          თარგმანს.
+          „მაუწყებელი“ ისწრაფვის პოლიტიკურად მნიშვნელოვანი ცოდნის გავრცელების ხელშეწყობისკენ და გთავაზობთ ანალიტიკური სტატიებისა და წიგნების ქართულ თარგმანს.
         </p>
 
         {/* Initial Loading */}
@@ -123,31 +114,27 @@ export default function ClientSideTranslate({ initialArticles = [] }) {
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mt-5 mx-4 lg:mx-0">
-            {processedArticles.map((article) => (
+            {Array.isArray(processedArticles) && processedArticles.length > 0 && processedArticles.map((article) => (
               <Link href={`/translate/${article.id}`} passHref key={article.id}>
-                <div className="bg-[#F6F4F8] rounded-tl-[10px] rounded-tr-[10px] border border-[#B6A8CD] overflow-hidden cursor-pointer">
+                <div className="bg-[#F6F4F8] rounded-tl-[10px] rounded-tr-[10px] border border-[#B6A8CD] overflow-hidden cursor-pointer hover:shadow-md transition-shadow">
                   <div className="relative w-full h-[200px]">
                     <Image
-                      src={article.acf?.image || "/images/default-image.png"} 
+                      src={article.acf?.image || '/images/default-image.png'}
                       alt="article-cover"
                       fill
                       style={{ objectFit: 'cover' }}
                       className="article-image"
                       loading="lazy"
-                      onError={(e) => {
-                        e.target.onerror = null;
-                        e.target.src = "/images/default-image.png";
-                      }}
                     />
                   </div>
                   <div className="p-[18px]">
-                    <h2 className="text-[20px] font-bold mb-2" style={{ color: "#474F7A" }}>
+                    <h2 className="text-[20px] font-bold mb-2" style={{ color: '#474F7A' }}>
                       {article.title?.rendered || 'Untitled Article'}
                     </h2>
                     <span className="text-[#8D91AB] text-[14px] font-bold">
-                      {article.acf?.["ავტორი"] || "Unknown"}
+                      {article.acf?.['ავტორი'] || 'Unknown'}
                     </span>
-                    <p className="text-sm pt-[18px]" style={{ color: "#000" }}>
+                    <p className="text-sm pt-[18px]" style={{ color: '#000' }}>
                       {article.acf?.['main-text']}
                     </p>
                     <div className="flex flex-col justify-end pt-[30px] items-end">
