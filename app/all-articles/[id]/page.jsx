@@ -1,5 +1,3 @@
-// app/all-articles/[id]/page.jsx
-
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import moment from 'moment';
@@ -18,18 +16,23 @@ const categories = [
   { name: 'თავისუფალი სვეტი', path: '/free-column' },
 ];
 
+// Fetch the article with cache busting
 async function fetchArticle(id) {
   const apiUrl = `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/wp/v2/article/${id}?acf_format=standard&_fields=id,title,acf,date&_=${new Date().getTime()}`;
 
   try {
-    const res = await fetch(apiUrl);
+    const res = await fetch(apiUrl, {
+      cache: 'no-store', // Disable caching
+    });
 
     if (!res.ok) {
       console.error(`Failed to fetch article with id ${id}: ${res.status} ${res.statusText}`);
       return null;
     }
 
-    return res.json();
+    const article = await res.json();
+    console.log(`Fetched article: `, article); // Debug the API response
+    return article;
   } catch (error) {
     console.error(`Error fetching article with id ${id}:`, error);
     return null;
@@ -45,79 +48,43 @@ function decodeHTMLEntities(str) {
   return decode(str);
 }
 
+// Sanitize content while allowing inline styles for WYSIWYG-rendered media
 function getSanitizedContent(content) {
   return sanitizeHtml(content, {
     allowedTags: [
       'b', 'i', 'em', 'strong', 'a', 'p', 'blockquote',
       'ul', 'ol', 'li', 'br', 'span', 'h1', 'h2', 'h3',
-      'h4', 'h5', 'h6', 'img', 'code', 'pre'
+      'h4', 'h5', 'h6', 'img', 'video', 'source', 'audio', 'figure', 'figcaption'
     ],
     allowedAttributes: {
       'a': ['href', 'target', 'rel'],
-      'img': ['src', 'alt', 'title', 'width', 'height'],
+      'img': ['src', 'alt', 'title', 'width', 'height', 'style'],
+      'video': ['src', 'controls', 'width', 'height', 'poster', 'style'],
+      'audio': ['src', 'controls'],
+      'source': ['src', 'type'],
       'span': ['style'],
       'p': ['style'],
-      'blockquote': ['cite'],
-      // Add other tags and their allowed attributes as needed
+      'blockquote': ['cite', 'style'],
+      'figure': [],
+      'figcaption': [],
     },
-    allowedSchemes: ['http', 'https', 'mailto'],
+    allowedSchemes: ['http', 'https', 'data'],
     allowedSchemesByTag: {
       img: ['http', 'https', 'data'],
+      video: ['http', 'https'],
+      audio: ['http', 'https'],
     },
     allowedStyles: {
       '*': {
-        'color': [/^#[0-9a-fA-F]{3,6}$/],
-        'background-color': [/^#[0-9a-fA-F]{3,6}$/],
-        'font-weight': [/^bold$/],
-        'text-align': [/^(left|right|center|justify)$/],
-        // Add other allowed styles as needed
+        'width': [/^\d+(?:px|%)$/],
+        'height': [/^\d+(?:px|%)$/],
+        'max-width': [/^\d+(?:px|%)$/],
+        'max-height': [/^\d+(?:px|%)$/],
+        'float': [/^(left|right|none)$/],
       },
     },
     allowVulnerableTags: false,
   });
-}
-
-function extractDescription(content, wordLimit = 30) {
-  // Remove all HTML tags
-  const text = content.replace(/<[^>]*>/g, '');
-  // Split into words
-  const words = text.split(/\s+/);
-  // Take the first `wordLimit` words
-  const shortText = words.slice(0, wordLimit).join(' ');
-  return shortText + (words.length > wordLimit ? '...' : '');
-}
-
-export async function generateMetadata({ params }) {
-  const { id } = params;
-  const article = await fetchArticle(id);
-
-  if (!article) {
-    return {};
-  }
-
-  // Sanitize the main text for metadata description
-  const sanitizedMainText = getSanitizedContent(article.acf['main-text']);
-  const description = extractDescription(sanitizedMainText, 30); // Adjust word limit as needed
-
-  return {
-    title: article.title.rendered,
-    description: description || 'An article.',
-    openGraph: {
-      title: article.title.rendered,
-      description: description,
-      url: `https://www.mautskebeli.ge/all-articles/${article.id}`,
-      images: [
-        {
-          url: article.acf.image || '/images/default-og-image.jpg',
-        },
-      ],
-    },
-    twitter: {
-      title: article.title.rendered,
-      description: description,
-      images: [article.acf.image || '/images/default-og-image.jpg'],
-    },
-  };
 }
 
 const ArticlePage = async ({ params }) => {
@@ -135,15 +102,14 @@ const ArticlePage = async ({ params }) => {
   // Sanitize and process the main text
   let sanitizedContent = getSanitizedContent(article.acf['main-text']);
 
-  // Use Cheerio to manipulate the HTML content
+  // Use Cheerio to manipulate and enhance the HTML content
   const $ = load(sanitizedContent);
 
-  // Find all anchor tags and add target="_blank" and rel="noopener noreferrer"
-  $('a').each((i, elem) => {
-    const href = $(elem).attr('href');
-    if (href && !href.startsWith('/') && !href.startsWith('#')) {
-      $(elem).attr('target', '_blank');
-      $(elem).attr('rel', 'noopener noreferrer');
+  // Ensure all media sources have absolute URLs
+  $('img, video, audio, source').each((i, elem) => {
+    const src = $(elem).attr('src');
+    if (src && !src.startsWith('http')) {
+      $(elem).attr('src', `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}${src}`);
     }
   });
 

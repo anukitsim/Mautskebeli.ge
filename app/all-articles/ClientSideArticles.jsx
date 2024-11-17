@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import useSWRInfinite from 'swr/infinite';
+import { mutate } from 'swr';
 
 // Utility function to decode HTML entities
 const decodeHTMLEntities = (text) => {
@@ -40,37 +41,34 @@ export default function ClientSideArticles({ initialArticles }) {
   // Ensure processedArticles is initialized with an array
   const [processedArticles, setProcessedArticles] = useState(initialArticles || []);
 
-  // Use SWR for infinite scrolling
-  const fetcher = (url) => fetch(url).then((res) => res.json());
+  // SWR Fetcher with cache-busting query
+  const fetcher = (url) => fetch(`${url}&_=${new Date().getTime()}`).then((res) => res.json());
 
   const getKey = (pageIndex, previousPageData) => {
     if (previousPageData && !previousPageData.length) return null; // No more articles to load
     return `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/wp/v2/article?acf_format=standard&_fields=id,title,acf,date&per_page=10&page=${pageIndex + 1}`;
   };
-  
 
   const { data, error, size, setSize, isValidating } = useSWRInfinite(getKey, fetcher, {
     revalidateOnFocus: true,
-    refreshInterval: 60000,
+    revalidateOnReconnect: true,
+    refreshInterval: 0, // Disable interval
   });
 
-  // Safeguard: Ensure articles is always an array
   const articles = Array.isArray(data) ? [].concat(...data) : initialArticles || [];
 
-  // Process the articles (decode entities, strip HTML, and truncate text)
   useEffect(() => {
     if (Array.isArray(articles)) {
       const processed = articles.map((article) => ({
         ...article,
         title: {
-          rendered: decodeHTMLEntities(article.title.rendered) // Decode the title
+          rendered: decodeHTMLEntities(article.title.rendered)
         },
         acf: {
           ...article.acf,
           ['main-text']: truncateText(decodeHTMLEntities(stripHtml(article.acf?.['main-text'] || '')), 30),
         },
       }));
-
       if (JSON.stringify(processedArticles) !== JSON.stringify(processed)) {
         setProcessedArticles(processed);
       }
@@ -99,23 +97,33 @@ export default function ClientSideArticles({ initialArticles }) {
     };
   }, [isValidating, setSize, size]);
 
-  // Handle errors
+  const refreshArticles = () => {
+    mutate(`${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/wp/v2/article`);
+  };
+
   if (error) return <div>Error loading articles.</div>;
 
   return (
     <section className="mx-auto flex flex-col overflow-hidden">
       <div className="w-full sm:w-11/12 md:w-10/12 lg:w-10/12 xl:w-9/12 mx-auto">
-        <p className="text-[#474F7A] text-[24px] font-bold mt-5 lg:mt-14 pl-4 lg:pl-2">
-          სტატიები
-        </p>
+        <div className="flex justify-between items-center">
+          <p className="text-[#474F7A] text-[24px] font-bold mt-5 lg:mt-14 pl-4 lg:pl-2">
+            სტატიები
+          </p>
+          <button
+            onClick={refreshArticles}
+            className="text-white bg-blue-500 px-4 py-2 rounded"
+          >
+            Refresh Articles
+          </button>
+        </div>
         <p className="text-[#8D91AB] text-wrap pl-4 text-[14px] font-bold lg:pl-2 pt-5 w-11/12 lg:w-9/12 lg:text-justify mb-10">
           „მაუწყებელი“ მიზნად ისახავს საზოგადოებრივად მნიშვნელოვანი, მაგრამ პოლიტიკური დღის წესრიგის მიერ უგულებელყოფილი საკითხების წინ წამოწევას და გთავაზობთ ანალიტიკურ სტატიებს.
         </p>
 
-        {/* Initial Loading */}
         {isValidating && processedArticles.length === 0 ? (
           <div className="flex justify-center items-center mt-10">
-            <img src="/images/loader.svg" alt="Loading" /> {/* Custom loader */}
+            <img src="/images/loader.svg" alt="Loading" />
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mt-5 mx-4 lg:mx-0">
@@ -154,7 +162,6 @@ export default function ClientSideArticles({ initialArticles }) {
           </div>
         )}
 
-        {/* Infinite Scrolling Loader */}
         {isValidating && processedArticles.length > 0 && (
           <div ref={loadMoreRef} className="h-10 w-full flex justify-center items-center">
             <img src="/images/loader.svg" alt="Loading more articles" />
@@ -166,3 +173,4 @@ export default function ClientSideArticles({ initialArticles }) {
     </section>
   );
 }
+

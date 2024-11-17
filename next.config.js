@@ -1,9 +1,15 @@
-import redirects from './redirects.json' assert { type: 'json' };
+// next.config.cjs
+
+const redirects = require('./redirects.json');
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ['mautskebeli.wpenginepowered.com', 'img.youtube.com', 'www.mautskebeli.ge'],
+    domains: [
+      'mautskebeli.wpenginepowered.com',
+      'img.youtube.com',
+      'www.mautskebeli.ge'
+    ],
     formats: ['image/avif', 'image/webp'],
     deviceSizes: [320, 420, 768, 1024, 1200],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
@@ -29,4 +35,4 @@ const nextConfig = {
   },
 };
 
-export default nextConfig;
+module.exports = nextConfig;
