@@ -11,7 +11,7 @@ import { load } from 'cheerio';
 // Import client components dynamically
 import dynamic from 'next/dynamic';
 
-// Dynamically import client components
+// Dynamically import client components to keep the page as a Server Component
 const ShareButtons = dynamic(() => import('./ShareButtons'), { ssr: false });
 const LanguageDropdown = dynamic(() => import('./LanguageDropdown'), { ssr: false });
 const ScrollToTopButton = dynamic(() => import('./ScrollToTopButton'), { ssr: false });
@@ -64,27 +64,29 @@ export async function generateMetadata({ params }) {
   const description = article.acf.description || article.acf.sub_title || '';
   const decodedDescription = decode(description);
 
-  // Ensure the image URL is absolute
-  const imageUrl = article.acf.image
+  // Ensure the image URL is absolute and points to the original image
+  let imageUrl = article.acf.image
     ? article.acf.image.startsWith('http')
       ? article.acf.image
       : `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}${article.acf.image}`
     : 'https://www.mautskebeli.ge/images/default-og-image.jpg'; // Use absolute URL for default image
 
+  // Remove any query parameters that might cause issues
+  imageUrl = imageUrl.split('?')[0];
+
+  // Set metadataBase to ensure relative URLs are correctly resolved
+  const metadataBase = new URL('https://www.mautskebeli.ge');
+
   return {
+    metadataBase, // Ensure relative URLs are resolved correctly
     title: decodedTitle,
     description: decodedDescription,
     openGraph: {
       title: decodedTitle,
       description: decodedDescription,
-      url: `https://www.mautskebeli.ge/all-articles/${id}`,
+      url: `/all-articles/${id}`, // Relative URL
       type: 'article',
-      images: [
-        {
-          url: imageUrl,
-          alt: decodedTitle,
-        },
-      ],
+      images: [imageUrl], // Use array of strings to prevent URL transformation
       locale: 'ka_GE',
       siteName: 'Mautskebeli',
     },
@@ -209,6 +211,7 @@ const ArticlePage = async ({ params }) => {
     $(elem).css('margin-left', '20px');
     $(elem).css('padding-left', '15px');
     $(elem).css('border-left', '5px solid #ccc');
+    $(elem).css('font-style', 'italic');
   });
 
   sanitizedContent = $.html();
