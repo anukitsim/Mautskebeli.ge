@@ -7,11 +7,14 @@ import 'moment/locale/ka';
 import { decode } from 'html-entities';
 import sanitizeHtml from 'sanitize-html';
 import { load } from 'cheerio';
-import ShareButtons from './ShareButtons';
-import LanguageDropdown from './LanguageDropdown';
-import ScrollToTopButton from './ScrollToTopButton';
 
-// Ensure this page is a Server Component (do not add 'use client' at the top)
+// Import client components dynamically
+import dynamic from 'next/dynamic';
+
+// Dynamically import client components
+const ShareButtons = dynamic(() => import('./ShareButtons'), { ssr: false });
+const LanguageDropdown = dynamic(() => import('./LanguageDropdown'), { ssr: false });
+const ScrollToTopButton = dynamic(() => import('./ScrollToTopButton'), { ssr: false });
 
 const categories = [
   { name: 'სტატიები', path: '/all-articles' },
@@ -66,7 +69,7 @@ export async function generateMetadata({ params }) {
     ? article.acf.image.startsWith('http')
       ? article.acf.image
       : `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}${article.acf.image}`
-    : '/images/default-og-image.jpg';
+    : 'https://www.mautskebeli.ge/images/default-og-image.jpg'; // Use absolute URL for default image
 
   return {
     title: decodedTitle,
@@ -84,6 +87,12 @@ export async function generateMetadata({ params }) {
       ],
       locale: 'ka_GE',
       siteName: 'Mautskebeli',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: decodedTitle,
+      description: decodedDescription,
+      images: [imageUrl],
     },
   };
 }
