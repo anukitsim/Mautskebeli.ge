@@ -1,17 +1,11 @@
-// app/free-column/[id]/ColumnPage.jsx
-
 'use client';
+
 import { useEffect, useState } from 'react';
-import Image from 'next/image';
-import DOMPurify from 'dompurify';
+import sanitizeHtml from 'sanitize-html';
+import { load } from 'cheerio';
 import moment from 'moment';
 import 'moment/locale/ka';
-import {
-  FacebookShareButton,
-  FacebookIcon,
-  TwitterShareButton,
-  TwitterIcon,
-} from 'next-share';
+import { decode } from 'html-entities';
 
 const categories = [
   { name: 'სტატიები', path: '/all-articles' },
@@ -25,79 +19,53 @@ function formatDate(dateString) {
   return moment(dateString).format('LL');
 }
 
+// Enhanced sanitization for WYSIWYG content with inline font-size
+function getSanitizedContent(content) {
+  const sanitized = sanitizeHtml(content, {
+    allowedTags: [
+      'b', 'i', 'em', 'strong', 'a', 'p', 'blockquote',
+      'ul', 'ol', 'li', 'br', 'span', 'h1', 'h2', 'h3',
+      'h4', 'h5', 'h6', 'img', 'video', 'source', 'audio', 'figure', 'figcaption'
+    ],
+    allowedAttributes: {
+      'a': ['href', 'target', 'rel'],
+      'span': ['style'], // Preserve inline styles for span
+      'p': ['style'],    // Preserve inline styles for paragraph
+      'blockquote': ['style'], // Preserve blockquote styles
+      'img': ['src', 'alt', 'title', 'width', 'height', 'style'], // Allow image styles
+    },
+    allowedSchemes: ['http', 'https', 'data'],
+    allowedStyles: {
+      '*': {
+        'font-size': [/^\d+(?:px|em|%)$/], // Allow font-size in px, em, and %
+        'text-align': [/^(left|right|center|justify)$/], // Allow text alignment
+        'font-weight': [/^(normal|bold|lighter|bolder|[1-9]00)$/], // Allow font weights
+        'color': [/^#[0-9a-fA-F]{3,6}$/], // Allow hex colors
+      },
+    },
+  });
+
+  // Preserve blockquote styling specifically
+  const $ = load(sanitized);
+  $('blockquote').each((_, elem) => {
+    $(elem).css('margin-left', '20px');
+    $(elem).css('padding-left', '15px');
+    $(elem).css('border-left', '5px solid #ccc');
+    $(elem).css('font-style', 'italic');
+  });
+
+  return $.html();
+}
+
 const ColumnPage = ({ article }) => {
-  const [showShareOptions, setShowShareOptions] = useState(false);
-  const [showScrollButton, setShowScrollButton] = useState(false);
   const [sanitizedContent, setSanitizedContent] = useState('');
 
   useEffect(() => {
     if (article) {
-      let sanitized = DOMPurify.sanitize(article.acf['main-text']);
-
-      // Parse the sanitized HTML
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(sanitized, 'text/html');
-
-      // Add target and rel to external links only
-      const links = doc.querySelectorAll('a');
-      links.forEach((link) => {
-        const href = link.getAttribute('href');
-        if (href) {
-          if (href.startsWith('#') || href.startsWith('/')) {
-            // Internal link; do nothing
-          } else {
-            try {
-              const linkUrl = new URL(href, window.location.origin);
-              if (linkUrl.origin !== window.location.origin) {
-                // External link
-                link.setAttribute('target', '_blank');
-                link.setAttribute('rel', 'noopener noreferrer');
-              }
-            } catch (e) {
-              // If URL parsing fails, treat as internal link
-            }
-          }
-        }
-      });
-
-      // Handle blockquote indentation
-      const blockquotes = doc.querySelectorAll('blockquote');
-      blockquotes.forEach((blockquote) => {
-        blockquote.style.marginLeft = '20px'; // Adjust the margin for indentation
-        blockquote.style.paddingLeft = '15px'; // Optional padding
-        blockquote.style.borderLeft = '5px solid #ccc'; // Optional border style
-      });
-
-      // Serialize back to a string
-      const updatedContent = doc.body.innerHTML;
-
-      setSanitizedContent(updatedContent);
+      const content = getSanitizedContent(article.acf['main-text']);
+      setSanitizedContent(content);
     }
   }, [article]);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const scrollY = window.scrollY;
-      const scrollThreshold = 2000;
-      const windowHeight = window.innerHeight;
-      const documentHeight = document.documentElement.scrollHeight;
-      const footerHeight = 100; // assuming footer height
-      const bottomThreshold = documentHeight - (footerHeight + windowHeight * 2);
-
-      if (scrollY > scrollThreshold && scrollY < bottomThreshold) {
-        setShowScrollButton(true);
-      } else {
-        setShowScrollButton(false);
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
 
   if (!article) {
     return (
@@ -128,83 +96,40 @@ const ColumnPage = ({ article }) => {
           ))}
         </div>
         <div className="w-full h-auto mb-5">
-          <Image
-            src={article.acf.image || '/images/default-og-image.jpg'}
-            alt={article.acf.title || 'Article Image'}
-            width={800}
-            height={450}
-            style={{ objectFit: 'cover' }}
-            className="rounded-lg w-full"
-          />
+          {article.acf.image && (
+            <img
+              src={article.acf.image}
+              alt={decode(article.acf.title)}
+              className="rounded-lg w-full"
+              style={{ objectFit: 'cover' }}
+            />
+          )}
+
           <h1 className="font-alk-tall-mtavruli text-[32px] sm:text-[64px] font-light leading-none text-[#474F7A] mt-[24px] mb-2">
-            {article.acf.title}
+            {decode(article.acf.title)}
           </h1>
+
           {article.acf.sub_title && (
             <h3 className="font-alk-tall-mtavruli text-[24px] sm:text-[32px] font-light leading-none text-[#474F7A] mt-[12px] mb-5">
               {article.acf.sub_title}
             </h3>
           )}
+
           {article.acf['ავტორი'] && (
             <h3 className="font-noto-sans-georgian text-[16px] sm:text-[24px] font-extrabold text-[#AD88C6] leading-normal mb-5">
               {article.acf['ავტორი']}
             </h3>
           )}
+
           <p className="text-[#474F7A] font-semibold pb-10">{formattedDate}</p>
         </div>
+
+        {/* Render sanitized WYSIWYG content */}
         <div
           className="article-content text-[#474F7A] font-noto-sans-georgian text-[14px] sm:text-[16px] font-normal lg:text-justify leading-[30px] sm:leading-[35px] tracking-[0.32px]"
           dangerouslySetInnerHTML={{ __html: sanitizedContent }}
         ></div>
-        <div className="flex flex-wrap gap-4 mt-10">
-          <button
-            onClick={() => setShowShareOptions(true)}
-            className="bg-[#FECE27] text-[#474F7A] pl-[18px] pr-[18px] pt-[4px] pb-[4px] text-[16px] font-semibold rounded flex gap-[12px] items-center justify-center"
-          >
-            <Image src="/images/share.png" alt="share icon" width={24} height={24} />
-          </button>
-        </div>
-        {showShareOptions && (
-          <div
-            className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center"
-            onClick={() => setShowShareOptions(false)}
-          >
-            <div
-              className="rounded-lg p-6 w-80"
-              style={{ backgroundColor: 'rgba(0, 0, 0, 0.30)' }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <h2 className="text-xl text-white font-bold mb-4">გააზიარე</h2>
-              <div className="flex items-center pt-7 gap-5">
-                <FacebookShareButton
-                  url={`https://www.mautskebeli.ge/free-column/${article.id}`}
-                  quote={article.acf.title}
-                >
-                  <FacebookIcon size={44} round={true} />
-                </FacebookShareButton>
-                <TwitterShareButton
-                  url={`https://www.mautskebeli.ge/free-column/${article.id}`}
-                  title={article.acf.title}
-                >
-                  <TwitterIcon size={44} round={true} />
-                </TwitterShareButton>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
-      {showScrollButton && (
-        <button
-          onClick={scrollToTop}
-          className="fixed bottom-10 right-10 text-[#474F7A] w-[210px] h-[51px] rounded-[100px] inline-flex items-center justify-center gap-[10px]"
-          style={{
-            padding: '25px 32px 28px 32px',
-            background: '#FECE27',
-            boxShadow: '0 0 20px 5px rgba(254, 206, 39, 0.5)',
-          }}
-        >
-          <span className="whitespace-nowrap">საწყისზე დაბრუნება</span>
-        </button>
-      )}
       <footer className="h-[100px]"></footer>
     </section>
   );

@@ -110,12 +110,7 @@ export default function ClientSideArticles({ initialArticles }) {
           <p className="text-[#474F7A] text-[24px] font-bold mt-5 lg:mt-14 pl-4 lg:pl-2">
             სტატიები
           </p>
-          <button
-            onClick={refreshArticles}
-            className="text-white bg-blue-500 px-4 py-2 rounded"
-          >
-            Refresh Articles
-          </button>
+        
         </div>
         <p className="text-[#8D91AB] text-wrap pl-4 text-[14px] font-bold lg:pl-2 pt-5 w-11/12 lg:w-9/12 lg:text-justify mb-10">
           „მაუწყებელი“ მიზნად ისახავს საზოგადოებრივად მნიშვნელოვანი, მაგრამ პოლიტიკური დღის წესრიგის მიერ უგულებელყოფილი საკითხების წინ წამოწევას და გთავაზობთ ანალიტიკურ სტატიებს.

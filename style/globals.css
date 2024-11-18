@@ -893,11 +893,7 @@ a.scale-on-hover:hover {
   color: #8C74B2; /* Hover color, optional customization */
 }
 
-.article-content img {
-  width: auto !important;  /* Ensure inline width is respected */
-  max-width: 100%;  /* Still maintain responsiveness */
-  height: auto !important;  /* Ensure inline height is respected */
-}
+
 
 
 /* Add this to your globals.css or component-specific CSS */

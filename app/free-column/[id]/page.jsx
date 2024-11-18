@@ -4,11 +4,12 @@ import ColumnPage from "./ColumnPage"; // Corrected import statement
 
 export async function generateMetadata({ params }) {
   const { id } = params;
+  const timestamp = new Date().getTime(); // Add a timestamp to bypass cache
 
   try {
     // Fetch the article data from WordPress
-    const apiUrl = `https://mautskebeli.wpenginepowered.com/wp-json/wp/v2/free-column/${id}?acf_format=standard&_fields=id,acf,date`;
-    const res = await fetch(apiUrl);
+    const apiUrl = `https://mautskebeli.wpenginepowered.com/wp-json/wp/v2/free-column/${id}?acf_format=standard&_fields=id,acf,date&_t=${timestamp}`;
+    const res = await fetch(apiUrl, { cache: 'no-store' });
 
     if (!res.ok) {
       throw new Error('Failed to fetch article data');
@@ -16,15 +17,12 @@ export async function generateMetadata({ params }) {
 
     const article = await res.json();
 
-    // Function to sanitize and extract text from HTML
     const sanitizeDescription = (html) => {
       const doc = new DOMParser().parseFromString(html, 'text/html');
       return doc.body.textContent || '';
     };
 
     const ogDescription = sanitizeDescription(article.acf['main-text']).slice(0, 150);
-
-    // Use the original image URL from WordPress backend
     const ogImageUrl = article.acf.image || '/images/default-og-image.jpg';
 
     return {
@@ -43,17 +41,10 @@ export async function generateMetadata({ params }) {
         ],
         type: 'article',
       },
-      additionalMetaTags: [
-        { property: 'fb:app_id', content: '1819807585106457' },
-        { property: 'og:site_name', content: 'Mautskebeli' },
-        { property: 'og:locale', content: 'ka_GE' },
-        { property: 'article:publisher', content: '100041686795244' },
-      ],
     };
   } catch (error) {
     console.error('Error generating metadata:', error);
 
-    // Return default metadata in case of error
     return {
       title: 'Default Title',
       description: 'Default description',
@@ -76,11 +67,11 @@ export async function generateMetadata({ params }) {
 
 export default async function Page({ params }) {
   const { id } = params;
+  const timestamp = new Date().getTime(); // Add a timestamp to bypass cache
 
   try {
-    // Fetch the article data from WordPress
-    const apiUrl = `https://mautskebeli.wpenginepowered.com/wp-json/wp/v2/free-column/${id}?acf_format=standard&_fields=id,acf,date`;
-    const res = await fetch(apiUrl);
+    const apiUrl = `https://mautskebeli.wpenginepowered.com/wp-json/wp/v2/free-column/${id}?acf_format=standard&_fields=id,acf,date&_t=${timestamp}`;
+    const res = await fetch(apiUrl, { cache: 'no-store' });
 
     if (!res.ok) {
       throw new Error('Failed to fetch article data');
@@ -88,7 +79,6 @@ export default async function Page({ params }) {
 
     const article = await res.json();
 
-    // Pass the article data to the client component
     return <ColumnPage article={article} />;
   } catch (error) {
     console.error('Error fetching article data:', error);

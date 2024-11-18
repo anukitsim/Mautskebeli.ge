@@ -62,6 +62,7 @@ export default function ClientSideFreeColumn({ initialArticles }) {
 
   const getKey = (pageIndex, previousPageData) => {
     if (previousPageData && !previousPageData.length) return null; // No more articles to load
+    console.log(`Fetching page ${pageIndex + 1}`); // Log to track which page is being requested
     return `https://mautskebeli.wpenginepowered.com/wp-json/wp/v2/free-column?acf_format=standard&_fields=id,title,acf,date&per_page=10&page=${pageIndex + 1}`;
   };
 
@@ -92,6 +93,9 @@ export default function ClientSideFreeColumn({ initialArticles }) {
           ['main-text']: truncateText(decodeHTMLEntities(stripHtml(article.acf?.['main-text'] || '')), 30),
         },
       }));
+
+      // Log processed articles to see if the new article is included
+      console.log('Processed Articles:', processed);
 
       // Only update the state if processed articles differ from previous ones
       if (JSON.stringify(previousArticlesRef.current) !== JSON.stringify(processed)) {
