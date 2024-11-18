@@ -9,8 +9,8 @@ import Head from 'next/head';
 
 export default function RootLayout({ children, metadata }) {
   const defaultMetadata = {
-    title: "Default Title",
-    description: "Default description",
+    title: "თავისუფალი სვეტი",
+    description: "ფართო, ინკლუზიური და რადიკალური დემოკრატიის იდეის კრიზისის ფონზე, „მაუწყებელი“ მიზნად ისახავს მხარი დაუჭიროს ადგილობრივი ხმების გაჟღერებას და თავისუფალ პლატფორმას უთმობს ავტორებს, რომელთაც სურთ სოციალურ-ეკონომიკურ საკითხებსა და ქვეყანაში მიმდინარე მოვლენებზე სტატიების გამოქვეყნებ",
     openGraph: {
       title: "Default OG Title",
       description: "Default OG Description",

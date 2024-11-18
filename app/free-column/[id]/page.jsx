@@ -26,10 +26,10 @@ export async function generateMetadata({ params }) {
     const ogImageUrl = article.acf.image || '/images/default-og-image.jpg';
 
     return {
-      title: article.acf.title || 'Default Title',
+      title: article.acf.title || 'თავისუფალი სვეტი',
       description: ogDescription || 'Default description',
       openGraph: {
-        title: article.acf.title || 'Default Title',
+        title: article.acf.title || 'თავისუფალი სვეტი',
         description: ogDescription || 'Default description',
         url: `https://www.mautskebeli.ge/free-column/${id}`,
         images: [
@@ -46,7 +46,7 @@ export async function generateMetadata({ params }) {
     console.error('Error generating metadata:', error);
 
     return {
-      title: 'Default Title',
+      title: 'თავისუფალი სვეტი',
       description: 'Default description',
       openGraph: {
         title: 'Default Title',

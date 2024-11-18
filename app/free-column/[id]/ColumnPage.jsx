@@ -19,7 +19,7 @@ function formatDate(dateString) {
   return moment(dateString).format('LL');
 }
 
-// Enhanced sanitization for WYSIWYG content with inline font-size
+// Enhanced sanitization for WYSIWYG content
 function getSanitizedContent(content) {
   const sanitized = sanitizeHtml(content, {
     allowedTags: [
@@ -29,24 +29,34 @@ function getSanitizedContent(content) {
     ],
     allowedAttributes: {
       'a': ['href', 'target', 'rel'],
-      'span': ['style'], // Preserve inline styles for span
-      'p': ['style'],    // Preserve inline styles for paragraph
-      'blockquote': ['style'], // Preserve blockquote styles
-      'img': ['src', 'alt', 'title', 'width', 'height', 'style'], // Allow image styles
+      'img': ['src', 'alt', 'title', 'width', 'height', 'style'], // Preserve resizing attributes
+      'video': ['src', 'controls', 'width', 'height', 'poster', 'style'],
+      'audio': ['src', 'controls'],
+      'source': ['src', 'type'],
+      'span': ['style'],
+      'p': ['style'],
+      'blockquote': ['cite', 'style'],
+      'figure': [],
+      'figcaption': [],
     },
     allowedSchemes: ['http', 'https', 'data'],
     allowedStyles: {
       '*': {
-        'font-size': [/^\d+(?:px|em|%)$/], // Allow font-size in px, em, and %
-        'text-align': [/^(left|right|center|justify)$/], // Allow text alignment
-        'font-weight': [/^(normal|bold|lighter|bolder|[1-9]00)$/], // Allow font weights
-        'color': [/^#[0-9a-fA-F]{3,6}$/], // Allow hex colors
+        'width': [/^\d+(?:px|%)$/], // Allow percentage and pixel-based widths
+        'height': [/^\d+(?:px|%)$/],
+        'max-width': [/^\d+(?:px|%)$/],
+        'max-height': [/^\d+(?:px|%)$/],
+        'float': [/^(left|right|none)$/],
+        'object-fit': [/^(cover|contain|fill|none|scale-down)$/],
+        'font-size': [/^\d+(?:px|em|rem|%)$/],
       },
     },
+    allowVulnerableTags: false,
   });
 
-  // Preserve blockquote styling specifically
+  // Enhance the content using Cheerio for blockquote styles
   const $ = load(sanitized);
+
   $('blockquote').each((_, elem) => {
     $(elem).css('margin-left', '20px');
     $(elem).css('padding-left', '15px');
@@ -96,35 +106,28 @@ const ColumnPage = ({ article }) => {
           ))}
         </div>
         <div className="w-full h-auto mb-5">
-          {article.acf.image && (
-            <img
-              src={article.acf.image}
-              alt={decode(article.acf.title)}
-              className="rounded-lg w-full"
-              style={{ objectFit: 'cover' }}
-            />
-          )}
-
+          {/* Standard img tag to preserve WYSIWYG resizing */}
+          <img
+            src={article.acf.image || '/images/default-og-image.jpg'}
+            alt={decode(article.acf.title)}
+            style={{ width: '100%', height: 'auto', objectFit: 'cover' }}
+            className="rounded-lg"
+          />
           <h1 className="font-alk-tall-mtavruli text-[32px] sm:text-[64px] font-light leading-none text-[#474F7A] mt-[24px] mb-2">
             {decode(article.acf.title)}
           </h1>
-
           {article.acf.sub_title && (
             <h3 className="font-alk-tall-mtavruli text-[24px] sm:text-[32px] font-light leading-none text-[#474F7A] mt-[12px] mb-5">
               {article.acf.sub_title}
             </h3>
           )}
-
           {article.acf['ავტორი'] && (
             <h3 className="font-noto-sans-georgian text-[16px] sm:text-[24px] font-extrabold text-[#AD88C6] leading-normal mb-5">
               {article.acf['ავტორი']}
             </h3>
           )}
-
           <p className="text-[#474F7A] font-semibold pb-10">{formattedDate}</p>
         </div>
-
-        {/* Render sanitized WYSIWYG content */}
         <div
           className="article-content text-[#474F7A] font-noto-sans-georgian text-[14px] sm:text-[16px] font-normal lg:text-justify leading-[30px] sm:leading-[35px] tracking-[0.32px]"
           dangerouslySetInnerHTML={{ __html: sanitizedContent }}

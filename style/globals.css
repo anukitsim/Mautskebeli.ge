@@ -893,6 +893,13 @@ a.scale-on-hover:hover {
   color: #8C74B2; /* Hover color, optional customization */
 }
 
+.article-content blockquote {
+  border-left: 4px solid #ccc; /* Gray left border */
+  padding-left: 16px;         /* Padding for the blockquote text */
+  font-style: italic;         /* Italicized blockquote text */
+  text-align: right;          /* Right-align the blockquote text */
+  margin: 16px 0;             /* Add spacing around blockquote */
+}
 
 
 
@@ -911,3 +918,4 @@ a.scale-on-hover:hover {
   margin-top: 0.25rem;
   margin-bottom: 0.25rem;
 }
+
