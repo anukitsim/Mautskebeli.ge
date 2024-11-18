@@ -50,7 +50,7 @@ function decodeHTMLEntities(str) {
 
 // Sanitize content while allowing inline styles for WYSIWYG-rendered media
 function getSanitizedContent(content) {
-  return sanitizeHtml(content, {
+  const sanitized = sanitizeHtml(content, {
     allowedTags: [
       'b', 'i', 'em', 'strong', 'a', 'p', 'blockquote',
       'ul', 'ol', 'li', 'br', 'span', 'h1', 'h2', 'h3',
@@ -58,7 +58,7 @@ function getSanitizedContent(content) {
     ],
     allowedAttributes: {
       'a': ['href', 'target', 'rel'],
-      'img': ['src', 'alt', 'title', 'width', 'height', 'style'],
+      'img': ['src', 'alt', 'title', 'width', 'height', 'style'], // Preserve resizing attributes
       'video': ['src', 'controls', 'width', 'height', 'poster', 'style'],
       'audio': ['src', 'controls'],
       'source': ['src', 'type'],
@@ -69,22 +69,31 @@ function getSanitizedContent(content) {
       'figcaption': [],
     },
     allowedSchemes: ['http', 'https', 'data'],
-    allowedSchemesByTag: {
-      img: ['http', 'https', 'data'],
-      video: ['http', 'https'],
-      audio: ['http', 'https'],
-    },
     allowedStyles: {
       '*': {
-        'width': [/^\d+(?:px|%)$/],
+        'width': [/^\d+(?:px|%)$/], // Allow percentage and pixel-based widths
         'height': [/^\d+(?:px|%)$/],
         'max-width': [/^\d+(?:px|%)$/],
         'max-height': [/^\d+(?:px|%)$/],
         'float': [/^(left|right|none)$/],
+        'object-fit': [/^(cover|contain|fill|none|scale-down)$/],
+        'font-size': [/^\d+(?:px|em|rem|%)$/],
       },
     },
     allowVulnerableTags: false,
   });
+
+  // Enhance the content using Cheerio for blockquote styles
+  const $ = load(sanitized);
+
+  $('blockquote').each((_, elem) => {
+    $(elem).css('margin-left', '20px');
+    $(elem).css('padding-left', '15px');
+    $(elem).css('border-left', '5px solid #ccc');
+    $(elem).css('font-style', 'italic');
+  });
+
+  return $.html();
 }
 
 const ArticlePage = async ({ params }) => {
