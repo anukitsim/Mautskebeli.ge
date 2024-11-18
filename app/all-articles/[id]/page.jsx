@@ -1,3 +1,5 @@
+// app/all-articles/[id]/page.jsx
+
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import moment from 'moment';
@@ -9,6 +11,8 @@ import ShareButtons from './ShareButtons';
 import LanguageDropdown from './LanguageDropdown';
 import ScrollToTopButton from './ScrollToTopButton';
 
+// Ensure this page is a Server Component (do not add 'use client' at the top)
+
 const categories = [
   { name: 'სტატიები', path: '/all-articles' },
   { name: 'თარგმანი', path: '/translate' },
@@ -16,27 +20,72 @@ const categories = [
   { name: 'თავისუფალი სვეტი', path: '/free-column' },
 ];
 
-// Fetch the article with cache busting
+// Fetch the article
 async function fetchArticle(id) {
-  const apiUrl = `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/wp/v2/article/${id}?acf_format=standard&_fields=id,title,acf,date&_=${new Date().getTime()}`;
+  const apiUrl = `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/wp/v2/article/${id}?acf_format=standard&_fields=id,title,acf,date`;
 
   try {
     const res = await fetch(apiUrl, {
-      cache: 'no-store', // Disable caching
+      next: { revalidate: 10 }, // Adjust revalidation as needed
     });
 
     if (!res.ok) {
-      console.error(`Failed to fetch article with id ${id}: ${res.status} ${res.statusText}`);
+      console.error(
+        `Failed to fetch article with id ${id}: ${res.status} ${res.statusText}`
+      );
       return null;
     }
 
     const article = await res.json();
-    console.log(`Fetched article: `, article); // Debug the API response
     return article;
   } catch (error) {
     console.error(`Error fetching article with id ${id}:`, error);
     return null;
   }
+}
+
+// Generate Metadata for the Article
+export async function generateMetadata({ params }) {
+  const { id } = params;
+  const article = await fetchArticle(id);
+
+  if (!article) {
+    return {
+      title: 'Article Not Found',
+      description: 'This article does not exist.',
+    };
+  }
+
+  // Decode HTML entities in the title and description
+  const decodedTitle = decode(article.title.rendered || '');
+  const description = article.acf.description || article.acf.sub_title || '';
+  const decodedDescription = decode(description);
+
+  // Ensure the image URL is absolute
+  const imageUrl = article.acf.image
+    ? article.acf.image.startsWith('http')
+      ? article.acf.image
+      : `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}${article.acf.image}`
+    : '/images/default-og-image.jpg';
+
+  return {
+    title: decodedTitle,
+    description: decodedDescription,
+    openGraph: {
+      title: decodedTitle,
+      description: decodedDescription,
+      url: `https://www.mautskebeli.ge/all-articles/${id}`,
+      type: 'article',
+      images: [
+        {
+          url: imageUrl,
+          alt: decodedTitle,
+        },
+      ],
+      locale: 'ka_GE',
+      siteName: 'Mautskebeli',
+    },
+  };
 }
 
 function formatDate(dateString) {
@@ -52,30 +101,51 @@ function decodeHTMLEntities(str) {
 function getSanitizedContent(content) {
   const sanitized = sanitizeHtml(content, {
     allowedTags: [
-      'b', 'i', 'em', 'strong', 'a', 'p', 'blockquote',
-      'ul', 'ol', 'li', 'br', 'span', 'h1', 'h2', 'h3',
-      'h4', 'h5', 'h6', 'img', 'video', 'source', 'audio', 'figure', 'figcaption'
+      'b',
+      'i',
+      'em',
+      'strong',
+      'a',
+      'p',
+      'blockquote',
+      'ul',
+      'ol',
+      'li',
+      'br',
+      'span',
+      'h1',
+      'h2',
+      'h3',
+      'h4',
+      'h5',
+      'h6',
+      'img',
+      'video',
+      'source',
+      'audio',
+      'figure',
+      'figcaption',
     ],
     allowedAttributes: {
-      'a': ['href', 'target', 'rel'],
-      'img': ['src', 'alt', 'title', 'width', 'height', 'style'], // Preserve resizing attributes
-      'video': ['src', 'controls', 'width', 'height', 'poster', 'style'],
-      'audio': ['src', 'controls'],
-      'source': ['src', 'type'],
-      'span': ['style'],
-      'p': ['style'],
-      'blockquote': ['cite', 'style'],
-      'figure': [],
-      'figcaption': [],
+      a: ['href', 'target', 'rel'],
+      img: ['src', 'alt', 'title', 'width', 'height', 'style'],
+      video: ['src', 'controls', 'width', 'height', 'poster', 'style'],
+      audio: ['src', 'controls'],
+      source: ['src', 'type'],
+      span: ['style'],
+      p: ['style'],
+      blockquote: ['cite', 'style'],
+      figure: [],
+      figcaption: [],
     },
     allowedSchemes: ['http', 'https', 'data'],
     allowedStyles: {
       '*': {
-        'width': [/^\d+(?:px|%)$/], // Allow percentage and pixel-based widths
-        'height': [/^\d+(?:px|%)$/],
+        width: [/^\d+(?:px|%)$/],
+        height: [/^\d+(?:px|%)$/],
         'max-width': [/^\d+(?:px|%)$/],
         'max-height': [/^\d+(?:px|%)$/],
-        'float': [/^(left|right|none)$/],
+        float: [/^(left|right|none)$/],
         'object-fit': [/^(cover|contain|fill|none|scale-down)$/],
         'font-size': [/^\d+(?:px|em|rem|%)$/],
       },
@@ -118,7 +188,10 @@ const ArticlePage = async ({ params }) => {
   $('img, video, audio, source').each((i, elem) => {
     const src = $(elem).attr('src');
     if (src && !src.startsWith('http')) {
-      $(elem).attr('src', `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}${src}`);
+      $(elem).attr(
+        'src',
+        `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}${src}`
+      );
     }
   });
 
@@ -132,7 +205,8 @@ const ArticlePage = async ({ params }) => {
   sanitizedContent = $.html();
 
   // Determine if the language dropdown should be shown
-  const showLanguageDropdown = article.acf.language1 === true || article.acf.language2 === true;
+  const showLanguageDropdown =
+    article.acf.language1 === true || article.acf.language2 === true;
 
   return (
     <section className="w-full mx-auto mt-10 px-4 lg:px-0 overflow-x-hidden relative">
@@ -154,7 +228,10 @@ const ArticlePage = async ({ params }) => {
         </div>
         <div className="w-full h-auto mb-5">
           <Image
-            src={article.acf.image || '/images/default-og-image.jpg'}
+            src={
+              article.acf.image ||
+              '/images/default-og-image.jpg'
+            }
             alt={article.title.rendered}
             width={800}
             height={450}
