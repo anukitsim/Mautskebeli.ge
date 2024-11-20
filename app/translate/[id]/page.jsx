@@ -195,7 +195,7 @@ const ArticlePage = async ({ params }) => {
         <h2 className="font-noto-sans-georgian text-[16px] sm:text-[24px] font-extrabold text-[#AD88C6] leading-normal mb-5">
           {article.acf['ავტორი']}
         </h2>
-        <h2 className="font-noto-sans-georgian text-[16px] sm:text-[20px] font-semibold text-[#AD88C6]  leading-normal mb-5">
+        <h2 className="font-noto-sans-georgian text-[16px] sm:text-[20px] font-semibold text-[#474F7A]  leading-normal mb-5">
   {article.acf['მთარგმნელი']}
 </h2>
         <p className="text-[#474F7A] font-semibold pb-10">
