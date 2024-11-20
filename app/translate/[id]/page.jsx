@@ -41,22 +41,71 @@ function decodeHTMLEntities(str) {
 }
 
 function getSanitizedContent(content) {
-  return sanitizeHtml(content, {
-    allowedTags: ['b', 'i', 'em', 'strong', 'a', 'p', 'blockquote', 'ul', 'ol', 'li', 'br', 'span', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'img', 'code', 'pre'],
+  const sanitized = sanitizeHtml(content, {
+    allowedTags: [
+      'b',
+      'i',
+      'em',
+      'strong',
+      'a',
+      'p',
+      'blockquote',
+      'ul',
+      'ol',
+      'li',
+      'br',
+      'span',
+      'h1',
+      'h2',
+      'h3',
+      'h4',
+      'h5',
+      'h6',
+      'img',
+      'video',
+      'source',
+      'audio',
+      'figure',
+      'figcaption',
+    ],
     allowedAttributes: {
-      'a': ['href', 'target', 'rel'],
-      'img': ['src', 'alt', 'title', 'width', 'height'],
-      'span': ['style'],
-      'p': ['style'],
-      'blockquote': ['cite'],
+      a: ['href', 'target', 'rel'],
+      img: ['src', 'alt', 'title', 'width', 'height', 'style'],
+      video: ['src', 'controls', 'width', 'height', 'poster', 'style'],
+      audio: ['src', 'controls'],
+      source: ['src', 'type'],
+      span: ['style'],
+      p: ['style'],
+      blockquote: ['cite', 'style'],
+      figure: [],
+      figcaption: [],
     },
-    allowedSchemes: ['http', 'https', 'mailto'],
-    allowedSchemesByTag: { img: ['http', 'https', 'data'] },
+    allowedSchemes: ['http', 'https', 'data'],
     allowedStyles: {
-      '*': { 'color': [/^#[0-9a-fA-F]{3,6}$/], 'background-color': [/^#[0-9a-fA-F]{3,6}$/], 'font-weight': [/^bold$/], 'text-align': [/^(left|right|center|justify)$/] },
+      '*': {
+        width: [/^\d+(?:px|%)$/],
+        height: [/^\d+(?:px|%)$/],
+        'max-width': [/^\d+(?:px|%)$/],
+        'max-height': [/^\d+(?:px|%)$/],
+        float: [/^(left|right|none)$/],
+        'object-fit': [/^(cover|contain|fill|none|scale-down)$/],
+        'font-size': [/^\d+(?:px|em|rem|%)$/],
+      },
     },
     allowVulnerableTags: false,
   });
+
+  // Enhance the content using Cheerio for blockquote styles
+  const $ = load(sanitized);
+
+  $('blockquote').each((_, elem) => {
+    $(elem).css('margin-left', '20px');
+    $(elem).css('padding-left', '15px');
+    $(elem).css('border-left', '5px solid #ccc');
+    $(elem).css('font-style', 'italic');
+  });
+
+  return $.html();
 }
 
 function extractDescription(content, wordLimit = 30) {
@@ -146,6 +195,9 @@ const ArticlePage = async ({ params }) => {
         <h2 className="font-noto-sans-georgian text-[16px] sm:text-[24px] font-extrabold text-[#AD88C6] leading-normal mb-5">
           {article.acf['ავტორი']}
         </h2>
+        <h2 className="font-noto-sans-georgian text-[16px] sm:text-[20px] font-semibold text-[#AD88C6]  leading-normal mb-5">
+  {article.acf['მთარგმნელი']}
+</h2>
         <p className="text-[#474F7A] font-semibold pb-10">
           {article.formattedDate}
         </p>

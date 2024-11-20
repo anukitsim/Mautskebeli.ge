@@ -19,4 +19,3 @@ export default async function AllArticlesList() {
   const initialArticles = await fetchInitialArticles(); // Fetch initial articles server-side without cache
   return <ClientSideArticles initialArticles={initialArticles} />; // Pass to Client Component
 }
-
