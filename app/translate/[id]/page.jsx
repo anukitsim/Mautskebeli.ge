@@ -16,7 +16,7 @@ const categories = [
 ];
 
 async function fetchArticle(id) {
-  const apiUrl = `https://mautskebeli.wpenginepowered.com/wp-json/wp/v2/targmani/${id}?acf_format=standard&_fields=id,title,acf,date,google_description&_=${new Date().getTime()}`;
+  const apiUrl = `https://mautskebeli.wpenginepowered.com/wp-json/wp/v2/targmani/${id}?acf_format=standard&_fields=id,title,acf,date&_=${new Date().getTime()}`;
 
   try {
     const res = await fetch(apiUrl);
@@ -108,6 +108,13 @@ function getSanitizedContent(content) {
   return $.html();
 }
 
+function extractDescription(content, wordLimit = 30) {
+  const text = content.replace(/<[^>]*>/g, '');
+  const words = text.split(/\s+/);
+  const shortText = words.slice(0, wordLimit).join(' ');
+  return shortText + (words.length > wordLimit ? '...' : '');
+}
+
 export async function generateMetadata({ params }) {
   const { id } = params;
   const article = await fetchArticle(id);
@@ -116,11 +123,12 @@ export async function generateMetadata({ params }) {
     return {};
   }
 
-  const description = article.acf.google_description || 'An article.';
+  const sanitizedMainText = getSanitizedContent(article.acf['main-text']);
+  const description = extractDescription(sanitizedMainText, 30);
 
   return {
     title: article.title.rendered,
-    description: description,
+    description: description || 'An article.',
     openGraph: {
       title: article.title.rendered,
       description: description,
@@ -188,8 +196,8 @@ const ArticlePage = async ({ params }) => {
           {article.acf['ავტორი']}
         </h2>
         <h2 className="font-noto-sans-georgian text-[16px] sm:text-[20px] font-semibold text-[#474F7A]  leading-normal mb-5">
-          {article.acf['მთარგმნელი']}
-        </h2>
+  {article.acf['მთარგმნელი']}
+</h2>
         <p className="text-[#474F7A] font-semibold pb-10">
           {article.formattedDate}
         </p>
