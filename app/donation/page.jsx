@@ -17,7 +17,7 @@ const page = () => {
         <div className="W-7/12 flex flex-col gap-[30px] mt-4">
           <div>
             <h1 className="font-tall-mtavruli text-[#474F7A] text-6xl pl-5 font-normal text-blue-dark leading-normal mt-8 ">
-              <span className="text-[#AD88C6]">"მაუწყებელს" </span>
+              <span className="text-[#AD88C6] font-semibold">"მაუწყებელს" </span>
               თქვენი მხარდაჭერა სჭირდება!
             </h1>
           </div>
