@@ -16,8 +16,8 @@ const page = () => {
         </div>
         <div className="W-7/12 flex flex-col gap-[30px] mt-4">
           <div>
-            <h1 className="font-tall-mtavruli text-6xl pl-5 font-normal text-blue-dark leading-normal mt-8 ">
-              <span className="text-[#AD88C6]">"მაუწყებელს"</span>
+            <h1 className="font-tall-mtavruli text-[#474F7A] text-6xl pl-5 font-normal text-blue-dark leading-normal mt-8 ">
+              <span className="text-[#AD88C6]">"მაუწყებელს" </span>
               თქვენი მხარდაჭერა სჭირდება!
             </h1>
           </div>
@@ -25,7 +25,7 @@ const page = () => {
           <div className="flex gap-[20px] w-full">
             <div className="w-full  pl-4 flex gap-[24px] flex-col text-[#474F7A] text-[16px] font-normal ">
               <p>
-                “მაუწყებელი” დამოუკიდებელი სახალხო მედია, რომელსაც დღის წესრიგში
+                “მაუწყებელი” დამოუკიდებელი სახალხო მედიაა, რომელსაც დღის წესრიგში
                 შემოაქვს საზოგადოებისთვის მნიშვნელოვანი პოლიტიკური და სოციალური
                 საკითხები.
               </p>
