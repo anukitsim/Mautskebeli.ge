@@ -1,25 +1,31 @@
-import "../../style/globals.css";
-import Header from "../components/Header";
-import Navigation from "../components/Navigation";
-import { MenuProvider } from "@/app/context/MenuContext";
-import Footer from "../components/Footer";
-import Head from "next/head";
-import Script from "next/script";
+// app/(root)/layout.jsx
+
+import '../../style/globals.css';
+import { Noto_Sans_Georgian } from 'next/font/google';
+import Head from 'next/head';
+import Script from 'next/script';
 
 export const metadata = {
-  title: "მაუწყებელი",
-  description: "მედია პლათფორმა მაუწყებელი",
-  app_id: "1819807585106457",
+  title: 'მაუწყებელი',
+  description: 'მედია პლათფორმა მაუწყებელი',
+  app_id: '1819807585106457',
 };
 
-export default function RootLayout({ children }) {
-  
+// Import and configure your Google font
+const notoSansGeorgian = Noto_Sans_Georgian({
+  subsets: ['georgian'],
+  weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900'],
+  display: 'swap',
+  variable: '--font-noto-sans-georgian',
+});
 
+export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      
+    <html lang="en" className={`${notoSansGeorgian.variable}`}>
+      <head>
+        {/* Include any additional <head> elements if necessary */}
+      </head>
       <body>
-        {/* Your actual content goes here */}
         {children}
 
         {/* Google Analytics script moved inside the <body> */}
@@ -32,11 +38,11 @@ export default function RootLayout({ children }) {
           strategy="afterInteractive"
           dangerouslySetInnerHTML={{
             __html: `
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
-              gtag('js', new Date());
-              gtag('config', 'G-MZY3EGWH6J');
-            `,
+                  window.dataLayer = window.dataLayer || [];
+                  function gtag(){dataLayer.push(arguments);}
+                  gtag('js', new Date());
+                  gtag('config', 'G-MZY3EGWH6J');
+                `,
           }}
         />
       </body>
