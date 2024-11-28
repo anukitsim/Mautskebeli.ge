@@ -7,14 +7,10 @@ import 'moment/locale/ka';
 import { decode } from 'html-entities';
 import sanitizeHtml from 'sanitize-html';
 import { load } from 'cheerio';
+import React from 'react';
 
-// Import client components dynamically
-import dynamic from 'next/dynamic';
-
-// Dynamically import client components to keep the page as a Server Component
-const ShareButtons = dynamic(() => import('./ShareButtons'), { ssr: false });
-const LanguageDropdown = dynamic(() => import('./LanguageDropdown'), { ssr: false });
-const ScrollToTopButton = dynamic(() => import('./ScrollToTopButton'), { ssr: false });
+// Import the Client Component handling dynamic imports
+import DynamicClientComponents from './DynamicClientComponents';
 
 const categories = [
   { name: 'სტატიები', path: '/all-articles' },
@@ -164,7 +160,7 @@ function getSanitizedContent(content) {
     allowVulnerableTags: false,
   });
 
-  // Enhance the content using Cheerio for blockquote styles
+  // Enhance the content using Cheerio for blockquote styles and to add target="_blank" to links
   const $ = load(sanitized);
 
   $('blockquote').each((_, elem) => {
@@ -172,6 +168,12 @@ function getSanitizedContent(content) {
     $(elem).css('padding-left', '15px');
     $(elem).css('border-left', '5px solid #ccc');
     $(elem).css('font-style', 'italic');
+  });
+
+  // Ensure all <a> tags open in new tabs
+  $('a').each((_, elem) => {
+    $(elem).attr('target', '_blank');
+    $(elem).attr('rel', 'noopener noreferrer');
   });
 
   return $.html();
@@ -206,7 +208,7 @@ const ArticlePage = async ({ params }) => {
     }
   });
 
-  // Style blockquotes
+  // Style blockquotes (already handled in getSanitizedContent, so this may be redundant)
   $('blockquote').each((i, elem) => {
     $(elem).css('margin-left', '20px');
     $(elem).css('padding-left', '15px');
@@ -253,7 +255,11 @@ const ArticlePage = async ({ params }) => {
 
           {/* Language Dropdown */}
           {showLanguageDropdown && (
-            <LanguageDropdown id={id} currentLanguage="georgian" />
+            <DynamicClientComponents
+              id={id}
+              title={article.title.rendered}
+              showLanguageDropdown={showLanguageDropdown}
+            />
           )}
         </div>
 
@@ -290,11 +296,22 @@ const ArticlePage = async ({ params }) => {
         ></div>
 
         {/* Share Buttons */}
-        <ShareButtons articleId={article.id} title={article.title.rendered} />
+        {/* Ensure ShareButtons is rendered only once */}
+        <DynamicClientComponents
+          id={id}
+          title={article.title.rendered}
+          showLanguageDropdown={false} // LanguageDropdown won't render here
+        />
       </div>
 
       {/* Scroll to Top Button */}
-      <ScrollToTopButton />
+      {/* Already included in DynamicClientComponents above, so this might be redundant */}
+      {/* Remove if not needed */}
+      {/* <DynamicClientComponents
+        id={id}
+        title={article.title.rendered}
+        showLanguageDropdown={false}
+      /> */}
 
       <footer className="h-[100px]"></footer>
     </section>

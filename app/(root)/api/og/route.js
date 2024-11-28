@@ -1,6 +1,6 @@
 // app/api/og/route.js
 
-import { ImageResponse } from 'next/server';
+import { ImageResponse } from 'next/og'; // Updated import path
 
 export default function handler(req) {
   try {
