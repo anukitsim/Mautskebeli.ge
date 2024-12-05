@@ -24,7 +24,28 @@ const extractVideoId = (videoUrl) => {
   return match ? match[1] : null;
 };
 
-// Remove constructUrl from here
+// Utility to check if a URL is valid
+const isValidImageUrl = async (url) => {
+  try {
+    const response = await fetch(url, { method: 'HEAD' }); // Use HEAD for lightweight checks
+    return response.ok;
+  } catch (error) {
+    console.error(`Error validating URL: ${url}`, error);
+    return false;
+  }
+};
+
+// Utility to determine the correct URL
+const getImageUrl = async (post) => {
+  const baseR2Url = 'https://media.mautskebeli.ge/';
+  const newUrl = `${baseR2Url}${post.image}`;
+  const originalUrl = post.image;
+
+  if (await isValidImageUrl(newUrl)) {
+    return newUrl;
+  }
+  return originalUrl; // Fallback to the original URL if new one fails
+};
 
 const MainNews = async () => {
   let slides = [];
@@ -73,12 +94,23 @@ const MainNews = async () => {
       });
 
     const videoDetails = await Promise.all(videoDetailsPromises);
-    const updatedSlides = data.map((post) => {
+
+    const updatedSlidesPromises = data.map(async (post) => {
       const videoDetail = videoDetails.find(
         (videoPost) => videoPost.id === post.id
       );
-      return videoDetail || post;
+      const enrichedPost = videoDetail || post;
+
+      // Dynamically validate and update the image URL
+      const validatedImageUrl = await getImageUrl(enrichedPost);
+
+      return {
+        ...enrichedPost,
+        image: validatedImageUrl,
+      };
     });
+
+    const updatedSlides = await Promise.all(updatedSlidesPromises);
 
     // Limit to the latest 5 uploaded slides
     slides = updatedSlides.slice(0, 5);
@@ -91,3 +123,4 @@ const MainNews = async () => {
 };
 
 export default MainNews;
+

@@ -8,7 +8,8 @@ const nextConfig = {
     domains: [
       'mautskebeli.wpenginepowered.com',
       'img.youtube.com',
-      'www.mautskebeli.ge'
+      'www.mautskebeli.ge',
+      'media.mautskebeli.ge'
     ],
     formats: ['image/avif', 'image/webp'],
     deviceSizes: [320, 420, 768, 1024, 1200],

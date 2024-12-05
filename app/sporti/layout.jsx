@@ -1,6 +1,6 @@
 import '../../style/globals.css'
 import '../../node_modules/alk-tall-mtavruli/css/alk-tall-mtavruli.css';
-import { Noto_Sans_Georgian } from '@next/font/google';
+import { Noto_Sans_Georgian } from 'next/font/google';
 
 const notoSansGeorgian = Noto_Sans_Georgian({
   subsets: ['georgian'],
