@@ -15,8 +15,6 @@ const nextConfig = {
     formats: ['image/avif', 'image/webp'], // Optional: Keep if pre-optimizing via Cloudflare
     deviceSizes: [320, 420, 768, 1024, 1200],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
-    // Remove or keep the loader as 'default' since 'unoptimized' is set to true
-    // loader: 'default',
   },
   async redirects() {
     return redirects.map(({ source, destination }) => {

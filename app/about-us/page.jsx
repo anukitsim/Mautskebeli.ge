@@ -68,7 +68,7 @@ const Page = () => {
                 objectFit="contain"
               />
             </div>
-            <div className="flex-1 min-w-[200px] h-[200px] flex justify-center">
+            {/* <div className="flex-1 min-w-[200px] h-[200px] flex justify-center">
               <Image
                 src="/images/mxardamcheri3.jpeg"
                 alt="mxardamcheri3"
@@ -76,7 +76,7 @@ const Page = () => {
                 height={200}
                 objectFit="contain"
               />
-            </div>
+            </div> */}
             <div className="flex-1 min-w-[200px] h-[200px] flex justify-center">
               <Image
                 src="/images/mxardamcheri4.jpeg"
