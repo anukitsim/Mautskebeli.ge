@@ -1,3 +1,5 @@
+// app/all-articles/[id]/ScrollToTopButton.jsx
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -9,8 +11,12 @@ const ScrollToTopButton = () => {
     const handleScroll = () => {
       const scrollY = window.scrollY;
       const scrollThreshold = 2000;
+      const windowHeight = window.innerHeight;
+      const documentHeight = document.documentElement.scrollHeight;
+      const footerHeight = 100;
+      const bottomThreshold = documentHeight - (footerHeight + windowHeight * 2);
 
-      if (scrollY > scrollThreshold) {
+      if (scrollY > scrollThreshold && scrollY < bottomThreshold) {
         setShowScrollButton(true);
       } else {
         setShowScrollButton(false);
@@ -25,13 +31,19 @@ const ScrollToTopButton = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  if (!showScrollButton) return null;
+  if (!showScrollButton) {
+    return null;
+  }
 
   return (
     <button
       onClick={scrollToTop}
       className="fixed bottom-10 right-10 text-[#474F7A] w-[210px] h-[51px] rounded-[100px] inline-flex items-center justify-center gap-[10px]"
-      style={{ background: '#FECE27', boxShadow: '0 0 20px 5px rgba(254, 206, 39, 0.5)' }}
+      style={{
+        padding: '25px 32px 28px 32px',
+        background: '#FECE27',
+        boxShadow: '0 0 20px 5px rgba(254, 206, 39, 0.5)',
+      }}
     >
       <span className="whitespace-nowrap">საწყისზე დაბრუნება</span>
     </button>
