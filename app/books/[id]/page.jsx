@@ -1,220 +1,186 @@
-// app/books/[id]/page.jsx
-
-import React from 'react';
+import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import moment from 'moment';
 import 'moment/locale/ka';
 import { decode } from 'html-entities';
 import sanitizeHtml from 'sanitize-html';
 import { load } from 'cheerio';
-import Image from 'next/image';
+import React from 'react';
 
-// Import the new Client Component
-import DynamicClientComponents from './DynamicClientComponents';
+import ShareButtons from './ShareButtons';
 
-export async function generateMetadata({ params }) {
-  const { id } = params;
+// Fetch the book details
+async function fetchBook(id) {
+  const apiUrl = `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/wp/v2/mau-books/${id}?acf_format=standard&_fields=id,title,acf,date`;
 
   try {
-    const apiUrl = `https://www.mautskebeli.ge/api/book-og?id=${id}`;
-    console.log(`Fetching OG tags from: ${apiUrl}`);
-
-    const res = await fetch(apiUrl);
+    const res = await fetch(apiUrl, {
+      next: { revalidate: 10 },
+    });
 
     if (!res.ok) {
-      console.error(`Error fetching OG tags: ${res.statusText}`);
-      return {
-        title: 'Default Title',
-        description: 'Default description',
-        openGraph: {
-          title: 'Default Title',
-          description: 'Default description',
-          url: `https://www.mautskebeli.ge/books/${id}`,
-          images: [
-            {
-              url: '/images/default-og-image.jpg',
-              width: 1200,
-              height: 630,
-            },
-          ],
-          type: 'article',
-        },
-      };
+      console.error(`Failed to fetch book with id ${id}: ${res.status} ${res.statusText}`);
+      return null;
     }
 
-    const ogTags = await res.json();
-    console.log('OG Tags:', ogTags);
-
-    return {
-      title: ogTags.title,
-      description: ogTags.description,
-      openGraph: {
-        title: ogTags.title,
-        description: ogTags.description,
-        url: ogTags.url,
-        images: [
-          {
-            url: ogTags.image,
-            width: 1200,
-            height: 630,
-          },
-        ],
-        type: 'article',
-      },
-    };
+    const book = await res.json();
+    return book;
   } catch (error) {
-    console.error('Unexpected error fetching metadata:', error);
-    return {
-      title: 'Default Title',
-      description: 'Default description',
-      openGraph: {
-        title: 'Default Title',
-        description: 'Default description',
-        url: `https://www.mautskebeli.ge/books/${id}`,
-        images: [
-          {
-            url: '/images/default-og-image.jpg',
-            width: 1200,
-            height: 630,
-          },
-        ],
-        type: 'article',
-      },
-    };
+    console.error(`Error fetching book with id ${id}:`, error);
+    return null;
   }
 }
 
-const Page = async ({ params }) => {
+// Generate Metadata for the Book
+export async function generateMetadata({ params }) {
   const { id } = params;
-  const article = await fetchArticle(id); // Ensure fetchArticle is defined or imported
+  const book = await fetchBook(id);
 
-  if (!article) {
-    notFound();
+  if (!book) {
+    return {
+      title: 'Book Not Found',
+      description: 'This book does not exist.',
+    };
   }
 
-  // Process article data
-  article.formattedDate = formatDate(article.date); // Ensure formatDate is defined or imported
-  article.title.rendered = decodeHTMLEntities(article.title.rendered); // Ensure decodeHTMLEntities is defined or imported
+  const decodedTitle = decode(book.title.rendered || '');
+  const description = book.acf.text || book.acf.sub_title || '';
+  const decodedDescription = decode(description);
 
-  // Sanitize and process the main text
-  let sanitizedContent = getSanitizedContent(article.acf['main-text']); // Ensure getSanitizedContent is defined or imported
+  let imageUrl = book.acf.image
+    ? `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/wp/v2/media/${book.acf.image}`
+    : 'https://www.mautskebeli.ge/images/default-og-image.jpg';
 
-  // Use Cheerio to manipulate and enhance the HTML content
-  const $ = load(sanitizedContent);
+  imageUrl = imageUrl.split('?')[0];
 
-  // Ensure all media sources have absolute URLs
-  $('img, video, audio, source').each((i, elem) => {
-    const src = $(elem).attr('src');
-    if (src && !src.startsWith('http')) {
-      $(elem).attr(
-        'src',
-        `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}${src}`
-      );
-    }
+  const metadataBase = new URL('https://www.mautskebeli.ge');
+
+  return {
+    metadataBase,
+    title: decodedTitle,
+    description: decodedDescription,
+    openGraph: {
+      title: decodedTitle,
+      description: decodedDescription,
+      url: `/books/${id}`,
+      type: 'book',
+      images: [imageUrl],
+      locale: 'ka_GE',
+      siteName: 'Mautskebeli',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: decodedTitle,
+      description: decodedDescription,
+      images: [imageUrl],
+    },
+  };
+}
+
+function formatDate(dateString) {
+  moment.locale('ka');
+  return moment(dateString).format('LL');
+}
+
+function decodeHTMLEntities(str) {
+  return decode(str);
+}
+
+function getSanitizedContent(content) {
+  const sanitized = sanitizeHtml(content, {
+    allowedTags: [
+      'b', 'i', 'em', 'strong', 'a', 'p', 'blockquote',
+      'ul', 'ol', 'li', 'br', 'span', 'h1', 'h2', 'h3',
+      'h4', 'h5', 'h6', 'img', 'video', 'source', 'audio',
+      'figure', 'figcaption',
+    ],
+    allowedAttributes: {
+      a: ['href', 'target', 'rel'],
+      img: ['src', 'alt', 'title', 'width', 'height', 'style'],
+      video: ['src', 'controls', 'width', 'height', 'poster', 'style'],
+      audio: ['src', 'controls'],
+      source: ['src', 'type'],
+      span: ['style'],
+      p: ['style'],
+      blockquote: ['cite', 'style'],
+      figure: [],
+      figcaption: [],
+    },
+    allowedSchemes: ['http', 'https', 'data'],
   });
 
-  // Style blockquotes
-  $('blockquote').each((i, elem) => {
+  const $ = load(sanitized);
+
+  $('blockquote').each((_, elem) => {
     $(elem).css('margin-left', '20px');
     $(elem).css('padding-left', '15px');
     $(elem).css('border-left', '5px solid #ccc');
     $(elem).css('font-style', 'italic');
   });
 
-  sanitizedContent = $.html();
+  $('a').each((_, elem) => {
+    $(elem).attr('target', '_blank');
+    $(elem).attr('rel', 'noopener noreferrer');
+  });
 
-  // Determine if the language dropdown should be shown
-  const showLanguageDropdown =
-    article.acf.language1 === true || article.acf.language2 === true;
+  return $.html();
+}
+
+const BookPage = async ({ params }) => {
+  const { id } = params;
+  const book = await fetchBook(id);
+
+  if (!book) {
+    notFound();
+  }
+
+  book.formattedDate = formatDate(book.date);
+  book.title.rendered = decodeHTMLEntities(book.title.rendered);
+
+  let sanitizedContent = getSanitizedContent(book.acf.text);
 
   return (
     <section className="w-full mx-auto mt-10 px-4 lg:px-0 overflow-x-hidden relative">
       <div className="w-full lg:w-[60%] mx-auto bg-opacity-90 p-5 rounded-lg">
-        <div className="lg:flex hidden justify-start rounded-md space-x-6 px-20 gap-10 py-4 mt-[-12px] mb-10 font-noto-sans-georgian w-full mx-auto bg-[#AD88C6]">
-          {categories.map((category) => (
-            <a
-              key={category.name}
-              href={category.path}
-              className={`text-sm text-[#474F7A] ${
-                category.name === 'სტატიები'
-                  ? 'text-white font-bold'
-                  : 'text-[#474F7A] hover:scale-110'
-              }`}
-            >
-              {category.name}
-            </a>
-          ))}
-        </div>
         <div className="w-full h-auto mb-5">
           <Image
-            src={
-              article.acf.image ||
-              '/images/default-og-image.jpg'
-            }
-            alt={article.title.rendered}
+            src={book.acf.image || '/images/default-og-image.jpg'}
+            alt={book.title.rendered}
             width={800}
             height={450}
             style={{ objectFit: 'cover' }}
             className="rounded-lg w-full"
           />
-
-          {/* Language Dropdown */}
-          {showLanguageDropdown && (
-            <DynamicClientComponents
-              id={id}
-              title={article.title.rendered}
-              showLanguageDropdown={showLanguageDropdown}
-            />
-          )}
         </div>
 
-        <h1 className="font-alk-tall-mtavruli text-[32px] sm:text-[64px] font-light leading-none text-[#474F7A] mt-[24px] mb-5">
-          {article.title.rendered}
+        <h1 className="text-[32px] sm:text-[64px] font-light leading-none text-[#474F7A] mt-[24px] mb-5">
+          {book.title.rendered}
         </h1>
-        <h3 className="font-alk-tall-mtavruli sm:text-[34px] lg:text-[34px] font-light leading-wide text-[#474F7A] mt-[24px] mb-5">
-          {article.acf.sub_title}
+        <h3 className="sm:text-[34px] lg:text-[34px] font-light text-[#474F7A] mt-[24px] mb-5">
+          {book.acf.sub_title}
         </h3>
-        <h2 className="font-noto-sans-georgian text-[16px] sm:text-[24px] font-extrabold text-[#AD88C6] leading-normal mb-5">
-          {article.acf['ავტორი']}
+        <h2 className="text-[16px] sm:text-[24px] font-extrabold text-[#AD88C6] mb-5">
+          {book.acf.author}
         </h2>
+        <h3 className="text-[14px] sm:text-[20px] text-[#8D91AB] mb-5">
+          {book.acf['რეცენზიის_ავტორი']}
+        </h3>
         <p className="text-[#474F7A] font-semibold pb-10">
-          {article.formattedDate}
+          {book.formattedDate}
         </p>
-        {article.acf.full_article_pdf && (
-          <p className="text-[#474F7A] font-semibold pb-10">
-            იხილეთ სტატიის{' '}
-            <a
-              href={article.acf.full_article_pdf}
-              target="_blank"
-              rel="noopener noreferrer"
-              download
-              className="underline"
-            >
-              პდფ ვერსია
-            </a>
-          </p>
-        )}
 
         <div
-          className="article-content text-[#474F7A] font-noto-sans-georgian text-[14px] sm:text-[16px] font-normal lg:text-justify leading-[30px] sm:leading-[35px] tracking-[0.32px] mt-5"
+          className="text-[#474F7A] text-[14px] sm:text-[16px] font-normal lg:text-justify leading-[30px] sm:leading-[35px] mt-5"
           dangerouslySetInnerHTML={{ __html: sanitizedContent }}
         ></div>
 
         {/* Share Buttons */}
-        <DynamicClientComponents
-          id={id}
-          title={article.title.rendered}
-          showLanguageDropdown={false} // Hide language dropdown here if not needed
-        />
+        <div className="mt-10">
+          <ShareButtons bookId={id} title={book.title.rendered} />
+        </div>
       </div>
-
-      {/* Scroll to Top Button */}
-      {/* Already handled within DynamicClientComponents */}
-      {/* Remove if DynamicClientComponents already includes ScrollToTopButton */}
-
-      <footer className="h-[100px]"></footer>
     </section>
   );
 };
 
-export default Page;
+export default BookPage;

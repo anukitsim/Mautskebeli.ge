@@ -120,9 +120,27 @@ export async function generateMetadata({ params }) {
   const article = await fetchArticle(id);
 
   if (!article) {
-    return {};
+    return {
+      title: 'Article Not Found',
+      description: 'This article does not exist.',
+      openGraph: {
+        title: 'Article Not Found',
+        description: 'This article does not exist.',
+        images: ['/images/default-og-image.jpg'],
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: 'Article Not Found',
+        description: 'This article does not exist.',
+        images: ['/images/default-og-image.jpg'],
+      },
+    };
   }
 
+  // Use the ACF image or fallback to the default image
+  const mainImage = `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/wp-content/uploads/${article.acf.image}.jpg` || '/images/default-og-image.jpg';
+
+  // Generate a description from the main text
   const sanitizedMainText = getSanitizedContent(article.acf['main-text']);
   const description = extractDescription(sanitizedMainText, 30);
 
@@ -133,12 +151,13 @@ export async function generateMetadata({ params }) {
       title: article.title.rendered,
       description: description,
       url: `https://www.mautskebeli.ge/translate/${article.id}`,
-      images: [{ url: article.acf.image || '/images/default-og-image.jpg' }],
+      images: [{ url: mainImage }],
     },
     twitter: {
+      card: 'summary_large_image',
       title: article.title.rendered,
       description: description,
-      images: [article.acf.image || '/images/default-og-image.jpg'],
+      images: [mainImage],
     },
   };
 }
