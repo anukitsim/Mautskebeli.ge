@@ -23,6 +23,7 @@ const Header = () => {
                   alt="Live"
                   width={20}
                   height={20}
+                  style={{ width: "20px", height: "20px" }}
                 />
               
                 <span className="hidden sm:inline text-[#474F7A]">დონაცია</span>

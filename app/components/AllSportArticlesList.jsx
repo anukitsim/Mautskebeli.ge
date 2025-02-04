@@ -91,7 +91,7 @@ const AllArticlesPage = () => {
                       src={article.acf.image || '/images/default-image.png'}
                       alt="article-cover"
                       layout="fill"
-                      objectFit="cover"
+                      style={{ objectFit: "cover" }}
                       className="article-image"
                       onError={(e) => { e.target.onerror = null; e.target.src = '/images/default-image.png'; }}
                     />

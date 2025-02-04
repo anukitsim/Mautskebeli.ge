@@ -52,15 +52,15 @@ const Footer = () => {
         <div className="h-full w-1/2 flex flex-col gap-[18px]">
           <h1 className="text-[#AD88C6] text-[16px] font-bold">კონტაქტი</h1>
           <div className="flex gap-[10px] text-[#474F7A] text-[16px]">
-            <Image src="/images/mail.svg" alt="mail" width={20} height={20} objectFit="contain" />
+            <Image src="/images/mail.svg" alt="mail" width={20} height={20}  style={{ objectFit: "contain",  width: "20px", height: "20px" }} />
             <a href="mailto:platformforsj@gmail.com" className="text-[16px]">platformforsj@gmail.com</a>
           </div>
           <div className="flex gap-[10px] text-[#474F7A] text-[16px]">
-            <Image src="/images/phone.svg" alt="phone" width={20} height={20} objectFit="contain" />
+            <Image src="/images/phone.svg" alt="phone" width={20} height={20} style={{ objectFit: "contain",  width: "20px", height: "20px" }} />
             <a href="tel:+995574831085" className="text-[16px]">+995 574 83 10 85</a>
           </div>
           <div className="flex gap-[10px] text-[#474F7A]">
-            <Image src="/images/location.svg" alt="location" width={20} height={20} objectFit="contain" />
+            <Image src="/images/location.svg" alt="location" width={20} height={20} style={{ objectFit: "contain",  width: "20px", height: "20px" }} />
             <a href="https://www.google.com/maps/search/?api=1&query=Kostava+30,+Batumi" target="_blank" className="text-[16px] whitespace-nowrap">ბათუმი, კოსტავას 30</a>
           </div>
           <Link href='/'>
@@ -78,27 +78,27 @@ const Footer = () => {
         <div className="h-full w-1/3 flex flex-col gap-[16px]">
           <h1 className="text-[#AD88C6] text-[16px] font-bold">გამოგვიწერე</h1>
           <Link href='https://www.facebook.com/mautskebeli.ge' target='_blank' className="flex gap-[10px] text-[16px] text-[#474F7A]">
-            <Image src="/images/fb.svg" alt="Facebook" width={25} height={10} objectFit="contain" />
+            <Image src="/images/fb.svg" alt="Facebook" width={25} height={10} style={{ objectFit: "contain", width: "20px", height: "20px" }} />
             <span>Facebook</span>
           </Link>
           <Link href='https://www.youtube.com/@mautskebeli' target='_blank' className="flex gap-[10px] text-[16px] text-[#474F7A]">
-            <Image src="/images/yt.svg" alt="YouTube" width={25} height={0} objectFit="contain" />
+            <Image src="/images/yt.svg" alt="YouTube" width={25} height={0} style={{ objectFit: "contain", width: "20px", height: "20px" }} />
             <span>YouTube</span>
           </Link>
           <Link href='https://www.instagram.com/mautskebeli.ge/' target='_blank' className="flex gap-[10px] text-[16px] text-[#474F7A]">
-            <Image src="/images/instagram.svg" alt="Instagram" width={25} height={20} objectFit="contain" />
+            <Image src="/images/instagram.svg" alt="Instagram" width={25} height={20} style={{ objectFit: "contain", width: "20px", height: "20px" }} />
             <span>Instagram</span>
           </Link>
           <Link href='https://www.tiktok.com/@mautskebeli.ge' target='_blank' className="flex gap-[10px] text-[16px] text-[#474F7A]">
-            <Image src="/images/tiktok.svg" alt="TikTok" width={25} height={20} objectFit="contain" />
+            <Image src="/images/tiktok.svg" alt="TikTok" width={25} height={20} style={{ objectFit: "contain", width: "20px", height: "20px" }} />
             <span>TikTok</span>
           </Link>
           <Link href='https://x.com/mautskebeli' target='_blank' className="flex gap-[10px] text-[16px] text-[#474F7A]">
-            <Image src="/images/x.svg" alt="X Twitter" width={25} height={20} objectFit="contain" />
+            <Image src="/images/x.svg" alt="X Twitter" width={25} height={20} style={{ objectFit: "contain", width: "20px", height: "20px" }} />
             <span>X Twitter</span>
           </Link>
           <div className="flex gap-[10px] text-[16px] text-[#474F7A]">
-            <Image src="/images/telegram.svg" alt="Telegram" width={25} height={20} objectFit="contain" />
+            <Image src="/images/telegram.svg" alt="Telegram" width={25} height={20} style={{ objectFit: "contain", width: "20px", height: "20px" }} />
             <span>Telegram</span>
           </div>
         </div>
@@ -161,15 +161,15 @@ const Footer = () => {
         <div className="flex flex-col justify-center items-center gap-[18px]">
           <h1 className="text-white text-[15px] font-bold">კონტაქტი</h1>
           <div className="flex gap-[10px]  text-[#474F7A] text-[15px]">
-            <Image src="/images/mail.svg" alt="mail" width={20} height={20} objectFit="contain" />
+            <Image src="/images/mail.svg" alt="mail" width={20} height={20} style={{ objectFit: "contain",  width: "20px", height: "20px" }} />
             <a href="mailto:platformforsj@gmail.com" className="text-[16px]">platformforsj@gmail.com</a>
           </div>
           <div className="flex gap-[10px]  text-[#474F7A] text-[15px]">
-            <Image src="/images/phone.svg" alt="phone" width={20} height={20} objectFit="contain" />
+            <Image src="/images/phone.svg" alt="phone" width={20} height={20} style={{ objectFit: "contain",  width: "20px", height: "20px" }} />
             <a href="tel:+995574831085" className="text-[16px]">+995 574 83 10 85</a>
           </div>
           <div className="flex gap-[10px]  text-[#474F7A] text-[15px]">
-            <Image src="/images/location.svg" alt="location" width={20} height={20} objectFit="contain" />
+            <Image src="/images/location.svg" alt="location" width={20} height={20} style={{ objectFit: "contain",  width: "20px", height: "20px" }} />
             <a href="https://www.google.com/maps/search/?api=1&query=Kostava+30,+Batumi" target="_blank" className="text-[16px] whitespace-nowrap">ბათუმი, კოსტავას 30</a>
           </div>
         </div>
@@ -182,7 +182,7 @@ const Footer = () => {
                 alt="Facebook"
                 width={25}
                 height={20}
-                objectFit="contain"
+                style={{ objectFit: "contain",  width: "25px", height: "20px" }}
               />
               <span>Facebook</span>
             </Link>
@@ -192,7 +192,7 @@ const Footer = () => {
                 alt="YouTube"
                 width={25}
                 height={20}
-                objectFit="contain"
+                style={{ objectFit: "contain",  width: "25px", height: "20px" }}
               />
               <span>YouTube</span>
             </Link>
@@ -202,7 +202,7 @@ const Footer = () => {
                 alt="Instagram"
                 width={25}
                 height={20}
-                objectFit="contain"
+                style={{ objectFit: "contain",  width: "25px", height: "20px" }}
               />
               <span>Instagram</span>
             </Link>
@@ -214,7 +214,7 @@ const Footer = () => {
                 alt="TikTok"
                 width={25}
                 height={20}
-                objectFit="contain"
+                style={{ objectFit: "contain",  width: "25px", height: "20px" }}
               />
               <span>TikTok</span>
             </Link>
@@ -224,7 +224,7 @@ const Footer = () => {
                 alt="X Twitter"
                 width={25}
                 height={20}
-                objectFit="contain"
+                style={{ objectFit: "contain", width: "25px", height: "20px" }}
               />
               <span>X Twitter</span>
             </Link>
@@ -234,7 +234,7 @@ const Footer = () => {
                 alt="Telegram"
                 width={25}
                 height={20}
-                objectFit="contain"
+                style={{ objectFit: "contain",  width: "25px", height: "20px" }}
               />
               <span>Telegram</span>
             </div>

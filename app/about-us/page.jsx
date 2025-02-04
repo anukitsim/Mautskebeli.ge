@@ -56,7 +56,7 @@ const Page = () => {
                 alt="mxardamcheri1"
                 width={200}
                 height={200}
-                objectFit="contain"
+                style={{ objectFit: "contain" }}
               />
             </div>
             <div className="flex-1 min-w-[200px] h-[70px] flex justify-center items-center">
@@ -65,7 +65,7 @@ const Page = () => {
                 alt="mxardamcheri2"
                 width={300}
                 height={70}
-                objectFit="contain"
+                style={{ objectFit: "contain" }}
               />
             </div>
             {/* <div className="flex-1 min-w-[200px] h-[200px] flex justify-center">
@@ -83,7 +83,7 @@ const Page = () => {
                 alt="mxardamcheri4"
                 width={200}
                 height={200}
-                objectFit="contain"
+                style={{ objectFit: "contain" }}
               />
             </div>
           </div>

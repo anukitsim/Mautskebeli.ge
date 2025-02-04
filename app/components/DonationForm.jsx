@@ -1,23 +1,26 @@
-"use client";
+// components/DonationForm.jsx
 
-import React, { useState, useEffect } from "react";
+'use client';
+
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
+import PayPalButton from "./PayPalButton";
 
-// Custom PaymentMessage component to show the payment result
+// PaymentMessage Component
 const PaymentMessage = ({ message, isError, onClose }) => {
   if (!message) return null;
-
   return (
     <div
-      className={`fixed top-4 left-1/2 transform -translate-x-1/2 px-4 py-2 rounded shadow-lg ${
+      className={`fixed top-100 left-1/2 transform -translate-x-1/2 px-4 py-2 rounded shadow-lg ${
         isError ? "bg-red-500 text-white" : "bg-green-500 text-white"
-      }`}
+      } flex items-center space-x-4 z-50`}
     >
       <span>{message}</span>
       <button
         onClick={onClose}
-        className="ml-4 text-white font-semibold border-none bg-transparent"
+        className="text-white font-semibold border-none bg-transparent focus:outline-none"
+        aria-label="Close"
       >
         ✖
       </button>
@@ -25,55 +28,18 @@ const PaymentMessage = ({ message, isError, onClose }) => {
   );
 };
 
-// Function to handle payment status by querying the backend
-const handlePaymentStatus = async (orderId, setPaymentMessage, setIsError) => {
-  try {
-    const response = await fetch(
-      "https://mautskebeli.wpenginepowered.com/wp-json/wp/v2/verify-payment-status",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ orderId }),
-      }
-    );
-
-    const result = await response.json();
-
-    if (result.status === "Succeeded") {
-      if (result.isRecurring) {
-        setPaymentMessage(
-          "Recurring donation succeeded! Your card has been saved for future donations."
-        );
-      } else {
-        setPaymentMessage("One-time donation succeeded!");
-      }
-      setIsError(false);
-    } else {
-      setPaymentMessage("Payment failed.");
-      setIsError(true);
-    }
-  } catch (error) {
-    setPaymentMessage("Error capturing payment status.");
-    setIsError(true);
-  }
-};
-
-// Modal component (not automatically triggered now, but kept for reference)
+// Modal Component
 const Modal = ({ show, handleClose, handleConfirm }) => {
   if (!show) return null;
-
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
       <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
         <h2 className="text-xl font-semibold mb-4">ყოველთვიური გადახდა</h2>
         <p className="mb-6">
-          ბარათის მონაცემები შეინახება და ყოველთვიურად ავტომატურად
-          ჩამოგეჭრებათ მითითებული თანხა. გადახდის დღემდე 2 დღით ადრე
-          მიიღებთ გამაფრთხილებელ შეტყობინებას ელექტრონული ფოსტის საშუალებით.
-          გამოწერის გაუქმება შეგიძლიათ ნებისმიერ დროს. თუკი ეთანხმებით
-          დააჭირეთ ღილაკს - ვადასტურებ
+          ბარათის მონაცემები შეინახება და ყოველთვიურად ავტომატურად ჩამოგეჭრებათ
+          მითითებული თანხა. გადახდის დღემდე 2 დღით ადრე მიიღებთ გამაფრთხილებელ
+          შეტყობინებას ელექტრონული ფოსტის საშუალებით. გამოწერის გაუქმება
+          შეგიძლიათ ნებისმიერ დროს. თუკი ეთანხმებით დააჭირეთ ღილაკს - ვადასტურებ
         </p>
         <div className="flex justify-end gap-4">
           <button
@@ -96,39 +62,145 @@ const Modal = ({ show, handleClose, handleConfirm }) => {
 
 const DonationForm = () => {
   const [formData, setFormData] = useState({
-    donationAmount: 5,  // Default donation amount
+    donationAmount: 5, // Default donation amount
     donorName: "",
     donorEmail: "",
     donorPhone: "",
-    isRecurring: true,  // (1) Now checked by default
+    isRecurring: false, // Set to false by default
   });
-
-  // For displaying a loading indicator on the submit button
   const [loading, setLoading] = useState(false);
-
-  // For the old modal (currently not triggered automatically)
   const [showModal, setShowModal] = useState(false);
-
-  // Payment success/error message
   const [paymentMessage, setPaymentMessage] = useState("");
   const [isError, setIsError] = useState(false);
-
-  // For showing terms/privacy sections
   const [showTerms, setShowTerms] = useState(false);
   const [showPrivacy, setShowPrivacy] = useState(false);
-
-  // For the tooltip explanation on hover
   const [showTooltip, setShowTooltip] = useState(false);
 
   const searchParams = useSearchParams();
 
-  // Capture the orderId after the user is redirected from TBC payment page
+  // Ref to hold the latest formData
+  const formDataRef = useRef(formData);
+
+  useEffect(() => {
+    formDataRef.current = formData;
+  }, [formData]);
+
+  // Callback to get the latest donation data
+  const getDonationData = useCallback(() => {
+    return {
+      donationAmount: parseFloat(formDataRef.current.donationAmount),
+      donorName: formDataRef.current.donorName.trim(),
+      donorEmail: formDataRef.current.donorEmail.trim(),
+      donorPhone: formDataRef.current.donorPhone.trim(),
+      isRecurring: formDataRef.current.isRecurring,
+    };
+  }, []);
+
+  // This effect checks if the user was redirected back from a TBC payment
   useEffect(() => {
     const orderId = searchParams.get("orderId");
     if (orderId) {
       handlePaymentStatus(orderId, setPaymentMessage, setIsError);
     }
   }, [searchParams]);
+
+  // Function to finalize PayPal donation by calling the backend
+  const finalizePayPalDonation = useCallback(
+    async (details, currency, donorName, donorEmail) => {
+      console.log("Finalizing PayPal donation with details:", details);
+      try {
+        // Extract necessary details from PayPal response
+        const transactionID = details.id; // PayPal order ID
+
+        // Determine payment method based on context
+        const payment_method = "PayPal";
+
+        // Determine currency from PayPal details
+        const currencyCode =
+          details.purchase_units[0].amount.currency_code || "USD";
+
+        // Access the latest formData from the ref
+        const currentFormData = formDataRef.current;
+
+        // Build the payload expected by /paypal-donation-complete
+        const payload = {
+          donationAmount: parseFloat(currentFormData.donationAmount),
+          donorName: donorName,
+          donorEmail: donorEmail,
+          donorPhone: currentFormData.donorPhone.trim() || "",
+          isRecurring: currentFormData.isRecurring,
+          transactionID: transactionID,
+          currency: currencyCode,
+          payment_method: payment_method,
+          payment_type: currentFormData.isRecurring ? "Recurring" : "One-Time",
+        };
+
+        // Send POST request to finalize the donation in WordPress
+        const res = await fetch(
+          "https://mautskebeli.wpenginepowered.com/wp-json/wp/v2/paypal-donation-complete",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload),
+          }
+        );
+
+        const json = await res.json();
+        if (!res.ok) {
+          console.error("Failed to finalize PayPal donation:", json);
+          setPaymentMessage("PayPal donation finalization failed.");
+          setIsError(true);
+        } else {
+          console.log("PayPal donation saved to WordPress:", json);
+          setPaymentMessage("PayPal donation completed successfully.");
+          setIsError(false);
+          // Optionally, you can reset the form or perform other actions here
+        }
+      } catch (error) {
+        console.error("Error finalizing PayPal donation:", error);
+        setPaymentMessage(
+          "Error finalizing donation. Please try again later."
+        );
+        setIsError(true);
+      }
+    },
+    [] // No dependencies needed as we're using a ref
+  );
+
+  // HandleTransactionComplete
+  const handleTransactionComplete = useCallback(
+    (details) => {
+      console.log("Transaction completed:", details);
+
+      // Extract currency from PayPal details
+      const currency =
+        details.purchase_units[0].amount.currency_code || "USD";
+
+      // Extract donor information from PayPal details if form is not filled
+      const currentFormData = formDataRef.current;
+      const donorName =
+        currentFormData.donorName.trim() ||
+        `${details.payer.name.given_name} ${details.payer.name.surname}`;
+      const donorEmail =
+        currentFormData.donorEmail.trim() || details.payer.email_address;
+
+      // Log the extracted donor email
+      console.log("Extracted Donor Email:", donorEmail);
+
+      // Now finalize in WP
+      finalizePayPalDonation(details, currency, donorName, donorEmail);
+    },
+    [finalizePayPalDonation]
+  );
+
+  // HandleTransactionError
+  const handleTransactionError = useCallback((error) => {
+    setPaymentMessage("An error occurred during the transaction.");
+    setIsError(true);
+    console.error("PayPal Error:", error);
+  }, []);
 
   // Handle form field updates
   const handleInputChange = (e) => {
@@ -138,30 +210,30 @@ const DonationForm = () => {
 
   // Increment the donation amount by 5
   const handleIncrement = () => {
-    setFormData({
-      ...formData,
-      donationAmount: (parseFloat(formData.donationAmount) || 0) + 5,
-    });
+    setFormData((prev) => ({
+      ...prev,
+      donationAmount: Math.max((parseFloat(prev.donationAmount) || 0) + 5, 5),
+    }));
   };
 
   // Decrement the donation amount by 5 (stopping at 5 as minimum)
   const handleDecrement = () => {
-    setFormData({
-      ...formData,
-      donationAmount: Math.max(
-        (parseFloat(formData.donationAmount) || 0) - 5,
-        5
-      ),
-    });
+    setFormData((prev) => ({
+      ...prev,
+      donationAmount: Math.max((parseFloat(prev.donationAmount) || 0) - 5, 5),
+    }));
   };
 
-  // Simplified recurring payments checkbox handler
-  // (2) No longer showing the modal automatically on check
+  // Handle recurring payments checkbox
   const handleRecurringChange = (e) => {
-    setFormData({ ...formData, isRecurring: e.target.checked });
+    if (e.target.checked) {
+      setShowModal(true);
+    } else {
+      setFormData({ ...formData, isRecurring: false });
+    }
   };
 
-  // These modal handlers remain but are not called automatically
+  // Modal handlers
   const handleModalConfirm = () => {
     setFormData({ ...formData, isRecurring: true });
     setShowModal(false);
@@ -172,7 +244,7 @@ const DonationForm = () => {
     setShowModal(false);
   };
 
-  // Handle form submission for one-time or recurring donations
+  // Handle form submission for TBC donations
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -182,6 +254,8 @@ const DonationForm = () => {
       donorEmail: formData.donorEmail.trim(),
       donorPhone: formData.donorPhone.trim() || undefined,
       isRecurring: formData.isRecurring,
+      payment_method: "Local", // Explicitly set payment_method
+      currency: "GEL", // Always GEL for local donations
     };
 
     if (
@@ -189,7 +263,8 @@ const DonationForm = () => {
       !trimmedFormData.donorName ||
       !trimmedFormData.donorEmail
     ) {
-      alert("Please fill out all required fields before submitting.");
+      setPaymentMessage("Please fill out all required fields before submitting.");
+      setIsError(true);
       return;
     }
 
@@ -211,7 +286,8 @@ const DonationForm = () => {
 
       if (!response.ok) {
         console.error("Donation Failed:", responseData.message);
-        alert("Failed to process donation: " + responseData.message);
+        setPaymentMessage("Failed to process donation: " + responseData.message);
+        setIsError(true);
       } else {
         if (responseData.paymentUrl) {
           // Redirect to the TBC payment URL
@@ -219,18 +295,23 @@ const DonationForm = () => {
         } else {
           // Payment succeeded but no redirect (rare scenario)
           if (formData.isRecurring) {
-            alert(
+            setPaymentMessage(
               "Recurring donation setup successful, card will be saved for future transactions."
             );
+            setIsError(false);
           } else {
-            alert("One-time donation completed successfully.");
+            setPaymentMessage("One-time donation completed successfully.");
+            setIsError(false);
           }
         }
       }
     } catch (error) {
       setLoading(false);
       console.error("Error submitting donation:", error);
-      alert("Error submitting donation: Please check the console for more details.");
+      setPaymentMessage(
+        "Error submitting donation: Please try again later."
+      );
+      setIsError(true);
     }
   };
 
@@ -238,6 +319,7 @@ const DonationForm = () => {
     setPaymentMessage("");
   };
 
+  // The component JSX
   return (
     <div className="flex flex-col gap-4">
       <div className="flex gap-2 pl-2 items-center">
@@ -266,7 +348,8 @@ const DonationForm = () => {
           <button
             type="button"
             onClick={handleDecrement}
-            className="absolute left-2 bg-transparent border-none cursor-pointer"
+            className="absolute left-2 bg-transparent border-none cursor-pointer focus:outline-none"
+            aria-label="Decrease donation amount"
           >
             <img src="/images/minus.png" alt="Minus" />
           </button>
@@ -279,11 +362,13 @@ const DonationForm = () => {
             className="p-3 rounded-lg border border-gray-300 w-full text-center hide-arrows"
             style={{ paddingLeft: "60px", paddingRight: "60px" }}
             required
+            min={5}
           />
           <button
             type="button"
             onClick={handleIncrement}
-            className="absolute right-2 bg-transparent border-none cursor-pointer"
+            className="absolute right-2 bg-transparent border-none cursor-pointer focus:outline-none"
+            aria-label="Increase donation amount"
           >
             <img src="/images/plus.png" alt="Plus" />
           </button>
@@ -352,14 +437,21 @@ const DonationForm = () => {
           )}
         </div>
 
-        {/* Submit button for processing the donation */}
+        {/* TBC "Submit" button */}
         <button
           type="submit"
-          className="bg-[#AD88C6] w-full text-white p-3 rounded-lg mt-4 hover:scale-105 transition-colors duration-300"
+          className="bg-[#AD88C6] w-full text-white p-3 rounded-lg mt-4 hover:scale-105 transition-transform duration-300 disabled:opacity-50"
           disabled={loading}
         >
-          {loading ? "მუშავდება.." : "გადახდა"}
+          {loading ? "მუშაობდა.." : "გადახდა"}
         </button>
+
+        {/* PayPal Button Container */}
+        <PayPalButton
+          getDonationData={getDonationData}
+          onTransactionComplete={handleTransactionComplete}
+          onTransactionError={handleTransactionError}
+        />
 
         {/* Terms of Service and Privacy Policy */}
         <div className="mt-4">
@@ -389,7 +481,7 @@ const DonationForm = () => {
                 გაუქმების ბმული გამოგეგზავნებათ ელ-ფოსტაზე.
                 <br />
                 5. ყველა გადახდა უსაფრთხოდ მუშავდება TBC ბანკის სისტემებით. ჩვენ
-                არ ვინახავთ ბარათის ინფორმაციას მონაცემთა ბაზაში.
+                არ ვინახავთ ბარათის informaciją მონაცემთა ბაზაში.
               </p>
             </div>
           )}
@@ -432,7 +524,7 @@ const DonationForm = () => {
         </div>
       </form>
 
-      {/* Modal Popup (not shown automatically now) */}
+      {/* Modal Popup */}
       <Modal
         show={showModal}
         handleClose={handleModalClose}
