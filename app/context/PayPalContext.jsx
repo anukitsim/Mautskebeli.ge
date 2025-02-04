@@ -11,7 +11,7 @@ export const PayPalContext = createContext();
 // Create the PayPalProvider component
 export const PayPalProvider = ({ children }) => {
   const [sdkLoaded, setSdkLoaded] = useState(false);
-  const clientId = 'AYlqZEZoVSEneZaXSwsFmsVu0kTwaASIwdn9clPyg-pTLhc57WWyHSHAHCkMlfwF7Trp1vpGLqsf41Fx'; // Use environment variable
+  const clientId =  process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID
 
   useEffect(() => {
     if (!clientId) {
