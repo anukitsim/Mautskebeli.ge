@@ -1,6 +1,4 @@
-// components/PayPalButton.jsx
-
-'use client';
+"use client";
 
 import React, { useEffect, useRef, useContext } from "react";
 import { PayPalContext } from "@/app/context/PayPalContext";
@@ -13,20 +11,17 @@ const PayPalButtonComponent = ({
   const buttonContainerRef = useRef(null);
   const { sdkLoaded } = useContext(PayPalContext);
 
-  // Render PayPal Button
   useEffect(() => {
     if (!sdkLoaded) {
-      console.log("SDK not loaded yet.");
+      console.log("PayPal SDK not loaded yet.");
       return;
     }
-
     if (!buttonContainerRef.current) {
       console.error("PayPal button container is not available.");
       return;
     }
-
     console.log("Rendering PayPal button...");
-    const paypalButtons = window.paypal
+    window.paypal
       .Buttons({
         style: {
           layout: "vertical",
@@ -69,7 +64,6 @@ const PayPalButtonComponent = ({
         console.error("PayPal Render Error:", err);
       });
 
-    // Cleanup on unmount
     return () => {
       console.log("Cleaning up PayPal button...");
       if (buttonContainerRef.current) {
@@ -81,10 +75,7 @@ const PayPalButtonComponent = ({
   return (
     <div
       className="w-full z-0 rounded-lg border-2 border-[#AD88C6] transition-transform duration-300 hover:scale-105 flex justify-center items-center"
-      style={{
-        height: "50px",
-        overflow: "hidden",
-      }}
+      style={{ height: "50px", overflow: "hidden" }}
     >
       {!sdkLoaded ? (
         <svg
@@ -112,22 +103,17 @@ const PayPalButtonComponent = ({
         <div
           ref={buttonContainerRef}
           id="paypal-button-container"
-          style={{
-            width: "100%",
-            height: "100%",
-          }}
+          style={{ width: "100%", height: "100%" }}
         ></div>
       )}
     </div>
   );
 };
 
-// Use React.memo to prevent unnecessary re-renders
-export default React.memo(PayPalButtonComponent, (prevProps, nextProps) => {
-  // Since getDonationData is a stable function (useCallback), we can assume it doesn't change
-  return (
+export default React.memo(
+  PayPalButtonComponent,
+  (prevProps, nextProps) =>
     prevProps.getDonationData === nextProps.getDonationData &&
     prevProps.onTransactionComplete === nextProps.onTransactionComplete &&
     prevProps.onTransactionError === nextProps.onTransactionError
-  );
-});
+);
