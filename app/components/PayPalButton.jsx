@@ -1,3 +1,5 @@
+// components/PayPalButton.jsx
+
 "use client";
 
 import React, { useEffect, useRef, useContext } from "react";

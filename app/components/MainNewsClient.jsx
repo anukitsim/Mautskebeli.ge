@@ -1,25 +1,22 @@
-// app/components/MainNewsClient.js (Client Component)
-
 'use client';
 
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useMenu } from '../context/MenuContext'; // Adjust the path as necessary
+import he from 'he'; // Import the he library
 
 const MainNewsClient = ({ slides }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
-  const { isMenuOpen } = useMenu(); // If you need this context
+  const { isMenuOpen } = useMenu();
   const mobileSectionStyle = isMenuOpen ? 'top-[calc(32px+40%)]' : 'top-32';
 
-  // Define constructUrl function here
+  // Define constructUrl function
   const constructUrl = (post) => {
     const { id, post_type, videoId } = post;
-
     if (videoId) {
       return `/${post_type}?videoId=${videoId}`;
     }
-
     switch (post_type) {
       case 'article':
         return `/all-articles/${id}`;
@@ -40,10 +37,7 @@ const MainNewsClient = ({ slides }) => {
       }
     };
 
-    // Attach the event listener for keydown events
     window.addEventListener('keydown', handleKeyDown);
-
-    // Clean up the event listener on component unmount
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
@@ -78,7 +72,7 @@ const MainNewsClient = ({ slides }) => {
             >
               <Image
                 src={slide.image}
-                alt={slide.title}
+                alt={he.decode(slide.title)}
                 layout="fill"
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 style={{ objectFit: 'cover' }}
@@ -90,8 +84,11 @@ const MainNewsClient = ({ slides }) => {
                   მთავარი ამბები
                 </h2>
                 <p className="text-[#FFF] pl-5 tracking-normal pt-[10px] font-alk-tall-mtavruli lg:text-[72px] sm:text-[30px] font-light leading-none [text-edge:cap] [leading-trim:both]">
-                  {slide.title.split(' ').slice(0, 7).join(' ')}
-                  {slide.title.split(' ').length > 7 && '...'}
+                  {he.decode(slide.title)
+                    .split(' ')
+                    .slice(0, 7)
+                    .join(' ')}
+                  {he.decode(slide.title).split(' ').length > 7 && '...'}
                 </p>
               </div>
             </div>
@@ -134,7 +131,7 @@ const MainNewsClient = ({ slides }) => {
             >
               <Image
                 src={slide.image}
-                alt={slide.title}
+                alt={he.decode(slide.title)}
                 width={1920}
                 height={1080}
                 sizes="(max-width: 768px) 100vw, 50vw"
@@ -148,14 +145,16 @@ const MainNewsClient = ({ slides }) => {
                   მთავარი ამბები
                 </h2>
                 <p className="text-[#FFF] pl-5 tracking-wider pt-[10px] pb-5 font-alk-tall-mtavruli sm:text-[100px] font-light leading-6 [text-edge:cap] [leading-trim:both]">
-                  {slide.title.split(' ').slice(0, 7).join(' ')}
-                  {slide.title.split(' ').length > 7 && '...'}
+                  {he.decode(slide.title)
+                    .split(' ')
+                    .slice(0, 7)
+                    .join(' ')}
+                  {he.decode(slide.title).split(' ').length > 7 && '...'}
                 </p>
               </div>
             </div>
           </Link>
         ))}
-
         <button
           onClick={prevSlide}
           className="absolute left-5 top-[25%] -translate-y-1/2 z-30"
