@@ -1,19 +1,26 @@
-import ClientSideTranslate from './ClientSideTranslate'; // Import client component
+/**
+ * This is the server component for /translate
+ * It fetches initial data from WP, then renders ClientSideTranslate with that data.
+ */
 
-// Server-side function to fetch the initial translations
+import ClientSideTranslate from "./ClientSideTranslate";
+
+// Fetch initial translations server-side for page 1
 async function fetchInitialTranslations() {
   const res = await fetch(
-    'https://mautskebeli.wpenginepowered.com/wp-json/wp/v2/targmani?acf_format=standard&_fields=id,title,acf,date&per_page=10&page=1',
-    { cache: 'no-store' } // Disable caching
+    `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/wp/v2/targmani?acf_format=standard&per_page=10&page=1`,
+    { cache: "no-store" } // disable caching
   );
   if (!res.ok) {
-    throw new Error('Failed to fetch translations');
+    throw new Error("Failed to fetch initial translations");
   }
   return res.json();
 }
 
-// Server Component: Fetches data server-side and passes it to the client component
 export default async function TranslatePage() {
-  const initialTranslations = await fetchInitialTranslations(); // Fetch initial translations server-side
-  return <ClientSideTranslate initialTranslations={initialTranslations} />; // Pass to Client Component
+  // Load the first page of posts server-side
+  const initialTranslations = await fetchInitialTranslations();
+
+  // Render the client component, passing initial data
+  return <ClientSideTranslate initialTranslations={initialTranslations} />;
 }
