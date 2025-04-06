@@ -5,7 +5,6 @@ import "moment/locale/ka";
 import { decode } from "html-entities";
 import sanitizeHtml from "sanitize-html";
 import { load } from "cheerio";
-import React from "react";
 import DynamicClientComponents from "./DynamicClientComponents";
 
 /**
@@ -180,7 +179,7 @@ export default async function TranslationPage({ params }) {
         </h3>
 
         {/* Author (ავტორი) */}
-        <h2 className="font-noto-sans-georgian text-[16px] sm:text-[24px] font-extrabold text-[#AD88C6] leading-normal mb-2">
+        <h2 className="font-noto-sans-georgian text-[16px] sm:text-[24px] font-extrabold text-[#474F7A] leading-normal mb-2">
           {translation.acf["ავტორი"]}
         </h2>
 
