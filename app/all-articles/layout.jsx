@@ -6,6 +6,7 @@ import Navigation from "../components/Navigation";
 import { MenuProvider } from "@/app/context/MenuContext";
 import Footer from "../components/Footer";
 
+
 export const metadata = {
   title: "Mautskebeli",
   description: "Default description for Mautskebeli.",

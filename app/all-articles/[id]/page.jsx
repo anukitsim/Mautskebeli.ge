@@ -1,5 +1,3 @@
-// app/all-articles/[id]/page.jsx
-
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import moment from 'moment';
@@ -9,7 +7,6 @@ import sanitizeHtml from 'sanitize-html';
 import { load } from 'cheerio';
 import React from 'react';
 
-// Import the Client Component handling dynamic imports
 import DynamicClientComponents from './DynamicClientComponents';
 
 const categories = [
@@ -19,19 +16,16 @@ const categories = [
   { name: 'თავისუფალი სვეტი', path: '/free-column' },
 ];
 
-// Fetch the article
 async function fetchArticle(id) {
   const apiUrl = `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/wp/v2/article/${id}?acf_format=standard&_fields=id,title,acf,date`;
 
   try {
     const res = await fetch(apiUrl, {
-      next: { revalidate: 10 }, // Adjust revalidation as needed
+      next: { revalidate: 10 },
     });
 
     if (!res.ok) {
-      console.error(
-        `Failed to fetch article with id ${id}: ${res.status} ${res.statusText}`
-      );
+      console.error(`Failed to fetch article with id ${id}: ${res.status} ${res.statusText}`);
       return null;
     }
 
@@ -43,7 +37,6 @@ async function fetchArticle(id) {
   }
 }
 
-// Generate Metadata for the Article
 export async function generateMetadata({ params }) {
   const { id } = params;
   const article = await fetchArticle(id);
@@ -55,34 +48,30 @@ export async function generateMetadata({ params }) {
     };
   }
 
-  // Decode HTML entities in the title and description
   const decodedTitle = decode(article.title.rendered || '');
   const description = article.acf.description || article.acf.sub_title || '';
   const decodedDescription = decode(description);
 
-  // Ensure the image URL is absolute and points to the original image
   let imageUrl = article.acf.image
     ? article.acf.image.startsWith('http')
       ? article.acf.image
       : `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}${article.acf.image}`
-    : 'https://www.mautskebeli.ge/images/default-og-image.jpg'; // Use absolute URL for default image
+    : 'https://www.mautskebeli.ge/images/default-og-image.jpg';
 
-  // Remove any query parameters that might cause issues
   imageUrl = imageUrl.split('?')[0];
 
-  // Set metadataBase to ensure relative URLs are correctly resolved
   const metadataBase = new URL('https://www.mautskebeli.ge');
 
   return {
-    metadataBase, // Ensure relative URLs are resolved correctly
+    metadataBase,
     title: decodedTitle,
     description: decodedDescription,
     openGraph: {
       title: decodedTitle,
       description: decodedDescription,
-      url: `/all-articles/${id}`, // Relative URL
+      url: `/all-articles/${id}`,
       type: 'article',
-      images: [imageUrl], // Use array of strings to prevent URL transformation
+      images: [imageUrl],
       locale: 'ka_GE',
       siteName: 'Mautskebeli',
     },
@@ -104,34 +93,12 @@ function decodeHTMLEntities(str) {
   return decode(str);
 }
 
-// Sanitize content while allowing inline styles for WYSIWYG-rendered media
 function getSanitizedContent(content) {
   const sanitized = sanitizeHtml(content, {
     allowedTags: [
-      'b',
-      'i',
-      'em',
-      'strong',
-      'a',
-      'p',
-      'blockquote',
-      'ul',
-      'ol',
-      'li',
-      'br',
-      'span',
-      'h1',
-      'h2',
-      'h3',
-      'h4',
-      'h5',
-      'h6',
-      'img',
-      'video',
-      'source',
-      'audio',
-      'figure',
-      'figcaption',
+      'b', 'i', 'em', 'strong', 'a', 'p', 'blockquote',
+      'ul', 'ol', 'li', 'br', 'span', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+      'img', 'video', 'source', 'audio', 'figure', 'figcaption',
     ],
     allowedAttributes: {
       a: ['href', 'target', 'rel'],
@@ -160,7 +127,6 @@ function getSanitizedContent(content) {
     allowVulnerableTags: false,
   });
 
-  // Enhance the content using Cheerio for blockquote styles and to add target="_blank" to links
   const $ = load(sanitized);
 
   $('blockquote').each((_, elem) => {
@@ -170,7 +136,6 @@ function getSanitizedContent(content) {
     $(elem).css('font-style', 'italic');
   });
 
-  // Ensure all <a> tags open in new tabs
   $('a').each((_, elem) => {
     $(elem).attr('target', '_blank');
     $(elem).attr('rel', 'noopener noreferrer');
@@ -187,38 +152,32 @@ const ArticlePage = async ({ params }) => {
     notFound();
   }
 
-  // Process article data
   article.formattedDate = formatDate(article.date);
   article.title.rendered = decodeHTMLEntities(article.title.rendered);
 
-  // Sanitize and process the main text
   let sanitizedContent = getSanitizedContent(article.acf['main-text']);
-
-  // Use Cheerio to manipulate and enhance the HTML content
   const $ = load(sanitizedContent);
 
-  // Ensure all media sources have absolute URLs
-  $('img, video, audio, source').each((i, elem) => {
-    const src = $(elem).attr('src');
-    if (src && !src.startsWith('http')) {
-      $(elem).attr(
-        'src',
-        `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}${src}`
-      );
-    }
-  });
+  // Convert image URLs to absolute and wrap with high-res links
+  $('img').each((i, elem) => {
+    let src = $(elem).attr('src');
 
-  // Style blockquotes (already handled in getSanitizedContent, so this may be redundant)
-  $('blockquote').each((i, elem) => {
-    $(elem).css('margin-left', '20px');
-    $(elem).css('padding-left', '15px');
-    $(elem).css('border-left', '5px solid #ccc');
-    $(elem).css('font-style', 'italic');
+    // Absolute URL
+    if (src && !src.startsWith('http')) {
+      src = `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}${src}`;
+      $(elem).attr('src', src);
+    }
+
+    // Strip WordPress resizing suffix (e.g. -300x200.jpg => .jpg)
+    const highResSrc = src?.replace(/-\d+x\d+(?=\.\w{3,4}$)/, '');
+
+    const imgHtml = $.html(elem);
+    const wrapped = `<a href="${highResSrc}" target="_blank" rel="noopener noreferrer">${imgHtml}</a>`;
+    $(elem).replaceWith(wrapped);
   });
 
   sanitizedContent = $.html();
 
-  // Determine if the language dropdown should be shown
   const showLanguageDropdown =
     article.acf.language1 === true || article.acf.language2 === true;
 
@@ -240,20 +199,16 @@ const ArticlePage = async ({ params }) => {
             </a>
           ))}
         </div>
+
         <div className="w-full h-auto mb-5">
           <Image
-            src={
-              article.acf.image ||
-              '/images/default-og-image.jpg'
-            }
+            src={article.acf.image || '/images/default-og-image.jpg'}
             alt={article.title.rendered}
             width={800}
             height={450}
             style={{ objectFit: 'cover' }}
             className="rounded-lg w-full"
           />
-
-          {/* Language Dropdown */}
           {showLanguageDropdown && (
             <DynamicClientComponents
               id={id}
@@ -295,24 +250,12 @@ const ArticlePage = async ({ params }) => {
           dangerouslySetInnerHTML={{ __html: sanitizedContent }}
         ></div>
 
-        {/* Share Buttons */}
-        {/* Ensure ShareButtons is rendered only once */}
         <DynamicClientComponents
           id={id}
           title={article.title.rendered}
-          showLanguageDropdown={false} // LanguageDropdown won't render here
+          showLanguageDropdown={false}
         />
       </div>
-
-      {/* Scroll to Top Button */}
-      {/* Already included in DynamicClientComponents above, so this might be redundant */}
-      {/* Remove if not needed */}
-      {/* <DynamicClientComponents
-        id={id}
-        title={article.title.rendered}
-        showLanguageDropdown={false}
-      /> */}
-
       <footer className="h-[100px]"></footer>
     </section>
   );
