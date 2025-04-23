@@ -1,3 +1,5 @@
+// all-articles/[id]/page.jsx
+
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import moment from 'moment';
@@ -176,10 +178,14 @@ const ArticlePage = async ({ params }) => {
     $(elem).replaceWith(wrapped);
   });
 
+ 
   sanitizedContent = $.html();
 
-  const showLanguageDropdown =
-    article.acf.language1 === true || article.acf.language2 === true;
+  /* ─────────────────── translation flags ─────────────────── */
+  const hasEng = article.acf.language1 === true;
+  const hasRu  = article.acf.language2 === true;
+  const showLanguageDropdown = hasEng || hasRu;
+
 
   return (
     <section className="w-full mx-auto mt-10 px-4 lg:px-0 overflow-x-hidden relative">
@@ -211,9 +217,12 @@ const ArticlePage = async ({ params }) => {
           />
           {showLanguageDropdown && (
             <DynamicClientComponents
-              id={id}
-              title={article.title.rendered}
-              showLanguageDropdown={showLanguageDropdown}
+            id={id}
+            title={article.title.rendered}
+            showLanguageDropdown={showLanguageDropdown}
+            hasEng={hasEng}
+            hasRu={hasRu}
+            currentLanguage="georgian"
             />
           )}
         </div>
@@ -250,11 +259,14 @@ const ArticlePage = async ({ params }) => {
           dangerouslySetInnerHTML={{ __html: sanitizedContent }}
         ></div>
 
-        <DynamicClientComponents
+       <DynamicClientComponents
           id={id}
           title={article.title.rendered}
           showLanguageDropdown={false}
-        />
+          hasEng={hasEng}
+          hasRu={hasRu}
+          currentLanguage="georgian"
+          />
       </div>
       <footer className="h-[100px]"></footer>
     </section>

@@ -1,26 +1,32 @@
 // app/all-articles/[id]/ENG/LanguageDropdown.jsx
 
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
-const LanguageDropdown = ({ id, currentLanguage }) => {
+const LanguageDropdown = ({
+  id,
+  currentLanguage,
+  hasEng = false,
+  hasRu = false,
+}) => {
   const [dropdownOpen, setDropdownOpen] = useState(true);
   const router = useRouter();
 
   const availableLanguages = [
-    { key: 'georgian', label: 'ქართული' },
-    { key: 'language1', label: 'English' },
-    { key: 'language2', label: 'Русский' },
-  ];
+    { key: 'georgian',  label: 'ქართული', available: true },
+    { key: 'language1', label: 'English',  available: hasEng },
+    { key: 'language2', label: 'Русский',  available: hasRu  },
+  ].filter(lang => lang.available);
+  
 
   const handleLanguageNavigation = (language) => {
-    if (language === 'georgian') {
+    if (language === "georgian") {
       router.push(`/all-articles/${id}`);
-    } else if (language === 'language1') {
+    } else if (language === "language1") {
       router.push(`/all-articles/${id}/ENG`);
-    } else if (language === 'language2') {
+    } else if (language === "language2") {
       router.push(`/all-articles/${id}/RU`);
     }
   };
@@ -33,7 +39,7 @@ const LanguageDropdown = ({ id, currentLanguage }) => {
       >
         Choose language
         <span className="ml-1 text-sm align-middle">
-          {dropdownOpen ? '▼' : '▶'}
+          {dropdownOpen ? "▼" : "▶"}
         </span>
       </span>
       {dropdownOpen && (
@@ -45,8 +51,8 @@ const LanguageDropdown = ({ id, currentLanguage }) => {
               disabled={language.key === currentLanguage}
               className={`px-4 py-2 rounded text-sm font-semibold ${
                 language.key === currentLanguage
-                  ? 'bg-gray-300 text-[#474F7A] cursor-not-allowed'
-                  : 'bg-[#AD88C6] text-[#474F7A] hover:bg-[#AD88C6]'
+                  ? "bg-gray-300 text-[#474F7A] cursor-not-allowed"
+                  : "bg-[#AD88C6] text-[#474F7A] hover:bg-[#AD88C6]"
               }`}
             >
               {language.label}

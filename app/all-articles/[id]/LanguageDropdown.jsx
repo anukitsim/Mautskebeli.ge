@@ -5,15 +5,16 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-const LanguageDropdown = ({ id, currentLanguage }) => {
+const LanguageDropdown = ({ id, currentLanguage, hasEng = false, hasRu = false }) => {
+  
   const [dropdownOpen, setDropdownOpen] = useState(true);
   const router = useRouter();
 
   const availableLanguages = [
-    { key: 'georgian', label: 'ქართული' },
-    { key: 'language1', label: 'English' },
-    { key: 'language2', label: 'Русский' },
-  ];
+    { key: 'georgian',  label: 'ქართული', available: true },
+    { key: 'language1', label: 'English',  available: hasEng },
+    { key: 'language2', label: 'Русский',  available: hasRu  },
+  ].filter(lang => lang.available);
 
   const handleLanguageNavigation = (language) => {
     if (language === 'georgian') {

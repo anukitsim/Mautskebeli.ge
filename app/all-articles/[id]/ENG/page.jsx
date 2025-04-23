@@ -1,25 +1,27 @@
 // app/all-articles/[id]/ENG/page.jsx
 
-import Image from 'next/image';
-import { notFound } from 'next/navigation';
-import moment from 'moment';
-import 'moment/locale/ka';
-import { decode } from 'html-entities';
-import sanitizeHtml from 'sanitize-html';
-import { load } from 'cheerio'; // Updated import
-import ShareButtons from './ShareButtons';
-import LanguageDropdown from './LanguageDropdown';
-import ScrollToTopButton from './ScrollToTopButton';
+import Image from "next/image";
+import { notFound } from "next/navigation";
+import moment from "moment";
+import "moment/locale/ka";
+import { decode } from "html-entities";
+import sanitizeHtml from "sanitize-html";
+import { load } from "cheerio"; // Updated import
+import ShareButtons from "./ShareButtons";
+import LanguageDropdown from "./LanguageDropdown";
+import ScrollToTopButton from "./ScrollToTopButton";
 
 const categories = [
-  { name: 'სტატიები', path: '/all-articles' },
-  { name: 'თარგმანი', path: '/translate' },
-  { name: 'მაუწყებელი წიგნები', path: '/books' },
-  { name: 'თავისუფალი სვეტი', path: '/free-column' },
+  { name: "სტატიები", path: "/all-articles" },
+  { name: "თარგმანი", path: "/translate" },
+  { name: "მაუწყებელი წიგნები", path: "/books" },
+  { name: "თავისუფალი სვეტი", path: "/free-column" },
 ];
 
 async function fetchArticle(id) {
-  const apiUrl = `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/wp/v2/article/${id}?acf_format=standard&_fields=id,title,acf,date&_=${new Date().getTime()}`;
+  const apiUrl = `${
+    process.env.NEXT_PUBLIC_WORDPRESS_API_URL
+  }/wp/v2/article/${id}?acf_format=standard&_fields=id,title,acf,date&_=${new Date().getTime()}`;
   const res = await fetch(apiUrl);
 
   if (!res.ok) {
@@ -29,8 +31,8 @@ async function fetchArticle(id) {
 }
 
 function formatDate(dateString) {
-  moment.locale('ka');
-  return moment(dateString).format('LL');
+  moment.locale("ka");
+  return moment(dateString).format("LL");
 }
 
 function decodeHTMLEntities(str) {
@@ -47,21 +49,21 @@ export async function generateMetadata({ params }) {
 
   return {
     title: `${article.acf.language1_title} - English Version`,
-    description: article.acf.language1_sub_title || 'An article in English.',
+    description: article.acf.language1_sub_title || "An article in English.",
     openGraph: {
       title: article.acf.language1_title,
       description: article.acf.language1_sub_title,
       url: `https://www.mautskebeli.ge/all-articles/${article.id}/ENG`,
       images: [
         {
-          url: article.acf.language1_image || '/images/default-og-image.jpg',
+          url: article.acf.language1_image || "/images/default-og-image.jpg",
         },
       ],
     },
     twitter: {
       title: article.acf.language1_title,
       description: article.acf.language1_sub_title,
-      images: [article.acf.language1_image || '/images/default-og-image.jpg'],
+      images: [article.acf.language1_image || "/images/default-og-image.jpg"],
     },
   };
 }
@@ -88,24 +90,26 @@ const Language1Page = async ({ params }) => {
   // Use cheerio to manipulate the HTML content
   const $ = load(sanitizedContent); // Updated code
 
-  $('a').each((i, elem) => {
-    const href = $(elem).attr('href');
-    if (href && !href.startsWith('/') && !href.startsWith('#')) {
-      $(elem).attr('target', '_blank');
-      $(elem).attr('rel', 'noopener noreferrer');
+  $("a").each((i, elem) => {
+    const href = $(elem).attr("href");
+    if (href && !href.startsWith("/") && !href.startsWith("#")) {
+      $(elem).attr("target", "_blank");
+      $(elem).attr("rel", "noopener noreferrer");
     }
   });
 
-  $('blockquote').each((i, elem) => {
-    $(elem).css('margin-left', '20px');
-    $(elem).css('padding-left', '15px');
-    $(elem).css('border-left', '5px solid #ccc');
+  $("blockquote").each((i, elem) => {
+    $(elem).css("margin-left", "20px");
+    $(elem).css("padding-left", "15px");
+    $(elem).css("border-left", "5px solid #ccc");
   });
 
   sanitizedContent = $.html();
 
-  // Determine if the language dropdown should be shown
-  const showLanguageDropdown = article.acf.language1_title || article.acf.language2_title;
+  // figure out which translations exist
+  const hasEng = Boolean(article.acf.language1_title);
+  const hasRu = Boolean(article.acf.language2_title);
+  const showLanguageDropdown = hasEng || hasRu;
 
   return (
     <section className="w-full mx-auto mt-10 px-4 lg:px-0 overflow-x-hidden relative">
@@ -116,9 +120,9 @@ const Language1Page = async ({ params }) => {
               key={category.name}
               href={category.path}
               className={`text-sm text-[#474F7A] ${
-                category.name === 'სტატიები'
-                  ? 'text-white font-bold'
-                  : 'text-[#474F7A] hover:scale-110'
+                category.name === "სტატიები"
+                  ? "text-white font-bold"
+                  : "text-[#474F7A] hover:scale-110"
               }`}
             >
               {category.name}
@@ -127,17 +131,22 @@ const Language1Page = async ({ params }) => {
         </div>
         <div className="w-full h-auto mb-5">
           <Image
-            src={article.acf.language1_image || '/images/default-og-image.jpg'}
+            src={article.acf.language1_image || "/images/default-og-image.jpg"}
             alt={article.title.rendered}
             width={800}
             height={450}
-            style={{ objectFit: 'cover' }}
+            style={{ objectFit: "cover" }}
             className="rounded-lg w-full"
           />
 
           {/* Language Dropdown */}
           {showLanguageDropdown && (
-            <LanguageDropdown id={id} currentLanguage="language1" />
+            <LanguageDropdown
+              id={id}
+              currentLanguage="language1"
+              hasEng={hasEng}
+              hasRu={hasRu}
+            />
           )}
 
           <h1 className="font-alk-tall-mtavruli text-[32px] sm:text-[64px] font-light leading-none text-[#474F7A] mt-[24px] mb-5">
@@ -154,7 +163,7 @@ const Language1Page = async ({ params }) => {
           </p>
           {article.acf.language1_pdf && (
             <p className="text-[#474F7A] font-semibold pb-10">
-              იხილეთ სტატიის{' '}
+              იხილეთ სტატიის{" "}
               <a
                 href={article.acf.language1_pdf}
                 target="_blank"
