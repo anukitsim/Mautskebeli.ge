@@ -4,7 +4,7 @@ import "../../style/globals.css";
 import { Noto_Sans_Georgian } from "next/font/google";
 import Head from "next/head";
 import Script from "next/script";
-import AnalyticsPageView from "@/components/AnalyticsPageView";
+import AnalyticsPageView from "../components/AnalyticsPageView";
 
 export const metadata = {
   title: "მაუწყებელი",
