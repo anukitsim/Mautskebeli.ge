@@ -1,23 +1,19 @@
 'use client';
 
-import { usePathname, useSearchParams } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { useEffect } from 'react';
 
 export default function AnalyticsPageView() {
-  const pathname     = usePathname();       // e.g. /news/123
-  const searchParams = useSearchParams();   // e.g. ?utm_source=…
+  const pathname = usePathname();           // /news/123 etc.
 
   useEffect(() => {
     if (typeof window === 'undefined' || !window.gtag) return;
 
-    const url =
-      pathname + (searchParams?.toString() ? `?${searchParams}` : '');
-
     window.gtag('event', 'page_view', {
-      page_path: url,
-      page_location: window.location.href, // optional but nice
+      page_path: pathname,
+      page_location: window.location.href, // optional
     });
-  }, [pathname, searchParams]);
+  }, [pathname]);
 
   return null; // renders nothing
 }
