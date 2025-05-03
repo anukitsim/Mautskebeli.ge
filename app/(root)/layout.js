@@ -1,30 +1,29 @@
 // app/(root)/layout.jsx
 
-import '../../style/globals.css';
-import { Noto_Sans_Georgian } from 'next/font/google';
-import Head from 'next/head';
-import Script from 'next/script';
+import "../../style/globals.css";
+import { Noto_Sans_Georgian } from "next/font/google";
+import Head from "next/head";
+import Script from "next/script";
+import AnalyticsPageView from "@/components/AnalyticsPageView";
 
 export const metadata = {
-  title: 'მაუწყებელი',
-  description: 'მედია პლათფორმა მაუწყებელი',
-  app_id: '1819807585106457',
+  title: "მაუწყებელი",
+  description: "მედია პლატფორმა მაუწყებელი",
+  app_id: "1819807585106457",
 };
 
 // Import and configure your Google font
 const notoSansGeorgian = Noto_Sans_Georgian({
-  subsets: ['georgian'],
-  weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900'],
-  display: 'swap',
-  variable: '--font-noto-sans-georgian',
+  subsets: ["georgian"],
+  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
+  display: "swap",
+  variable: "--font-noto-sans-georgian",
 });
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${notoSansGeorgian.variable}`}>
-      <head>
-        {/* Include any additional <head> elements if necessary */}
-      </head>
+      <head>{/* Include any additional <head> elements if necessary */}</head>
       <body>
         {children}
 
@@ -41,10 +40,12 @@ export default function RootLayout({ children }) {
                   window.dataLayer = window.dataLayer || [];
                   function gtag(){dataLayer.push(arguments);}
                   gtag('js', new Date());
-                  gtag('config', 'G-MZY3EGWH6J');
+                  gtag('config', 'G-MZY3EGWH6J', { send_page_view: false });
                 `,
           }}
         />
+
+        <AnalyticsPageView />
       </body>
     </html>
   );

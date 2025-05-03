@@ -16,7 +16,7 @@ async function fetchArticleDetails(articleId) {
 export async function generateMetadata({ params }) {
   const articleId = params.id; // Use params.id to get the article ID
   let title = 'მაუწყებელი';
-  let description = 'მედია პლათფორმა მაუწყებელი';
+  let description = 'მედია პლატფორმა მაუწყებელი';
   let images = [
     {
       url: 'https://www.mautskebeli.ge/images/og-logo.jpg', // Default image URL
@@ -66,7 +66,7 @@ export default function RootLayout({ children }) {
       <head>
         {/* Ensure meta tags are explicitly set */}
         <meta property="og:title" content="მაუწყებელი" />
-        <meta property="og:description" content="მედია პლათფორმა მაუწყებელი" />
+        <meta property="og:description" content="მედია პლატფორმა მაუწყებელი" />
         <meta property="og:url" content="https://www.mautskebeli.ge/" />
         <meta property="og:image" content="https://www.mautskebeli.ge/images/og-logo.jpg" />
         <meta property="og:image:width" content="800" />
@@ -77,7 +77,7 @@ export default function RootLayout({ children }) {
         {/* Ensure Twitter meta tags are set */}
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content="მაუწყებელი" />
-        <meta name="twitter:description" content="მედია პლათფორმა მაუწყებელი" />
+        <meta name="twitter:description" content="მედია პლატფორმა მაუწყებელი" />
         <meta name="twitter:image" content="https://www.mautskebeli.ge/images/og-logo.jpg" />
         <meta name="twitter:image:width" content="800" />
         <meta name="twitter:image:height" content="600" />

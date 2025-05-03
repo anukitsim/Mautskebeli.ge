@@ -9,7 +9,7 @@ import Head from 'next/head';
 
 export const metadata = {
   title: "mautskebeli.ge",
-  description: "მედია პლათფორმა მაუწყებელი",
+  description: "მედია პლატფორმა მაუწყებელი",
   ogImage: "https://mautskebeli.ge/api/og?title=Default%20Title",
   metadataBase: new URL('https://www.mautskebeli.ge'), 
 };
