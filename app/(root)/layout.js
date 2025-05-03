@@ -1,5 +1,5 @@
 // app/(root)/layout.jsx
-'use client';
+
 
 import "../../style/globals.css";
 import { Noto_Sans_Georgian } from "next/font/google";
@@ -17,7 +17,7 @@ export const metadata = {
   openGraph: {
     title:       "მაუწყებელი",
     description: "მედია პლატფორმა მაუწყებელი",    // ✅
-    url:         "https://www.mautskebeli.ge/",        // ← put your real domain
+    url:         "https://www.mautskebeli.ge/",       
     siteName:    "მაუწყებელი",
     locale:      "ka_GE",
     type:        "website",
