@@ -40,53 +40,10 @@ const Page = () => {
             </p>
           </div>
 
-          <div className="flex flex-col gap-[24px]">
-            <h1 className="text-[#474F7A] text-xl">
-              თვალი გვადევნეთ სხვადასხვა სოციალურ ქსელში.
-            </h1>
-          </div>
+        
 
-          <h1 className="text-6xl text-[#AD88C6] font-alk-tall-mtavruli">
-            მხარდამჭერები
-          </h1>
-          <div className="w-full flex flex-wrap gap-10 lg:gap-0 items-center pb-20">
-            <div className="flex-1 min-w-[200px] h-[200px] flex lg:justify-start justify-center">
-              <Image
-                src="/images/mxardamcheri1.png"
-                alt="mxardamcheri1"
-                width={200}
-                height={200}
-                style={{ objectFit: "contain" }}
-              />
-            </div>
-            <div className="flex-1 min-w-[200px] h-[70px] flex justify-center items-center">
-              <Image
-                src="/images/mxardamcheri2.png"
-                alt="mxardamcheri2"
-                width={300}
-                height={70}
-                style={{ objectFit: "contain" }}
-              />
-            </div>
-            {/* <div className="flex-1 min-w-[200px] h-[200px] flex justify-center">
-              <Image
-                src="/images/mxardamcheri3.jpeg"
-                alt="mxardamcheri3"
-                width={200}
-                height={200}
-                objectFit="contain"
-              />
-            </div> */}
-            <div className="flex-1 min-w-[200px] h-[200px] flex justify-center">
-              <Image
-                src="/images/mxardamcheri4.jpeg"
-                alt="mxardamcheri4"
-                width={200}
-                height={200}
-                style={{ objectFit: "contain" }}
-              />
-            </div>
-          </div>
+         
+       
         </div>
       </section>
     </>
