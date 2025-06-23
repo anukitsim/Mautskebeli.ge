@@ -1,11 +1,16 @@
-//components/DonationForm.jsx
-
+// components/DonationForm.jsx
 "use client";
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
-import PayPalButton from "./PayPalButton"; // Import the PayPal button component
+import PayPalButton from "./PayPalButton";
+
+// -------------------------
+//  MAINTENANCE SWITCH
+//  Flip to false (or delete block) to restore the full form.
+// -------------------------
+const MAINTENANCE_MODE = true;
 
 // -------------------------
 // TBC (Local Bank) Payment Status Verification
@@ -98,13 +103,14 @@ const Modal = ({ show, handleClose, handleConfirm }) => {
 // DonationForm Component
 // -------------------------
 const DonationForm = () => {
+  /* ─── state / refs / effects (must always run) ───────────── */
   const [formData, setFormData] = useState({
     donationAmount: 5,
     donorName: "",
     donorEmail: "",
     donorPhone: "",
-    isRecurring: false, // default is false for one-time donations (needed for PayPal)
-    payment_method: "Local", // "Local" for TBC; PayPal donations use the separate button
+    isRecurring: false,
+    payment_method: "Local",
   });
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
@@ -115,14 +121,11 @@ const DonationForm = () => {
   const [showTooltip, setShowTooltip] = useState(false);
 
   const searchParams = useSearchParams();
-
-  // Use a ref for the formData so that our PayPal callbacks always see the current values
   const formDataRef = useRef(formData);
   useEffect(() => {
     formDataRef.current = formData;
   }, [formData]);
 
-  // On mount, check if an orderId is in the URL (from TBC redirection) and verify payment status.
   useEffect(() => {
     const orderId = searchParams.get("orderId");
     if (orderId) {
@@ -130,7 +133,22 @@ const DonationForm = () => {
     }
   }, [searchParams]);
 
-  // Returns the donation data for use by the PayPal button
+  /* ─── EARLY RETURN DURING MAINTENANCE ────────────────────── */
+  if (MAINTENANCE_MODE) {
+    return (
+      <div className="flex flex-col items-center justify-center gap-2 p-10
+                      bg-white rounded-lg shadow text-center">
+        <h2 className="text-xl font-semibold text-gray-800">
+          პროგრამული სამუშაოები
+        </h2>
+        <p className="text-[#AD88C6]">მალე დავბრუნდებით</p>
+      </div>
+    );
+  }
+
+  /* ─── everything below is unchanged original form ────────── */
+
+  // -------- helper callbacks / PayPal finalisation / submit -----------------
   const getDonationData = useCallback(() => {
     return {
       donationAmount: parseFloat(formDataRef.current.donationAmount),
@@ -139,17 +157,14 @@ const DonationForm = () => {
       donorPhone: formDataRef.current.donorPhone.trim(),
       isRecurring: formDataRef.current.isRecurring,
       payment_method: formDataRef.current.payment_method,
-      currency: "GEL", // Adjust if needed (for PayPal you may switch to USD)
+      currency: "GEL",
     };
   }, []);
 
-  // -------------------------
-  // PayPal Donation Finalization
-  // -------------------------
   const finalizePayPalDonation = useCallback(async (details) => {
     try {
       console.log("Finalizing PayPal donation with details:", details);
-      const transactionID = details.id; // PayPal transaction ID
+      const transactionID = details.id;
       const currencyCode =
         details.purchase_units[0].amount.currency_code || "USD";
       const currentFormData = formDataRef.current;
@@ -169,7 +184,6 @@ const DonationForm = () => {
         payment_type: currentFormData.isRecurring ? "Recurring" : "One-Time",
       };
 
-      // Call the new PayPal donation finalization endpoint in your plugin.
       const res = await fetch(
         "https://mautskebeli.wpenginepowered.com/wp-json/wp/v2/paypal-donation-complete",
         {
@@ -209,12 +223,8 @@ const DonationForm = () => {
     console.error("PayPal Error:", error);
   }, []);
 
-  // -------------------------
-  // Local Bank (TBC) Donation Submission
-  // -------------------------
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // Force payment_method to "Local" when using TBC
     const trimmedFormData = {
       donationAmount: parseFloat(formData.donationAmount),
       donorName: formData.donorName.trim(),
@@ -254,7 +264,6 @@ const DonationForm = () => {
         setIsError(true);
       } else {
         if (responseData.paymentUrl) {
-          // Redirect to TBC payment URL
           window.location.href = responseData.paymentUrl;
         } else {
           if (formData.isRecurring) {
@@ -275,9 +284,7 @@ const DonationForm = () => {
     }
   };
 
-  // -------------------------
-  // Form Input & Modal Handlers
-  // -------------------------
+  // ------------ UI event handlers (checkboxes, tooltip etc.) ----------------
   const handleRecurringChange = (e) => {
     if (e.target.checked) {
       setShowModal(true);
@@ -290,50 +297,52 @@ const DonationForm = () => {
     setFormData((prev) => ({ ...prev, isRecurring: true }));
     setShowModal(false);
   };
-
   const handleModalClose = () => {
     setFormData((prev) => ({ ...prev, isRecurring: false }));
     setShowModal(false);
   };
-
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
-
   const handleIncrement = () => {
     setFormData((prev) => ({
       ...prev,
       donationAmount: Math.max((parseFloat(prev.donationAmount) || 0) + 5, 5),
     }));
   };
-
   const handleDecrement = () => {
     setFormData((prev) => ({
       ...prev,
       donationAmount: Math.max((parseFloat(prev.donationAmount) || 0) - 5, 5),
     }));
   };
-
   const closePaymentMessage = () => setPaymentMessage("");
 
+  /* ───────────────────────────────────────────────────────────
+   * ORIGINAL JSX (unchanged)
+   * ─────────────────────────────────────────────────────────── */
   return (
     <div className="flex flex-col gap-4">
+      {/* Header */}
       <div className="flex gap-2 pl-2 items-center">
         <Image src="/images/donacia.png" alt="donation" width={20} height={20} />
         <h1 className="text-[18px] font-semibold">დონაცია</h1>
       </div>
 
+      {/* payment banner */}
       <PaymentMessage
         message={paymentMessage}
         isError={isError}
         onClose={closePaymentMessage}
       />
 
+      {/* form */}
       <form
         onSubmit={handleSubmit}
         className="flex-col flex justify-center items-center rounded-lg bg-[url('/images/donacia-foni.png')] bg-cover bg-no-repeat p-6 sm:p-8 gap-6 w-full lg:w-[25vw] max-w-lg"
       >
+        {/* amount with +/- */}
         <div className="relative flex items-center w-full">
           <button
             type="button"
@@ -363,6 +372,7 @@ const DonationForm = () => {
           </button>
         </div>
 
+        {/* name / email / phone */}
         <input
           type="text"
           name="donorName"
@@ -392,6 +402,7 @@ const DonationForm = () => {
           className="p-3 rounded-lg border border-gray-300 w-full"
         />
 
+        {/* recurring checkbox + tooltip */}
         <div
           className="relative inline-block group"
           onMouseEnter={() => setShowTooltip(true)}
@@ -420,6 +431,7 @@ const DonationForm = () => {
           )}
         </div>
 
+        {/* submit / PayPal */}
         <button
           type="submit"
           className="bg-[#AD88C6] w-full text-white p-3 rounded-lg mt-4 hover:scale-105 transition-transform duration-300 disabled:opacity-50"
@@ -428,9 +440,6 @@ const DonationForm = () => {
           {loading ? "მუშაობდა.." : "გადახდა"}
         </button>
 
-        {/* -------------------------
-            Render the PayPal Button only for one‑time (non‑recurring) donations.
-            ------------------------- */}
         {!formData.isRecurring && (
           <PayPalButton
             getDonationData={getDonationData}
@@ -439,6 +448,7 @@ const DonationForm = () => {
           />
         )}
 
+        {/* terms / privacy */}
         <div className="mt-4">
           <p
             className={`text-sm cursor-pointer ${
@@ -492,12 +502,14 @@ const DonationForm = () => {
         </div>
       </form>
 
+      {/* modal */}
       <Modal
         show={showModal}
         handleClose={handleModalClose}
         handleConfirm={handleModalConfirm}
       />
 
+      {/* style for number input */}
       <style jsx>{`
         input[type="number"]::-webkit-outer-spin-button,
         input[type="number"]::-webkit-inner-spin-button {
