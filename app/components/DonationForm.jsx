@@ -10,7 +10,7 @@ import PayPalButton from "./PayPalButton";
 //  MAINTENANCE SWITCH
 //  Flip to false (or delete block) to restore the full form.
 // -------------------------
-const MAINTENANCE_MODE = true;
+const MAINTENANCE_MODE = false;
 
 // -------------------------
 // TBC (Local Bank) Payment Status Verification

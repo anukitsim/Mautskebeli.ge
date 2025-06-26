@@ -15,17 +15,17 @@ const page = () => {
           </Suspense>
         </div>
         <div className="W-7/12 flex flex-col gap-[30px] mt-4">
-          {/* <div>
+          <div>
             <h1 className="font-tall-mtavruli text-[#474F7A] text-6xl pl-5 font-normal text-blue-dark leading-normal mt-8 ">
               <span className="text-[#AD88C6] font-semibold">
                 "მაუწყებელს"{" "}
               </span>
               თქვენი მხარდაჭერა სჭირდება!
             </h1>
-          </div> */}
+          </div>
 
           <div className="flex gap-[20px] w-full">
-            {/* <div className="w-full  pl-4 flex gap-[24px] flex-col text-[#474F7A] text-[16px] font-normal ">
+            <div className="w-full  pl-4 flex gap-[24px] flex-col text-[#474F7A] text-[16px] font-normal ">
               <p>
                 “მაუწყებელი” დამოუკიდებელი სახალხო მედიაა, რომელსაც დღის
                 წესრიგში შემოაქვს საზოგადოებისთვის მნიშვნელოვანი პოლიტიკური და
@@ -40,8 +40,8 @@ const page = () => {
                 დამოუკიდებელი და უკომპრომისო საქმიანობისათვის თქვენი მხარდაჭერა
                 გვჭირდება.
               </p>
-            </div> */}
-            {/* <div className="w-6/12">
+            </div>
+            <div className="w-6/12">
               <Image
                 src="/images/tree.png"
                 alt="donation"
@@ -49,9 +49,9 @@ const page = () => {
                 height={266}
                 className="w-full"
               />
-            </div> */}
+            </div>
           </div>
-          {/* <div className="flex pl-4 flex-col gap-[24px]">
+          <div className="flex pl-4 flex-col gap-[24px]">
             <h1 className="text-[#474F7A] text-[32px] font-bold">
               მედიის დინამიური მუშაობისთვის ბევრი რამ არის საჭირო
             </h1>
@@ -63,8 +63,8 @@ const page = () => {
               არასტაბილურობიდან გამომდინარე, არსებულ გამოწვევებთან გამკლავება და
               მომავლის დაგეგმვა შეუძლებელია.
             </p>
-          </div> */}
-          {/* <div className="flex flex-col pl-4 gap-[24px]">
+          </div>
+          <div className="flex flex-col pl-4 gap-[24px]">
             <h1 className="text-[#474F7A] text-[32px] font-bold">
               გააძლიერე სახალხო მედია
             </h1>
@@ -79,7 +79,7 @@ const page = () => {
               ყოველთვიური მხარდაჭერის პრაქტიკა, რაც მოგვცემს განვითარების
               საშუალებას.
             </p>
-          </div> */}
+          </div>
         </div>
       </section>
       <section className="block lg:hidden">
@@ -94,15 +94,15 @@ const page = () => {
           <div className="flex pr-1 pl-4 text-balance flex-col gap-[20px] w-full">
             <div className=" flex gap-[24px] text-balance flex-col mt-5 text-[#474F7A] text-[16px] font-normal ">
               <div>
-                {/* <h1 className="font-tall-mtavruli text-[#474F7A] text-xl  font-normal text-blue-dark leading-normal mt-8 ">
+                <h1 className="font-tall-mtavruli text-[#474F7A] text-xl  font-normal text-blue-dark leading-normal mt-8 ">
                   <span className="text-[#AD88C6] font-semibold">
                     "მაუწყებელს"{" "}
                   </span>
                   თქვენი მხარდაჭერა სჭირდება!
-                </h1> */}
+                </h1>
               </div>
 
-              {/* <p className="w-11/12">
+              <p className="w-11/12">
                 “მაუწყებელი” დამოუკიდებელი სახალხო მედიაა, რომელსაც დღის
                 წესრიგში შემოაქვს საზოგადოებისთვის მნიშვნელოვანი პოლიტიკური და
                 სოციალური საკითხები.
@@ -111,9 +111,9 @@ const page = () => {
                 ჩვენ ვაგრძელებთ მშრომელების დემოკრატიისა და თანასწორობისთვის
                 ბრძოლის ტრადიციას - ბრძოლას იმ სიკეთეებისთვის, რომლებიც
                 კაპიტალის მფლობელების ნებით არ მოგვცემია.
-              </p> */}
+              </p>
             </div>
-            {/* <div className="">
+            <div className="">
               <Image
                 src="/images/tree.png"
                 alt="donation"
@@ -121,9 +121,9 @@ const page = () => {
                 height={266}
                 className="w-full"
               />
-            </div> */}
+            </div>
           </div>
-          {/* <div className="flex  w-11/12  pl-4 flex-col gap-[24px]">
+          <div className="flex  w-11/12  pl-4 flex-col gap-[24px]">
             <p className="font-semibold text-[#474F7A]">
               დამოუკიდებელი და უკომპრომისო საქმიანობისათვის თქვენი მხარდაჭერა
               გვჭირდება.
@@ -144,8 +144,8 @@ const page = () => {
               ჩვენს ჟურნალისტებსა და ოპერატორებს ჰონორარისა თუ გადაადგილებისთვის
               საჭირო თანხების გარეშე უწევთ მუშაობა
             </p>
-          </div> */}
-          {/* <div className="flex flex-col pl-4 pr-2 gap-[24px]">
+          </div>
+          <div className="flex flex-col pl-4 pr-2 gap-[24px]">
             <h1 className="text-[#474F7A]  text-[20px] font-extrabold">
               შეგიძლიათ ერთჯერადად ან ყოველთვიურად დაეხმაროთ "მაუწყებელს"
             </h1>
@@ -171,7 +171,7 @@ const page = () => {
               ყოველთვიური მხარდაჭერის პრაქტიკა, რაც მოგვცემს განვითარების
               საშუალებას.
             </p>
-          </div> */}
+          </div>
         </div>
       </section>
       <Footer />
