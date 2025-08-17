@@ -43,7 +43,7 @@ const page = () => {
                 გვჭირდება.
               </p>
             </div>
-            <div className="w-6/12">
+            {/* <div className="w-6/12">
               <Image
                 src="/images/tree.png"
                 alt="donation"
@@ -51,7 +51,7 @@ const page = () => {
                 height={266}
                 className="w-full"
               />
-            </div>
+            </div> */}
           </div>
 
           <div className="flex flex-col pl-4 gap-[24px]">
@@ -111,7 +111,7 @@ const page = () => {
               </p>
             </div>
 
-            <div>
+            {/* <div>
               <Image
                 src="/images/tree.png"
                 alt="donation"
@@ -119,7 +119,7 @@ const page = () => {
                 height={266}
                 className="w-full"
               />
-            </div>
+            </div> */}
           </div>
 
           <div className="flex w-11/12 pl-4 pr-2 flex-col gap-[24px]">
