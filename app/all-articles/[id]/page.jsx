@@ -12,19 +12,23 @@ import React from 'react';
 import DynamicClientComponents from './DynamicClientComponents';
 
 const categories = [
-  { name: 'სტატიები', path: '/all-articles' },
-  { name: 'თარგმანი', path: '/translate' },
-  { name: 'მაუწყებელი წიგნები', path: '/books' },
+  { name: 'სტატიები', path: '/სტატიები' },
+  { name: 'თარგმანი', path: '/თარგმანი' },
+  { name: 'მაუწყებელი წიგნები', path: '/წიგნები' },
   { name: 'თავისუფალი სვეტი', path: '/free-column' },
 ];
 
 async function fetchArticle(slugOrId) {
-  // Try fetching by slug first
-  let apiUrl = `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/wp/v2/article?slug=${slugOrId}&acf_format=standard&_fields=id,title,acf,date,slug`;
+  // Decode the slug/ID in case it's URL-encoded (Georgian characters)
+  const decodedSlugOrId = decodeURIComponent(slugOrId);
+  
+  // Try fetching by slug first (URL-encode it properly for the API)
+  let apiUrl = `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/wp/v2/article?slug=${encodeURIComponent(decodedSlugOrId)}&acf_format=standard&_fields=id,title,acf,date,slug`;
 
   try {
     let res = await fetch(apiUrl, {
       next: { revalidate: 10 },
+      cache: 'no-store', // Disable caching temporarily to debug
     });
 
     if (res.ok) {
@@ -35,20 +39,29 @@ async function fetchArticle(slugOrId) {
     }
 
     // If slug doesn't work, try by ID (for backward compatibility)
-    apiUrl = `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/wp/v2/article/${slugOrId}?acf_format=standard&_fields=id,title,acf,date,slug`;
-    res = await fetch(apiUrl, {
-      next: { revalidate: 10 },
-    });
+    // Check if it's a number (ID) or string (slug)
+    const isNumeric = !isNaN(decodedSlugOrId) && !isNaN(parseFloat(decodedSlugOrId));
+    
+    if (isNumeric) {
+      apiUrl = `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/wp/v2/article/${decodedSlugOrId}?acf_format=standard&_fields=id,title,acf,date,slug`;
+      res = await fetch(apiUrl, {
+        next: { revalidate: 10 },
+        cache: 'no-store',
+      });
 
-    if (!res.ok) {
-      console.error(`Failed to fetch article with slug/id ${slugOrId}: ${res.status} ${res.statusText}`);
-      return null;
+      if (!res.ok) {
+        console.error(`Failed to fetch article with ID ${decodedSlugOrId}: ${res.status} ${res.statusText}`);
+        return null;
+      }
+
+      const article = await res.json();
+      return article;
     }
 
-    const article = await res.json();
-    return article;
+    console.error(`Could not find article with slug: ${decodedSlugOrId}`);
+    return null;
   } catch (error) {
-    console.error(`Error fetching article with slug/id ${slugOrId}:`, error);
+    console.error(`Error fetching article with slug/id ${decodedSlugOrId}:`, error);
     return null;
   }
 }
