@@ -1,7 +1,7 @@
 import "../../../style/globals.css"
 
 import { MenuProvider } from "@/app/context/MenuContext";
-import { LanguageProvider } from "../context/LanguageContext";
+import { LanguageProvider } from "@/app/context/LanguageContext";
 
 import SportHeader from "@/app/components/SportHeader";
 import SportNavigation from "@/app/components/SportNavigation";
