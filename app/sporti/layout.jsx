@@ -3,6 +3,7 @@ import '../../node_modules/alk-tall-mtavruli/css/alk-tall-mtavruli.css';
 import { Noto_Sans_Georgian } from 'next/font/google';
 import Script from 'next/script';
 import AnalyticsPageView from '../components/AnalyticsPageView';
+import { LanguageProvider } from "../context/LanguageContext";
 
 const notoSansGeorgian = Noto_Sans_Georgian({
   subsets: ['georgian'],
@@ -22,6 +23,7 @@ export default function RootLayout({ children }) {
       <link rel="icon" href="/favicon.ico" />
       </head>
       <body className='bg-[#AD88C6]'>
+        <LanguageProvider>
         {children}
         
         {/* Google Analytics */}
@@ -42,6 +44,8 @@ export default function RootLayout({ children }) {
           }}
         />
         <AnalyticsPageView />
+      
+        </LanguageProvider>
       </body>
     </html>
   );

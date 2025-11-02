@@ -5,6 +5,7 @@ import React from "react";
 import Footer from "../components/Footer";
 import Script from 'next/script';
 import AnalyticsPageView from '../components/AnalyticsPageView';
+import { LanguageProvider } from "../context/LanguageContext";
 
 // export const metadata = {
 //   title: "Create Next App",
@@ -13,11 +14,12 @@ import AnalyticsPageView from '../components/AnalyticsPageView';
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="ka">
       <head>
       <link rel="icon" href="/favicon.ico" />
       </head>
       <body>
+        <LanguageProvider>
        
 
         {children}
@@ -41,6 +43,8 @@ export default function RootLayout({ children }) {
           }}
         />
         <AnalyticsPageView />
+      
+        </LanguageProvider>
       </body>
     </html>
   );

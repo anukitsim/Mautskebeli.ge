@@ -142,11 +142,6 @@ export default async function sitemap() {
     '/resursebi',
     '/msoflio',
     '/saxli',
-    // Facebook posts
-    '/facebook-post/1',
-    '/facebook-post/2',
-    '/facebook-post/3',
-    '/facebook-post/4',
   ];
 
   const staticRoutes = staticPages.map((route) => ({

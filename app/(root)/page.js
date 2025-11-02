@@ -1,4 +1,3 @@
-import FacebookNews from "../components/FacebookNews";
 import Footer from "../components/Footer";
 import Header from "../components/Header";
 import HomePagePodcast from "../components/HomePagePodcast";
@@ -26,10 +25,6 @@ export default function Home() {
         </div>
 
         <div className="container mx-auto">
-          {/* Facebook News Section */}
-          <section className="px-4 lg:px-8 mt-10">
-            <FacebookNews />
-          </section>
           <DonationPopup />
 
           {/* Home Page Videos Section */}

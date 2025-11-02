@@ -1,6 +1,7 @@
 import '../../style/globals.css'
 
 import { MenuProvider } from "@/app/context/MenuContext";
+import { LanguageProvider } from "../context/LanguageContext";
 
 import SportHeader from '../components/SportHeader';
 import SportNavigation from '../components/SportNavigation';
@@ -15,11 +16,12 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="ka">
       <head>
       <link rel="icon" href="/favicon.ico" />
       </head>
       <body className='bg-[#AD88C6]'>
+        <LanguageProvider>
       <MenuProvider>
           <div className="sticky top-0 z-50">
            <SportHeader />
@@ -30,7 +32,7 @@ export default function RootLayout({ children }) {
         <div className="mt-40 bg-[#AD88C6]">
         <SportFooter />
         </div>
-        
+       
         {/* Google Analytics */}
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-C2ZPMYP4FY"
@@ -49,6 +51,8 @@ export default function RootLayout({ children }) {
           }}
         />
         <AnalyticsPageView />
+      
+        </LanguageProvider>
       </body>
     </html>
   );

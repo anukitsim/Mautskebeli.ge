@@ -7,6 +7,7 @@ import Header from "../components/Header";
 import Navigation from "../components/Navigation";
 
 import { MenuProvider } from "../context/MenuContext";
+import { LanguageProvider } from "../context/LanguageContext";
 import { PayPalProvider } from "../context/PayPalContext";
 import Script from 'next/script';
 import AnalyticsPageView from '../components/AnalyticsPageView';
@@ -15,8 +16,9 @@ import "../../style/globals.css";
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="ka">
       <body>
+        <LanguageProvider>
         <PayPalProvider>
           <MenuProvider>
             <div className="sticky top-0 z-50">
@@ -45,6 +47,8 @@ export default function RootLayout({ children }) {
           }}
         />
         <AnalyticsPageView />
+      
+        </LanguageProvider>
       </body>
     </html>
   );

@@ -4,10 +4,11 @@ import Footer from "../components/Footer";
 import "../../style/globals.css"
 import Script from 'next/script';
 import AnalyticsPageView from '../components/AnalyticsPageView';
+import { LanguageProvider } from "../context/LanguageContext";
 
 export default function RootLayout({ children, pageMeta }) {
   return (
-    <html lang="en">
+    <html lang="ka">
       <head>
       <link rel="icon" href="/favicon.ico" />
       </head>
@@ -23,6 +24,7 @@ export default function RootLayout({ children, pageMeta }) {
         <link rel="stylesheet" href="/style/globals.css" />
       </Head>
       <body>
+        <LanguageProvider>
         {children}
         <Footer />
         
@@ -44,6 +46,8 @@ export default function RootLayout({ children, pageMeta }) {
           }}
         />
         <AnalyticsPageView />
+      
+        </LanguageProvider>
       </body>
     </html>
   );

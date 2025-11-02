@@ -4,6 +4,7 @@ import "../../style/globals.css";
 import { Noto_Sans_Georgian } from "next/font/google";
 import Script from "next/script";
 import AnalyticsPageView from "../components/AnalyticsPageView";
+import { LanguageProvider } from "../context/LanguageContext";
 
 // ──────────────────────────
 //  Metadata (title, OG, etc.)
@@ -70,10 +71,12 @@ export default function RootLayout({ children }) {
         />
       </head>
       <body>
-        {children}
+        <LanguageProvider>
+          {children}
 
-        {/* SPA route-change tracker */}
+          {/* SPA route-change tracker */}
         <AnalyticsPageView />
+        </LanguageProvider>
       </body>
     </html>
   );

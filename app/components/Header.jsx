@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import LanguageSwitcher from "./LanguageSwitcher";
 
 const Header = () => {
   return (
@@ -20,7 +21,7 @@ const Header = () => {
         </Link>
 
         {/* right-hand actions */}
-        <div className="flex gap-8">
+        <div className="flex gap-4 items-center">
           {/* ░░ HIGHLIGHTED DONATION ░░ */}
           <Link
             href="/donation"
@@ -52,7 +53,7 @@ const Header = () => {
             />
           </Link>
 
-          {/* live link (unchanged) */}
+          {/* live link */}
           <Link
             href="/live"
             className="flex gap-2.5 text-xs justify-center items-center"
@@ -67,6 +68,11 @@ const Header = () => {
               პირდაპირი ეთერი
             </span>
           </Link>
+
+          {/* Language Switcher - styled for header */}
+          <div className="hidden sm:block">
+            <LanguageSwitcher variant="header" />
+          </div>
         </div>
       </div>
 

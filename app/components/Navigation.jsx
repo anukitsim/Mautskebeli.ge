@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { useMenu } from '../context/MenuContext';
 import Search from './Search';
 import { useRouter } from 'next/navigation';
+import LanguageSwitcher from './LanguageSwitcher';
 
 const Navigation = ({ onVideoSelect }) => {
   const { isMenuOpen, setIsMenuOpen } = useMenu();
@@ -47,6 +48,9 @@ const Navigation = ({ onVideoSelect }) => {
         <Search isSearchOpen={isSearchOpen} setIsSearchOpen={setIsSearchOpen} />
         <div className={`${isMenuOpen ? "fixed" : "hidden"} top-32 left-0 h-full w-full bg-[#AD88C6] p-4 sm:hidden z-50 overflow-y-auto`}>
           <div className='text-white text-[15px] p-[24px] flex gap-[16px] flex-col'>
+            <div className="pb-4 border-b border-white/20">
+              <LanguageSwitcher />
+            </div>
             <Link href="/">მთავარი</Link>
             <Link href="/text">ტექსტი</Link>
             <Link href="/podcast">პოდკასტი</Link>

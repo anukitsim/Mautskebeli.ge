@@ -857,27 +857,6 @@ a.scale-on-hover:hover {
 }
 
 
-/* styles.css */
-
-.facebook-news-container {
-  display: flex;
-  flex-direction: row;
-  gap: 5px;
-  overflow-x: auto;
-}
-
-@media (max-width: 768px) {
-  .facebook-post {
-    flex: 0 0 auto;
-    min-width: 300px; /* Adjust based on design requirements */
-  }
-
-  .facebook-news-container {
-    flex-wrap: nowrap;
-  }
-}
-
-
 /* Ensure default link styles inside the article content */
 .article-content a {
   color: #0000EE; /* Standard blue link color */
