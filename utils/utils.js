@@ -9,10 +9,14 @@ export const constructUrl = (post) => {
   
     switch (post_type) {
       case "article":
-        // Use slug if available, fallback to ID
-        return `/all-articles/${slug || id}`;
+        // Use Georgian URL with slug if available, fallback to ID
+        return `/სტატიები/${slug || id}`;
       case "mau-books":
-        return `/books/${slug || id}`;
+        // Use Georgian URL with slug if available, fallback to ID
+        return `/წიგნები/${slug || id}`;
+      case "translate":
+        // Use Georgian URL
+        return `/თარგმანი/${slug || id}`;
       default:
         return `/${post_type}/${slug || id}`;
     }

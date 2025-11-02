@@ -78,8 +78,8 @@ export async function generateMetadata({ params }) {
 
   const metadataBase = new URL('https://www.mautskebeli.ge');
 
-  // Use slug for canonical URL if available, fallback to ID
-  const canonicalPath = article.slug ? `/all-articles/${article.slug}` : `/all-articles/${id}`;
+  // Use Georgian URL with slug for canonical URL if available, fallback to ID
+  const canonicalPath = article.slug ? `/სტატიები/${article.slug}` : `/სტატიები/${id}`;
 
   return {
     metadataBase,

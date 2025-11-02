@@ -142,8 +142,8 @@ export default function ClientSideArticles({ initialArticles }) {
             {processedArticles.map((article, index) => {
               // For now, load images from WP directly:
               const imageUrl = article.acf?.image || "/images/default-image.png";
-              // Use slug if available, fallback to ID for backward compatibility
-              const articleUrl = article.slug ? `/all-articles/${article.slug}` : `/all-articles/${article.id}`;
+              // Use Georgian URL with slug if available, fallback to ID for backward compatibility
+              const articleUrl = article.slug ? `/სტატიები/${article.slug}` : `/სტატიები/${article.id}`;
 
               return (
                 <Link

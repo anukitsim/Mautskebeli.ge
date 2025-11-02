@@ -16,7 +16,7 @@ export const metadata = {
   openGraph: {
     title:       "მაუწყებელი",
     description: "მედია პლატფორმა მაუწყებელი",
-    url:         "https://www.mautskebeli.ge/",
+    url:         "https://www.mautskebeli.ge/",       
     siteName:    "მაუწყებელი",
     locale:      "ka_GE",
     type:        "website",
