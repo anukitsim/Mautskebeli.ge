@@ -53,7 +53,7 @@ export default function RootLayout({ children }) {
       <body>
         {children}
 
-        {/* Google Analytics loader */}
+        {/* Google Analytics - G-C2ZPMYP4FY */}
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-C2ZPMYP4FY"
           strategy="afterInteractive"
