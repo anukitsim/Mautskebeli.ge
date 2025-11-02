@@ -65,7 +65,7 @@ const HomePageStatiebi = () => {
     <section className="mx-auto flex flex-col px-4">
       <div className="w-full flex items-center justify-between lg:px-2">
         <p className="text-[#474F7A] text-2xl font-bold">სტატიები</p>
-        <Link href='/სტატიები' className="text-[#474F7A] text-sm font-semibold">
+        <Link href='/all-articles' className="text-[#474F7A] text-sm font-semibold">
           ნახე ყველა
         </Link>
       </div>
@@ -75,7 +75,7 @@ const HomePageStatiebi = () => {
         {articles.map(article => {
           const imageUrl = article.acf.image ? article.acf.image : '/images/default-image.png';
           return (
-            <Link href={article.slug ? `/სტატიები/${article.slug}` : `/სტატიები/${article.id}`} passHref key={article.id}>
+            <Link href={article.slug ? `/all-articles/${article.slug}` : `/all-articles/${article.id}`} passHref key={article.id}>
               <div className="flex-none w-[300px] bg-[#F6F4F8] rounded-lg border border-[#B6A8CD] overflow-hidden flex flex-col h-[500px]">
                 {/* Image Section (Unchanged) */}
                 <div className="relative w-full h-[200px] flex-shrink-0"> {/* Added flex-shrink-0 */}
@@ -122,7 +122,7 @@ const HomePageStatiebi = () => {
         {articles.map(article => {
           const imageUrl = article.acf.image ? article.acf.image : '/images/default-image.png';
           return (
-            <Link href={article.slug ? `/სტატიები/${article.slug}` : `/სტატიები/${article.id}`} passHref key={article.id}>
+            <Link href={article.slug ? `/all-articles/${article.slug}` : `/all-articles/${article.id}`} passHref key={article.id}>
               <div className="bg-[#F6F4F8] rounded-lg border border-[#B6A8CD] overflow-hidden flex flex-col h-[490px]"> {/* Added h-[400px] */}
                 {/* Image Section (Unchanged) */}
                 <div className="relative w-full h-[200px] flex-shrink-0"> {/* Added flex-shrink-0 */}

@@ -12,9 +12,9 @@ import React from 'react';
 import DynamicClientComponents from './DynamicClientComponents';
 
 const categories = [
-  { name: 'სტატიები', path: '/სტატიები' },
-  { name: 'თარგმანი', path: '/თარგმანი' },
-  { name: 'მაუწყებელი წიგნები', path: '/წიგნები' },
+  { name: 'სტატიები', path: '/all-articles' },
+  { name: 'თარგმანი', path: '/translate' },
+  { name: 'მაუწყებელი წიგნები', path: '/books' },
   { name: 'თავისუფალი სვეტი', path: '/free-column' },
 ];
 
@@ -91,8 +91,8 @@ export async function generateMetadata({ params }) {
 
   const metadataBase = new URL('https://www.mautskebeli.ge');
 
-  // Use Georgian URL with slug for canonical URL if available, fallback to ID
-  const canonicalPath = article.slug ? `/სტატიები/${article.slug}` : `/სტატიები/${id}`;
+  // Use slug for canonical URL if available, fallback to ID
+  const canonicalPath = article.slug ? `/all-articles/${article.slug}` : `/all-articles/${id}`;
 
   return {
     metadataBase,

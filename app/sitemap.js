@@ -126,12 +126,12 @@ export default async function sitemap() {
     '/live',
     '/search',
     '/all-videos',
-    '/სტატიები',          // Articles (Georgian URL)
+    '/all-articles',
     '/all-sport-videos',
     '/sport-articles',
     '/free-column',
-    '/თარგმანი',           // Translate (Georgian URL)
-    '/წიგნები',            // Books (Georgian URL)
+    '/translate',
+    '/books',
     // Categories
     '/shroma',
     '/mecniereba',
@@ -163,25 +163,25 @@ export default async function sitemap() {
     fetchAllTranslations(),
   ]);
 
-  // Create article routes with slugs (using Georgian URLs)
+  // Create article routes with slugs
   const articleRoutes = articles.map((article) => ({
-    url: `${baseUrl}/სტატიები/${article.slug}`,
+    url: `${baseUrl}/all-articles/${article.slug}`,
     lastModified: new Date(article.modified),
     changeFrequency: 'weekly',
     priority: 0.7,
   }));
 
-  // Create book routes (using Georgian URLs)
+  // Create book routes
   const bookRoutes = books.map((book) => ({
-    url: `${baseUrl}/წიგნები/${book.slug}`,
+    url: `${baseUrl}/books/${book.slug}`,
     lastModified: new Date(book.modified),
     changeFrequency: 'weekly',
     priority: 0.7,
   }));
 
-  // Create translation routes (using Georgian URLs)
+  // Create translation routes (use ID since they might not have slugs)
   const translationRoutes = translations.map((translation) => ({
-    url: `${baseUrl}/თარგმანი/${translation.id}`,
+    url: `${baseUrl}/translate/${translation.id}`,
     lastModified: new Date(translation.modified),
     changeFrequency: 'weekly',
     priority: 0.7,

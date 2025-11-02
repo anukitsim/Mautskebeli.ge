@@ -34,23 +34,6 @@ const nextConfig = {
       return sourceObj;
     });
   },
-  async rewrites() {
-    return [
-      // Rewrite Georgian URLs to English folder structure
-      {
-        source: '/სტატიები/:path*',
-        destination: '/all-articles/:path*',
-      },
-      {
-        source: '/წიგნები/:path*',
-        destination: '/books/:path*',
-      },
-      {
-        source: '/თარგმანი/:path*',
-        destination: '/translate/:path*',
-      },
-    ];
-  },
 };
 
 module.exports = nextConfig;
