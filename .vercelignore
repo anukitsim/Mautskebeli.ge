@@ -1,0 +1,4 @@
+# Force Vercel to ignore local build cache
+.next/
+node_modules/.cache/
+
