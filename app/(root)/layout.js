@@ -50,19 +50,15 @@ const notoSansGeorgian = Noto_Sans_Georgian({
 export default function RootLayout({ children }) {
   return (
     <html lang="ka" className={notoSansGeorgian.variable}>
-      <body>
-        {children}
-
-        {/* Google Analytics - G-C2ZPMYP4FY */}
+      <head>
+        {/* Google Analytics - G-C2ZPMYP4FY - Placed in <head> for Search Console verification */}
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-C2ZPMYP4FY"
-          strategy="afterInteractive"
+          strategy="beforeInteractive"
         />
-
-        {/* GA init (send_page_view disabled; handled by AnalyticsPageView) */}
         <Script
           id="ga-init"
-          strategy="afterInteractive"
+          strategy="beforeInteractive"
           dangerouslySetInnerHTML={{
             __html: `
               window.dataLayer = window.dataLayer || [];
@@ -72,6 +68,9 @@ export default function RootLayout({ children }) {
             `
           }}
         />
+      </head>
+      <body>
+        {children}
 
         {/* SPA route-change tracker */}
         <AnalyticsPageView />
