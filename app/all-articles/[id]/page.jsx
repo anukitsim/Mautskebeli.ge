@@ -78,6 +78,9 @@ export async function generateMetadata({ params }) {
 
   const metadataBase = new URL('https://www.mautskebeli.ge');
 
+  // Use slug for canonical URL if available, fallback to ID
+  const canonicalPath = article.slug ? `/all-articles/${article.slug}` : `/all-articles/${id}`;
+
   return {
     metadataBase,
     title: decodedTitle,
@@ -85,7 +88,7 @@ export async function generateMetadata({ params }) {
     openGraph: {
       title: decodedTitle,
       description: decodedDescription,
-      url: `/all-articles/${id}`,
+      url: canonicalPath,
       type: 'article',
       images: [imageUrl],
       locale: 'ka_GE',
