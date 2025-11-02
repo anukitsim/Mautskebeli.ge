@@ -1,6 +1,5 @@
 // app/(root)/layout.jsx
 
-
 import "../../style/globals.css";
 import { Noto_Sans_Georgian } from "next/font/google";
 import Script from "next/script";
@@ -11,13 +10,13 @@ import AnalyticsPageView from "../components/AnalyticsPageView";
 // ──────────────────────────
 export const metadata = {
   title:       "მაუწყებელი",
-  description: "მედია პლატფორმა მაუწყებელი",      // ✅ correct spelling
+  description: "მედია პლატფორმა მაუწყებელი",
   app_id:      "1819807585106457",
 
   openGraph: {
     title:       "მაუწყებელი",
-    description: "მედია პლატფორმა მაუწყებელი",    // ✅
-    url:         "https://www.mautskebeli.ge/",       
+    description: "მედია პლატფორმა მაუწყებელი",
+    url:         "https://www.mautskebeli.ge/",
     siteName:    "მაუწყებელი",
     locale:      "ka_GE",
     type:        "website",
@@ -27,7 +26,7 @@ export const metadata = {
   twitter: {
     card:        "summary_large_image",
     title:       "მაუწყებელი",
-    description: "მედია პლატფორმა მაუწყებელი",    // ✅
+    description: "მედია პლატფორმა მაუწყებელი",
     images: ["/images/logo.png"]
   }
 };
@@ -54,7 +53,7 @@ export default function RootLayout({ children }) {
       <body>
         {children}
 
-        {/* Google Analytics loader */}
+        {/* Google Analytics loader */}
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=G-C2ZPMYP4FY"
           strategy="afterInteractive"
@@ -74,7 +73,7 @@ export default function RootLayout({ children }) {
           }}
         />
 
-        {/* SPA route‑change tracker */}
+        {/* SPA route-change tracker */}
         <AnalyticsPageView />
       </body>
     </html>

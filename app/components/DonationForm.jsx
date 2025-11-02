@@ -1,16 +1,9 @@
-// components/DonationForm.jsx
 "use client";
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
-import PayPalButton from "./PayPalButton";
-
-// -------------------------
-//  MAINTENANCE SWITCH
-//  Flip to false (or delete block) to restore the full form.
-// -------------------------
-const MAINTENANCE_MODE = false;
+import PayPalButton from "./PayPalButton"; // Import the PayPal button component
 
 // -------------------------
 // TBC (Local Bank) Payment Status Verification
@@ -39,7 +32,9 @@ async function handlePaymentStatus(orderId, setPaymentMessage, setIsError) {
     }
   } catch (error) {
     console.error("Error verifying payment status:", error);
-    setPaymentMessage("Error verifying payment status. See console for details.");
+    setPaymentMessage(
+      "Error verifying payment status. See console for details."
+    );
     setIsError(true);
   }
 }
@@ -76,17 +71,13 @@ const Modal = ({ show, handleClose, handleConfirm }) => {
       <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
         <h2 className="text-xl font-semibold mb-4">ყოველთვიური გადახდა</h2>
         <p className="mb-6">
-          ბარათის მონაცემები შეინახება და ყოველთვიურად ავტომატურად ჩამოგეჭრებათ მითითებული
-          თანხა. გადახდის დღემდე 2 დღით ადრე მიიღებთ გამაფრთხილებელ შეტყობინებას.
-          გამოწერის გაუქმება შეგიძლიათ ნებისმიერ დროს. თუკი ეთანხმებით, დააჭირეთ ღილაკს - ვადასტურებ
+          ბარათის მონაცემები შეინახება და ყოველთვიურად ავტომატურად ჩამოგეჭრებათ
+          მითითებული თანხა. გადახდის დღემდე 2 დღით ადრე მიიღებთ გამაფრთხილებელ
+          შეტყობინებას. გამოწერის გაუქმება შეგიძლიათ ნებისმიერ დროს. თუკი
+          ეთანხმებით, დააჭირეთ ღილაკს - ვადასტურებ
         </p>
         <div className="flex justify-end gap-4">
-          <button
-            className="bg-[#474F7A] text-white p-2 rounded hover:bg-gray-700"
-            onClick={handleClose}
-          >
-            გათიშვა
-          </button>
+         
           <button
             className="bg-[#AD88C6] text-white p-2 rounded hover:bg-[#9B7EBD]"
             onClick={handleConfirm}
@@ -103,14 +94,13 @@ const Modal = ({ show, handleClose, handleConfirm }) => {
 // DonationForm Component
 // -------------------------
 const DonationForm = () => {
-  /* ─── state / refs / effects (must always run) ───────────── */
   const [formData, setFormData] = useState({
-    donationAmount: 5,
+    donationAmount: "",
     donorName: "",
     donorEmail: "",
     donorPhone: "",
-    isRecurring: false,
-    payment_method: "Local",
+    isRecurring: true, // default is false for one-time donations (needed for PayPal)
+    payment_method: "Local", // "Local" for TBC; PayPal donations use the separate button
   });
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
@@ -121,11 +111,14 @@ const DonationForm = () => {
   const [showTooltip, setShowTooltip] = useState(false);
 
   const searchParams = useSearchParams();
+
+  // Use a ref for the formData so that our PayPal callbacks always see the current values
   const formDataRef = useRef(formData);
   useEffect(() => {
     formDataRef.current = formData;
   }, [formData]);
 
+  // On mount, check if an orderId is in the URL (from TBC redirection) and verify payment status.
   useEffect(() => {
     const orderId = searchParams.get("orderId");
     if (orderId) {
@@ -133,22 +126,13 @@ const DonationForm = () => {
     }
   }, [searchParams]);
 
-  /* ─── EARLY RETURN DURING MAINTENANCE ────────────────────── */
-  if (MAINTENANCE_MODE) {
-    return (
-      <div className="flex flex-col items-center justify-center gap-2 p-10
-                      bg-white rounded-lg shadow text-center">
-        <h2 className="text-xl font-semibold text-gray-800">
-          პროგრამული სამუშაოები
-        </h2>
-        <p className="text-[#AD88C6]">მალე დავბრუნდებით</p>
-      </div>
-    );
-  }
+  useEffect(() => {
+  // if you want to require confirmation right away
+  setShowModal(true);
+}, []);
 
-  /* ─── everything below is unchanged original form ────────── */
 
-  // -------- helper callbacks / PayPal finalisation / submit -----------------
+  // Returns the donation data for use by the PayPal button
   const getDonationData = useCallback(() => {
     return {
       donationAmount: parseFloat(formDataRef.current.donationAmount),
@@ -157,14 +141,17 @@ const DonationForm = () => {
       donorPhone: formDataRef.current.donorPhone.trim(),
       isRecurring: formDataRef.current.isRecurring,
       payment_method: formDataRef.current.payment_method,
-      currency: "GEL",
+      currency: "GEL", // Adjust if needed (for PayPal you may switch to USD)
     };
   }, []);
 
+  // -------------------------
+  // PayPal Donation Finalization
+  // -------------------------
   const finalizePayPalDonation = useCallback(async (details) => {
     try {
       console.log("Finalizing PayPal donation with details:", details);
-      const transactionID = details.id;
+      const transactionID = details.id; // PayPal transaction ID
       const currencyCode =
         details.purchase_units[0].amount.currency_code || "USD";
       const currentFormData = formDataRef.current;
@@ -184,6 +171,7 @@ const DonationForm = () => {
         payment_type: currentFormData.isRecurring ? "Recurring" : "One-Time",
       };
 
+      // Call the new PayPal donation finalization endpoint in your plugin.
       const res = await fetch(
         "https://mautskebeli.wpenginepowered.com/wp-json/wp/v2/paypal-donation-complete",
         {
@@ -223,8 +211,12 @@ const DonationForm = () => {
     console.error("PayPal Error:", error);
   }, []);
 
+  // -------------------------
+  // Local Bank (TBC) Donation Submission
+  // -------------------------
   const handleSubmit = async (e) => {
     e.preventDefault();
+    // Force payment_method to "Local" when using TBC
     const trimmedFormData = {
       donationAmount: parseFloat(formData.donationAmount),
       donorName: formData.donorName.trim(),
@@ -240,7 +232,9 @@ const DonationForm = () => {
       !trimmedFormData.donorName ||
       !trimmedFormData.donorEmail
     ) {
-      setPaymentMessage("Please fill out all required fields before submitting.");
+      setPaymentMessage(
+        "Please fill out all required fields before submitting."
+      );
       setIsError(true);
       return;
     }
@@ -260,10 +254,13 @@ const DonationForm = () => {
 
       if (!response.ok) {
         console.error("Donation Failed:", responseData.message);
-        setPaymentMessage("Failed to process donation: " + responseData.message);
+        setPaymentMessage(
+          "Failed to process donation: " + responseData.message
+        );
         setIsError(true);
       } else {
         if (responseData.paymentUrl) {
+          // Redirect to TBC payment URL
           window.location.href = responseData.paymentUrl;
         } else {
           if (formData.isRecurring) {
@@ -284,95 +281,141 @@ const DonationForm = () => {
     }
   };
 
-  // ------------ UI event handlers (checkboxes, tooltip etc.) ----------------
-  const handleRecurringChange = (e) => {
-    if (e.target.checked) {
-      setShowModal(true);
-    } else {
-      setFormData((prev) => ({ ...prev, isRecurring: false }));
-    }
+  // -------------------------
+  // Form Input & Modal Handlers
+  // -------------------------
+
+  /* choose frequency — sets isRecurring and optionally opens modal */
+  const handleFrequencySelect = (recurring) => {
+    if (recurring && !formData.isRecurring) setShowModal(true);
+    setFormData((p) => ({ ...p, isRecurring: recurring }));
   };
+
+  // const handleRecurringChange = (e) => {
+  //   if (e.target.checked) {
+  //     setShowModal(true);
+  //   } else {
+  //     setFormData((prev) => ({ ...prev, isRecurring: false }));
+  //   }
+  // };
 
   const handleModalConfirm = () => {
     setFormData((prev) => ({ ...prev, isRecurring: true }));
     setShowModal(false);
   };
+
   const handleModalClose = () => {
-    setFormData((prev) => ({ ...prev, isRecurring: false }));
+    
     setShowModal(false);
   };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
-  const handleIncrement = () => {
-    setFormData((prev) => ({
-      ...prev,
-      donationAmount: Math.max((parseFloat(prev.donationAmount) || 0) + 5, 5),
-    }));
+
+  // Preset donation amounts
+   const presetAmounts = formData.isRecurring
+    ? [15, 20, 25, 50, 100] 
+    : [20, 30, 50, 100, 200];  
+
+  // When a preset amount is clicked
+  const handlePresetClick = (amount) => {
+    setFormData((prev) => ({ ...prev, donationAmount: amount }));
   };
-  const handleDecrement = () => {
-    setFormData((prev) => ({
-      ...prev,
-      donationAmount: Math.max((parseFloat(prev.donationAmount) || 0) - 5, 5),
-    }));
-  };
+
   const closePaymentMessage = () => setPaymentMessage("");
 
-  /* ───────────────────────────────────────────────────────────
-   * ORIGINAL JSX (unchanged)
-   * ─────────────────────────────────────────────────────────── */
   return (
     <div className="flex flex-col gap-4">
-      {/* Header */}
       <div className="flex gap-2 pl-2 items-center">
-        <Image src="/images/donacia.png" alt="donation" width={20} height={20} />
+        <Image
+          src="/images/donacia.png"
+          alt="donation"
+          width={20}
+          height={20}
+        />
         <h1 className="text-[18px] font-semibold">დონაცია</h1>
       </div>
 
-      {/* payment banner */}
       <PaymentMessage
         message={paymentMessage}
         isError={isError}
         onClose={closePaymentMessage}
       />
 
-      {/* form */}
       <form
         onSubmit={handleSubmit}
         className="flex-col flex justify-center items-center rounded-lg bg-[url('/images/donacia-foni.png')] bg-cover bg-no-repeat p-6 sm:p-8 gap-6 w-full lg:w-[25vw] max-w-lg"
       >
-        {/* amount with +/- */}
-        <div className="relative flex items-center w-full">
-          <button
-            type="button"
-            onClick={handleDecrement}
-            className="absolute left-2 bg-transparent border-none cursor-pointer focus:outline-none"
-            aria-label="Decrease donation amount"
-          >
-            <img src="/images/minus.png" alt="Minus" />
-          </button>
-          <input
-            type="number"
-            name="donationAmount"
-            value={formData.donationAmount}
-            onChange={handleInputChange}
-            placeholder="ლარი"
-            className="p-3 rounded-lg border border-gray-300 w-full text-center hide-arrows"
-            style={{ paddingLeft: "60px", paddingRight: "60px" }}
-            required
-          />
-          <button
-            type="button"
-            onClick={handleIncrement}
-            className="absolute right-2 bg-transparent border-none cursor-pointer focus:outline-none"
-            aria-label="Increase donation amount"
-          >
-            <img src="/images/plus.png" alt="Plus" />
-          </button>
+         <div className="grid grid-cols-2 gap-2 w-full">
+          {[
+            { label: "ერთჯერადი", recurring: false },
+            { label: "ყოველთვიური", recurring: true },
+          ].map(({ label, recurring }) => {
+            const active = formData.isRecurring === recurring;
+            return (
+              <button
+                key={label}
+                type="button"
+                onClick={() => handleFrequencySelect(recurring)}
+                className={`
+          w-full py-2 text-sm font-semibold rounded-md border
+          transition duration-150 active:translate-y-[2px] active:shadow-inner
+          focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#AD88C6]
+          ${
+            active
+              ? "bg-[#AD88C6] text-white border-[#AD88C6] shadow-[0_4px_0_0_#8C6AB0]"
+              : "bg-white text-[#474F7A] border-[#AD88C6] shadow-[0_4px_0_0_#D8C4EB] hover:bg-[#AD88C6] hover:text-white hover:shadow-[0_4px_0_0_#8C6AB0]"
+          }
+        `}
+              >
+                {label}
+              </button>
+            );
+          })}
         </div>
+        {/* -------------------------
+            Preset Amount Buttons
+            ------------------------- */}
+        <div className="grid grid-cols-5 gap-2 w-full">
+          {presetAmounts.map((amt) => {
+            const selected = Number(formData.donationAmount) === amt;
+            return (
+              <button
+                key={amt}
+                type="button"
+                onClick={() => handlePresetClick(amt)}
+                className={`
+          w-full py-2 text-sm font-semibold border rounded-md
+          transition-all duration-150
+          focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#AD88C6]
+          active:translate-y-[2px] active:shadow-inner
+          ${
+            selected
+              ? "bg-[#AD88C6] text-white border-[#AD88C6] shadow-[0_4px_0_0_#8C6AB0]"
+              : "bg-white text-[#474F7A] border-[#AD88C6] shadow-[0_4px_0_0_#D8C4EB] hover:bg-[#AD88C6] hover:text-white hover:shadow-[0_4px_0_0_#8C6AB0]"
+          }
+        `}
+              >
+                {amt} ₾
+              </button>
+            );
+          })}
+        </div>
+        {/* -------------------------
+            Custom Amount Input
+            ------------------------- */}
+        <input
+          type="number"
+          name="donationAmount"
+          value={formData.donationAmount}
+          onChange={handleInputChange}
+          placeholder="ლარი"
+          className="p-3 rounded-lg border border-gray-300 w-full text-center hide-arrows"
+          required
+        />
 
-        {/* name / email / phone */}
         <input
           type="text"
           name="donorName"
@@ -402,8 +445,7 @@ const DonationForm = () => {
           className="p-3 rounded-lg border border-gray-300 w-full"
         />
 
-        {/* recurring checkbox + tooltip */}
-        <div
+        {/* <div
           className="relative inline-block group"
           onMouseEnter={() => setShowTooltip(true)}
           onMouseLeave={() => setShowTooltip(false)}
@@ -423,15 +465,16 @@ const DonationForm = () => {
               <p className="font-semibold mb-2">ყოველთვიური გადახდა</p>
               <p>
                 ბარათის მონაცემები შეინახება და ყოველთვიურად ავტომატურად
-                ჩამოგეჭრებათ მითითებული თანხა. გადახდის დღემდე 2 დღით ადრე
+                ჩამოგეჭრებათ მითითებული თანხა. გადახდის დღემდე 2 დ" + "ღით ადრე
                 მიიღებთ გამაფრთხილებელ შეტყობინებას. გამოწერის გაუქმება
-                შეგიძლიათ ნებისმიერ დროს.
+                შეგიძლიათ ნებისმიერ დროს."
               </p>
             </div>
           )}
-        </div>
+        </div> */}
+        {/* ── choose one-time vs recurring ────────────────────────── */}
+       
 
-        {/* submit / PayPal */}
         <button
           type="submit"
           className="bg-[#AD88C6] w-full text-white p-3 rounded-lg mt-4 hover:scale-105 transition-transform duration-300 disabled:opacity-50"
@@ -440,6 +483,9 @@ const DonationForm = () => {
           {loading ? "მუშაობდა.." : "გადახდა"}
         </button>
 
+        {/* -------------------------
+            Render the PayPal Button only for one-time (non-recurring) donations.
+            ------------------------- */}
         {!formData.isRecurring && (
           <PayPalButton
             getDonationData={getDonationData}
@@ -448,7 +494,6 @@ const DonationForm = () => {
           />
         )}
 
-        {/* terms / privacy */}
         <div className="mt-4">
           <p
             className={`text-sm cursor-pointer ${
@@ -464,11 +509,19 @@ const DonationForm = () => {
                 <strong>მომსახურების პირობები:</strong>
               </p>
               <p>
-                1. დონაცია არის ნებაყოფლობითი და არ ექვემდებარება დაბრუნებას.<br />
-                2. შეგიძლიათ აირჩიოთ ერთჯერადი ან ყოველთვიური დონაცია.<br />
-                3. ყოველთვიური დონაცია ავტომატურად ჩამოიჭრება თქვენს მიერ მითითებული ბარათიდან, ხოლო გადახდის წინ მიიღებთ გამაფრთხილებელ შეტყობინებას.<br />
-                4. ყოველთვიური დონაციის გაუქმება შეგიძლიათ ნებისმიერ დროს, გაუქმების ბმული გამოგეგზავნებათ ელ-ფოსტაზე.<br />
-                5. ყველა გადახდა უსაფრთხოდ მუშავდება TBC ბანკის სისტემებით. ჩვენ არ ვინახავთ ბარათის ინფორმაციის მონაცემთა ბაზაში.
+                1. დონაცია არის ნებაყოფლობითი და არ ექვემდებარება დაბრუნებას.
+                <br />
+                2. შეგიძლიათ აირჩიოთ ერთჯერადი ან ყოველთვიური დონაცია.
+                <br />
+                3. ყოველთვიური დონაცია ავტომატურად ჩამოიჭრება თქვენს მიერ
+                მითითებული ბარათიდან, ხოლო გადახდის წინ მიიღებთ გამაფრთხილებელ
+                შეტყობინებას.
+                <br />
+                4. ყოველთვიური დონაციის გაუქმება შეგიძლიათ ნებისმიერ დროს,
+                გაუქმების ბმული გამოგეგზავნებათ ელ-ფოსტაზე.
+                <br />
+                5. ყველა გადახდა უსაფრთხოდ მუშავდება TBC ბანკის სისტემებით. ჩვენ
+                არ ვინახავთ ბარათის ინფორმაციის მონაცემთა ბაზაში.
               </p>
             </div>
           )}
@@ -487,11 +540,21 @@ const DonationForm = () => {
                 <strong>კონფიდენციალურობის პოლიტიკა:</strong>
               </p>
               <p>
-                1. ჩვენ ვაგროვებთ მხოლოდ იმ მონაცემებს, რომლებიც საჭიროა ტრანზაქციის დასამუშავებლად: სახელი, ელ-ფოსტა და (სურვილისამებრ) ტელეფონის ნომერი.<br />
-                2. თქვენი ბარათის მონაცემები უსაფრთხოდ მუშავდება TBC ბანკის მიერ. ჩვენ არ ვინახავთ ბარათის დეტალებს ჩვენს მონაცემთა ბაზაში.<br />
-                3. თქვენი მონაცემები არ გადაეცემა მესამე მხარეებს სარეკლამო მიზნებისთვის.<br />
-                4. ყოველთვიური დონაციის შემთხვევაში, ბარათის ინფორმაცია ინახება ბანკის სისტემებში მომდევნო გადახდებისთვის.<br />
-                5. თქვენ გაქვთ უფლება მოითხოვოთ თქვენი მონაცემების წაშლა ან შეცვლა ნებისმიერ დროს.
+                1. ჩვენ ვაგროვებთ მხოლოდ იმ მონაცემებს, რომლებიც საჭიროა
+                ტრანზაქციის დასამუშავებლად: სახელი, ელ-ფოსტა და (სურვილისამებრ)
+                ტელეფონის ნომერი.
+                <br />
+                2. თქვენი ბარათის მონაცემები უსაფრთხოდ მუშავდება TBC ბანკის
+                მიერ. ჩვენ არ ვინახავთ ბარათის დეტალებს ჩვენს მონაცემთა ბაზაში.
+                <br />
+                3. თქვენი მონაცემები არ გადაეცემა მესამე მხარეებს სარეკლამო
+                მიზნებისთვის.
+                <br />
+                4. ყოველთვიური დონაციის შემთხვევაში, ბარათის ინფორმაცია ინახება
+                ბანკის სისტემებში მომდევნო გადახდებისთვის.
+                <br />
+                5. თქვენ გაქვთ უფლება მოითხოვოთ თქვენი მონაცემების წაშლა ან
+                შეცვლა ნებისმიერ დროს.
               </p>
             </div>
           )}
@@ -502,14 +565,12 @@ const DonationForm = () => {
         </div>
       </form>
 
-      {/* modal */}
       <Modal
         show={showModal}
         handleClose={handleModalClose}
         handleConfirm={handleModalConfirm}
       />
 
-      {/* style for number input */}
       <style jsx>{`
         input[type="number"]::-webkit-outer-spin-button,
         input[type="number"]::-webkit-inner-spin-button {
