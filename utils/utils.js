@@ -1,7 +1,7 @@
 // /utils/utils.js
 
 export const constructUrl = (post) => {
-    const { id, post_type, videoId } = post;
+    const { id, post_type, videoId, slug } = post;
   
     if (videoId) {
       return `/${post_type}?videoId=${videoId}`;
@@ -9,11 +9,12 @@ export const constructUrl = (post) => {
   
     switch (post_type) {
       case "article":
-        return `/all-articles/${id}`;
+        // Use slug if available, fallback to ID
+        return `/all-articles/${slug || id}`;
       case "mau-books":
-        return `/books/${id}`;
+        return `/books/${slug || id}`;
       default:
-        return `/${post_type}/${id}`;
+        return `/${post_type}/${slug || id}`;
     }
   };
   

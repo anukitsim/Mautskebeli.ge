@@ -51,7 +51,7 @@ export default function ClientSideArticles({ initialArticles }) {
     if (previousPageData && !previousPageData.length) return null; // No more to load
     return `${
       process.env.NEXT_PUBLIC_WORDPRESS_API_URL
-    }/wp/v2/article?acf_format=standard&_fields=id,title,acf,date&per_page=10&page=${
+    }/wp/v2/article?acf_format=standard&_fields=id,title,acf,date,slug&per_page=10&page=${
       pageIndex + 1
     }`;
   };
@@ -142,10 +142,12 @@ export default function ClientSideArticles({ initialArticles }) {
             {processedArticles.map((article, index) => {
               // For now, load images from WP directly:
               const imageUrl = article.acf?.image || "/images/default-image.png";
+              // Use slug if available, fallback to ID for backward compatibility
+              const articleUrl = article.slug ? `/all-articles/${article.slug}` : `/all-articles/${article.id}`;
 
               return (
                 <Link
-                  href={`/all-articles/${article.id}`}
+                  href={articleUrl}
                   passHref
                   key={article.id || `article-${index}`}
                 >

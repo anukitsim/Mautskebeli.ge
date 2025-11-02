@@ -18,23 +18,37 @@ const categories = [
   { name: 'თავისუფალი სვეტი', path: '/free-column' },
 ];
 
-async function fetchArticle(id) {
-  const apiUrl = `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/wp/v2/article/${id}?acf_format=standard&_fields=id,title,acf,date`;
+async function fetchArticle(slugOrId) {
+  // Try fetching by slug first
+  let apiUrl = `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/wp/v2/article?slug=${slugOrId}&acf_format=standard&_fields=id,title,acf,date,slug`;
 
   try {
-    const res = await fetch(apiUrl, {
+    let res = await fetch(apiUrl, {
+      next: { revalidate: 10 },
+    });
+
+    if (res.ok) {
+      const articles = await res.json();
+      if (articles && articles.length > 0) {
+        return articles[0];
+      }
+    }
+
+    // If slug doesn't work, try by ID (for backward compatibility)
+    apiUrl = `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/wp/v2/article/${slugOrId}?acf_format=standard&_fields=id,title,acf,date,slug`;
+    res = await fetch(apiUrl, {
       next: { revalidate: 10 },
     });
 
     if (!res.ok) {
-      console.error(`Failed to fetch article with id ${id}: ${res.status} ${res.statusText}`);
+      console.error(`Failed to fetch article with slug/id ${slugOrId}: ${res.status} ${res.statusText}`);
       return null;
     }
 
     const article = await res.json();
     return article;
   } catch (error) {
-    console.error(`Error fetching article with id ${id}:`, error);
+    console.error(`Error fetching article with slug/id ${slugOrId}:`, error);
     return null;
   }
 }

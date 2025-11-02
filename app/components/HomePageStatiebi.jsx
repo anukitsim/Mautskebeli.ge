@@ -20,7 +20,7 @@ const HomePageStatiebi = () => {
   useEffect(() => {
     const fetchArticles = async () => {
       try {
-        const response = await fetch(`https://mautskebeli.wpenginepowered.com/wp-json/wp/v2/article?acf_format=standard&_fields=id,title,acf,date&_=${new Date().getTime()}`);
+        const response = await fetch(`https://mautskebeli.wpenginepowered.com/wp-json/wp/v2/article?acf_format=standard&_fields=id,title,acf,date,slug&_=${new Date().getTime()}`);
 
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -75,7 +75,7 @@ const HomePageStatiebi = () => {
         {articles.map(article => {
           const imageUrl = article.acf.image ? article.acf.image : '/images/default-image.png';
           return (
-            <Link href={`/all-articles/${article.id}`} passHref key={article.id}>
+            <Link href={article.slug ? `/all-articles/${article.slug}` : `/all-articles/${article.id}`} passHref key={article.id}>
               <div className="flex-none w-[300px] bg-[#F6F4F8] rounded-lg border border-[#B6A8CD] overflow-hidden flex flex-col h-[500px]">
                 {/* Image Section (Unchanged) */}
                 <div className="relative w-full h-[200px] flex-shrink-0"> {/* Added flex-shrink-0 */}
@@ -122,7 +122,7 @@ const HomePageStatiebi = () => {
         {articles.map(article => {
           const imageUrl = article.acf.image ? article.acf.image : '/images/default-image.png';
           return (
-            <Link href={`/all-articles/${article.id}`} passHref key={article.id}>
+            <Link href={article.slug ? `/all-articles/${article.slug}` : `/all-articles/${article.id}`} passHref key={article.id}>
               <div className="bg-[#F6F4F8] rounded-lg border border-[#B6A8CD] overflow-hidden flex flex-col h-[490px]"> {/* Added h-[400px] */}
                 {/* Image Section (Unchanged) */}
                 <div className="relative w-full h-[200px] flex-shrink-0"> {/* Added flex-shrink-0 */}
