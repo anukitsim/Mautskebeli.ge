@@ -1,6 +1,8 @@
 import '../../style/globals.css'
 import '../../node_modules/alk-tall-mtavruli/css/alk-tall-mtavruli.css';
 import { Noto_Sans_Georgian } from 'next/font/google';
+import Script from 'next/script';
+import AnalyticsPageView from '../components/AnalyticsPageView';
 
 const notoSansGeorgian = Noto_Sans_Georgian({
   subsets: ['georgian'],
@@ -19,7 +21,28 @@ export default function RootLayout({ children }) {
       <head>
       <link rel="icon" href="/favicon.ico" />
       </head>
-      <body className='bg-[#AD88C6]'>{children}</body>
+      <body className='bg-[#AD88C6]'>
+        {children}
+        
+        {/* Google Analytics */}
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-C2ZPMYP4FY"
+          strategy="afterInteractive"
+        />
+        <Script
+          id="ga-init"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-C2ZPMYP4FY', { send_page_view: false });
+            `
+          }}
+        />
+        <AnalyticsPageView />
+      </body>
     </html>
   );
 }

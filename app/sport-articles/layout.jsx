@@ -6,6 +6,8 @@ import SportHeader from '../components/SportHeader';
 import SportNavigation from '../components/SportNavigation';
 import SportFooter from '../components/SportFooter';
 import Head from 'next/head';
+import Script from 'next/script';
+import AnalyticsPageView from '../components/AnalyticsPageView';
 
 export const metadata = {
   title: "mautskebeli.ge",
@@ -40,7 +42,25 @@ export default function RootLayout({ children }) {
         <div className="mt-40 bg-[#AD88C6]">
         <SportFooter />
         </div>
-       
+        
+        {/* Google Analytics */}
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-C2ZPMYP4FY"
+          strategy="afterInteractive"
+        />
+        <Script
+          id="ga-init-sport-articles"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-C2ZPMYP4FY', { send_page_view: false });
+            `
+          }}
+        />
+        <AnalyticsPageView />
       </body>
     </html>
   );

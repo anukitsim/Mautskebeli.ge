@@ -5,6 +5,8 @@ import { MenuProvider } from "@/app/context/MenuContext";
 import SportHeader from "@/app/components/SportHeader";
 import SportNavigation from "@/app/components/SportNavigation";
 import SportFooter from "@/app/components/SportFooter";
+import Script from 'next/script';
+import AnalyticsPageView from '@/app/components/AnalyticsPageView';
 
 export const metadata = {
   title: "მაუწყებელი • Mautskebeli",
@@ -28,7 +30,25 @@ export default function RootLayout({ children }) {
         <div className="mt-40 bg-[#AD88C6]">
         <SportFooter />
         </div>
-       
+        
+        {/* Google Analytics */}
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-C2ZPMYP4FY"
+          strategy="afterInteractive"
+        />
+        <Script
+          id="ga-init-sport-video-id"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-C2ZPMYP4FY', { send_page_view: false });
+            `
+          }}
+        />
+        <AnalyticsPageView />
       </body>
     </html>
   );

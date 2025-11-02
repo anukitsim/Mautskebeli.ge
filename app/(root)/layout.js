@@ -56,7 +56,7 @@ export default function RootLayout({ children }) {
 
         {/* Google Analytics loader */}
         <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-MZY3EGWH6J"
+          src="https://www.googletagmanager.com/gtag/js?id=G-C2ZPMYP4FY"
           strategy="afterInteractive"
         />
 
@@ -69,7 +69,7 @@ export default function RootLayout({ children }) {
               window.dataLayer = window.dataLayer || [];
               function gtag(){dataLayer.push(arguments);}
               gtag('js', new Date());
-              gtag('config', 'G-MZY3EGWH6J', { send_page_view: false });
+              gtag('config', 'G-C2ZPMYP4FY', { send_page_view: false });
             `
           }}
         />
