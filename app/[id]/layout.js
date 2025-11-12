@@ -1,70 +1,19 @@
+"use client";
 import "../../style/globals.css";
 import Header from "../components/Header";
 import Navigation from "../components/Navigation";
 import { MenuProvider } from "@/app/context/MenuContext";
+import { LanguageProvider } from "@/app/context/LanguageContext";
 import Footer from "../components/Footer";
 import { fetchArticleTitle } from "../../utils/fetchArticleTitle";
 import Script from 'next/script';
 import AnalyticsPageView from '../components/AnalyticsPageView';
 
-async function fetchArticleDetails(articleId) {
-  const res = await fetch(`https://mautskebeli.wpenginepowered.com/wp-json/wp/v2/article/${articleId}?acf_format=standard&_fields=id,title,acf,date`);
-  if (!res.ok) {
-    throw new Error('Failed to fetch article');
-  }
-  return res.json();
-}
-
-export async function generateMetadata({ params }) {
-  const articleId = params.id; // Use params.id to get the article ID
-  let title = 'მაუწყებელი';
-  let description = 'მედია პლატფორმა მაუწყებელი';
-  let images = [
-    {
-      url: 'https://www.mautskebeli.ge/images/og-logo.jpg', // Default image URL
-      width: 800,
-      height: 600,
-    },
-    
-  ];
-
-  if (articleId) {
-    try {
-      const article = await fetchArticleDetails(articleId);
-      title = article.title.rendered || title;
-      description = article.acf.title || description;
-      if (article.acf.image) {
-        images = [
-          {
-            url: article.acf.image,
-            width: 800,
-            height: 600,
-          },
-        ];
-      }
-    } catch (error) {
-      console.error('Error fetching article details:', error);
-    }
-  }
-
-  return {
-    title,
-    description,
-    openGraph: {
-      title,
-      description,
-      url: articleId ? `https://www.mautskebeli.ge/all-articles/${articleId}` : 'https://www.mautskebeli.ge/',
-      siteName: 'მაუწყებელი',
-      images,
-      locale: 'en_US',
-      type: 'article',
-    },
-  };
-}
+// Note: generateMetadata removed - this is now a client component for LanguageProvider
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="ka">
       <head>
         {/* Ensure meta tags are explicitly set */}
         <meta property="og:title" content="მაუწყებელი" />
@@ -88,13 +37,15 @@ export default function RootLayout({ children }) {
      
       </head>
       <body>
-        <MenuProvider>
-          <div className="sticky top-0 z-50">
-            <Header />
-            <Navigation />
-          </div>
-        </MenuProvider>
-        {children}
+        <LanguageProvider>
+          <MenuProvider>
+            <div className="sticky top-0 z-50">
+              <Header />
+              <Navigation />
+            </div>
+          </MenuProvider>
+          {children}
+        </LanguageProvider>
         <div className="mt-40">
           <Footer />
         </div>
