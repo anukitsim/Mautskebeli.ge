@@ -1,0 +1,4 @@
+# Force Vercel to redeploy with latest commit
+# This file exists to ensure Vercel picks up commit 941a4e2
+# Build timestamp: 2025-11-12
+
