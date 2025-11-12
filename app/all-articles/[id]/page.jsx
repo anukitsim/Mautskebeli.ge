@@ -47,15 +47,15 @@ async function fetchArticle(slugOrId) {
       res = await fetch(apiUrl, {
         next: { revalidate: 10 },
         cache: 'no-store',
-      });
+    });
 
-      if (!res.ok) {
+    if (!res.ok) {
         console.error(`Failed to fetch article with ID ${decodedSlugOrId}: ${res.status} ${res.statusText}`);
-        return null;
-      }
+      return null;
+    }
 
-      const article = await res.json();
-      return article;
+    const article = await res.json();
+    return article;
     }
 
     console.error(`Could not find article with slug: ${decodedSlugOrId}`);

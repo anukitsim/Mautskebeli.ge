@@ -73,20 +73,22 @@ export default function DonationPopup() {
         onClick={hide}
       />
 
-      {/* banner */}
+      {/* banner - immune to Google Translate */}
       <div
         ref={bannerRef}
         className="
+          notranslate
           relative w-full translate-y-full animate-banner-slide
-          min-h-[34vh] md:min-h-[28vh] xl:min-h-[24vh]
-          px-6 sm:px-8 md:px-12 py-8 md:py-10
+          min-h-[28vh] md:min-h-[22vh] xl:min-h-[20vh]
+          px-6 sm:px-8 md:px-12 py-6 md:py-7
           bg-gradient-to-b from-[#8C74B2] to-[#7B62B9] text-white
           shadow-[0_-4px_20px_rgba(0,0,0,.35)]
         "
+        translate="no"
       >
         {/* crown */}
         <svg
-          className="absolute top-0 left-0 w-full h-[22px] sm:h-[26px] md:h-[32px] fill-[#FECE27]"
+          className="absolute top-0 left-0 w-full h-[18px] sm:h-[22px] md:h-[26px] fill-[#FECE27]"
           viewBox="0 0 1440 100"
           preserveAspectRatio="none"
         >
@@ -94,7 +96,7 @@ export default function DonationPopup() {
         </svg>
 
         {/* controls top-right */}
-        <div className="absolute top-6 right-4 flex gap-3 items-center">
+        <div className="absolute top-4 right-4 flex gap-3 items-center">
           <button
             onClick={() => setLang((p) => (p === "ka" ? "en" : "ka"))}
             aria-label={t.aria}
@@ -119,14 +121,14 @@ export default function DonationPopup() {
         </div>
 
         {/* layout:  md→ two columns  */}
-        <div className="md:grid md:grid-cols-12 md:items-center gap-8 flex-1 overflow-y-auto">
+        <div className="md:grid md:grid-cols-12 md:items-center gap-6 flex-1 overflow-y-auto">
           {/* text */}
           <div className="md:col-span-8">
-            <h2 className="font-extrabold text-[#FECE27] text-xl sm:text-2xl md:text-3xl mb-6 drop-shadow-[0_2px_4px_rgba(0,0,0,.45)]">
+            <h2 className="font-extrabold text-[#FECE27] text-lg sm:text-xl md:text-2xl mb-4 drop-shadow-[0_2px_4px_rgba(0,0,0,.45)]">
               {t.heading}
             </h2>
 
-            <div className="space-y-5 text-[15px] sm:text-[16px] md:text-lg leading-relaxed">
+            <div className="space-y-3 text-[14px] sm:text-[15px] md:text-base leading-relaxed">
               {t.body.map((p) => (
                 <p key={p.slice(0, 22)}>{p}</p>
               ))}
@@ -137,23 +139,23 @@ export default function DonationPopup() {
          
         </div>
 
-        {/* CTA row */}
-        <div className="mt-8 flex justify-end">
-          <Link
-            href="/donation"
-            className="
-              inline-flex items-center justify-center
-              h-[46px] px-8 rounded-full
-              bg-[#FECE27] text-[#4D3F77] font-bold
-              shadow-[0_0_10px_rgba(254,206,39,.6)]
-              transition hover:shadow-[0_0_20px_rgba(254,206,39,1)]
-              focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#FECE27]
-            "
-          >
-            {t.cta}
-          </Link>
-        </div>
-      </div>
+            {/* CTA row */}
+        <div className="mt-5 flex justify-end">
+              <Link
+                href="/donation"
+                className="
+                  inline-flex items-center justify-center
+              h-[42px] px-7 rounded-full text-sm md:text-base
+                  bg-[#FECE27] text-[#4D3F77] font-bold
+                  shadow-[0_0_10px_rgba(254,206,39,.6)]
+                  transition hover:shadow-[0_0_20px_rgba(254,206,39,1)]
+                  focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#FECE27]
+                "
+              >
+                {t.cta}
+              </Link>
+            </div>
+          </div>
 
       {/* motion */}
       <style jsx>{`

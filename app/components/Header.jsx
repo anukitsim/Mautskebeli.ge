@@ -6,40 +6,42 @@ import LanguageSwitcher from "./LanguageSwitcher";
 
 const Header = () => {
   return (
-    <header className="h-20 w-full flex bg-[#FBFAFC] flex-col items-start">
+    <header className="h-16 sm:h-20 w-full flex bg-[#FBFAFC] flex-col items-start">
       {/* top line */}
-      <div className="w-10/12 h-1/2 mx-auto mt-5 flex justify-between items-center">
+      <div className="w-11/12 sm:w-10/12 h-1/2 mx-auto mt-3 sm:mt-5 flex justify-between items-center">
         {/* logo */}
-        <Link href="/">
+        <Link href="/" className="flex-shrink-0">
           <Image
             src="/images/IMG_0311.svg"
             alt="logo"
-            width={116}
-            height={32}
+            width={90}
+            height={25}
+            className="w-[90px] h-[25px] sm:w-[116px] sm:h-[32px]"
             priority
           />
         </Link>
 
         {/* right-hand actions */}
-        <div className="flex gap-4 items-center">
+        <div className="flex gap-2 sm:gap-4 items-center">
           {/* ░░ HIGHLIGHTED DONATION ░░ */}
           <Link
             href="/donation"
             className="
-              relative inline-flex items-center gap-2.5 text-xs font-semibold
-              px-4 py-2 rounded-full
+              relative inline-flex items-center gap-1.5 sm:gap-2.5 text-[10px] sm:text-xs font-semibold
+              px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-full
               bg-[#FECE27] text-[#5F4AA5]
               shadow-[0_0_10px_rgba(254,206,39,.6)]
               transition-all duration-300 ease-out
               hover:shadow-[0_0_18px_rgba(254,206,39,1)] focus-visible:outline-none
+              flex-shrink-0
             "
           >
             <Image
               src="/images/donation.svg"
               alt=""
-              width={20}
-              height={20}
-              style={{ width: "20px", height: "20px" }}
+              width={16}
+              height={16}
+              className="w-[16px] h-[16px] sm:w-[20px] sm:h-[20px]"
             />
             <span className="hidden sm:inline">გააძლიერე მაუწყებელი</span>
 
@@ -56,23 +58,22 @@ const Header = () => {
           {/* live link */}
           <Link
             href="/live"
-            className="flex gap-2.5 text-xs justify-center items-center"
+            className="flex gap-1.5 sm:gap-2.5 text-[10px] sm:text-xs justify-center items-center flex-shrink-0"
           >
             <Image
               src="/images/pirdapiri-eteri.svg"
               alt="Live"
-              width={20}
-              height={20}
+              width={16}
+              height={16}
+              className="w-[16px] h-[16px] sm:w-[20px] sm:h-[20px]"
             />
             <span className="hidden sm:inline text-[#474F7A]">
               პირდაპირი ეთერი
             </span>
           </Link>
 
-          {/* Language Switcher - styled for header */}
-          <div className="hidden sm:block">
-            <LanguageSwitcher variant="header" />
-          </div>
+          {/* Language Switcher - visible on all devices */}
+          <LanguageSwitcher variant="header" />
         </div>
       </div>
 
