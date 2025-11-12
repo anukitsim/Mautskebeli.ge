@@ -43,12 +43,12 @@ export default function RootLayout({ children }) {
               <Header />
               <Navigation />
             </div>
+            {children}
+            <div className="mt-40">
+              <Footer />
+            </div>
           </MenuProvider>
-          {children}
         </LanguageProvider>
-        <div className="mt-40">
-          <Footer />
-        </div>
         
         {/* Google Analytics */}
         <Script

@@ -27,11 +27,10 @@ export default function RootLayout({ children }) {
               <Header />
               <Navigation />
             </div>
+            {children}
+            <Footer />
           </MenuProvider>
-
-          {children}
         </LanguageProvider>
-        <Footer />
         
         {/* Google Analytics */}
         <Script
