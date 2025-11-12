@@ -2,7 +2,6 @@ import "../../style/globals.css";
 import Header from "../components/Header";
 import Navigation from "../components/Navigation";
 import { MenuProvider } from "@/app/context/MenuContext";
-import { LanguageProvider } from "@/app/context/LanguageContext";
 import Footer from "../components/Footer";
 import { fetchArticleTitle } from "../../utils/fetchArticleTitle";
 import Script from 'next/script';
@@ -65,7 +64,7 @@ export async function generateMetadata({ params }) {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="ka">
+    <html lang="en">
       <head>
         {/* Ensure meta tags are explicitly set */}
         <meta property="og:title" content="მაუწყებელი" />
@@ -89,37 +88,35 @@ export default function RootLayout({ children }) {
      
       </head>
       <body>
-        <LanguageProvider>
-          <MenuProvider>
-            <div className="sticky top-0 z-50">
-              <Header />
-              <Navigation />
-            </div>
-          </MenuProvider>
-          {children}
-          <div className="mt-40">
-            <Footer />
+        <MenuProvider>
+          <div className="sticky top-0 z-50">
+            <Header />
+            <Navigation />
           </div>
-          
-          {/* Google Analytics */}
-          <Script
-            src="https://www.googletagmanager.com/gtag/js?id=G-C2ZPMYP4FY"
-            strategy="afterInteractive"
-          />
-          <Script
-            id="ga-init-article-id"
-            strategy="afterInteractive"
-            dangerouslySetInnerHTML={{
-              __html: `
-                window.dataLayer = window.dataLayer || [];
-                function gtag(){dataLayer.push(arguments);}
-                gtag('js', new Date());
-                gtag('config', 'G-C2ZPMYP4FY', { send_page_view: false });
-              `
-            }}
-          />
-          <AnalyticsPageView />
-        </LanguageProvider>
+        </MenuProvider>
+        {children}
+        <div className="mt-40">
+          <Footer />
+        </div>
+        
+        {/* Google Analytics */}
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-C2ZPMYP4FY"
+          strategy="afterInteractive"
+        />
+        <Script
+          id="ga-init-article-id"
+          strategy="afterInteractive"
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-C2ZPMYP4FY', { send_page_view: false });
+            `
+          }}
+        />
+        <AnalyticsPageView />
       </body>
     </html>
   );
