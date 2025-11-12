@@ -1,6 +1,9 @@
 import Image from "next/image"
 import Link from "next/link"
 
+// Force dynamic rendering (required for client-side context in layout)
+export const dynamic = 'force-dynamic'
+
 const page = () => {
   return (
     <>
