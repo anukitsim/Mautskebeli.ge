@@ -3,13 +3,15 @@ import Image from "next/image";
 
 const Sidebar = () => {
   return (
-    <aside className="lg:flex lg:flex-col hidden items-start gap-7 lg:w-3/12 p-8 rounded-[16px] border border-lilac-20 bg-lilac-20/20 shadow-md md:w-64 md:gap-7"
+    <aside
+      className="lg:flex lg:flex-col hidden items-start justify-center lg:w-3/12 py-8 px-6 rounded-[16px] border border-lilac-20 bg-lilac-20/20 shadow-md md:w-64 flex-shrink-0 self-stretch min-h-0"
       style={{
         boxShadow: '4px 4px 12px rgba(93, 78, 116, 0.14)',
         border: '1px solid #E0DBE8',
         background: 'rgba(224, 219, 232, 0.20)'
       }}
     >
+      <div className="flex flex-col gap-7 w-full">
       <Link href="/shroma" className="flex flex-row gap-3">
         <Image src="/images/shroma.svg" alt="shroma" width={0} height={0} style={{ width: 'auto', height: '20px' }} />
         <span className="text-[#222] text-[15px]">შრომა</span>
@@ -94,6 +96,7 @@ const Sidebar = () => {
         />
         <span className="text-[#222] text-[15px]">სახლი ყველას</span>
       </Link>
+      </div>
     </aside>
   );
 };

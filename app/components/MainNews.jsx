@@ -2,6 +2,7 @@
 import React from "react";
 import MainNewsClient from "./MainNewsClient";
 
+// Main page hero: no sport — sport has its own page at /sporti
 const videoPostTypes = [
   "kalaki",
   "mecniereba",
@@ -12,7 +13,6 @@ const videoPostTypes = [
   "xelovneba",
   "ekonomika",
   "resursebi",
-  "sporti-videos",
 ];
 
 // Extract the YouTube video ID (unchanged)
@@ -50,6 +50,9 @@ const MainNews = async () => {
 
     // Sort by date (descending)
     data.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    // Exclude sport from main page hero (sport only on /sporti)
+    data = data.filter((post) => post.post_type !== "sporti-videos");
 
     // For video posts, fetch additional details
     const videoDetailsPromises = data

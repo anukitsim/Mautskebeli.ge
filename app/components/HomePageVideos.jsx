@@ -93,13 +93,6 @@ const VideoCard = ({ videoId, caption, onSelect, postType, isMobile, index }) =>
               </svg>
             </div>
           </div>
-
-          {/* Duration badge placeholder */}
-          <div className="absolute bottom-3 right-3">
-            <span className="px-2 py-0.5 bg-black/70 text-white text-[10px] font-medium rounded">
-              ვიდეო
-            </span>
-          </div>
         </div>
 
         {/* Content */}

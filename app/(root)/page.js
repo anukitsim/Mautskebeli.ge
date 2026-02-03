@@ -21,8 +21,8 @@ export default function Home() {
           <Navigation />
         </div>
 
-        {/* Main News Section - Hero Banner with Sidebar */}
-        <div className="mx-auto mt-8 flex flex-col md:flex-row gap-5 w-11/12 md:w-10/12 lg:mb-0 mb-[280px]">
+        {/* Main News Section - Hero Banner with Sidebar (same width as sections below) */}
+        <div className="mx-auto mt-8 flex flex-col md:flex-row gap-5 w-11/12 md:w-10/12 lg:mb-0 mb-[280px] items-stretch">
           <Sidebar />
           <MainNews />
         </div>
@@ -32,28 +32,29 @@ export default function Home() {
           <NewsSection />
         </section> */}
 
-        <div className="container mx-auto">
+        {/* Sections: same width as hero (w-11/12 md:w-10/12), podcast stays full width below */}
+        <div className="mx-auto w-11/12 md:w-10/12">
           <DonationPopup />
 
           {/* Home Page Videos Section */}
-          <section className="px-4 lg:px-8 mt-12 lg:mt-16">
+          <section className="px-0 mt-12 lg:mt-16">
             <HomePageVideos />
           </section>
 
           {/* Home Page Statiebi Section */}
-          <section className="px-4 lg:px-8 mt-12 lg:mt-16">
+          <section className="px-0 mt-12 lg:mt-16">
             <HomePageStatiebi />
           </section>
         </div>
 
-        {/* Home Page Podcast Section */}
+        {/* Home Page Podcast Section - full width, do not change */}
         <div className="mt-12 lg:mt-16">
           <HomePagePodcast />
         </div>
 
-        <div className="container mx-auto">
+        <div className="mx-auto w-11/12 md:w-10/12">
           {/* Home Page Rcheuli Section */}
-          <section className="px-4 lg:px-8 mt-12 lg:mt-16">
+          <section className="px-0 mt-12 lg:mt-16">
             <HomePageRcheuli />
           </section>
 

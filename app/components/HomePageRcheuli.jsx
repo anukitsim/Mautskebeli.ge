@@ -52,6 +52,7 @@ const HomePageRcheuli = () => {
 
         const filteredAndSortedPosts = data
           .filter(post => post.acf_fields.rcheuli)
+          .filter(post => !['sporti-videos', 'sporti'].includes(post.post_type))
           .sort((a, b) => new Date(b.modified) - new Date(a.modified))
           .slice(0, 4);
 

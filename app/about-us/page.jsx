@@ -7,21 +7,12 @@ import Image from "next/image";
 const Page = () => {
   return (
     <main className="min-h-screen bg-[#FBFAFC]">
-      {/* Title block - bigger and bolder */}
-      <div className="w-11/12 md:w-10/12 max-w-4xl mx-auto px-4 pt-12 lg:pt-16 pb-10">
-        <div className="flex items-center gap-4 mb-2">
-          <div className="w-1.5 h-12 bg-[#AD88C6] rounded-full flex-shrink-0" />
-          <h1 className="font-alk-tall-mtavruli text-4xl lg:text-5xl xl:text-6xl text-[#474F7A] font-bold leading-tight">
-            <span className="text-[#AD88C6]">„მაუწყებლის"</span> შესახებ
-          </h1>
-        </div>
-      </div>
-
-      {/* Content - no card, direct on background */}
-      <div className="w-11/12 md:w-10/12 max-w-4xl mx-auto px-4 pb-20 lg:pb-28">
+      {/* Content - no title; first word styled like title, then body continues */}
+      <div className="w-11/12 md:w-10/12 max-w-4xl mx-auto px-4 pt-12 lg:pt-16 pb-20 lg:pb-28">
         <div className="font-noto-sans-georgian text-[#474F7A] space-y-7 lg:space-y-8 text-base lg:text-lg leading-relaxed lg:leading-[1.85]">
           <p>
-            „მაუწყებელი" დამოუკიდებელი ონლაინ მედია პლატფორმაა, რომელიც შეიქმნა იმ ადამიანების, თემებისა და ბრძოლების გასაშუქებლად, რომლებიც ხშირად დომინანტური მედიის დღის წესრიგს მიღმა რჩება. ჩვენი მიზანია კრიტიკული ჟურნალისტიკისა და სოციალური თხრობის საშუალებით საზოგადოებრივ დებატებში შემოვიტანოთ სოციალური უთანასწორობის, შრომითი ექსპლუატაციის, მიგრაციის, ადამიანის უფლებების და დემოკრატიის საკითხები.
+            <span className="inline-block w-1.5 bg-[#AD88C6] rounded-sm mr-2.5 align-middle shrink-0 self-center" style={{ height: '1.1em', minHeight: '28px' }} aria-hidden />
+            <span className="font-alk-tall-mtavruli font-bold text-[#8B6AAE] text-3xl sm:text-4xl lg:text-5xl align-baseline leading-tight">„მაუწყებელი"</span> დამოუკიდებელი ონლაინ მედია პლატფორმაა, რომელიც შეიქმნა იმ ადამიანების, თემებისა და ბრძოლების გასაშუქებლად, რომლებიც ხშირად დომინანტური მედიის დღის წესრიგს მიღმა რჩება. ჩვენი მიზანია კრიტიკული ჟურნალისტიკისა და სოციალური თხრობის საშუალებით საზოგადოებრივ დებატებში შემოვიტანოთ სოციალური უთანასწორობის, შრომითი ექსპლუატაციის, მიგრაციის, ადამიანის უფლებების და დემოკრატიის საკითხები.
           </p>
 
           <p>

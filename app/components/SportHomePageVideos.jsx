@@ -63,7 +63,7 @@ const VideoCard = ({ videoId, caption, onSelect, postType }) => {
   );
 };
 
-function SportHomePageVideos() {
+function SportHomePageVideos({ compact = false }) {
   const [randomVideos, setRandomVideos] = useState([]);
   const [selectedVideoId, setSelectedVideoId] = useState(null);
   const [modalIsOpen, setModalIsOpen] = useState(false);
@@ -125,7 +125,7 @@ function SportHomePageVideos() {
 
   return (
     <>
-      <div className="w-full sm:w-10/12 flex items-center justify-between lg:mt-20 mt-[42px] mx-auto pl-4 pr-4 lg:pl-2 lg:pr-2 mb-6 lg:mb-8">
+      <div className={`w-full sm:w-10/12 flex items-center justify-between mx-auto pl-4 pr-4 lg:pl-2 lg:pr-2 mb-6 lg:mb-8 ${compact ? 'mt-0' : 'lg:mt-20 mt-[42px]'}`}>
         <div className="flex items-center gap-3">
           <div className="w-1.5 h-10 bg-[#AD88C6] rounded-full" />
           <h2 className="text-[#474F7A] text-2xl lg:text-3xl font-bold">ვიდეო</h2>

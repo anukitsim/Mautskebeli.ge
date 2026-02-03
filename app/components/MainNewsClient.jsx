@@ -98,7 +98,7 @@ const MainNewsClient = ({ slides }) => {
       {/* Desktop View */}
       <div className="lg:block sm:hidden w-full">
         <section 
-          className="relative w-full h-full min-h-[500px] rounded-[20px] overflow-hidden
+          className="relative w-full h-full min-h-[420px] rounded-[20px] overflow-hidden
                      ring-1 ring-black/5 group"
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}

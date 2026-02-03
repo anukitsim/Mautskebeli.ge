@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 
-const SportsArticles = () => {
+const SportsArticles = ({ compact = false }) => {
   const [articles, setArticles] = useState([]);
 
   const stripHtml = (html) => {
@@ -71,7 +71,7 @@ const SportsArticles = () => {
   }, []);
 
   return (
-    <section className="mx-auto mt-[110px] flex flex-col">
+    <section className={`mx-auto flex flex-col ${compact ? 'mt-8 lg:mt-10' : 'mt-[110px]'}`}>
       <style jsx global>{`
         @media (max-width: 768px) {
           .article:first-child {
@@ -110,7 +110,6 @@ const SportsArticles = () => {
       <div className="w-10/12 mx-auto flex articles-container overflow-x-auto mt-5 flex-row gap-5">
         {articles.map(article => {
           const imageUrl = article.acf.image ? article.acf.image : '/images/default-image.png';
-          console.log(`Article ID: ${article.id}, Image URL: ${imageUrl}`); // Debugging log
           return (
             <Link href={`/sport-articles/${article.id}`} passHref key={article.id}>
               <div className="article bg-[#F6F4F8] rounded-tl-[10px] rounded-tr-[10px] border border-[#B6A8CD] overflow-hidden" style={{ minWidth: '300px', maxWidth: '400px' }}>

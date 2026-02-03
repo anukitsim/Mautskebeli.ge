@@ -35,6 +35,7 @@ const Navigation = ({ onVideoSelect }) => {
     { label: "ამბები", href: "/news" },
     { label: "ტექსტი", href: "/text" },
     { label: "პოდკასტი", href: "/podcast" },
+    { label: "სპორტი", href: "/sporti" },
     { label: "ჩვენ შესახებ", href: "/about-us" },
   ];
 
