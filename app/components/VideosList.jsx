@@ -212,7 +212,7 @@ function VideosList({ endpoint, title }) {
           }}
         >
           <div className="modalContentArea" onClick={closeModal}>
-            <div className="max-w-[900px] mx-auto" onClick={handleVideoContainerClick}>
+            <div className="max-w-[900px] mx-auto px-4" onClick={handleVideoContainerClick}>
               <CustomYoutubePlayer videoId={selectedVideoId} numVideos={2}/>
             </div>
           </div>

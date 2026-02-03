@@ -1,12 +1,15 @@
 'use client';
 
 import { useLanguage } from '../context/LanguageContext';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 
 const LanguageSwitcher = ({ variant = 'nav' }) => {
   const { language, changeLanguage, isTranslating } = useLanguage();
   const [showTooltip, setShowTooltip] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [tooltipPosition, setTooltipPosition] = useState({ top: 0, right: 0 });
+  const buttonRef = useRef(null);
 
   // Detect mobile device
   useEffect(() => {
@@ -19,6 +22,17 @@ const LanguageSwitcher = ({ variant = 'nav' }) => {
     
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
+
+  // Calculate tooltip position when showing
+  useEffect(() => {
+    if (showTooltip && buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      setTooltipPosition({
+        top: rect.bottom + 8,
+        right: window.innerWidth - rect.right,
+      });
+    }
+  }, [showTooltip]);
 
   // Handle tooltip display - stays visible on hover
   const handleEngHover = () => {
@@ -47,7 +61,7 @@ const LanguageSwitcher = ({ variant = 'nav' }) => {
   // Header variant (for white background)
   if (variant === 'header') {
     return (
-      <div className="flex items-center gap-0.5 sm:gap-1 bg-[#AD88C6]/10 rounded-full p-0.5 sm:p-1 relative notranslate min-w-[80px] sm:min-w-[100px]" translate="no">
+      <div ref={buttonRef} className="flex items-center gap-0.5 sm:gap-1 bg-[#AD88C6]/10 rounded-full p-0.5 sm:p-1 relative notranslate min-w-[80px] sm:min-w-[100px]" translate="no">
         <button
           onClick={() => changeLanguage('ka')}
           disabled={isTranslating}
@@ -88,31 +102,30 @@ const LanguageSwitcher = ({ variant = 'nav' }) => {
           <span translate="no" className="notranslate">ENG</span>
         </button>
         
-        {/* Tooltip - responsive positioning */}
-        {showTooltip && (
+        {/* Tooltip - rendered via portal at body level */}
+        {showTooltip && typeof document !== 'undefined' && createPortal(
           <div 
-            className={`
-              absolute top-full mt-2 right-0 sm:right-0 
-              bg-[#474F7A] text-white text-[10px] sm:text-xs 
-              px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg shadow-lg
-              whitespace-nowrap z-50
-              transition-opacity duration-300
-              max-w-[200px] sm:max-w-none
-              ${showTooltip ? 'opacity-100' : 'opacity-0'}
-            `}
+            className="fixed text-white px-3 py-2 rounded-lg
+                       whitespace-nowrap pointer-events-none animate-fadeIn"
             style={{
-              animation: 'fadeIn 0.3s ease-in-out'
+              backgroundColor: 'rgb(71, 79, 122)',
+              top: tooltipPosition.top,
+              right: tooltipPosition.right,
+              zIndex: 2147483647,
+              boxShadow: '0 10px 25px rgba(0,0,0,0.3)',
             }}
           >
-            <div className="flex flex-col gap-0.5 sm:gap-1">
-              <span className="font-semibold text-[9px] sm:text-xs">Auto-generated Translation</span>
-              <span className="text-[8px] sm:text-[10px] opacity-80">Powered by Google Translate</span>
+            <div className="flex flex-col gap-0.5 text-center">
+              <span className="font-semibold text-[11px]">Auto-generated Translation</span>
+              <span className="text-[10px] opacity-75">Powered by Google Translate</span>
             </div>
-            {/* Arrow */}
+            {/* Arrow pointing up */}
             <div 
-              className="absolute -top-1 right-4 w-2 h-2 bg-[#474F7A] transform rotate-45"
+              className="absolute -top-1.5 right-6 w-3 h-3 transform rotate-45"
+              style={{ backgroundColor: 'rgb(71, 79, 122)' }}
             ></div>
-          </div>
+          </div>,
+          document.body
         )}
         {isTranslating && (
           <div className="absolute -right-6 sm:-right-8 top-1/2 -translate-y-1/2 animate-fade-in">
@@ -128,7 +141,7 @@ const LanguageSwitcher = ({ variant = 'nav' }) => {
 
   // Nav variant (for purple background) - default
   return (
-    <div className="flex items-center gap-0.5 sm:gap-1 bg-white/10 rounded-full p-0.5 sm:p-1 relative notranslate min-w-[80px] sm:min-w-[100px]" translate="no">
+    <div ref={buttonRef} className="flex items-center gap-0.5 sm:gap-1 bg-white/10 rounded-full p-0.5 sm:p-1 relative notranslate min-w-[80px] sm:min-w-[100px]" translate="no">
       <button
         onClick={() => changeLanguage('ka')}
         disabled={isTranslating}
@@ -169,31 +182,30 @@ const LanguageSwitcher = ({ variant = 'nav' }) => {
         <span translate="no" className="notranslate">ENG</span>
       </button>
       
-      {/* Tooltip - responsive positioning */}
-      {showTooltip && (
+      {/* Tooltip - rendered via portal at body level */}
+      {showTooltip && typeof document !== 'undefined' && createPortal(
         <div 
-          className={`
-            absolute top-full mt-2 right-0 sm:right-0 
-            bg-[#474F7A] text-white text-[10px] sm:text-xs 
-            px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg shadow-lg
-            whitespace-nowrap z-50
-            transition-opacity duration-300
-            max-w-[200px] sm:max-w-none
-            ${showTooltip ? 'opacity-100' : 'opacity-0'}
-          `}
+          className="fixed text-white px-3 py-2 rounded-lg
+                     whitespace-nowrap pointer-events-none animate-fadeIn"
           style={{
-            animation: 'fadeIn 0.3s ease-in-out'
+            backgroundColor: 'rgb(71, 79, 122)',
+            top: tooltipPosition.top,
+            right: tooltipPosition.right,
+            zIndex: 2147483647,
+            boxShadow: '0 10px 25px rgba(0,0,0,0.3)',
           }}
         >
-          <div className="flex flex-col gap-0.5 sm:gap-1">
-            <span className="font-semibold text-[9px] sm:text-xs">Auto-generated Translation</span>
-            <span className="text-[8px] sm:text-[10px] opacity-80">Powered by Google Translate</span>
+          <div className="flex flex-col gap-0.5 text-center">
+            <span className="font-semibold text-[11px]">Auto-generated Translation</span>
+            <span className="text-[10px] opacity-75">Powered by Google Translate</span>
           </div>
-          {/* Arrow */}
+          {/* Arrow pointing up */}
           <div 
-            className="absolute -top-1 right-4 w-2 h-2 bg-[#474F7A] transform rotate-45"
+            className="absolute -top-1.5 right-6 w-3 h-3 transform rotate-45"
+            style={{ backgroundColor: 'rgb(71, 79, 122)' }}
           ></div>
-        </div>
+        </div>,
+        document.body
       )}
       {isTranslating && (
         <div className="absolute -right-6 sm:-right-8 top-1/2 -translate-y-1/2 animate-fade-in">

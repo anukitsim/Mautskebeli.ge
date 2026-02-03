@@ -6,11 +6,9 @@ import HomePageStatiebi from "../components/HomePageStatiebi";
 import HomePageVideos from "../components/HomePageVideos";
 import MainNews from "../components/MainNews";
 import Navigation from "../components/Navigation";
-import Sidebar from "../components/Sidebar";
 import NewsSection from "../components/NewsSection";
 import { MenuProvider } from "../context/MenuContext";
 import DonationPopup from "../components/DonationPopup";
-import DonationBanner from "../components/DonationBanner";
 
 export default function Home() {
   return (
@@ -21,19 +19,18 @@ export default function Home() {
           <Navigation />
         </div>
 
-        {/* Main News Section - Hero Banner with Sidebar */}
-        <div className="mx-auto mt-8 flex flex-col md:flex-row gap-5 w-11/12 md:w-10/12 lg:mb-0 mb-[280px]">
-          <Sidebar />
+        {/* Full Width Main News Banner - Top Row */}
+        <div className="mx-auto mt-8 w-11/12 md:w-10/12 lg:mb-0 mb-[280px]">
           <MainNews />
         </div>
 
-        {/* News Section - ახალი ამბები */}
-        {/* <section className="container mx-auto px-4 lg:px-8 mt-24 lg:mt-32">
-          <NewsSection />
-        </section> */}
-
         <div className="container mx-auto">
           <DonationPopup />
+
+          {/* News Section - Below Banner */}
+          <section className="px-4 lg:px-8 mt-24 lg:mt-32">
+            <NewsSection />
+          </section>
 
           {/* Home Page Videos Section */}
           <section className="px-4 lg:px-8 mt-12 lg:mt-16">
@@ -56,11 +53,6 @@ export default function Home() {
           <section className="px-4 lg:px-8 mt-12 lg:mt-16">
             <HomePageRcheuli />
           </section>
-
-          {/* Donation Banner */}
-          {/* <section className="px-4 lg:px-8 mt-12 lg:mt-16">
-            <DonationBanner />
-          </section> */}
         </div>
 
         <Footer />

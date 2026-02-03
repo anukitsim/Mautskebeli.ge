@@ -125,11 +125,23 @@ function SportHomePageVideos() {
 
   return (
     <>
-      <div className="w-full sm:w-10/12 flex items-center justify-between lg:mt-20 mt-[42px] mx-auto pl-4 pr-4 lg:pl-2 lg:pr-2">
-        <p className="text-[#474F7A] text-[24px] font-bold">ვიდეო</p>
-        <Link href='/all-sport-videos' className="text-[#474F7A] text-[14px] font-semibold">ნახე ყველა</Link>
+      <div className="w-full sm:w-10/12 flex items-center justify-between lg:mt-20 mt-[42px] mx-auto pl-4 pr-4 lg:pl-2 lg:pr-2 mb-6 lg:mb-8">
+        <div className="flex items-center gap-3">
+          <div className="w-1.5 h-10 bg-[#AD88C6] rounded-full" />
+          <h2 className="text-[#474F7A] text-2xl lg:text-3xl font-bold">ვიდეო</h2>
+        </div>
+        <Link 
+          href="/all-sport-videos" 
+          className="text-[#474F7A] text-sm font-semibold hover:text-[#AD88C6] 
+                     transition-colors duration-300 flex items-center gap-2 group"
+        >
+          <span>ნახე ყველა</span>
+          <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
+        </Link>
       </div>
-      <div className="flex sm:hidden overflow-x-auto hide-scroll-bar pl-2 mt-5">
+      <div className="flex sm:hidden overflow-x-auto hide-scroll-bar pl-2">
         <div className="flex">
           {randomVideos.map((video) => (
             <div key={video.id} className="inline-block px-2 w-[248px]">
@@ -176,7 +188,7 @@ function SportHomePageVideos() {
           }}
         >
           <div className="modalContentArea" onClick={handleModalClick}>
-            <div className="max-w-[900px] mx-auto pt-20" onClick={handleVideoContainerClick}>
+            <div className="max-w-[900px] mx-auto pt-20 px-4" onClick={handleVideoContainerClick}>
               <CustomYoutubePlayer videoId={selectedVideoId} numVideos={2} />
             </div>
           </div>

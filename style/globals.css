@@ -507,6 +507,17 @@ margin-right: 10px;
 .v-volume {
   position: relative;
   grid-column: 10;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.v-volume:hover .v-volume-slider-container {
+  width: 90px !important;
+}
+
+.v-volume-slider-container {
+  transition: width 0.3s ease-out;
 }
 
 input[type=range] {
@@ -515,31 +526,105 @@ input[type=range] {
 }
 
 input[type=range]::-webkit-slider-runnable-track {
-  background: white;
+  background: rgba(255, 255, 255, 0.2);
   border-radius: 10px;
-  height: 8px;
+  height: 6px;
 }
 
 input[type=range]::-webkit-slider-thumb {
   -webkit-appearance: none;
-  height: 16px;
-  width: 16px;
+  height: 14px;
+  width: 14px;
   border-radius: 50%;
   background: white;
   cursor: pointer;
   margin-top: -4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
 }
 
 input[type=range]:hover::-webkit-slider-thumb {
-  background: #AD88C6;
+  background: white;
+  transform: scale(1.2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
-/* Additional styles to remove default styles on Firefox */
+input[type=range]:active::-webkit-slider-thumb {
+  transform: scale(1.3);
+}
+
+/* Firefox styles */
+input[type="range"]::-moz-range-track {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  height: 6px;
+  border: none;
+}
+
+input[type="range"]::-moz-range-thumb {
+  height: 14px;
+  width: 14px;
+  border-radius: 50%;
+  background: white;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+}
+
+input[type="range"]:hover::-moz-range-thumb {
+  transform: scale(1.2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
 input[type="range"]::-moz-focus-inner {
   border: 0;
 }
 input[type="range"]::-moz-focus-outer {
   border: 0;
+}
+
+/* Volume input specific styling */
+.v-volumeInput {
+  width: 100%;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  outline: none;
+  -webkit-appearance: none;
+}
+
+.v-volumeInput::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 14px;
+  width: 14px;
+  border-radius: 50%;
+  background: white;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+}
+
+.v-volumeInput:hover::-webkit-slider-thumb {
+  transform: scale(1.2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.v-volumeInput::-moz-range-thumb {
+  height: 14px;
+  width: 14px;
+  border-radius: 50%;
+  background: white;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+}
+
+.v-volumeInput:hover::-moz-range-thumb {
+  transform: scale(1.2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 
@@ -898,3 +983,175 @@ a.scale-on-hover:hover {
   margin-bottom: 0.25rem;
 }
 
+.article-content p {
+  margin-bottom: 1rem;
+}
+
+.article-content p:last-child {
+  margin-bottom: 0;
+}
+
+/* News Section Animations */
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Loading skeleton shimmer effect */
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    #E0DBE8 0%,
+    #F6F4F8 50%,
+    #E0DBE8 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* Line clamp utilities */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Fade in animation for tooltips */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-in-out forwards;
+}
+
+/* ===== TRANSLATION STABILITY - CRITICAL ===== */
+/* Prevent flickering when Google Translate is active */
+html.translated-ltr,
+html.translated-rtl {
+  /* Force hardware acceleration on entire document */
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  -webkit-perspective: 1000;
+  perspective: 1000;
+}
+
+/* Keep translated font elements stable and ALWAYS visible */
+html.translated-ltr font,
+html.translated-rtl font {
+  display: inline !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  vertical-align: baseline !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+/* CRITICAL: Force GPU compositing on ALL text containers */
+html.translated-ltr p,
+html.translated-ltr h1,
+html.translated-ltr h2,
+html.translated-ltr h3,
+html.translated-ltr h4,
+html.translated-ltr h5,
+html.translated-ltr h6,
+html.translated-ltr span,
+html.translated-ltr li,
+html.translated-ltr a,
+html.translated-ltr div,
+html.translated-rtl p,
+html.translated-rtl h1,
+html.translated-rtl h2,
+html.translated-rtl h3,
+html.translated-rtl h4,
+html.translated-rtl h5,
+html.translated-rtl h6,
+html.translated-rtl span,
+html.translated-rtl li,
+html.translated-rtl a,
+html.translated-rtl div {
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+/* Prevent content shifting during scroll */
+html.translated-ltr .article-content,
+html.translated-ltr [class*="article-content"],
+html.translated-ltr main,
+html.translated-ltr article,
+html.translated-ltr section,
+html.translated-rtl .article-content,
+html.translated-rtl [class*="article-content"],
+html.translated-rtl main,
+html.translated-rtl article,
+html.translated-rtl section {
+  contain: layout style paint;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+/* Body class hook for translation-stable state */
+body.translation-stable * {
+  -webkit-font-smoothing: antialiased !important;
+  -moz-osx-font-smoothing: grayscale !important;
+}
+
+/* Safari-specific scroll stabilization */
+@supports (-webkit-touch-callout: none) {
+  html.translated-ltr,
+  html.translated-rtl {
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  html.translated-ltr *,
+  html.translated-rtl * {
+    -webkit-font-smoothing: antialiased;
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+  }
+}

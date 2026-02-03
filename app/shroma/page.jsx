@@ -297,7 +297,9 @@ function XelovnebaVideos() {
                   ))}
                 </div>
 
-                <CustomYoutubePlayer key={customPlayerKey} videoId={activeVideoId} />
+                <div className="max-w-[900px] mx-auto px-4">
+                  <CustomYoutubePlayer key={customPlayerKey} videoId={activeVideoId} />
+                </div>
                 <div className="mx-auto lg:mt-[7%] lg:w-10/12 mt-[50px] sm:w-full flex flex-col gap-[23px] pl-5 pr-5">
                   <p className="text-[16px] text-[#474F7A] font-semibold">
                     {activeVideoDate ? formatDate(activeVideoDate) : ""}

@@ -73,7 +73,7 @@ const Footer = () => {
           <Link href="/about-us" className="text-[#474F7A]">ჩვენ შესახებ</Link>
           <Link href="/all-videos" className="text-[#474F7A]">ვიდეოები</Link>
           <Link href="/text" className="text-[#474F7A]">ტექსტი</Link>
-          <Link href="/sporti" className="text-[#474F7A]">სპორტი</Link>
+          <Link href="/news" className="text-[#474F7A]">ახალი ამბები</Link>
         </div>
         <div className="h-full w-1/3 flex flex-col gap-[16px]">
           <h1 className="text-[#AD88C6] text-[16px] font-bold">გამოგვიწერე</h1>
@@ -286,7 +286,7 @@ const Footer = () => {
               <Link href="/all-videos">ვიდეოები</Link>
             </div>
             <div className="flex flex-col gap-[12px] text-[#474F7A] text-[15px]">
-              <Link href="/sporti">სპორტი</Link>
+              <Link href="/news">ახალი ამბები</Link>
               <Link href="/text">ტექსტი</Link>
             </div>
           </div>

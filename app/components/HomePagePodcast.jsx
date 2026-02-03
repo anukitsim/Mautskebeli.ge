@@ -5,9 +5,9 @@ const HomePagePodcast = () => {
   return (
     <>
       {/* Desktop Banner */}
-      <section className="relative  w-full hidden lg:block">
-        <div className="relative w-full">
-          <Link href='/podcast'>
+      <section className="relative w-full hidden lg:block group overflow-hidden">
+        <div className="relative w-full transition-transform duration-700">
+          <Link href="/podcast">
             <Image
               src="/images/podcast-banner.svg"
               alt="Podcast Banner"
@@ -23,22 +23,23 @@ const HomePagePodcast = () => {
           <Link
             href="https://www.youtube.com/playlist?list=PL8wF1aEA4P8NJZUazilLH7ES-T-RQd3Cy"
             target="_blank"
+            className="transform transition-all duration-300 hover:scale-105 hover:-translate-y-1"
           >
             <Image
               src="/images/youtube-banner.png"
               alt="youtube"
               width={558}
               height={184}
-              className="transition duration-300 hover:scale-105"
+              className="drop-shadow-lg"
             />
           </Link>
         </div>
       </section>
 
       {/* Mobile Banner */}
-      <section className="relative w-full lg:hidden">
+      <section className="relative w-full lg:hidden overflow-hidden">
         <div className="relative w-full">
-          <Link href='/podcast'>
+          <Link href="/podcast">
             <Image
               src="/images/mobile-banner.png"
               alt="Podcast Banner"
@@ -54,13 +55,14 @@ const HomePagePodcast = () => {
           <Link
             href="https://www.youtube.com/playlist?list=PL8wF1aEA4P8NJZUazilLH7ES-T-RQd3Cy"
             target="_blank"
+            className="transform transition-all duration-300 hover:scale-105"
           >
             <Image
               src="/images/mobile-youtube-banner.png"
               alt="youtube"
               width={558}
               height={184}
-              className="transition duration-300 hover:scale-105"
+              className="drop-shadow-md"
             />
           </Link>
         </div>

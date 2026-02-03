@@ -6,9 +6,24 @@ import LanguageSwitcher from "./LanguageSwitcher";
 
 const Header = () => {
   return (
-    <header className="h-16 sm:h-20 w-full flex bg-[#FBFAFC] flex-col items-start">
+    <header className="relative h-16 sm:h-20 w-full flex flex-col items-start overflow-visible">
+      {/* Background matching page */}
+      <div className="absolute inset-0 bg-[#F5F3FA]" />
+      
+      {/* Subtle grid pattern */}
+      <div 
+        className="absolute inset-0 opacity-[0.15]"
+        style={{
+          backgroundImage: `
+            linear-gradient(rgba(173,136,198,0.15) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(173,136,198,0.15) 1px, transparent 1px)
+          `,
+          backgroundSize: '32px 32px'
+        }}
+      />
+      
       {/* top line */}
-      <div className="w-11/12 sm:w-10/12 h-1/2 mx-auto mt-3 sm:mt-5 flex justify-between items-center">
+      <div className="relative z-10 w-11/12 sm:w-10/12 h-1/2 mx-auto mt-3 sm:mt-5 flex justify-between items-center overflow-visible">
         {/* logo */}
         <Link href="/" className="flex-shrink-0">
           <Image
@@ -22,7 +37,7 @@ const Header = () => {
         </Link>
 
         {/* right-hand actions */}
-        <div className="flex gap-2 sm:gap-4 items-center">
+        <div className="flex gap-2 sm:gap-4 items-center overflow-visible">
           {/* ░░ HIGHLIGHTED DONATION ░░ */}
           <Link
             href="/donation"
@@ -55,23 +70,6 @@ const Header = () => {
             />
           </Link>
 
-          {/* live link */}
-          <Link
-            href="/live"
-            className="flex gap-1.5 sm:gap-2.5 text-[10px] sm:text-xs justify-center items-center flex-shrink-0"
-          >
-            <Image
-              src="/images/pirdapiri-eteri.svg"
-              alt="Live"
-              width={16}
-              height={16}
-              className="w-[16px] h-[16px] sm:w-[20px] sm:h-[20px]"
-            />
-            <span className="hidden sm:inline text-[#474F7A]">
-              პირდაპირი ეთერი
-            </span>
-          </Link>
-
           {/* Language Switcher - visible on all devices */}
           <LanguageSwitcher variant="header" />
         </div>
@@ -87,7 +85,6 @@ const Header = () => {
               opacity: 1;
             }
             60% {
-              /* bigger spread + tiny scale-up for extra pop */
               box-shadow: 0 0 0 18px rgba(254, 206, 39, 0);
               transform: scale(1.08);
               opacity: 0;
@@ -97,11 +94,9 @@ const Header = () => {
             }
           }
           .animate-donate-pulse {
-            /* slightly faster loop so it catches the eye more often */
             animation: donate-pulse 1.8s cubic-bezier(0.22, 0.61, 0.36, 1)
               infinite;
           }
-          /* pause pulse on hover/focus so users aren’t distracted */
           a:hover .animate-donate-pulse,
           a:focus-visible .animate-donate-pulse {
             animation-play-state: paused;

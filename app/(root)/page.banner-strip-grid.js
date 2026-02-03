@@ -6,31 +6,39 @@ import HomePageStatiebi from "../components/HomePageStatiebi";
 import HomePageVideos from "../components/HomePageVideos";
 import MainNews from "../components/MainNews";
 import Navigation from "../components/Navigation";
-import Sidebar from "../components/Sidebar";
 import NewsSection from "../components/NewsSection";
+import JustInStrip from "../components/JustInStrip";
 import { MenuProvider } from "../context/MenuContext";
 import DonationPopup from "../components/DonationPopup";
-import DonationBanner from "../components/DonationBanner";
 
 export default function Home() {
   return (
     <MenuProvider>
-      <main className="min-h-screen">
+      {/* Consistent soft lavender background throughout */}
+      <main className="min-h-screen bg-[#F5F3FA]">
         <div className="sticky top-0 z-50">
           <Header />
           <Navigation />
         </div>
 
-        {/* Main News Section - Hero Banner with Sidebar */}
-        <div className="mx-auto mt-8 flex flex-col md:flex-row gap-5 w-11/12 md:w-10/12 lg:mb-0 mb-[280px]">
-          <Sidebar />
-          <MainNews />
+        {/* Full Width Main News Banner */}
+        <div className="mx-auto mt-8 w-11/12 md:w-10/12 lg:mb-0 mb-[280px]">
+          <div className="rounded-[20px] shadow-[0_8px_40px_rgba(113,88,143,0.15)] overflow-hidden">
+            <MainNews />
+          </div>
         </div>
 
-        {/* News Section - ახალი ამბები */}
-        {/* <section className="container mx-auto px-4 lg:px-8 mt-24 lg:mt-32">
+        {/* Just In Strip - Between Banner and Grid */}
+        <div className="mx-auto w-11/12 md:w-10/12 mt-10 lg:mt-12">
+          <div className="bg-[#FEFEFE]/80 backdrop-blur-sm rounded-2xl border border-[#E8E4F0] p-4 shadow-sm">
+            <JustInStrip />
+          </div>
+        </div>
+
+        {/* News Section - Grid Below */}
+        <section className="mx-auto w-11/12 md:w-10/12 mt-12 lg:mt-16">
           <NewsSection />
-        </section> */}
+        </section>
 
         <div className="container mx-auto">
           <DonationPopup />
@@ -56,11 +64,6 @@ export default function Home() {
           <section className="px-4 lg:px-8 mt-12 lg:mt-16">
             <HomePageRcheuli />
           </section>
-
-          {/* Donation Banner */}
-          {/* <section className="px-4 lg:px-8 mt-12 lg:mt-16">
-            <DonationBanner />
-          </section> */}
         </div>
 
         <Footer />

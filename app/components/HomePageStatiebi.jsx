@@ -63,28 +63,39 @@ const HomePageStatiebi = () => {
 
   return (
     <section className="mx-auto flex flex-col px-4">
-      <div className="w-full flex items-center justify-between lg:px-2">
-        <p className="text-[#474F7A] text-2xl font-bold">სტატიები</p>
-        <Link href='/all-articles' className="text-[#474F7A] text-sm font-semibold">
-          ნახე ყველა
+      <div className="flex items-center justify-between mb-6 lg:mb-8">
+        <div className="flex items-center gap-3">
+          <div className="w-1.5 h-10 bg-[#AD88C6] rounded-full" />
+          <h2 className="text-[#474F7A] text-2xl lg:text-3xl font-bold">სტატიები</h2>
+        </div>
+        <Link 
+          href="/all-articles" 
+          className="text-[#474F7A] text-sm font-semibold hover:text-[#AD88C6] 
+                     transition-colors duration-300 flex items-center gap-2 group"
+        >
+          <span>ნახე ყველა</span>
+          <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
         </Link>
       </div>
 
       {/* Horizontal scrolling section for mobile */}
-      <div className="flex lg:hidden overflow-x-auto space-x-4 mt-5 no-scrollbar">
+      <div className="flex lg:hidden overflow-x-auto space-x-4 no-scrollbar">
         {articles.map(article => {
           const imageUrl = article.acf.image ? article.acf.image : '/images/default-image.png';
           return (
-            <Link href={article.slug ? `/all-articles/${article.slug}` : `/all-articles/${article.id}`} passHref key={article.id}>
-              <div className="flex-none w-[300px] bg-[#F6F4F8] rounded-lg border border-[#B6A8CD] overflow-hidden flex flex-col h-[500px]">
-                {/* Image Section (Unchanged) */}
-                <div className="relative w-full h-[200px] flex-shrink-0"> {/* Added flex-shrink-0 */}
+            <Link href={article.slug ? `/all-articles/${article.slug}` : `/all-articles/${article.id}`} passHref key={article.id} className="group">
+              <div className="flex-none w-[300px] bg-[#F6F4F8] rounded-xl border border-[#E0DBE8] overflow-hidden flex flex-col h-[500px]
+                             shadow-sm hover:shadow-xl transition-all duration-500 hover:-translate-y-1">
+                {/* Image Section */}
+                <div className="relative w-full h-[200px] flex-shrink-0 overflow-hidden">
                   <Image
                     src={imageUrl}
                     alt={`Cover image for ${article.title.rendered}`} 
                     fill
                     sizes="(max-width: 768px) 100vw, 33vw"
-                    className="object-cover"
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
                     priority
                   />
                 </div>
@@ -92,23 +103,23 @@ const HomePageStatiebi = () => {
                 {/* Text Section */}
                 <div className="p-4 flex flex-col flex-grow">
                   <div>
-                    <h2 className="text-base font-bold mb-2 text-[#474F7A]">
+                    <h2 className="text-base font-bold mb-2 text-[#474F7A] group-hover:text-[#AD88C6] transition-colors duration-300">
                       {article.title.rendered}
                     </h2>
-                    <span className="text-[#8D91AB] text-sm font-bold">
+                    <span className="text-[#8D91AB] text-sm font-medium">
                       {article.acf['ავტორი']}
                     </span>
-                    <p className="text-sm pt-4 text-black line-clamp-3"> {/* Ensure line-clamp-3 is applied */}
+                    <p className="text-sm pt-4 text-[#474F7A]/80 line-clamp-3">
                       {stripHtml(article.acf['main-text'])}
                     </p>
                   </div>
-                  <div className="flex justify-end pt-4 mt-auto"> {/* Added mt-auto */}
-                    <button
-                      aria-label={`Read full article: ${article.title.rendered}`} 
-                      className="text-white text-xs bg-[#AD88C6] rounded py-2 px-4"
+                  <div className="flex justify-end pt-4 mt-auto">
+                    <span
+                      className="text-white text-xs bg-[#AD88C6] rounded-full py-2 px-4
+                                 group-hover:bg-[#8B6AAE] transition-colors duration-300"
                     >
                       ნახეთ სრულად
-                    </button>
+                    </span>
                   </div>
                 </div>
               </div>
@@ -122,16 +133,17 @@ const HomePageStatiebi = () => {
         {articles.map(article => {
           const imageUrl = article.acf.image ? article.acf.image : '/images/default-image.png';
           return (
-            <Link href={article.slug ? `/all-articles/${article.slug}` : `/all-articles/${article.id}`} passHref key={article.id}>
-              <div className="bg-[#F6F4F8] rounded-lg border border-[#B6A8CD] overflow-hidden flex flex-col h-[490px]"> {/* Added h-[400px] */}
-                {/* Image Section (Unchanged) */}
-                <div className="relative w-full h-[200px] flex-shrink-0"> {/* Added flex-shrink-0 */}
+            <Link href={article.slug ? `/all-articles/${article.slug}` : `/all-articles/${article.id}`} passHref key={article.id} className="group">
+              <div className="bg-[#F6F4F8] rounded-xl border border-[#E0DBE8] overflow-hidden flex flex-col h-[490px]
+                             shadow-sm hover:shadow-xl transition-all duration-500 hover:-translate-y-1">
+                {/* Image Section */}
+                <div className="relative w-full h-[200px] flex-shrink-0 overflow-hidden">
                   <Image
                     src={imageUrl}
                     alt={`Cover image for ${article.title.rendered}`} 
                     fill
                     sizes="(max-width: 768px) 100vw, 33vw"
-                    className="object-cover" 
+                    className="object-cover transition-transform duration-500 group-hover:scale-105" 
                     priority
                   />
                 </div>
@@ -139,23 +151,23 @@ const HomePageStatiebi = () => {
                 {/* Text Section */}
                 <div className="p-4 flex flex-col flex-grow">
                   <div>
-                    <h2 className="text-lg font-bold mb-2 text-[#474F7A]">
+                    <h2 className="text-lg font-bold mb-2 text-[#474F7A] group-hover:text-[#AD88C6] transition-colors duration-300">
                       {article.title.rendered}
                     </h2>
-                    <span className="text-[#8D91AB] text-sm font-bold">
+                    <span className="text-[#8D91AB] text-sm font-medium">
                       {article.acf['ავტორი']}
                     </span>
-                    <p className="text-sm pt-4 text-black line-clamp-3"> {/* Ensure line-clamp-3 is applied */}
+                    <p className="text-sm pt-4 text-[#474F7A]/80 line-clamp-3">
                       {stripHtml(article.acf['main-text'])}
                     </p>
                   </div>
-                  <div className="flex justify-end pt-4 mt-auto"> {/* Added mt-auto */}
-                    <button
-                      aria-label={`Read full article: ${article.title.rendered}`} 
-                      className="text-white text-xs bg-[#AD88C6] rounded py-2 px-4"
+                  <div className="flex justify-end pt-4 mt-auto">
+                    <span
+                      className="text-white text-xs bg-[#AD88C6] rounded-full py-2 px-4
+                                 group-hover:bg-[#8B6AAE] transition-colors duration-300"
                     >
                       ნახეთ სრულად
-                    </button>
+                    </span>
                   </div>
                 </div>
               </div>

@@ -2,22 +2,21 @@
 
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import Image from "next/image";
-import MoreVideos from "./MoreVideos";
-import Link from "next/link";
 
 /**
- * Custom YouTube Player for Modals/Popups
- * Uses the same seamless design as NewsVideoPlayer
- * Includes MoreVideos feature for related content
+ * Custom Video Player with YouTube backend
+ * 
+ * Strategy for seamless experience:
+ * 1. POSTER STATE: Show thumbnail + custom play button (no YouTube visible)
+ * 2. LOADING STATE: Show thumbnail + spinner (YouTube loads invisibly behind)
+ * 3. PLAYING STATE: Show YouTube + transparent click overlay + our controls
+ * 4. PAUSED STATE: Show dark overlay hiding YouTube suggestions + play button
+ * 
+ * This approach hides YouTube's "More videos" panel that appears on pause
+ * by covering it with our branded overlay - like Netflix does.
  */
-export default function CustomYoutubePlayer({
-  videoUrl,
-  videoId,
-  onClose,
-  style,
-  customOverlayStyle,
-  numVideos = 4
-}) {
+
+export default function NewsVideoPlayer({ videoId }) {
   const containerRef = useRef(null);
   const playerRef = useRef(null);
   const playerInstanceRef = useRef(null);
@@ -25,7 +24,7 @@ export default function CustomYoutubePlayer({
   const hideControlsTimeout = useRef(null);
 
   // Player states
-  const [playerState, setPlayerState] = useState('poster');
+  const [playerState, setPlayerState] = useState('poster'); // poster, loading, ready, playing, paused, ended, buffering
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [progress, setProgress] = useState(0);
@@ -35,7 +34,7 @@ export default function CustomYoutubePlayer({
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isSeeking, setIsSeeking] = useState(false);
 
-  // YouTube thumbnail URLs
+  // YouTube thumbnail URLs (try maxres first, fallback to hq)
   const thumbnailUrl = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
   const fallbackThumbnail = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
   const [thumbnailSrc, setThumbnailSrc] = useState(thumbnailUrl);
@@ -46,14 +45,18 @@ export default function CustomYoutubePlayer({
   const isBuffering = playerState === 'buffering';
   const isLoading = playerState === 'loading';
   const hasStarted = playerState !== 'poster';
-  const showThumbnailOverlay = !isPlaying && ['poster', 'loading', 'paused', 'ended', 'buffering'].includes(playerState);
+  // Only show thumbnail overlay when NOT playing (so video is visible when playing)
+  // Show overlay for: poster, loading, paused, ended, buffering
+  // DON'T show for: playing, ready (when ready, video should be visible)
+  const showThumbnailOverlay = ['poster', 'loading', 'paused', 'ended', 'buffering'].includes(playerState);
 
-  function formatTime(timeInSeconds) {
-    if (!timeInSeconds || isNaN(timeInSeconds)) return "00:00";
-    const minutes = Math.floor(timeInSeconds / 60);
-    const seconds = Math.floor(timeInSeconds % 60);
-    return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
-  }
+  // Format time display
+  const formatTime = (seconds) => {
+    if (!seconds || isNaN(seconds)) return "00:00";
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+  };
 
   // Load YouTube IFrame API
   useEffect(() => {
@@ -77,9 +80,11 @@ export default function CustomYoutubePlayer({
     };
   }, []);
 
-  // Initialize player
+  // Initialize player when user clicks play
   const initializePlayer = useCallback(() => {
-    if (playerInstanceRef.current || !playerRef.current) return;
+    if (playerInstanceRef.current || !playerRef.current) {
+      return;
+    }
 
     const checkAndInit = () => {
       if (window.YT && window.YT.Player) {
@@ -115,6 +120,7 @@ export default function CustomYoutubePlayer({
       }
     };
 
+    // Wait for API to be ready
     if (window.YT && window.YT.Player) {
       checkAndInit();
     } else {
@@ -136,6 +142,7 @@ export default function CustomYoutubePlayer({
       } else {
         player.mute();
       }
+      // Player will auto-play due to autoplay: 1
       setPlayerState('ready');
     } catch (error) {
       console.error('Error in handlePlayerReady:', error);
@@ -156,13 +163,16 @@ export default function CustomYoutubePlayer({
       case window.YT.PlayerState.PLAYING:
         setPlayerState('playing');
         startProgressTracking();
+        // Update duration if not set
         if (playerInstanceRef.current) {
           try {
             const dur = playerInstanceRef.current.getDuration();
             if (dur > 0 && dur !== duration) {
               setDuration(dur);
             }
-          } catch (e) {}
+          } catch (e) {
+            console.error('Error getting duration:', e);
+          }
         }
         break;
       case window.YT.PlayerState.PAUSED:
@@ -204,15 +214,6 @@ export default function CustomYoutubePlayer({
       progressInterval.current = null;
     }
   };
-
-  // Initialize player when user clicks play
-  useEffect(() => {
-    if (hasStarted && !playerInstanceRef.current) {
-      if (window.YT && window.YT.Player) {
-        initializePlayer();
-      }
-    }
-  }, [hasStarted, initializePlayer]);
 
   // Control handlers
   const handlePlay = () => {
@@ -306,7 +307,7 @@ export default function CustomYoutubePlayer({
     return () => document.removeEventListener('fullscreenchange', handler);
   }, []);
 
-  // Auto-hide controls
+  // Auto-hide controls when playing
   const resetControlsTimer = useCallback(() => {
     setShowControls(true);
     if (hideControlsTimeout.current) clearTimeout(hideControlsTimeout.current);
@@ -325,6 +326,7 @@ export default function CustomYoutubePlayer({
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e) => {
+      // Don't capture if user is typing in an input
       if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
       
       switch (e.key) {
@@ -341,6 +343,14 @@ export default function CustomYoutubePlayer({
           e.preventDefault();
           skipTime(10);
           break;
+        case 'ArrowUp':
+          e.preventDefault();
+          handleVolumeChange({ target: { value: Math.min(100, volume + 10) } });
+          break;
+        case 'ArrowDown':
+          e.preventDefault();
+          handleVolumeChange({ target: { value: Math.max(0, volume - 10) } });
+          break;
         case 'f':
           e.preventDefault();
           toggleFullscreen();
@@ -352,8 +362,6 @@ export default function CustomYoutubePlayer({
         case 'Escape':
           if (isFullscreen) {
             document.exitFullscreen();
-          } else if (onClose) {
-            onClose();
           }
           break;
       }
@@ -361,46 +369,20 @@ export default function CustomYoutubePlayer({
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isPlaying, volume, currentTime, duration, isMuted, isFullscreen, onClose]);
+  }, [isPlaying, volume, currentTime, duration, isMuted, isFullscreen]);
 
   return (
     <div
       ref={containerRef}
       className="relative rounded-2xl overflow-hidden bg-black select-none"
-      style={{ 
-        boxShadow: '0 25px 50px -12px rgba(71, 79, 122, 0.35)',
-        ...style
-      }}
+      style={{ boxShadow: '0 25px 50px -12px rgba(71, 79, 122, 0.35)' }}
       onMouseMove={resetControlsTimer}
       onMouseLeave={() => isPlaying && setShowControls(false)}
     >
-      {/* Custom Overlay (MoreVideos) - Only show when not playing */}
-      {!isPlaying && customOverlayStyle && (
-        <div
-          className="absolute top-0 left-0 right-0 z-30 transition-opacity duration-300"
-          style={{ 
-            ...customOverlayStyle,
-            bottom: '100%',
-            paddingBottom: '1rem'
-          }}
-        >
-          <div className="flex flex-row justify-between pr-5 pt-2">
-            <Link
-              href="https://www.youtube.com/playlist?list=PL8wF1aEA4P8NJZUazilLH7ES-T-RQd3Cy"
-              target="_blank"
-              className="flex flex-col items-center"
-            >
-              <img src="/images/test.png" className="" alt="Playlist" />
-            </Link>
-            <MoreVideos numVideos={numVideos} />
-          </div>
-        </div>
-      )}
-
       {/* Aspect ratio container */}
       <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
         
-        {/* YouTube Player Container */}
+        {/* YouTube Player Container - Always present, YouTube will inject iframe here */}
         <div
           ref={playerRef}
           className="absolute inset-0 w-full h-full"
@@ -412,12 +394,17 @@ export default function CustomYoutubePlayer({
           }}
         />
 
-        {/* Thumbnail Overlay */}
-        {showThumbnailOverlay && (
+        {/* 
+          THUMBNAIL OVERLAY - Shows thumbnail when not playing
+          This hides YouTube's UI during poster/loading/paused states
+          IMPORTANT: Only show when NOT playing, so video is visible
+        */}
+        {showThumbnailOverlay && !isPlaying && (
           <div
             className="absolute inset-0 transition-opacity duration-300"
             style={{ zIndex: 10 }}
           >
+            {/* Thumbnail background */}
             <Image
               src={thumbnailSrc}
               alt="Video thumbnail"
@@ -426,14 +413,18 @@ export default function CustomYoutubePlayer({
               priority
               onError={() => setThumbnailSrc(fallbackThumbnail)}
             />
+            
+            {/* Gradient overlays for depth */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-black/30" />
+            
+            {/* Dark overlay when paused (hides YouTube suggestions) */}
             {(isPaused || playerState === 'ended') && (
               <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px]" />
             )}
           </div>
         )}
 
-        {/* Click area */}
+        {/* Click area for play/pause (above overlay, below controls) */}
         {hasStarted && (
           <div
             className="absolute inset-0 cursor-pointer"
@@ -449,14 +440,16 @@ export default function CustomYoutubePlayer({
             className="absolute inset-0 flex items-center justify-center pointer-events-none transition-opacity duration-300"
             style={{ zIndex: 20 }}
           >
-            {(isLoading || isBuffering) ? (
-              <div className="relative">
-                <div className="w-20 h-20 lg:w-24 lg:h-24 rounded-full border-4 border-white/20 border-t-[#AD88C6] animate-spin" />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-12 h-12 lg:w-14 lg:h-14 rounded-full bg-[#AD88C6]/20" />
-                </div>
+          {/* Loading spinner */}
+          {isLoading || isBuffering ? (
+            <div className="relative">
+              <div className="w-20 h-20 lg:w-24 lg:h-24 rounded-full border-4 border-white/20 border-t-[#AD88C6] animate-spin" />
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="w-12 h-12 lg:w-14 lg:h-14 rounded-full bg-[#AD88C6]/20" />
               </div>
-            ) : !isPlaying ? (
+            </div>
+          ) : !isPlaying ? (
+            /* Play button */
               <button
                 className="pointer-events-auto w-20 h-20 lg:w-24 lg:h-24 rounded-full bg-[#AD88C6] 
                           flex items-center justify-center shadow-2xl shadow-[#AD88C6]/40
@@ -465,10 +458,10 @@ export default function CustomYoutubePlayer({
                           transition-all duration-200"
                 onClick={handlePlay}
               >
-                <svg className="w-8 h-8 lg:w-10 lg:h-10 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M8 5v14l11-7z" />
-                </svg>
-              </button>
+              <svg className="w-8 h-8 lg:w-10 lg:h-10 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M8 5v14l11-7z" />
+              </svg>
+            </button>
             ) : null}
           </div>
         )}
@@ -494,16 +487,21 @@ export default function CustomYoutubePlayer({
           >
             {/* Progress bar */}
             <div className="relative h-1.5 group/progress cursor-pointer bg-white/20 hover:h-2 transition-all hover:bg-white/30">
+              {/* Played progress */}
               <div
-                className="absolute top-0 left-0 h-full bg-[#AD88C6] rounded-r transition-all group-hover/progress:bg-[#9B7BB4] group-hover/progress:shadow-[0_0_8px_rgba(173,136,198,0.6)]"
+                className="absolute top-0 left-0 h-full bg-[#AD88C6] transition-all group-hover/progress:bg-[#9B7BB4] group-hover/progress:shadow-[0_0_8px_rgba(173,136,198,0.6)]"
                 style={{ width: `${progress}%` }}
               />
+              
+              {/* Scrubber thumb */}
               <div
-                className="absolute top-1/2 -translate-y-1/2 w-4 h-4 bg-white rounded-full shadow-lg 
+                className="absolute top-1/2 -translate-y-1/2 w-4 h-4 bg-white rounded-full shadow-lg
                           scale-0 group-hover/progress:scale-100 transition-transform
                           group-hover/progress:shadow-[0_0_12px_rgba(173,136,198,0.8)] group-hover/progress:ring-2 group-hover/progress:ring-[#AD88C6]/50"
                 style={{ left: `calc(${progress}% - 8px)` }}
               />
+              
+              {/* Invisible range input */}
               <input
                 type="range"
                 className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
@@ -639,14 +637,16 @@ export default function CustomYoutubePlayer({
         )}
       </div>
 
-      {/* CSS to hide YouTube elements */}
+      {/* CSS to ensure YouTube iframe is visible and hide unwanted elements */}
       <style jsx global>{`
+        /* Ensure YouTube iframe is visible when playing */
         iframe[src*="youtube.com"] {
           display: block !important;
           opacity: 1 !important;
           visibility: visible !important;
         }
         
+        /* Hide YouTube UI elements we don't want */
         .ytp-chrome-top,
         .ytp-chrome-bottom,
         .ytp-watermark,

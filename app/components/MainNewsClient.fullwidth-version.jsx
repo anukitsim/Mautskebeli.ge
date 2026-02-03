@@ -98,8 +98,7 @@ const MainNewsClient = ({ slides }) => {
       {/* Desktop View */}
       <div className="lg:block sm:hidden w-full">
         <section 
-          className="relative w-full h-full min-h-[500px] rounded-[20px] overflow-hidden
-                     ring-1 ring-black/5 group"
+          className="relative w-full h-[550px] rounded-[16px] overflow-hidden group"
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
         >
@@ -135,12 +134,8 @@ const MainNewsClient = ({ slides }) => {
                 />
               </div>
               
-              {/* Gradient Overlay - More sophisticated */}
-              <div className={`absolute inset-0 bg-gradient-to-t from-[#1a1a2e]/85 via-[#1a1a2e]/30 to-transparent transition-opacity duration-[1400ms] ${
-                index === currentSlide ? 'opacity-100' : 'opacity-0'
-              }`} />
-              {/* Subtle vignette */}
-              <div className={`absolute inset-0 shadow-[inset_0_0_100px_rgba(0,0,0,0.3)] transition-opacity duration-[1400ms] ${
+              {/* Gradient Overlay */}
+              <div className={`absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent transition-opacity duration-[1400ms] ${
                 index === currentSlide ? 'opacity-100' : 'opacity-0'
               }`} />
               
