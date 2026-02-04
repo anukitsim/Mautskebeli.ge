@@ -8,97 +8,38 @@ const SportsArticles = ({ compact = false }) => {
   const [articles, setArticles] = useState([]);
 
   const stripHtml = (html) => {
+    if (!html) return '';
     const doc = new DOMParser().parseFromString(html, 'text/html');
-    return doc.body.textContent || "";
-  };
-
-  const truncateText = (text, limit) => {
-    const words = text.split(' ');
-    if (words.length > limit) {
-      return words.slice(0, limit).join(' ') + '...';
-    }
-    return text;
-  };
-
-  const verifyImageUrl = async (url) => {
-    try {
-      const response = await fetch(url, { method: 'HEAD' });
-      return response.ok;
-    } catch {
-      return false;
-    }
+    return doc.body.textContent || '';
   };
 
   useEffect(() => {
     const fetchArticles = async () => {
       try {
-        const response = await fetch(`https://mautskebeli.wpenginepowered.com/wp-json/wp/v2/sport-article?acf_format=standard&_fields=id,title,acf,date&_=${new Date().getTime()}`);
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
-        const sortedArticles = data.sort((a, b) => new Date(b.date) - new Date(a.date));
-        const lastThreeArticles = sortedArticles.slice(0, 3);
-
-        // Verify image URLs and retry if necessary
-        for (let article of lastThreeArticles) {
-          if (article.acf.image && !(await verifyImageUrl(article.acf.image))) {
-            console.warn(`Image not available immediately: ${article.acf.image}`);
-            setTimeout(async () => {
-              if (await verifyImageUrl(article.acf.image)) {
-                console.log(`Image now available: ${article.acf.image}`);
-                setArticles((prevArticles) =>
-                  prevArticles.map((prevArticle) =>
-                    prevArticle.id === article.id
-                      ? { ...prevArticle, acf: { ...prevArticle.acf, image: article.acf.image } }
-                      : prevArticle
-                  )
-                );
-              } else {
-                console.error(`Image still not available: ${article.acf.image}`);
-              }
-            }, 5000); // Retry after 5 seconds
-          }
-        }
-
-        setArticles(lastThreeArticles);
-      } catch (error) {
-        console.error('Error fetching articles:', error);
+        const res = await fetch(
+          `https://mautskebeli.wpenginepowered.com/wp-json/wp/v2/sport-article?acf_format=standard&_fields=id,title,acf,date,slug&per_page=3&_=${Date.now()}`
+        );
+        if (!res.ok) throw new Error('Fetch failed');
+        const data = await res.json();
+        const sorted = data.sort((a, b) => new Date(b.date) - new Date(a.date));
+        setArticles(sorted.slice(0, 3));
+      } catch (e) {
+        console.error('Error fetching sport articles:', e);
       }
     };
-
     fetchArticles();
   }, []);
 
   return (
-    <section className={`mx-auto flex flex-col ${compact ? 'mt-8 lg:mt-10' : 'mt-[110px]'}`}>
-      <style jsx global>{`
-        @media (max-width: 768px) {
-          .article:first-child {
-            flex: 0 0 100%;
-          }
-
-          .articles-container {
-            flex-wrap: nowrap;
-          }
-
-          .article:not(:first-child){
-            flex: 0 0 100%
-          }
-
-          .article {
-            flex: 0 0 auto;
-          }
-        }
-      `}</style>
-      <div className="w-full sm:w-10/12 flex items-center justify-between mx-auto pl-4 pr-4 lg:pl-2 lg:pr-2 mb-6 lg:mb-8">
+    <section className={`mx-auto w-11/12 md:w-10/12 flex flex-col ${compact ? 'mt-8 lg:mt-10' : 'mt-12 lg:mt-16'}`}>
+      <div className="flex items-center justify-between mb-6 lg:mb-8">
         <div className="flex items-center gap-3">
-          <div className="w-1.5 h-10 bg-[#AD88C6] rounded-full" />
-          <h2 className="text-[#474F7A] text-2xl lg:text-3xl font-bold">სტატიები</h2>
+          <div className="w-1.5 h-10 bg-[#FECE27] rounded-full" />
+          <h2 className="text-white text-2xl lg:text-3xl font-bold drop-shadow-sm">სტატიები</h2>
         </div>
-        <Link 
-          href="/sport-articles" 
-          className="text-[#474F7A] text-sm font-semibold hover:text-[#AD88C6] 
+        <Link
+          href="/sport-articles"
+          className="text-white/90 text-sm font-semibold hover:text-[#FECE27]
                      transition-colors duration-300 flex items-center gap-2 group"
         >
           <span>ნახე ყველა</span>
@@ -107,40 +48,81 @@ const SportsArticles = ({ compact = false }) => {
           </svg>
         </Link>
       </div>
-      <div className="w-10/12 mx-auto flex articles-container overflow-x-auto mt-5 flex-row gap-5">
-        {articles.map(article => {
-          const imageUrl = article.acf.image ? article.acf.image : '/images/default-image.png';
+
+      {/* Mobile horizontal scroll */}
+      <div className="flex lg:hidden overflow-x-auto gap-4 pb-4 -mx-4 px-4 hide-scroll-bar">
+        {articles.map((article) => {
+          const imageUrl = article.acf?.image || '/images/default-image.png';
+          const href = `/sport-articles/${article.id}`;
           return (
-            <Link href={`/sport-articles/${article.id}`} passHref key={article.id}>
-              <div className="article bg-[#F6F4F8] rounded-tl-[10px] rounded-tr-[10px] border border-[#B6A8CD] overflow-hidden" style={{ minWidth: '300px', maxWidth: '400px' }}>
-                <div className="article-image-container relative w-full h-[200px]">
+            <Link href={href} key={article.id} className="group flex-none w-[300px]">
+              <div className="bg-[#F6F4F8] rounded-xl border border-[#E0DBE8] overflow-hidden flex flex-col h-[500px]
+                             shadow-sm hover:shadow-xl transition-all duration-500 hover:-translate-y-1">
+                <div className="relative w-full h-[200px] flex-shrink-0 overflow-hidden">
                   <Image
                     src={imageUrl}
-                    alt="article-cover"
+                    alt=""
                     fill
-                    sizes="(max-width: 768px) 100vw, 33vw"
-                    style={{ objectFit: 'cover' }}
-                    className="article-image"
-                    priority
+                    sizes="300px"
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
                   />
                 </div>
-                <div className="p-[18px]">
-                  <h2 className="text-[20px] font-bold mb-2" style={{ color: '#474F7A' }}>
-                    {article.title.rendered}
+                <div className="p-4 flex flex-col flex-grow">
+                  <h2 className="text-base font-bold mb-2 text-[#474F7A] group-hover:text-[#5F4AA5] transition-colors duration-300 line-clamp-2">
+                    {article.title?.rendered}
                   </h2>
-                  <span className="text-[#8D91AB] text-[14px] font-bold">
-                  {article.acf['ავტორი']}
+                  <span className="text-[#8D91AB] text-sm font-medium">
+                    {article.acf?.['ავტორი']}
                   </span>
-                  <p className="text-sm pt-[18px]" style={{ color: '#000' }}>
-                    {truncateText(stripHtml(article.acf['main-text']), 30)}
+                  <p className="text-sm pt-4 text-[#474F7A]/80 line-clamp-3">
+                    {stripHtml(article.acf?.['main-text'])}
                   </p>
-                  <div className="flex flex-col justify-end pt-[30px] items-end">
-                    <span className="text-[15px] text-[#AD88C6]">
-                      {article.acf.translator} 
-                    </span>
-                    <button className="text-white text-[12px] mt-[16px] bg-[#AD88C6] rounded-[6px] pt-[10px] pb-[10px] pl-[12px] pr-[12px]">
+                  <div className="flex justify-end pt-4 mt-auto">
+                    <span className="text-[#5F4AA5] text-xs font-semibold bg-[#FECE27] rounded-full py-2 px-4
+                                   group-hover:bg-[#FECE27]/90 group-hover:shadow-md transition-all duration-300">
                       ნახეთ სრულად
-                    </button>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </Link>
+          );
+        })}
+      </div>
+
+      {/* Desktop grid */}
+      <div className="hidden lg:grid grid-cols-1 sm:grid-cols-3 gap-5">
+        {articles.map((article) => {
+          const imageUrl = article.acf?.image || '/images/default-image.png';
+          const href = `/sport-articles/${article.id}`;
+          return (
+            <Link href={href} key={article.id} className="group">
+              <div className="bg-[#F6F4F8] rounded-xl border border-[#E0DBE8] overflow-hidden flex flex-col h-[490px]
+                             shadow-sm hover:shadow-xl transition-all duration-500 hover:-translate-y-1">
+                <div className="relative w-full h-[200px] flex-shrink-0 overflow-hidden">
+                  <Image
+                    src={imageUrl}
+                    alt=""
+                    fill
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                </div>
+                <div className="p-4 flex flex-col flex-grow">
+                  <h2 className="text-lg font-bold mb-2 text-[#474F7A] group-hover:text-[#AD88C6] transition-colors duration-300 line-clamp-2">
+                    {article.title?.rendered}
+                  </h2>
+                  <span className="text-[#8D91AB] text-sm font-medium">
+                    {article.acf?.['ავტორი']}
+                  </span>
+                  <p className="text-sm pt-4 text-[#474F7A]/80 line-clamp-3">
+                    {stripHtml(article.acf?.['main-text'])}
+                  </p>
+                  <div className="flex justify-end pt-4 mt-auto">
+                    <span className="text-[#5F4AA5] text-xs font-semibold bg-[#FECE27] rounded-full py-2 px-4
+                                   group-hover:bg-[#FECE27]/90 group-hover:shadow-md transition-all duration-300">
+                      ნახეთ სრულად
+                    </span>
                   </div>
                 </div>
               </div>

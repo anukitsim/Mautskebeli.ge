@@ -1064,6 +1064,22 @@ a.scale-on-hover:hover {
   animation: fadeIn 0.3s ease-in-out forwards;
 }
 
+/* Donation banner icon: very subtle pulse */
+@keyframes donation-icon-pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.02);
+    opacity: 0.95;
+  }
+}
+
+.donation-icon-pulse {
+  animation: donation-icon-pulse 3.5s ease-in-out infinite;
+}
+
 /* ===== TRANSLATION STABILITY - CRITICAL ===== */
 /* Prevent flickering when Google Translate is active */
 html.translated-ltr,

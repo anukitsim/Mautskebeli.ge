@@ -53,50 +53,49 @@ const SportFooter = () => {
           <h1 className="text-[#FECE27] text-[16px] font-bold">კონტაქტი</h1>
           <div className="flex gap-[10px] text-[16px] text-[#FFFFFF]">
             <Image src="/images/mail-white.svg" alt="mail" width={0} height={0} style={{ width: "auto", height: "20px" }} />
-            <a href="mailto:platformforsj@gmail.com" className="text-[16px]">platformforsj@gmail.com</a>
+            <a href="mailto:platformforsj@gmail.com" className="text-[16px] hover:text-[#FECE27] transition-colors">platformforsj@gmail.com</a>
           </div>
           <div className="flex gap-[10px] text-[#FFFFFF] text-[16px]">
             <Image src="/images/phone-white.svg" alt="phone" width={0} height={0} style={{ width: "auto", height: "20px" }} />
-            <a href="tel:+995574831085" className="text-[16px]">+995 574 83 10 85</a>
+            <a href="tel:+995574831085" className="text-[16px] hover:text-[#FECE27] transition-colors">+995 574 83 10 85</a>
           </div>
           <div className="flex gap-[10px] text-[#FFFFFF]">
             <Image src="/images/location-white.svg" alt="location" width={0} height={0} style={{ width: 'auto', height: '20px' }} />
-            <a href="https://www.google.com/maps/search/?api=1&query=Kostava+30,+Batumi" target="_blank" className="text-[16px] whitespace-nowrap">ბათუმი, კოსტავას 30</a>
+            <a href="https://www.google.com/maps/search/?api=1&query=Kostava+30,+Batumi" target="_blank" className="text-[16px] whitespace-nowrap hover:text-[#FECE27] transition-colors">ბათუმი, კოსტავას 30</a>
           </div>
           <Link href='/'>
-          <Image src="/images/sport-logo-white.svg" alt="logo" width={116} height={32} className="mt-[32px]" />
+          <Image src="/images/sport-logo.svg" alt="სპორტი logo" width={116} height={40} className="mt-[32px]" />
           </Link>
         
         </div>
         <div className="h-full w-1/3 flex flex-col gap-[18px]">
           <h1 className="text-[#FECE27] text-[16px] font-bold">ნავიგაცია</h1>
-          <Link href="/about-us" className="text-[#FFFFFF]">ჩვენ შესახებ</Link>
-          
-          <Link href="/all-videos" className="text-[#FFFFFF]">ვიდეოები</Link>
-          <Link href="/text" className="text-[#FFFFFF]">ტექსტი</Link>
-          <Link href="/sporti" className="text-[#FFFFFF]">სპორტი</Link>
-          <Link href='/bolo-ambebi' className="text-[#FFFFFF]">ამბები</Link>
+          <Link href="/about-us" className="text-[#FFFFFF] hover:text-[#FECE27] transition-colors">ჩვენ შესახებ</Link>
+          <Link href="/all-videos" className="text-[#FFFFFF] hover:text-[#FECE27] transition-colors">ვიდეოები</Link>
+          <Link href="/text" className="text-[#FFFFFF] hover:text-[#FECE27] transition-colors">ტექსტი</Link>
+          <Link href="/sporti" className="text-[#FFFFFF] hover:text-[#FECE27] transition-colors">სპორტი</Link>
+          <Link href="/news" className="text-[#FFFFFF] hover:text-[#FECE27] transition-colors">ამბები</Link>
         </div>
         <div className="h-full w-1/3 flex flex-col gap-[16px]">
         <h1 className="text-[#FECE27] text-[16px] font-bold">გამოგვიწერე</h1>
       
-        <Link href='https://www.facebook.com/mautskebeli.ge' target='_blank' className="flex gap-[10px] text-[#FFFFFF] text-[16px]">
+        <Link href='https://www.facebook.com/mautskebeli.ge' target='_blank' className="flex gap-[10px] text-[#FFFFFF] hover:text-[#FECE27] text-[16px] transition-colors">
             <Image src="/images/facebook-white.svg" alt="mail" width={20} height={20} />
             <span>Facebook</span>
           </Link>
-          <Link href='https://www.youtube.com/@mautskebeli' target='_blank' className="flex gap-[10px] text-[#FFFFFF] text-[16px]">
+          <Link href='https://www.youtube.com/@mautskebeli' target='_blank' className="flex gap-[10px] text-[#FFFFFF] hover:text-[#FECE27] text-[16px] transition-colors">
             <Image src="/images/youtube-white.svg" alt="mail" width={20} height={20} />
             <span>YouTube</span>
           </Link>
-          <Link href='https://www.instagram.com/mautskebeli.ge/' target='_blank' className="flex gap-[10px] text-[#FFFFFF]">
+          <Link href='https://www.instagram.com/mautskebeli.ge/' target='_blank' className="flex gap-[10px] text-[#FFFFFF] hover:text-[#FECE27] transition-colors">
             <Image src="/images/instagram-white.svg" alt="mail" width={20} height={20} />
             <span className="text-[16px] whitespace-nowrap">Instagram</span>
           </Link>
-          <Link href='https://www.tiktok.com/@mautskebeli.ge' target='_blank' className="flex gap-[10px] text-[#FFFFFF] text-[16px]">
+          <Link href='https://www.tiktok.com/@mautskebeli.ge' target='_blank' className="flex gap-[10px] text-[#FFFFFF] hover:text-[#FECE27] text-[16px] transition-colors">
             <Image src="/images/tiktok-white.svg" alt="mail" width={20} height={20} />
             <span>TikTok</span>
           </Link>
-          <Link href='https://x.com/mautskebeli' target='_blank' className="flex gap-[10px] text-[#FFFFFF] text-[16px]">
+          <Link href='https://x.com/mautskebeli' target='_blank' className="flex gap-[10px] text-[#FFFFFF] hover:text-[#FECE27] text-[16px] transition-colors">
             <Image src="/images/x-white.svg" alt="mail" width={20} height={20} />
             <span>X Twitter</span>
           </Link>
@@ -165,7 +164,7 @@ const SportFooter = () => {
 
       {/* Mobile screen Footer */}
       <footer className="flex lg:hidden bg-[#AD88C6] flex-col justify-center mt-[42px] gap-[32px] items-center">
-        <Image src="/images/white-logo.svg" alt="logo" width={116} height={32} className="mt-[32px]" />
+        <Image src="/images/sport-logo.svg" alt="სპორტი logo" width={116} height={40} className="mt-[32px]" />
         <div className="flex flex-col justify-center items-center gap-[18px]">
           <h1 className="text-white text-[15px] font-bold">კონტაქტი</h1>
           <div className="flex gap-[10px]  text-[#474F7A] text-[15px]">

@@ -57,12 +57,12 @@ export default function Home() {
           <section className="px-0 mt-12 lg:mt-16">
             <HomePageRcheuli />
           </section>
-
-          {/* Donation Banner */}
-          {/* <section className="px-4 lg:px-8 mt-12 lg:mt-16">
-            <DonationBanner />
-          </section> */}
         </div>
+
+        {/* Donation Banner - full width, after მაუწყებელი გირჩევთ, before footer */}
+        <section className="mt-12 lg:mt-16 w-full">
+          <DonationBanner />
+        </section>
 
         <Footer />
       </main>

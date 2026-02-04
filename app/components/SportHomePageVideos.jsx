@@ -1,108 +1,134 @@
-"use client";
+'use client';
 
-import React, { useEffect, useState, useCallback } from "react";
-import Modal from "react-modal";
-import Image from "next/image";
-import CustomYoutubePlayer from "./CustomYoutube";
-import Link from "next/link";
+import React, { useEffect, useState, useCallback } from 'react';
+import Modal from 'react-modal';
+import Image from 'next/image';
+import CustomYoutubePlayer from './CustomYoutube';
+import Link from 'next/link';
 
-const PlayButton = ({ onClick }) => (
-  <img
-    src="/images/card-play-button.svg"
-    alt="play button"
-    width={42}
-    height={42}
-    onClick={onClick}
-    className="cursor-pointer transform hover:scale-110"
-  />
-);
+const decodeHtmlEntities = (text) => {
+  if (typeof window === 'undefined') return text || '';
+  if (!text) return '';
+  const textArea = document.createElement('textarea');
+  textArea.innerHTML = text;
+  return textArea.value;
+};
 
 const extractVideoId = (videoUrl) => {
   if (!videoUrl) return null;
-  const match = videoUrl.match(
+  const match = String(videoUrl).match(
     /(?:youtube\.com\/(?:[^/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?/\s]{11})/
   );
   return match ? match[1] : null;
 };
 
-const getThumbnailUrl = (videoId) => {
-  return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
-};
+const getThumbnailUrl = (videoId) =>
+  `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
 
-const VideoCard = ({ videoId, caption, onSelect, postType }) => {
+const VideoCard = ({ videoId, postId, caption, onSelect, isMobile, index }) => {
   const thumbnailUrl = getThumbnailUrl(videoId);
+  const videoPageUrl = `/all-sport-videos/${postId}`;
 
   const handlePlayClick = (e) => {
-    e.stopPropagation(); // Prevent the card click from propagating
-    onSelect(videoId);
+    e.preventDefault();
+    e.stopPropagation();
+    if (!isMobile) {
+      onSelect(videoId);
+    } else {
+      window.location.href = videoPageUrl;
+    }
   };
 
-  const videoPageUrl = `/${postType}?videoId=${videoId}`;
-
   return (
-    <div
-      className="relative flex flex-col items-start gap-2 p-2.5 rounded-lg bg-[#AD88C6] h-56"
-    >
-      <div
-        className="relative w-full bg-cover bg-center rounded-lg"
-        style={{ height: "70%" }}
-        onClick={handlePlayClick}
+    <Link href={videoPageUrl} className="group block">
+      <article
+        className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-2xl
+                   transition-all duration-500 transform hover:-translate-y-2
+                   border border-[#E0DBE8]/30 h-full"
+        style={{
+          animationDelay: `${index * 100}ms`,
+          animation: 'slideUp 0.6s ease-out forwards',
+          opacity: 0,
+        }}
       >
-        <div
-          style={{ backgroundImage: `url(${thumbnailUrl})`, height: "100%" }}
-          className="w-full bg-cover bg-center rounded-lg"
-        ></div>
-        <div className="absolute inset-0 flex justify-center items-center">
-          <PlayButton onClick={handlePlayClick} />
+        <div className="relative aspect-video overflow-hidden">
+          <Image
+            src={thumbnailUrl}
+            alt={decodeHtmlEntities(caption)}
+            fill
+            sizes="(max-width: 768px) 100vw, 25vw"
+            className="object-cover transition-transform duration-700 ease-out group-hover:scale-110"
+          />
+          <div
+            className="absolute inset-0 flex items-center justify-center
+                       bg-gradient-to-t from-black/50 via-black/20 to-transparent
+                       opacity-0 group-hover:opacity-100 transition-all duration-300"
+            onClick={handlePlayClick}
+          >
+            <div className="w-14 h-14 rounded-full bg-white/95 shadow-xl flex items-center justify-center
+                           transform scale-75 group-hover:scale-100 transition-transform duration-300">
+              <svg className="w-6 h-6 text-[#5F4AA5] ml-1" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M8 5v14l11-7z" />
+              </svg>
+            </div>
+          </div>
         </div>
-      </div>
-      <Link href={videoPageUrl} className="text-white text-sm font-semibold cursor-pointer">
-        {caption}
-      </Link>
-    </div>
+        <div className="p-4">
+          <h3 className="text-[#474F7A] text-sm font-bold leading-snug line-clamp-2
+                        transition-colors duration-300 group-hover:text-[#5F4AA5] mb-2">
+            {decodeHtmlEntities(caption)}
+          </h3>
+          <div className="flex items-center gap-2 opacity-0 transform translate-y-2
+                         group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
+            <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-semibold
+                           text-[#5F4AA5] bg-[#FECE27]/20 border border-[#FECE27]/40">
+              სპორტი
+            </span>
+          </div>
+        </div>
+      </article>
+    </Link>
   );
 };
 
 function SportHomePageVideos({ compact = false }) {
-  const [randomVideos, setRandomVideos] = useState([]);
+  const [videos, setVideos] = useState([]);
   const [selectedVideoId, setSelectedVideoId] = useState(null);
   const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     if (document.getElementById('__next')) {
-      Modal.setAppElement('#__next'); // Setting the app element
+      Modal.setAppElement('#__next');
     }
+    const check = () => setIsMobile(window.innerWidth <= 768);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
   }, []);
 
-  const fetchRandomVideos = async () => {
-    const endpoint = "https://mautskebeli.wpenginepowered.com/wp-json/wp/v2/";
-    try {
-      const postTypes = ["sporti-videos"];
-      const requests = postTypes.map((postType) =>
-        fetch(`${endpoint}${postType}?acf_format=standard&_fields=id,title,acf,date`)
-      );
-      const responses = await Promise.all(requests);
-      const videos = await Promise.all(
-        responses.map((response) => {
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          } else {
-            return response.json();
-          }
-        })
-      );
-      const allVideos = videos.flat().map(video => ({
-        ...video,
-        post_type: "all-sport-videos" // Ensure that post_type is correctly passed
-      })).slice(0, 4);
-      setRandomVideos(allVideos);
-    } catch (error) {
-      console.error("Error fetching videos:", error);
-    }
-  };
-
   useEffect(() => {
-    fetchRandomVideos();
+    const fetchVideos = async () => {
+      try {
+        const res = await fetch(
+          'https://mautskebeli.wpenginepowered.com/wp-json/wp/v2/sporti-videos?acf_format=standard&_fields=id,title,acf,date&per_page=4'
+        );
+        if (!res.ok) throw new Error('Fetch failed');
+        const data = await res.json();
+        const withVideoId = data
+          .map((v) => {
+            const url = v.acf?.video_url || v.acf?.video;
+            const videoId = extractVideoId(url);
+            return videoId ? { ...v, videoId, postId: v.id } : null;
+          })
+          .filter(Boolean)
+          .slice(0, 4);
+        setVideos(withVideoId);
+      } catch (e) {
+        console.error('Error fetching sport videos:', e);
+      }
+    };
+    fetchVideos();
   }, []);
 
   const handleVideoSelect = useCallback((videoId) => {
@@ -115,62 +141,60 @@ function SportHomePageVideos({ compact = false }) {
     setSelectedVideoId(null);
   }, []);
 
-  const handleModalClick = useCallback((e) => {
-    closeModal();
-  }, [closeModal]);
-
-  const handleVideoContainerClick = useCallback((e) => {
-    e.stopPropagation();
-  }, []);
+  const handleModalClick = useCallback((e) => closeModal(), [closeModal]);
+  const handleVideoContainerClick = useCallback((e) => e.stopPropagation(), []);
 
   return (
     <>
-      <div className={`w-full sm:w-10/12 flex items-center justify-between mx-auto pl-4 pr-4 lg:pl-2 lg:pr-2 mb-6 lg:mb-8 ${compact ? 'mt-0' : 'lg:mt-20 mt-[42px]'}`}>
-        <div className="flex items-center gap-3">
-          <div className="w-1.5 h-10 bg-[#AD88C6] rounded-full" />
-          <h2 className="text-[#474F7A] text-2xl lg:text-3xl font-bold">ვიდეო</h2>
+      <section className={`mx-auto w-11/12 md:w-10/12 ${compact ? 'mt-0' : 'mt-12 lg:mt-16'}`}>
+        <div className="flex items-center justify-between mb-6 lg:mb-8">
+          <div className="flex items-center gap-3">
+            <div className="w-1.5 h-10 bg-[#FECE27] rounded-full" />
+            <h2 className="text-white text-2xl lg:text-3xl font-bold drop-shadow-sm">ვიდეო</h2>
+          </div>
+          <Link
+            href="/all-sport-videos"
+            className="text-white/90 text-sm font-semibold hover:text-[#FECE27]
+                       transition-colors duration-300 flex items-center gap-2 group"
+          >
+            <span>ნახე ყველა</span>
+            <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </Link>
         </div>
-        <Link 
-          href="/all-sport-videos" 
-          className="text-[#474F7A] text-sm font-semibold hover:text-[#AD88C6] 
-                     transition-colors duration-300 flex items-center gap-2 group"
-        >
-          <span>ნახე ყველა</span>
-          <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-          </svg>
-        </Link>
-      </div>
-      <div className="flex sm:hidden overflow-x-auto hide-scroll-bar pl-2">
-        <div className="flex">
-          {randomVideos.map((video) => (
-            <div key={video.id} className="inline-block px-2 w-[248px]">
+
+        <div className="flex lg:hidden overflow-x-auto gap-4 hide-scroll-bar pb-4 -mx-4 px-4">
+          {videos.map((video, index) => (
+            <div key={video.id} className="w-[280px] flex-shrink-0">
               <VideoCard
-                videoId={extractVideoId(video.acf?.video)}
-                caption={video.title.rendered}
+                videoId={video.videoId}
+                postId={video.postId}
+                caption={video.title?.rendered || ''}
                 onSelect={handleVideoSelect}
-                postType={video.post_type} // Passing post_type correctly
+                isMobile={isMobile}
+                index={index}
               />
             </div>
           ))}
         </div>
-      </div>
-      <section className="lg:flex hidden w-10/12 mt-5 gap-[20px] mx-auto">
-        {randomVideos.map((video) => (
-          <div
-            key={video.id}
-            className="px-2 w-full sm:w-1/2 md:w-1/3 lg:w-1/4"
-          >
+
+        <div className="hidden lg:grid grid-cols-4 gap-6">
+          {videos.map((video, index) => (
             <VideoCard
-              videoId={extractVideoId(video.acf?.video)}
-              caption={video.title.rendered}
+              key={video.id}
+              videoId={video.videoId}
+              postId={video.postId}
+              caption={video.title?.rendered || ''}
               onSelect={handleVideoSelect}
-              postType={video.post_type} // Ensuring post_type is passed correctly
+              isMobile={isMobile}
+              index={index}
             />
-          </div>
-        ))}
+          ))}
+        </div>
       </section>
-      {selectedVideoId && (
+
+      {selectedVideoId && !isMobile && (
         <Modal
           isOpen={modalIsOpen}
           onRequestClose={closeModal}
@@ -178,13 +202,8 @@ function SportHomePageVideos({ compact = false }) {
           ariaHideApp={false}
           className="modalContent z-40"
           style={{
-            overlay: {
-              zIndex: 1000,
-              backgroundColor: "rgba(0, 0, 0, 0.75)",
-            },
-            content: {
-              outline: 'none' // Remove outline from modal content
-            }
+            overlay: { zIndex: 1000, backgroundColor: 'rgba(0, 0, 0, 0.85)' },
+            content: { outline: 'none' },
           }}
         >
           <div className="modalContentArea" onClick={handleModalClick}>
@@ -194,12 +213,23 @@ function SportHomePageVideos({ compact = false }) {
           </div>
           <button
             onClick={closeModal}
-            className="absolute top-2 left-2 sm:top-4 sm:left-4 lg:top-10 lg:left-10 z-50"
+            className="absolute top-4 right-4 lg:top-10 lg:right-10 z-50
+                       w-12 h-12 rounded-full bg-white/10 hover:bg-white/20
+                       flex items-center justify-center transition-colors duration-300"
           >
-            <Image src="/images/cross.svg" alt="close" width={70} height={70} priority />
+            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
           </button>
         </Modal>
       )}
+
+      <style jsx global>{`
+        @keyframes slideUp {
+          from { opacity: 0; transform: translateY(30px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
     </>
   );
 }

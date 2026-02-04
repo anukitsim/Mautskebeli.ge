@@ -22,7 +22,7 @@ export default function RootLayout({ children }) {
       <head>
       <link rel="icon" href="/favicon.ico" />
       </head>
-      <body className='bg-[#AD88C6]'>
+      <body className="bg-[#AD88C6]">
         <LanguageProvider>
         {children}
         
