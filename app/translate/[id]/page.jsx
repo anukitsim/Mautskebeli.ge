@@ -25,15 +25,10 @@ async function fetchTranslation(id) {
 
   try {
     const res = await fetch(apiUrl, { next: { revalidate: 10 } });
-    if (!res.ok) {
-      console.error(`Failed to fetch translation with id ${id}: ${res.statusText}`);
-      return null;
-    }
+    if (!res.ok) return null;
     const data = await res.json();
-    console.log("Fetched translation data:", data); // Debugging log
     return data;
   } catch (error) {
-    console.error(`Error fetching translation with id ${id}:`, error);
     return null;
   }
 }
@@ -46,32 +41,40 @@ export async function generateMetadata({ params }) {
   const { id } = params;
   const translation = await fetchTranslation(id);
 
-  // If no data found, return a 404-friendly metadata
   if (!translation) {
-    console.log("Translation not found for ID:", id);
     return {
       title: "Translation Not Found",
       description: "This translation does not exist.",
     };
   }
 
-  // Build out SEO metadata
   const decodedTitle = decode(translation.title.rendered || "");
-  const description =
-    translation.acf.description || translation.acf.sub_title || "";
-  const imageUrl = translation.acf.image?.startsWith("http")
-    ? translation.acf.image
-    : `https://mautskebeli.wpenginepowered.com${translation.acf.image}`;
+  const rawDescription =
+    translation.acf?.description || translation.acf?.sub_title || "";
+  const decodedDescription = decode(rawDescription);
 
-  console.log("Generated og:image URL:", imageUrl);
+  const baseUrl = process.env.NEXT_PUBLIC_WORDPRESS_API_URL || "https://mautskebeli.wpenginepowered.com";
+  let imageUrl = "https://www.mautskebeli.ge/images/default-og-image.jpg";
+  if (translation.acf?.image) {
+    const img = translation.acf.image;
+    if (typeof img === "string") {
+      imageUrl = img.startsWith("http") ? img : `${baseUrl}${img}`;
+    } else if (typeof img === "object" && img?.url) {
+      imageUrl = img.url.startsWith("http") ? img.url : `${baseUrl}${img.url}`;
+    }
+  }
+  imageUrl = imageUrl.split("?")[0];
+
+  const metadataBase = new URL("https://www.mautskebeli.ge");
 
   return {
+    metadataBase,
     title: decodedTitle,
-    description,
+    description: decodedDescription,
     openGraph: {
       title: decodedTitle,
-      description,
-      url: `https://www.mautskebeli.ge/translate/${id}`,
+      description: decodedDescription,
+      url: `/translate/${id}`,
       type: "article",
       images: [imageUrl],
       locale: "ka_GE",
@@ -80,7 +83,7 @@ export async function generateMetadata({ params }) {
     twitter: {
       card: "summary_large_image",
       title: decodedTitle,
-      description,
+      description: decodedDescription,
       images: [imageUrl],
     },
   };
@@ -95,23 +98,53 @@ function formatDate(dateString) {
 }
 
 /**
- * Sanitize the main-text HTML
+ * Sanitize the main-text HTML (aligned with articles/free-column for consistency and security)
  */
 function getSanitizedContent(content) {
   const sanitized = sanitizeHtml(content, {
-    allowedTags: sanitizeHtml.defaults.allowedTags.concat(["img"]),
+    allowedTags: [
+      "b", "i", "em", "strong", "a", "p", "blockquote",
+      "ul", "ol", "li", "br", "span", "h1", "h2", "h3", "h4", "h5", "h6",
+      "img", "video", "source", "audio", "figure", "figcaption",
+    ],
     allowedAttributes: {
-      img: ["src", "alt", "title"],
       a: ["href", "target", "rel"],
+      img: ["src", "alt", "title", "width", "height", "style"],
+      video: ["src", "controls", "width", "height", "poster", "style"],
+      audio: ["src", "controls"],
+      source: ["src", "type"],
+      span: ["style"],
+      p: ["style"],
+      blockquote: ["cite", "style"],
+      figure: [],
+      figcaption: [],
     },
+    allowedSchemes: ["http", "https", "data"],
+    allowedStyles: {
+      "*": {
+        width: [/^\d+(?:px|%)$/],
+        height: [/^\d+(?:px|%)$/],
+        "max-width": [/^\d+(?:px|%)$/],
+        "max-height": [/^\d+(?:px|%)$/],
+        float: [/^(left|right|none)$/],
+        "object-fit": [/^(cover|contain|fill|none|scale-down)$/],
+        "font-size": [/^\d+(?:px|em|rem|%)$/],
+      },
+    },
+    allowVulnerableTags: false,
   });
 
   const $ = load(sanitized);
-  $("a").attr("target", "_blank").attr("rel", "noopener noreferrer");
-  $("blockquote").css({
-    "border-left": "5px solid #ccc",
-    "padding-left": "15px",
-    "margin-left": "20px",
+  $("a").each((_, elem) => {
+    $(elem).attr("target", "_blank").attr("rel", "noopener noreferrer");
+  });
+  $("blockquote").each((_, elem) => {
+    $(elem).css({
+      "margin-left": "20px",
+      "padding-left": "15px",
+      "border-left": "5px solid #ccc",
+      "font-style": "italic",
+    });
   });
   return $.html();
 }
@@ -123,20 +156,16 @@ export default async function TranslationPage({ params }) {
   const { id } = params;
   const translation = await fetchTranslation(id);
 
-  // 404 if not found
-  if (!translation) {
-    console.log("Translation not found for ID:", id);
-    notFound();
-  }
+  if (!translation) notFound();
 
-  // Prepare data
+  const decodedTitle = decode(translation.title?.rendered || "");
   const formattedDate = formatDate(translation.date);
   const sanitizedContent = getSanitizedContent(translation.acf["main-text"] || "");
-  const imageUrl = translation.acf.image?.startsWith("http")
-    ? translation.acf.image
-    : `https://mautskebeli.wpenginepowered.com${translation.acf.image}`;
-
-  console.log("TranslationPage Image URL:", imageUrl);
+  const imageUrl = translation.acf?.image
+    ? (translation.acf.image.startsWith("http")
+        ? translation.acf.image
+        : `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL || "https://mautskebeli.wpenginepowered.com"}${translation.acf.image}`)
+    : "/images/default-og-image.jpg";
 
   return (
     <section className="w-full mx-auto mt-10 px-4 lg:px-0 overflow-x-hidden relative">
@@ -162,7 +191,7 @@ export default async function TranslationPage({ params }) {
         <div className="w-full h-auto mb-5">
           <Image
             src={imageUrl || "/images/default-og-image.jpg"}
-            alt={translation.title.rendered}
+            alt={decodedTitle}
             width={800}
             height={450}
             className="rounded-lg w-full"
@@ -172,10 +201,10 @@ export default async function TranslationPage({ params }) {
 
         {/* Title, Subtitle */}
         <h1 className="font-alk-tall-mtavruli text-[32px] sm:text-[64px] font-light leading-none text-[#474F7A] mt-[24px] mb-5">
-          {translation.title.rendered}
+          {decodedTitle}
         </h1>
         <h3 className="font-alk-tall-mtavruli sm:text-[34px] lg:text-[34px] font-light leading-wide text-[#474F7A] mt-[24px] mb-5">
-          {translation.acf.sub_title}
+          {translation.acf?.sub_title}
         </h3>
 
         {/* Author (ავტორი) */}
@@ -216,7 +245,7 @@ export default async function TranslationPage({ params }) {
         />
 
         {/* Client-Only Share/Buttons */}
-        <DynamicClientComponents id={id} title={translation.title.rendered} />
+        <DynamicClientComponents id={id} title={decodedTitle} />
       </div>
     </section>
   );

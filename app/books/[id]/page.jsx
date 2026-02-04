@@ -47,10 +47,16 @@ export async function generateMetadata({ params }) {
   const description = book.acf.text || book.acf.sub_title || '';
   const decodedDescription = decode(description);
 
-  let imageUrl = book.acf.image
-    ? `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/wp/v2/media/${book.acf.image}`
-    : 'https://www.mautskebeli.ge/images/default-og-image.jpg';
-
+  let imageUrl = 'https://www.mautskebeli.ge/images/default-og-image.jpg';
+  if (book.acf.image) {
+    if (typeof book.acf.image === 'string' && book.acf.image.startsWith('http')) {
+      imageUrl = book.acf.image;
+    } else if (typeof book.acf.image === 'string') {
+      imageUrl = `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}${book.acf.image}`;
+    } else if (typeof book.acf.image === 'object' && book.acf.image?.url) {
+      imageUrl = book.acf.image.url.startsWith('http') ? book.acf.image.url : `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}${book.acf.image.url}`;
+    }
+  }
   imageUrl = imageUrl.split('?')[0];
 
   const metadataBase = new URL('https://www.mautskebeli.ge');
@@ -137,6 +143,17 @@ const BookPage = async ({ params }) => {
   book.formattedDate = formatDate(book.date);
   book.title.rendered = decodeHTMLEntities(book.title.rendered);
 
+  const wpBase = process.env.NEXT_PUBLIC_WORDPRESS_API_URL || 'https://mautskebeli.wpenginepowered.com';
+  let bookImageSrc = '/images/default-og-image.jpg';
+  if (book.acf?.image) {
+    const img = book.acf.image;
+    if (typeof img === 'string') {
+      bookImageSrc = img.startsWith('http') ? img : `${wpBase}${img}`;
+    } else if (typeof img === 'object' && img?.url) {
+      bookImageSrc = img.url.startsWith('http') ? img.url : `${wpBase}${img.url}`;
+    }
+  }
+
   let sanitizedContent = getSanitizedContent(book.acf.text);
 
   return (
@@ -144,7 +161,7 @@ const BookPage = async ({ params }) => {
       <div className="w-full lg:w-[60%] mx-auto bg-opacity-90 p-5 rounded-lg">
         <div className="w-full h-auto mb-5">
           <Image
-            src={book.acf.image || '/images/default-og-image.jpg'}
+            src={bookImageSrc}
             alt={book.title.rendered}
             width={800}
             height={450}

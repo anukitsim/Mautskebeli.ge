@@ -28,7 +28,6 @@ async function fetchArticle(slugOrId) {
   try {
     let res = await fetch(apiUrl, {
       next: { revalidate: 10 },
-      cache: 'no-store', // Disable caching temporarily to debug
     });
 
     if (res.ok) {
@@ -46,8 +45,7 @@ async function fetchArticle(slugOrId) {
       apiUrl = `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/wp/v2/article/${decodedSlugOrId}?acf_format=standard&_fields=id,title,acf,date,slug`;
       res = await fetch(apiUrl, {
         next: { revalidate: 10 },
-        cache: 'no-store',
-    });
+      });
 
     if (!res.ok) {
         console.error(`Failed to fetch article with ID ${decodedSlugOrId}: ${res.status} ${res.statusText}`);
