@@ -27,7 +27,7 @@
     "html-to-text": "^9.0.5",
     "image-to-base64": "^2.2.0",
     "moment": "^2.30.1",
-    "next": "^14.2.5",
+    "next": "14.2.35",
     "next-share": "^0.27.0",
     "node-cache": "^5.1.2",
     "node-html-parser": "^6.1.13",
