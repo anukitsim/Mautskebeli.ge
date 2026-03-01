@@ -8,7 +8,10 @@ const Sidebar = () => {
       style={{
         boxShadow: '4px 4px 12px rgba(93, 78, 116, 0.14)',
         border: '1px solid #E0DBE8',
-        background: 'rgba(224, 219, 232, 0.20)'
+        background: 'rgba(224, 219, 232, 0.20)',
+        animation: 'slideUp 0.6s ease-out forwards',
+        animationDelay: '100ms',
+        opacity: 0
       }}
     >
       <div className="flex flex-col gap-7 w-full">

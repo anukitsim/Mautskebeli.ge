@@ -82,12 +82,19 @@ const HomePageStatiebi = () => {
 
       {/* Horizontal scrolling section for mobile */}
       <div className="flex lg:hidden overflow-x-auto space-x-4 no-scrollbar">
-        {articles.map(article => {
+        {articles.map((article, index) => {
           const imageUrl = article.acf.image ? article.acf.image : '/images/default-image.png';
           return (
             <Link href={article.slug ? `/all-articles/${article.slug}` : `/all-articles/${article.id}`} passHref key={article.id} className="group">
-              <div className="flex-none w-[300px] bg-[#F6F4F8] rounded-xl border border-[#E0DBE8] overflow-hidden flex flex-col h-[500px]
-                             shadow-sm hover:shadow-xl transition-all duration-500 hover:-translate-y-1">
+              <div 
+                className="flex-none w-[300px] bg-[#F6F4F8] rounded-xl border border-[#E0DBE8] overflow-hidden flex flex-col h-[500px]
+                             shadow-sm hover:shadow-xl transition-all duration-500 hover:-translate-y-1"
+                style={{
+                  animationDelay: `${index * 100}ms`,
+                  animation: 'slideUp 0.6s ease-out forwards',
+                  opacity: 0
+                }}
+              >
                 {/* Image Section */}
                 <div className="relative w-full h-[200px] flex-shrink-0 overflow-hidden">
                   <Image
@@ -130,12 +137,19 @@ const HomePageStatiebi = () => {
 
       {/* Grid for desktop screens */}
       <div className="hidden lg:grid w-full mx-auto grid-cols-1 sm:grid-cols-3 gap-5 mt-5">
-        {articles.map(article => {
+        {articles.map((article, index) => {
           const imageUrl = article.acf.image ? article.acf.image : '/images/default-image.png';
           return (
             <Link href={article.slug ? `/all-articles/${article.slug}` : `/all-articles/${article.id}`} passHref key={article.id} className="group">
-              <div className="bg-[#F6F4F8] rounded-xl border border-[#E0DBE8] overflow-hidden flex flex-col h-[490px]
-                             shadow-sm hover:shadow-xl transition-all duration-500 hover:-translate-y-1">
+              <div 
+                className="bg-[#F6F4F8] rounded-xl border border-[#E0DBE8] overflow-hidden flex flex-col h-[490px]
+                             shadow-sm hover:shadow-xl transition-all duration-500 hover:-translate-y-1"
+                style={{
+                  animationDelay: `${index * 100}ms`,
+                  animation: 'slideUp 0.6s ease-out forwards',
+                  opacity: 0
+                }}
+              >
                 {/* Image Section */}
                 <div className="relative w-full h-[200px] flex-shrink-0 overflow-hidden">
                   <Image

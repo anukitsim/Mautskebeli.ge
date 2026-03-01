@@ -5,7 +5,13 @@ const HomePagePodcast = () => {
   return (
     <>
       {/* Desktop Banner */}
-      <section className="relative w-full hidden lg:block group overflow-hidden">
+      <section 
+        className="relative w-full hidden lg:block group overflow-hidden"
+        style={{
+          animation: 'slideUp 0.6s ease-out forwards',
+          opacity: 0
+        }}
+      >
         <div className="relative w-full transition-transform duration-700">
           <Link href="/podcast">
             <Image
@@ -37,7 +43,14 @@ const HomePagePodcast = () => {
       </section>
 
       {/* Mobile Banner */}
-      <section className="relative w-full lg:hidden overflow-hidden">
+      <section 
+        className="relative w-full lg:hidden overflow-hidden"
+        style={{
+          animation: 'slideUp 0.6s ease-out forwards',
+          animationDelay: '80ms',
+          opacity: 0
+        }}
+      >
         <div className="relative w-full">
           <Link href="/podcast">
             <Image

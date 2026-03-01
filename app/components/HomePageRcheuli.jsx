@@ -103,8 +103,15 @@ const HomePageRcheuli = () => {
         <div className="flex gap-4">
           {posts.map((post, index) => (
             <Link href={constructUrl(post)} key={index} className="group block w-[280px] flex-shrink-0">
-              <article className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl 
-                                 transition-all duration-500 border border-[#E0DBE8]/30 h-full">
+              <article 
+                className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl 
+                                 transition-all duration-500 border border-[#E0DBE8]/30 h-full"
+                style={{
+                  animationDelay: `${index * 100}ms`,
+                  animation: 'slideUp 0.6s ease-out forwards',
+                  opacity: 0
+                }}
+              >
                 {/* Image */}
                 <div className="relative aspect-video overflow-hidden">
                   <Image
@@ -148,9 +155,16 @@ const HomePageRcheuli = () => {
       <div className="hidden lg:grid grid-cols-4 gap-6">
         {posts.map((post, index) => (
           <Link href={constructUrl(post)} key={index} className="group block">
-            <article className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-2xl 
+            <article 
+              className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-2xl 
                                transition-all duration-500 transform hover:-translate-y-2
-                               border border-[#E0DBE8]/30 h-full">
+                               border border-[#E0DBE8]/30 h-full"
+              style={{
+                animationDelay: `${index * 100}ms`,
+                animation: 'slideUp 0.6s ease-out forwards',
+                opacity: 0
+              }}
+            >
               {/* Image */}
               <div className="relative aspect-video overflow-hidden">
                 <Image

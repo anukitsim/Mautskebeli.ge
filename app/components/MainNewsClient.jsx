@@ -96,7 +96,13 @@ const MainNewsClient = ({ slides }) => {
   return (
     <>
       {/* Desktop View */}
-      <div className="lg:block sm:hidden w-full">
+      <div 
+        className="lg:block sm:hidden w-full"
+        style={{
+          animation: 'slideUp 0.6s ease-out forwards',
+          opacity: 0
+        }}
+      >
         <section 
           className="relative w-full h-full min-h-[420px] rounded-[20px] overflow-hidden
                      ring-1 ring-black/5 group"
@@ -266,6 +272,11 @@ const MainNewsClient = ({ slides }) => {
       {/* Mobile View */}
       <section
         className={`lg:hidden absolute z-0 left-0 ${mobileSectionStyle} w-full h-[335px]`}
+        style={{
+          animation: 'slideUp 0.6s ease-out forwards',
+          animationDelay: '80ms',
+          opacity: 0
+        }}
         onTouchStart={handleMouseEnter}
         onTouchEnd={handleMouseLeave}
       >
