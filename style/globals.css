@@ -1171,3 +1171,15 @@ body.translation-stable * {
     transform: translateZ(0);
   }
 }
+
+/* Search result highlight */
+mark.search-hl {
+  background: linear-gradient(120deg, #FECE27 0%, #FECE27 100%);
+  background-size: 100% 40%;
+  background-repeat: no-repeat;
+  background-position: 0 85%;
+  padding: 0 2px;
+  color: inherit;
+  font-weight: 600;
+  border-radius: 2px;
+}

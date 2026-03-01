@@ -33,12 +33,12 @@ const PayPalButtonComponent = ({
           height: 45,
         },
         createOrder: (data, actions) => {
-          console.log("Creating PayPal order...");
           const { donationAmount, donorName } = getDonationData();
           return actions.order.create({
             purchase_units: [
               {
                 amount: {
+                  currency_code: "USD",
                   value: donationAmount.toString(),
                 },
                 description: `Donation from ${donorName}`,

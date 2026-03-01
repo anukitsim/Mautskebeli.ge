@@ -11,6 +11,7 @@ export const dynamic = "force-dynamic";
 const CancelDonationWrapper = () => {
     const searchParams = useSearchParams();
     const recId = searchParams.get('recId');
+    const token = searchParams.get('token') || '';
     const [message, setMessage] = useState('');
     const [isError, setIsError] = useState(false);
     const [loading, setLoading] = useState(true);
@@ -19,7 +20,9 @@ const CancelDonationWrapper = () => {
         if (recId) {
             const cancelRecurringDonation = async () => {
                 try {
-                    const response = await fetch(`/api/cancel-recurring-payment?recId=${recId}`, {
+                    const params = new URLSearchParams({ recId });
+                    if (token) params.set('token', token);
+                    const response = await fetch(`/api/cancel-recurring-payment?${params.toString()}`, {
                         method: 'GET',
                         headers: {
                             'Content-Type': 'application/json',

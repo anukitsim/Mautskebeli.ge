@@ -5,6 +5,7 @@ import { NextResponse } from 'next/server';
 export async function GET(request) {
     const { searchParams } = new URL(request.url);
     const recId = searchParams.get('recId');
+    const token = searchParams.get('token') || '';
 
     if (!recId) {
         return NextResponse.json(
@@ -14,8 +15,10 @@ export async function GET(request) {
     }
 
     try {
+        const params = new URLSearchParams({ recId });
+        if (token) params.set('token', token);
         const response = await fetch(
-            `https://mautskebeli.wpenginepowered.com/wp-json/wp/v2/cancel-recurring-payment/?recId=${recId}`,
+            `https://mautskebeli.wpenginepowered.com/wp-json/wp/v2/cancel-recurring-payment/?${params.toString()}`,
             {
                 method: 'GET',
                 headers: {

@@ -32,9 +32,21 @@ const formatDate = (dateString) => {
   return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
 };
 
+// Normalize image from API (can be URL string, media ID, or object with url)
+const getNewsImageUrl = (news) => {
+  const raw = news?.acf?.image ?? news?.image;
+  if (!raw) return '/images/default-image.png';
+  if (typeof raw === 'string' && raw.startsWith('http')) return raw;
+  if (typeof raw === 'string') return raw;
+  if (typeof raw === 'object' && raw?.url) return raw.url;
+  // If API returns media ID (number), use default; resolving it would require an extra request
+  if (typeof raw === 'number') return '/images/default-image.png';
+  return '/images/default-image.png';
+};
+
 // News Card Component - Bigger version for grid
 const NewsCard = ({ news, index, featured = false }) => {
-  const imageUrl = news.acf?.image || '/images/default-image.png';
+  const imageUrl = getNewsImageUrl(news);
   const hasVideo = news.acf?.video_url;
   
   // Construct the proper URL - news always goes to /news/[slug]
@@ -169,7 +181,9 @@ const NewsSection = () => {
         if (!response.ok) throw new Error('Network response was not ok');
         
         const data = await response.json();
-        setNews(data.news || []);
+        // API returns { news: [...], total, total_pages } or sometimes array at top level
+        const list = Array.isArray(data) ? data : (data.news || []);
+        setNews(Array.isArray(list) ? list : []);
         setLoading(false);
       } catch (error) {
         console.error('Error fetching news:', error);

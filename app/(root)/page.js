@@ -28,9 +28,9 @@ export default function Home() {
         </div>
 
         {/* News Section - ახალი ამბები */}
-        {/* <section className="container mx-auto px-4 lg:px-8 mt-24 lg:mt-32">
+        <section className="container mx-auto px-4 lg:px-8 mt-24 lg:mt-32">
           <NewsSection />
-        </section> */}
+        </section>
 
         {/* Sections: same width as hero (w-11/12 md:w-10/12), podcast stays full width below */}
         <div className="mx-auto w-11/12 md:w-10/12">

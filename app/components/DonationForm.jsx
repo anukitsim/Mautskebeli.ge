@@ -8,15 +8,14 @@ import PayPalButton from "./PayPalButton"; // Import the PayPal button component
 // -------------------------
 // TBC (Local Bank) Payment Status Verification
 // -------------------------
-async function handlePaymentStatus(orderId, setPaymentMessage, setIsError) {
-  console.log("handlePaymentStatus called for orderId:", orderId);
+async function handlePaymentStatus(orderId, verifyToken, setPaymentMessage, setIsError) {
   try {
     const response = await fetch(
       "https://mautskebeli.wpenginepowered.com/wp-json/wp/v2/verify-payment-status",
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ orderId }),
+        body: JSON.stringify({ orderId, vt: verifyToken || "" }),
       }
     );
     const json = await response.json();
@@ -67,8 +66,8 @@ const PaymentMessage = ({ message, isError, onClose }) => {
 const Modal = ({ show, handleClose, handleConfirm }) => {
   if (!show) return null;
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-      <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50" onClick={handleClose}>
+      <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full" onClick={(e) => e.stopPropagation()}>
         <h2 className="text-xl font-semibold mb-4">ყოველთვიური გადახდა</h2>
         <p className="mb-6">
           ბარათის მონაცემები შეინახება და ყოველთვიურად ავტომატურად ჩამოგეჭრებათ
@@ -121,15 +120,18 @@ const DonationForm = () => {
   // On mount, check if an orderId is in the URL (from TBC redirection) and verify payment status.
   useEffect(() => {
     const orderId = searchParams.get("orderId");
+    const vt = searchParams.get("vt");
     if (orderId) {
-      handlePaymentStatus(orderId, setPaymentMessage, setIsError);
+      handlePaymentStatus(orderId, vt, setPaymentMessage, setIsError);
     }
   }, [searchParams]);
 
+  // Show recurring info modal on mount since default is recurring
   useEffect(() => {
-  // if you want to require confirmation right away
-  setShowModal(true);
-}, []);
+    if (formData.isRecurring) {
+      setShowModal(true);
+    }
+  }, []);
 
 
   // Returns the donation data for use by the PayPal button
@@ -412,6 +414,9 @@ const DonationForm = () => {
           value={formData.donationAmount}
           onChange={handleInputChange}
           placeholder="ლარი"
+          min="1"
+          max="50000"
+          step="1"
           className="p-3 rounded-lg border border-gray-300 w-full text-center hide-arrows"
           required
         />
@@ -487,11 +492,16 @@ const DonationForm = () => {
             Render the PayPal Button only for one-time (non-recurring) donations.
             ------------------------- */}
         {!formData.isRecurring && (
-          <PayPalButton
-            getDonationData={getDonationData}
-            onTransactionComplete={handleTransactionComplete}
-            onTransactionError={handleTransactionError}
-          />
+          <>
+            <p className="text-xs text-gray-500 text-center -mb-3">
+              PayPal გადახდა ხორციელდება USD ვალუტაში
+            </p>
+            <PayPalButton
+              getDonationData={getDonationData}
+              onTransactionComplete={handleTransactionComplete}
+              onTransactionError={handleTransactionError}
+            />
+          </>
         )}
 
         <div className="mt-4">

@@ -1,97 +1,154 @@
 'use client';
 
 import React, { useEffect, useState, Suspense, useCallback } from 'react';
-import { useSearchParams } from 'next/navigation';
-import SearchVideoCard from '../components/SearchVideoCard';
-import { useRouter } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
+import SearchVideoCard from '../components/SearchVideoCard';
 
-const truncateText = (text, limit) => {
-  if (!text) return '';
-  const words = String(text).split(' ');
-  if (words.length <= limit) return text;
-  return words.slice(0, limit).join(' ') + '...';
+const H_OPEN = '\u0000H\u0000';
+const H_CLOSE = '\u0000/h\u0000';
+
+function toHtml(str) {
+  if (!str || typeof str !== 'string') return '';
+  const parts = str.split(H_OPEN);
+  return parts
+    .map((part) => {
+      const i = part.indexOf(H_CLOSE);
+      if (i === -1) return escapeHtml(part);
+      const matched = part.slice(0, i);
+      const rest = part.slice(i + H_CLOSE.length);
+      return `<mark class="search-hl">${escapeHtml(matched)}</mark>${toHtml(rest)}`;
+    })
+    .join('');
+}
+
+function escapeHtml(s) {
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+const BADGE = {
+  title: { label: 'სათაური', cls: 'bg-[#474F7A]/15 text-[#474F7A] border-[#474F7A]/30' },
+  author: { label: 'ავტორი', cls: 'bg-[#AD88C6]/20 text-[#5F4AA5] border-[#AD88C6]/50' },
+  content: { label: 'ტექსტი', cls: 'bg-[#FECE27]/20 text-[#8B7300] border-[#FECE27]/50' },
 };
 
-const CustomLoader = () => (
-  <div className="flex justify-center items-center mt-4">
-    <img src="/images/loader.svg" alt="loading" />
-  </div>
-);
-
-const CONTENT_SECTIONS = [
-  { key: 'videos', title: 'ვიდეო', path: 'videos' },
-  { key: 'news', title: 'ამბები', path: 'news' },
-  { key: 'articles', title: 'სტატიები', path: 'articles' },
-  { key: 'translations', title: 'თარგმანი', path: 'translations' },
-  { key: 'freeColumns', title: 'თავისუფალი სვეტი', path: 'freeColumns' },
-  { key: 'books', title: 'მაუწყებელი წიგნები', path: 'books' },
-  { key: 'sportArticles', title: 'სპორტის სტატიები', path: 'sportArticles' },
-];
+function Badges({ matchedIn }) {
+  if (!matchedIn?.length) return null;
+  return (
+    <div className="flex flex-wrap gap-1.5 mb-2">
+      {matchedIn.map((k) => {
+        const b = BADGE[k];
+        if (!b) return null;
+        return (
+          <span
+            key={k}
+            className={`inline-flex items-center text-[11px] font-semibold px-2 py-0.5 rounded-full border ${b.cls}`}
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-current opacity-70 mr-1" aria-hidden />
+            {b.label}
+          </span>
+        );
+      })}
+    </div>
+  );
+}
 
 function ResultCard({ item }) {
+  const titleHtml = toHtml(item.titleHighlighted || item.title || '');
+  const authorHtml = item.authorHighlighted ? toHtml(item.authorHighlighted) : null;
+  const excerptHtml = item.excerptHighlighted ? toHtml(item.excerptHighlighted) : null;
+
   return (
-    <Link href={item.link} className="flex-shrink-0 block">
-      <div
-        className="article bg-[#F6F4F8] rounded-tl-[10px] rounded-tr-[10px] border border-[#B6A8CD] overflow-hidden hover:shadow-md transition-shadow"
-        style={{ minWidth: '300px', width: '100%' }}
-      >
-        <div className="article-image-container relative w-full h-[200px]">
+    <Link href={item.link} className="block group">
+      <div className="bg-white rounded-xl border border-[#E0DBE8] overflow-hidden hover:shadow-lg hover:border-[#AD88C6]/50 transition-all duration-200">
+        <div className="relative w-full h-[190px] bg-[#F6F4F8]">
           <Image
             src={item.imageUrl || '/images/default-og-image.jpg'}
             alt=""
             fill
-            sizes="(max-width: 300px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
             style={{ objectFit: 'cover' }}
-            className="article-image"
           />
         </div>
-        <div className="p-[18px]">
-          <h2 className="text-[20px] font-bold mb-2" style={{ color: '#474F7A' }}>
-            {item.title}
-          </h2>
+        <div className="p-4">
+          <Badges matchedIn={item.matchedIn} />
+          <h3
+            className="text-[17px] leading-snug font-bold text-[#474F7A] mb-1.5 line-clamp-2 group-hover:text-[#AD88C6] transition-colors"
+            dangerouslySetInnerHTML={{ __html: titleHtml }}
+          />
           {item.author && (
-            <span className="text-[#8D91AB] text-[14px] font-bold block mb-1">
-              {item.author}
-            </span>
-          )}
-          {item.excerpt && (
-            <p className="text-sm pt-[8px] text-[#000]">
-              {truncateText(item.excerpt, 30)}
+            <p className="text-[13px] font-semibold text-[#8D91AB] mb-1.5">
+              {authorHtml ? (
+                <span dangerouslySetInnerHTML={{ __html: authorHtml }} />
+              ) : (
+                item.author
+              )}
             </p>
           )}
-          <div className="flex flex-col justify-end pt-[20px] items-end">
-            <span className="text-[15px] text-[#AD88C6] font-semibold">
-              ნახეთ სრულად
-            </span>
-          </div>
+          {item.excerpt && (
+            <p className="text-[13px] leading-relaxed text-[#555] line-clamp-3">
+              {excerptHtml ? (
+                <span dangerouslySetInnerHTML={{ __html: excerptHtml }} />
+              ) : (
+                item.excerpt
+              )}
+            </p>
+          )}
+          <span className="inline-block mt-3 text-[13px] font-semibold text-[#AD88C6] group-hover:underline">
+            ნახეთ სრულად →
+          </span>
         </div>
       </div>
     </Link>
   );
 }
 
-const SearchResults = ({ searchQuery }) => {
+function VideoCard({ video, onSelect }) {
+  const titleHtml = toHtml(video.titleHighlighted || video.title || '');
+  return (
+    <div className="flex-shrink-0">
+      <SearchVideoCard
+        videoId={video.videoId}
+        caption={video.title}
+        onSelect={() => onSelect(video)}
+      />
+      <p
+        className="mt-1.5 text-[13px] text-[#474F7A] font-medium line-clamp-2 px-1"
+        dangerouslySetInnerHTML={{ __html: titleHtml }}
+      />
+    </div>
+  );
+}
+
+const SECTIONS = [
+  { key: 'videos', title: 'ვიდეოები' },
+  { key: 'news', title: 'ამბები' },
+  { key: 'articles', title: 'სტატიები' },
+  { key: 'translations', title: 'თარგმანი' },
+  { key: 'freeColumns', title: 'თავისუფალი სვეტი' },
+  { key: 'books', title: 'წიგნები' },
+  { key: 'sportArticles', title: 'სპორტი' },
+];
+
+const Loader = () => (
+  <div className="flex justify-center items-center py-12">
+    <img src="/images/loader.svg" alt="loading" />
+  </div>
+);
+
+function SearchResults({ searchQuery }) {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [currentVideoPage, setCurrentVideoPage] = useState(1);
-  const [isMobile, setIsMobile] = useState(false);
+  const [videoPage, setVideoPage] = useState(1);
   const router = useRouter();
 
-  const videosPerPage = isMobile ? 4 : Math.max(4, typeof window !== 'undefined' ? Math.floor(window.innerWidth / 280) : 6);
-
-  useEffect(() => {
-    const handleResize = () => setIsMobile(typeof window !== 'undefined' && window.innerWidth < 768);
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
+  const videosPerPage = typeof window !== 'undefined' && window.innerWidth < 768 ? 4 : 6;
 
   const fetchResults = useCallback(async () => {
     if (!searchQuery || searchQuery.length < 2) {
-      setData({ articles: [], news: [], videos: [], translations: [], freeColumns: [], books: [], sportArticles: [], meta: {} });
+      setData(null);
       setLoading(false);
       return;
     }
@@ -99,17 +156,15 @@ const SearchResults = ({ searchQuery }) => {
     setError(null);
     try {
       const res = await fetch(`/api/search?q=${encodeURIComponent(searchQuery)}`);
-      const json = await res.json();
       if (!res.ok) {
-        setData({ articles: [], news: [], videos: [], translations: [], freeColumns: [], books: [], sportArticles: [], meta: {} });
-        setError(json.error || 'Search failed');
-        setLoading(false);
-        return;
+        setError('ძიება ვერ მოხერხდა');
+        setData(null);
+      } else {
+        setData(await res.json());
       }
-      setData(json);
-    } catch (err) {
-      setError('Search failed');
-      setData({ articles: [], news: [], videos: [], translations: [], freeColumns: [], books: [], sportArticles: [], meta: {} });
+    } catch {
+      setError('ძიება ვერ მოხერხდა');
+      setData(null);
     } finally {
       setLoading(false);
     }
@@ -117,6 +172,7 @@ const SearchResults = ({ searchQuery }) => {
 
   useEffect(() => {
     fetchResults();
+    setVideoPage(1);
   }, [fetchResults]);
 
   const handleVideoClick = useCallback(
@@ -130,156 +186,125 @@ const SearchResults = ({ searchQuery }) => {
     [router]
   );
 
-  if (loading) return <CustomLoader />;
+  if (loading) return <Loader />;
 
-  const hasQuery = searchQuery && searchQuery.length >= 2;
-  const totalCount = data
-    ? (data.articles?.length || 0) +
-      (data.news?.length || 0) +
-      (data.videos?.length || 0) +
-      (data.translations?.length || 0) +
-      (data.freeColumns?.length || 0) +
-      (data.books?.length || 0) +
-      (data.sportArticles?.length || 0)
-    : 0;
-
-  if (!hasQuery) {
+  if (!searchQuery || searchQuery.length < 2) {
     return (
-      <div className="container mx-auto p-4">
-        <div className="rounded border border-[#E0DBE8] p-6 text-center text-[#474F7A]">
-          <p className="text-[16px]">შეიყვანეთ მინიმუმ 2 სიმბოლო ძიებისთვის.</p>
-        </div>
+      <div className="max-w-3xl mx-auto px-4 py-12 text-center">
+        <p className="text-[#474F7A] text-lg">შეიყვანეთ მინიმუმ 2 სიმბოლო ძიებისთვის.</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="container mx-auto p-4">
-        <div className="rounded border border-red-200 bg-red-50 p-6 text-center text-red-700">
-          <p>{error}</p>
-        </div>
+      <div className="max-w-3xl mx-auto px-4 py-12 text-center">
+        <p className="text-red-600">{error}</p>
       </div>
     );
   }
 
-  const paginatedVideos = data?.videos || [];
-  const videoStart = (currentVideoPage - 1) * videosPerPage;
-  const videoSlice = paginatedVideos.slice(videoStart, videoStart + videosPerPage);
-  const totalVideoPages = Math.ceil(paginatedVideos.length / videosPerPage);
+  const total = data
+    ? SECTIONS.reduce((sum, s) => sum + (data[s.key]?.length || 0), 0)
+    : 0;
+
+  const videos = data?.videos || [];
+  const vStart = (videoPage - 1) * videosPerPage;
+  const vSlice = videos.slice(vStart, vStart + videosPerPage);
+  const totalVPages = Math.ceil(videos.length / videosPerPage);
 
   return (
-    <div className="container mx-auto p-4">
-      <div
-        className="flex flex-wrap items-center gap-2 p-3 w-full rounded border border-[#E0DBE8]"
-      >
-        <span className="text-[16px] font-noto-sans-georgian text-[#474F7A]">
-          {totalCount} შედეგი სიტყვაზე &quot;{searchQuery}&quot;
+    <div className="max-w-6xl mx-auto px-4 py-6">
+      {/* Header */}
+      <div className="flex items-baseline gap-2 mb-1">
+        <h1 className="text-[22px] font-bold text-[#474F7A]">
+          ძიება: &ldquo;{searchQuery}&rdquo;
+        </h1>
+        <span className="text-[15px] text-[#8D91AB]">
+          — {total} შედეგი
         </span>
       </div>
+      <p className="text-[13px] text-[#9B8FB0] mb-6">
+        ნაჩვენებია შედეგები, სადაც საძიებო სიტყვა გვხვდება სათაურში, ავტორში ან ტექსტში.
+        მონიშნული ყვითლად.
+      </p>
 
-      {CONTENT_SECTIONS.map(({ key, title, path }) => {
-        const items = data?.[path] || [];
+      {total === 0 && (
+        <div className="mt-8 py-16 text-center rounded-xl border border-[#E0DBE8] bg-[#FAFAFA]">
+          <p className="text-[20px] font-semibold text-[#474F7A] mb-2">
+            შედეგები ვერ მოიძებნა
+          </p>
+          <p className="text-[15px] text-[#8D91AB] max-w-md mx-auto">
+            სცადეთ სხვა საძიებო სიტყვა ან შეამოწმეთ მართლწერა.
+          </p>
+        </div>
+      )}
+
+      {SECTIONS.map(({ key, title }) => {
+        const items = data?.[key] || [];
+        if (items.length === 0) return null;
+
         if (key === 'videos') {
-          if (items.length === 0) return null;
           return (
-            <div key={key} className="mt-6">
-              <div className="flex justify-between items-center mb-2">
-                <h2 className="text-[24px] font-bold font-noto-sans-georgian text-[#474F7A] pt-6 pb-4">
-                  {title}
-                </h2>
-                {totalVideoPages > 1 && (
+            <section key={key} className="mb-10">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-[20px] font-bold text-[#474F7A]">{title}</h2>
+                {totalVPages > 1 && (
                   <div className="flex gap-2">
                     <button
-                      type="button"
-                      onClick={() => setCurrentVideoPage((p) => Math.max(1, p - 1))}
-                      disabled={currentVideoPage === 1}
-                      className="bg-white rounded-full p-2 disabled:opacity-50"
+                      onClick={() => setVideoPage((p) => Math.max(1, p - 1))}
+                      disabled={videoPage === 1}
+                      className="p-1.5 rounded-full bg-[#F6F4F8] hover:bg-[#E0DBE8] disabled:opacity-40 transition"
                       aria-label="Previous"
                     >
-                      <Image src="/images/videos-left.svg" alt="" width={32} height={32} />
+                      <Image src="/images/videos-left.svg" alt="" width={24} height={24} />
                     </button>
                     <button
-                      type="button"
-                      onClick={() => setCurrentVideoPage((p) => p + 1)}
-                      disabled={currentVideoPage >= totalVideoPages}
-                      className="bg-white rounded-full p-2 disabled:opacity-50"
+                      onClick={() => setVideoPage((p) => p + 1)}
+                      disabled={videoPage >= totalVPages}
+                      className="p-1.5 rounded-full bg-[#F6F4F8] hover:bg-[#E0DBE8] disabled:opacity-40 transition"
                       aria-label="Next"
                     >
-                      <Image src="/images/videos-right.svg" alt="" width={32} height={32} />
+                      <Image src="/images/videos-right.svg" alt="" width={24} height={24} />
                     </button>
                   </div>
                 )}
               </div>
-              <div className="hidden md:grid gap-4" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))' }}>
-                {videoSlice.map((video) => (
-                  <div key={`${video.postType}-${video.id}`} className="flex-shrink-0">
-                    <SearchVideoCard
-                      videoId={video.videoId}
-                      caption={video.title}
-                      onSelect={() => handleVideoClick(video)}
-                    />
-                  </div>
+              <div className="flex gap-4 overflow-x-auto pb-2 md:grid md:overflow-visible"
+                style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))' }}>
+                {vSlice.map((v) => (
+                  <VideoCard key={`v-${v.id}`} video={v} onSelect={handleVideoClick} />
                 ))}
               </div>
-              <div className="flex md:hidden gap-4 overflow-x-auto pb-2">
-                {videoSlice.map((video) => (
-                  <div key={`${video.postType}-${video.id}`} className="flex-shrink-0 w-[250px]">
-                    <SearchVideoCard
-                      videoId={video.videoId}
-                      caption={video.title}
-                      onSelect={() => handleVideoClick(video)}
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
+            </section>
           );
         }
 
-        if (items.length === 0) return null;
-
         return (
-          <div key={key} className="mt-6">
-            <h2 className="text-[24px] font-bold font-noto-sans-georgian text-[#474F7A] pt-6 pb-4">
-              {title}
-            </h2>
-            <div className="hidden md:grid gap-4" style={{ gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))' }}>
+          <section key={key} className="mb-10">
+            <h2 className="text-[20px] font-bold text-[#474F7A] mb-4">{title}</h2>
+            <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
               {items.map((item) => (
                 <ResultCard key={`${key}-${item.id}`} item={item} />
               ))}
             </div>
-            <div className="flex md:hidden gap-4 overflow-x-auto pb-2">
-              {items.map((item) => (
-                <div key={`${key}-${item.id}`} className="flex-shrink-0 w-[300px]">
-                  <ResultCard item={item} />
-                </div>
-              ))}
-            </div>
-          </div>
+          </section>
         );
       })}
-
-      {totalCount === 0 && (
-        <div className="mt-8 p-6 rounded border border-[#E0DBE8] text-center text-[#474F7A]">
-          <p className="text-[16px]">შედეგები ვერ მოიძებნა. სცადეთ სხვა საკვანძო სიტყვა ან ავტორი.</p>
-        </div>
-      )}
     </div>
   );
-};
+}
 
-const SearchPage = () => {
+function SearchPage() {
   const searchParams = useSearchParams();
-  const searchQuery = searchParams.get('query')?.trim() || '';
+  const query = searchParams.get('query')?.trim() || '';
+  return <SearchResults searchQuery={query} />;
+}
 
-  return <SearchResults searchQuery={searchQuery} />;
-};
-
-const WrappedSearchPage = () => (
-  <Suspense fallback={<CustomLoader />}>
-    <SearchPage />
-  </Suspense>
-);
-
-export default WrappedSearchPage;
+export default function WrappedSearchPage() {
+  return (
+    <Suspense fallback={<Loader />}>
+      <SearchPage />
+    </Suspense>
+  );
+}

@@ -124,7 +124,7 @@ add_action('rest_api_init', 'twentytwentyfour_register_rest_endpoints');
 function handle_subscribe_request(WP_REST_Request $request)
 {
     $email = sanitize_email($request->get_param('email'));
-    error_log('Form submitted with email: ' . $email);
+    error_log('Form submitted with email (subscription request received)');
 
     if (!is_email($email)) {
         error_log('Invalid email submitted');
@@ -164,7 +164,7 @@ function sync_subscriber_to_service($post_id, $post, $update)
 
     // Get the email field using get_post_meta
     $email = get_post_meta($post_id, 'subscriber_email', true);
-    error_log('Retrieved email from post meta for post ID ' . $post_id . ': ' . $email);
+    error_log('Retrieved email from post meta for post ID ' . $post_id);
 
     if (empty($email) || !is_email($email)) {
         error_log('Invalid or missing email address for post ID: ' . $post_id);
@@ -204,9 +204,9 @@ function sync_subscriber_to_service($post_id, $post, $update)
         error_log('Response body: ' . $responseBody);
 
         if ($statusCode == 201 || $statusCode == 204) {
-            error_log('Subscriber successfully added/updated: ' . $email);
+            error_log('Subscriber successfully added/updated for post ID: ' . $post_id);
         } else {
-            error_log('Failed to add/update subscriber: ' . $email . '; Status code: ' . $statusCode . '; Response: ' . $responseBody);
+            error_log('Failed to add/update subscriber for post ID: ' . $post_id . '; Status code: ' . $statusCode);
         }
     }
 }
@@ -590,10 +590,18 @@ if (defined('WP_CLI') && WP_CLI) {
 function add_cors_http_header()
 {
     if (!headers_sent()) {
-        header("Access-Control-Allow-Origin: *");
+        $allowed_origins = [
+            'https://www.mautskebeli.ge',
+            'https://mautskebeli.ge',
+            'http://localhost:3000',
+        ];
+        $origin = isset($_SERVER['HTTP_ORIGIN']) ? $_SERVER['HTTP_ORIGIN'] : '';
+        if (in_array($origin, $allowed_origins, true)) {
+            header("Access-Control-Allow-Origin: $origin");
+            header("Access-Control-Allow-Credentials: true");
+        }
         header("Access-Control-Allow-Methods: GET, POST, OPTIONS");
         header("Access-Control-Allow-Headers: Content-Type, Authorization");
-        header("Access-Control-Allow-Credentials: true");
     }
 }
 
@@ -997,20 +1005,24 @@ function send_email($to, $subject, $message)
 
 
 
-// Handle donation request
 function handle_donation($request)
 {
-    error_log('handle_donation called');
     $data = $request->get_json_params();
-    error_log('Data received: ' . print_r($data, true));
 
-    // Check required fields
     if (!isset($data['donationAmount'], $data['donorName'], $data['donorEmail'])) {
-        error_log('Missing required fields');
         return new WP_REST_Response(['status' => 'error', 'message' => 'Missing required fields'], 400);
     }
 
-    // Create the donation post first and generate orderId
+    $amount = floatval($data['donationAmount']);
+    if ($amount < 1 || $amount > 50000) {
+        return new WP_REST_Response(['status' => 'error', 'message' => 'Donation amount must be between 1 and 50,000 GEL'], 400);
+    }
+    $data['donationAmount'] = $amount;
+
+    if (!is_email($data['donorEmail'])) {
+        return new WP_REST_Response(['status' => 'error', 'message' => 'Invalid email address'], 400);
+    }
+
     $post_id = create_donation_post($data, 'Pending');
 
     // **Set the donation as a WooCommerce order and mark it as a donation**
@@ -1049,14 +1061,19 @@ function handle_donation($request)
 }
 
 
-// Updated generate_cancellation_link function
 function generate_cancellation_link($recId)
 {
     if (empty($recId)) {
-        return '';                       // nothing to cancel
+        return '';
     }
+    $donation_post_id = get_donation_post_id_by_recId($recId);
+    $cancel_token = $donation_post_id ? get_post_meta($donation_post_id, 'cancel_token', true) : '';
     $frontend_cancel_url = 'https://www.mautskebeli.ge/cancel-donation';
-    return $frontend_cancel_url . '?recId=' . rawurlencode($recId);
+    $url = $frontend_cancel_url . '?recId=' . rawurlencode($recId);
+    if ($cancel_token) {
+        $url .= '&token=' . rawurlencode($cancel_token);
+    }
+    return $url;
 }
 
 
@@ -1079,7 +1096,7 @@ function handle_recurring_donation($data, $orderId)
         'description' => 'Setup recurring donation',
         'saveCard' => true,  // Ensure card is saved
         'methods' => [5],
-        'returnUrl' => 'https://www.mautskebeli.ge/donation?orderId=' . $orderId,
+        'returnUrl' => 'https://www.mautskebeli.ge/donation?orderId=' . $orderId . '&vt=' . rawurlencode(get_post_meta($orderId, 'verify_token', true)),
         'callbackUrl' => 'https://mautskebeli.wpenginepowered.com/wp-json/wp/v2/tbc-ipn',
     ];
 
@@ -1096,7 +1113,7 @@ function handle_recurring_donation($data, $orderId)
 
     // Handle API response
     $response_body = json_decode(wp_remote_retrieve_body($response), true);
-    error_log('Recurring donation API response: ' . print_r($response_body, true));
+    error_log('Recurring donation API response status: ' . (isset($response_body['payId']) ? 'payId received' : 'no payId'));
 
     if (isset($response_body['payId']) && isset($response_body['links'])) {
         // Save transaction_id (payId) to post meta
@@ -1168,7 +1185,7 @@ function save_recurring_payment_info($orderId, $recId)
     $donorEmail = get_post_meta($orderId, 'email', true);
     $donationAmount = get_post_meta($orderId, 'amount', true);
 
-    error_log('Retrieved donorEmail: ' . $donorEmail . ' and donationAmount: ' . $donationAmount);
+    error_log('Retrieved donor data for orderId: ' . $orderId);
 
     // Update ACF fields instead of saving in a custom table
     // Use the ACF field names you provided earlier
@@ -1258,7 +1275,7 @@ function charge_recurring_payment($recId, $amount)
 
         return true;
     } else {
-        error_log('Failed to process recurring payment: ' . print_r($response_body, true));
+        error_log('Failed to process recurring payment for recId: ' . $recId . ' - HTTP status: ' . wp_remote_retrieve_response_code($response));
         return false;
     }
 }
@@ -1599,6 +1616,9 @@ function process_daily_recurring_payments()
                 // Update next_payment_date on the EXISTING post
                 update_post_meta($donation_post_id, 'next_payment_date', $new_next_payment_date);
                 
+                // Reset reminder flag so the donor gets a reminder before next month's charge
+                update_post_meta($donation_post_id, 'reminder_email_sent', 0);
+
                 // Update last charge tracking
                 update_post_meta($donation_post_id, 'last_charge_date', date('Y-m-d', $today_timestamp));
                 update_post_meta($donation_post_id, 'last_charge_timestamp', current_time('mysql'));
@@ -1998,7 +2018,6 @@ function get_users_with_recurring_donations()
 
 
 
-// Delete a recurring payment by recId
 function delete_recurring_payment($request)
 {
     $params = $request->get_query_params();
@@ -2012,6 +2031,20 @@ function delete_recurring_payment($request)
     }
 
     $recId = sanitize_text_field($params['recId']);
+
+    // Validate cancel token to prevent unauthorized cancellation
+    $provided_token = isset($params['token']) ? sanitize_text_field($params['token']) : '';
+    $donation_post_id = get_donation_post_id_by_recId($recId);
+    if ($donation_post_id) {
+        $stored_token = get_post_meta($donation_post_id, 'cancel_token', true);
+        if (!empty($stored_token) && !hash_equals($stored_token, $provided_token)) {
+            return new WP_REST_Response([
+                'status' => 'error',
+                'message' => 'Invalid cancellation token.',
+            ], 403);
+        }
+    }
+
     $access_token = get_tbc_access_token();
 
     if (!$access_token) {
@@ -2228,7 +2261,7 @@ function process_payment($amount, $donorName, $email, $orderId, $isRecurring = f
             'total' => $amount,
             'currency' => 'GEL'
         ],
-        'returnurl' => 'https://www.mautskebeli.ge/donation?orderId=' . $orderId,
+        'returnurl' => 'https://www.mautskebeli.ge/donation?orderId=' . $orderId . '&vt=' . rawurlencode(get_post_meta($orderId, 'verify_token', true)),
         'expirationMinutes' => 10,
         'methods' => [5],
         'merchantPaymentId' => (string) $orderId,
@@ -2291,11 +2324,8 @@ function process_payment($amount, $donorName, $email, $orderId, $isRecurring = f
  */
 function verify_payment_status($request)
 {
-
     $data = $request->get_json_params();
-    error_log('verify_payment_status called with data: ' . print_r($data, true));
 
-    /* ───────────────────────── 0.  Basic validation ───────────────────────── */
     if (empty($data['orderId'])) {
         return new WP_REST_Response(
             ['status' => 'error', 'message' => 'Missing orderId'],
@@ -2304,6 +2334,17 @@ function verify_payment_status($request)
     }
 
     $order_id = (int) $data['orderId'];
+
+    // Validate verify token to prevent IDOR
+    $provided_token = isset($data['vt']) ? sanitize_text_field($data['vt']) : '';
+    $stored_token = get_post_meta($order_id, 'verify_token', true);
+    if (!empty($stored_token) && !hash_equals($stored_token, $provided_token)) {
+        return new WP_REST_Response(
+            ['status' => 'error', 'message' => 'Invalid verification token'],
+            403
+        );
+    }
+
     $pay_id = get_post_meta($order_id, 'transaction_id', true);
 
     if (!$pay_id) {
@@ -2365,11 +2406,9 @@ function verify_payment_status($request)
             );
         }
 
-        /* ── RACE-PROOF EMAIL FLAG  ────────────────────────────────────────── */
-        if (!get_post_meta($order_id, 'email_sent', true)) {
-
-            // 1) atomically set the flag (timestamp helps in audits)
-            update_post_meta($order_id, 'email_sent', current_time('mysql'));
+        /* ── RACE-PROOF EMAIL FLAG (atomic via add_post_meta unique) ────── */
+        $email_lock = add_post_meta($order_id, 'email_sent', current_time('mysql'), true);
+        if ($email_lock) {
 
             // 2) build and send the actual e-mail once
             $donor_email = get_post_meta($order_id, 'email', true);
@@ -2449,8 +2488,76 @@ function register_verify_payment_status_endpoint()
         'permission_callback' => '__return_true',
     ]);
 
+    register_rest_route('wp/v2', '/paypal-donation-complete', [
+        'methods' => 'POST',
+        'callback' => 'handle_paypal_donation_complete',
+        'permission_callback' => '__return_true',
+    ]);
 }
 add_action('rest_api_init', 'register_verify_payment_status_endpoint');
+
+
+/**
+ * Handle PayPal donation finalization.
+ * Called by the frontend after PayPal order capture succeeds.
+ */
+function handle_paypal_donation_complete(WP_REST_Request $request)
+{
+    $data = $request->get_json_params();
+
+    $amount        = isset($data['donationAmount']) ? floatval($data['donationAmount']) : 0;
+    $donor_name    = isset($data['donorName']) ? sanitize_text_field($data['donorName']) : '';
+    $donor_email   = isset($data['donorEmail']) ? sanitize_email($data['donorEmail']) : '';
+    $donor_phone   = isset($data['donorPhone']) ? sanitize_text_field($data['donorPhone']) : '';
+    $transaction_id = isset($data['transactionID']) ? sanitize_text_field($data['transactionID']) : '';
+    $currency      = isset($data['currency']) ? sanitize_text_field($data['currency']) : 'USD';
+    $payment_type  = (!empty($data['isRecurring']) && $data['isRecurring']) ? 'Recurring' : 'One-Time';
+
+    if ($amount < 1 || empty($donor_name) || !is_email($donor_email) || empty($transaction_id)) {
+        return new WP_REST_Response([
+            'status' => 'error',
+            'message' => 'Missing or invalid required fields',
+        ], 400);
+    }
+
+    $post_id = wp_insert_post([
+        'post_type'   => 'donation',
+        'post_title'  => 'PayPal Donation from ' . $donor_name,
+        'post_content' => '',
+        'post_status' => 'publish',
+    ]);
+
+    if (is_wp_error($post_id)) {
+        return new WP_REST_Response([
+            'status' => 'error',
+            'message' => 'Failed to create donation record',
+        ], 500);
+    }
+
+    update_post_meta($post_id, 'order_id', $post_id);
+    update_post_meta($post_id, 'name', $donor_name);
+    update_post_meta($post_id, 'email', $donor_email);
+    update_post_meta($post_id, 'phone', $donor_phone);
+    update_post_meta($post_id, 'amount', $amount);
+    update_post_meta($post_id, 'payment_status', 'Succeeded');
+    update_post_meta($post_id, 'payment_type', $payment_type);
+    update_post_meta($post_id, 'payment_method', 'PayPal');
+    update_post_meta($post_id, 'transaction_id', $transaction_id);
+    update_post_meta($post_id, 'currency', $currency);
+    update_post_meta($post_id, 'is_donation', true);
+
+    $subject = 'მადლობას გიხდით მხარდაჭერისთვის!';
+    $message = "თქვენი კონტრიბუცია ({$amount} {$currency}) აძლიერებს პლათფორმას!<br><br>";
+    $message .= 'პატივისცემით,<br>Mautskebeli.ge';
+    send_email($donor_email, $subject, $message);
+    update_post_meta($post_id, 'email_sent', current_time('mysql'));
+
+    return new WP_REST_Response([
+        'status' => 'success',
+        'message' => 'PayPal donation recorded successfully.',
+        'post_id' => $post_id,
+    ], 200);
+}
 
 
 /* --------------------------------------------------------------------
@@ -2511,11 +2618,9 @@ function tbc_mark_donation_succeeded($order_id, $tbc_body)
         );
     }
 
-    // 2  race-proof e-mail (same flag you already use)
-    if (!get_post_meta($order_id, 'email_sent', true)) {
-
-        update_post_meta($order_id, 'email_sent', current_time('mysql'));
-
+    // 2  race-proof e-mail (atomic via add_post_meta unique)
+    $email_lock = add_post_meta($order_id, 'email_sent', current_time('mysql'), true);
+    if ($email_lock) {
         $donor_email = get_post_meta($order_id, 'email', true);
         $donor_name = get_post_meta($order_id, 'name', true);
         $amount = get_post_meta($order_id, 'amount', true);
@@ -2765,6 +2870,12 @@ function create_donation_post($data, $payment_status)
         update_post_meta($post_id, 'retry_count', 0);
     }
 
+    // Generate secret tokens for secure links
+    $cancel_token = bin2hex(random_bytes(16));
+    update_post_meta($post_id, 'cancel_token', $cancel_token);
+    $verify_token = bin2hex(random_bytes(16));
+    update_post_meta($post_id, 'verify_token', $verify_token);
+
     return $post_id;
 }
 
@@ -2871,7 +2982,7 @@ function get_tbc_access_token()
     $body = json_decode(wp_remote_retrieve_body($response), true);
 
     if (empty($body['access_token'])) {
-        error_log('TBC token error: ' . print_r($body, true));
+        error_log('TBC token error: failed to obtain access token');
         return null;
     }
 
@@ -2882,22 +2993,12 @@ function get_tbc_access_token()
     return $body['access_token'];
 }
 
-// Register the donation REST endpoint
-function register_donation_endpoint()
-{
-    register_rest_route('wp/v2', '/submit-donation/', array(
-        'methods' => 'POST',
-        'callback' => 'handle_donation',
-        'permission_callback' => '__return_true'
-    ));
-}
-add_action('rest_api_init', 'register_donation_endpoint');
+// Duplicate register_donation_endpoint removed — already registered in twentytwentyfour_register_rest_endpoints()
 
 // Fetch the TBC token on initialization
 add_action('init', function () {
     if (current_user_can('administrator')) {
-        $token = get_tbc_access_token();
-        error_log('TBC Access Token: ' . $token);
+        get_tbc_access_token();
     }
 });
 
@@ -4214,8 +4315,8 @@ function add_news_acf_fields() {
                     'label' => 'Author / ავტორი',
                     'name' => 'author',
                     'type' => 'text',
-                    'instructions' => 'Author name for this news item',
-                    'required' => 1,
+                    'instructions' => 'Author name for this news item (optional)',
+                    'required' => 0,
                     'default_value' => '',
                     'placeholder' => 'Enter author name',
                 ),
