@@ -85,9 +85,9 @@ const NewsCard = ({ news, index, featured = false }) => {
             {/* Date */}
             <p className="text-white/60 text-sm mb-2">{formatDate(news.date)}</p>
 
-            {/* Title */}
-            <h3 className="text-white text-2xl lg:text-3xl font-bold leading-tight mb-2 
-                          line-clamp-3 transition-colors duration-300 group-hover:text-[#FECE27]">
+            {/* Title - same font as main banner (ALK Tall Mtavruli) */}
+            <h3 className="font-alk-tall-mtavruli text-white text-[1.4rem] lg:text-[1.85rem] font-light leading-tight mb-2 
+                          tracking-wide line-clamp-3 transition-colors duration-300 group-hover:text-[#FECE27]">
               {decodeHTMLEntities(news.title)}
             </h3>
 
@@ -145,8 +145,8 @@ const NewsCard = ({ news, index, featured = false }) => {
           {/* Date */}
           <p className="text-[#8B7AA0] text-xs mb-2">{formatDate(news.date)}</p>
           
-          {/* Title */}
-          <h3 className="text-[#474F7A] text-lg font-bold leading-snug line-clamp-2 
+          {/* Title - same font as main banner (ALK Tall Mtavruli) */}
+          <h3 className="font-alk-tall-mtavruli text-[#474F7A] text-xl font-light leading-snug tracking-wide line-clamp-2 
                         transition-colors duration-300 group-hover:text-[#AD88C6] mb-2">
             {decodeHTMLEntities(news.title)}
           </h3>
