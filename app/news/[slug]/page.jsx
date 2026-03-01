@@ -66,15 +66,19 @@ export async function generateMetadata({ params }) {
     stripHtml(news.acf?.description || news.acf?.main_text || '').slice(0, 200)
   );
 
-  let imageUrl = 'https://www.mautskebeli.ge/images/og-logo.jpg';
+  let rawImageUrl = '';
   if (news.acf?.image) {
     const img = news.acf.image;
     if (typeof img === 'string' && img.startsWith('http')) {
-      imageUrl = img.split('?')[0];
+      rawImageUrl = img.split('?')[0];
     } else if (typeof img === 'object' && img?.url) {
-      imageUrl = img.url.split('?')[0];
+      rawImageUrl = img.url.split('?')[0];
     }
   }
+
+  const imageUrl = rawImageUrl
+    ? `https://www.mautskebeli.ge/api/og-image?url=${encodeURIComponent(rawImageUrl)}`
+    : 'https://www.mautskebeli.ge/images/og-logo.jpg';
 
   const metadataBase = new URL('https://www.mautskebeli.ge');
   const canonicalUrl = `/news/${slug}`;
