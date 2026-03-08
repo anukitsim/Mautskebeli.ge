@@ -3,7 +3,7 @@
 // ========================================
 // EMERGENCY: DISABLE DONATION EMAILS
 // ========================================
-define('MSB_EMAILS_DISABLED', true);
+define('MSB_EMAILS_DISABLED', false);
 
 // Block donation-related emails from being sent
 add_filter('pre_wp_mail', function($null, $atts) {
@@ -475,6 +475,205 @@ add_action('rest_api_init', function () {
 });
 
 
+function get_hero_cards()
+{
+    $args = array(
+        'post_type' => array(
+            'article',
+            'free-column',
+            'news',
+            'main',
+            'mau-books',
+            'targmani',
+            'sport-article',
+            'sporti-videos',
+            'mecniereba',
+            'medicina',
+            'msoflio',
+            'saxli',
+            'kalaki',
+            'shroma',
+            'xelovneba',
+            'ekonomika',
+            'resursebi',
+        ),
+        'posts_per_page' => 2,
+        'meta_query' => array(
+            array(
+                'key' => 'hero_card',
+                'value' => '1',
+                'compare' => '='
+            )
+        ),
+        'orderby' => 'meta_value_num',
+        'meta_key' => 'hero_card_order',
+        'order' => 'ASC',
+    );
+
+    $query = new WP_Query($args);
+    $cards = array();
+
+    $video_post_types = array(
+        'kalaki', 'mecniereba', 'medicina', 'msoflio',
+        'saxli', 'shroma', 'xelovneba', 'ekonomika',
+        'resursebi', 'sporti-videos',
+    );
+
+    if ($query->have_posts()) {
+        while ($query->have_posts()) {
+            $query->the_post();
+            $fields = get_fields();
+            $post_type = get_post_type();
+            $post_id = get_the_ID();
+
+            $video_url = '';
+            $video_id = '';
+            if (in_array($post_type, $video_post_types)) {
+                $video_url = isset($fields['video_url']) ? $fields['video_url'] : (isset($fields['video']) ? $fields['video'] : '');
+                if ($video_url) {
+                    preg_match('/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/', $video_url, $matches);
+                    $video_id = isset($matches[1]) ? $matches[1] : '';
+                }
+            }
+
+            $slug = '';
+            if ($post_type === 'news') {
+                $slug = get_post_field('post_name', $post_id);
+            }
+
+            $cards[] = array(
+                'id' => $post_id,
+                'title' => get_the_title(),
+                'date' => get_the_date('c'),
+                'post_type' => $post_type,
+                'slug' => $slug,
+                'hero_card_image' => isset($fields['hero_card_image']) ? (is_array($fields['hero_card_image']) ? $fields['hero_card_image']['url'] : $fields['hero_card_image']) : '',
+                'hero_card_order' => isset($fields['hero_card_order']) ? intval($fields['hero_card_order']) : 1,
+                'hero_card_custom_url' => isset($fields['hero_card_custom_url']) ? $fields['hero_card_custom_url'] : '',
+                'video_id' => $video_id,
+                'image' => isset($fields['image']) ? $fields['image'] : '',
+            );
+        }
+        wp_reset_postdata();
+    }
+
+    usort($cards, function ($a, $b) {
+        return $a['hero_card_order'] - $b['hero_card_order'];
+    });
+
+    wp_send_json($cards);
+}
+
+add_action('rest_api_init', function () {
+    register_rest_route('custom/v1', '/hero-cards', array(
+        'methods' => 'GET',
+        'callback' => 'get_hero_cards',
+        'permission_callback' => '__return_true',
+    ));
+});
+
+add_filter('acf/update_value/name=hero_card', function ($value, $post_id, $field) {
+    return $value ? '1' : '0';
+}, 10, 3);
+
+
+add_action('acf/init', function () {
+    if (!function_exists('acf_add_local_field_group')) return;
+
+    acf_add_local_field_group(array(
+        'key' => 'group_hero_card_settings',
+        'title' => 'Hero Card - მთავარი გვერდის ბარათი',
+        'fields' => array(
+            array(
+                'key' => 'field_hero_card',
+                'label' => 'Hero Card',
+                'name' => 'hero_card',
+                'type' => 'true_false',
+                'instructions' => 'მონიშნეთ რომ ეს პოსტი მთავარ გვერდზე ბარათად გამოჩნდეს',
+                'default_value' => 0,
+                'ui' => 1,
+            ),
+            array(
+                'key' => 'field_hero_card_image',
+                'label' => 'Hero Card Image',
+                'name' => 'hero_card_image',
+                'type' => 'image',
+                'instructions' => 'ბარათის სურათი (შეიძლება განსხვავდებოდეს პოსტის სურათისგან)',
+                'return_format' => 'url',
+                'preview_size' => 'medium',
+                'conditional_logic' => array(
+                    array(
+                        array(
+                            'field' => 'field_hero_card',
+                            'operator' => '==',
+                            'value' => '1',
+                        ),
+                    ),
+                ),
+            ),
+            array(
+                'key' => 'field_hero_card_order',
+                'label' => 'Hero Card Order',
+                'name' => 'hero_card_order',
+                'type' => 'number',
+                'instructions' => '1 = ზედა ბარათი, 2 = ქვედა ბარათი',
+                'default_value' => 1,
+                'min' => 1,
+                'max' => 2,
+                'conditional_logic' => array(
+                    array(
+                        array(
+                            'field' => 'field_hero_card',
+                            'operator' => '==',
+                            'value' => '1',
+                        ),
+                    ),
+                ),
+            ),
+            array(
+                'key' => 'field_hero_card_custom_url',
+                'label' => 'Hero Card Custom URL',
+                'name' => 'hero_card_custom_url',
+                'type' => 'url',
+                'instructions' => 'არასავალდებულო - მაგ. პოდკასტის ლინკი: /podcast?videoId=xxx',
+                'conditional_logic' => array(
+                    array(
+                        array(
+                            'field' => 'field_hero_card',
+                            'operator' => '==',
+                            'value' => '1',
+                        ),
+                    ),
+                ),
+            ),
+        ),
+        'location' => array(
+            array(array('param' => 'post_type', 'operator' => '==', 'value' => 'article')),
+            array(array('param' => 'post_type', 'operator' => '==', 'value' => 'news')),
+            array(array('param' => 'post_type', 'operator' => '==', 'value' => 'free-column')),
+            array(array('param' => 'post_type', 'operator' => '==', 'value' => 'main')),
+            array(array('param' => 'post_type', 'operator' => '==', 'value' => 'mau-books')),
+            array(array('param' => 'post_type', 'operator' => '==', 'value' => 'targmani')),
+            array(array('param' => 'post_type', 'operator' => '==', 'value' => 'sport-article')),
+            array(array('param' => 'post_type', 'operator' => '==', 'value' => 'sporti-videos')),
+            array(array('param' => 'post_type', 'operator' => '==', 'value' => 'mecniereba')),
+            array(array('param' => 'post_type', 'operator' => '==', 'value' => 'medicina')),
+            array(array('param' => 'post_type', 'operator' => '==', 'value' => 'msoflio')),
+            array(array('param' => 'post_type', 'operator' => '==', 'value' => 'saxli')),
+            array(array('param' => 'post_type', 'operator' => '==', 'value' => 'kalaki')),
+            array(array('param' => 'post_type', 'operator' => '==', 'value' => 'shroma')),
+            array(array('param' => 'post_type', 'operator' => '==', 'value' => 'xelovneba')),
+            array(array('param' => 'post_type', 'operator' => '==', 'value' => 'ekonomika')),
+            array(array('param' => 'post_type', 'operator' => '==', 'value' => 'resursebi')),
+        ),
+        'menu_order' => 0,
+        'position' => 'side',
+        'style' => 'default',
+        'label_placement' => 'top',
+    ));
+});
+
+
 // Add this function near other REST API functions
 function add_acf_to_json_api($data, $post, $context)
 {
@@ -923,27 +1122,27 @@ function msb_set_payment_status($order_id, $new_status)
 
 
 
-// Updated send_email function without automatic cancellation link
 function send_email($to, $subject, $message)
 {
+    if (empty($to) || !is_email($to)) {
+        error_log("[EMAIL] BLOCKED: Invalid recipient address: '$to' for subject: $subject");
+        return;
+    }
+
     $headers = array(
         'Content-Type: text/html; charset=UTF-8',
         'From: Mautskebeli.ge <noreply@mautskebeli.ge>',
         'Reply-To: noreply@mautskebeli.ge',
     );
 
-    // Log email details
-    error_log('Attempting to send email to: ' . $to);
-    error_log('Email subject: ' . $subject);
+    error_log("[EMAIL] Sending to: $to | Subject: $subject");
 
-    // Send the email
     $sent = wp_mail($to, $subject, $message, $headers);
 
-    // Log the result
     if ($sent) {
-        error_log('Email successfully sent to ' . $to);
+        error_log("[EMAIL] Successfully sent to $to");
     } else {
-        error_log('Failed to send email to ' . $to);
+        error_log("[EMAIL] FAILED to send to $to");
     }
 }
 
@@ -1215,7 +1414,7 @@ function generate_thank_you_email_content($donor_name, $amount, $next_payment_da
 
     /* add link only if we actually have one */
     if ($cancel_link) {
-        $message .= "გასაუქმებლად გადადით <a href='" .
+        $message .= "თუ გსურთ ყოველთვიური დონაციის გაუქმება, გადადით <a href='" .
             esc_url($cancel_link) . "'>ბმულზე</a><br><br>";
     }
 
@@ -1288,30 +1487,42 @@ function charge_recurring_payment($recId, $amount)
  */
 function send_monthly_success_email($donation_post_id)
 {
-    // Fetch donor info from post meta
+    $billing_period = date('Ym', current_time('timestamp'));
+    $lock_key = 'monthly_success_email_' . $billing_period;
+    $already_sent = get_post_meta($donation_post_id, $lock_key, true);
+    if ($already_sent) {
+        error_log("[EMAIL] Monthly success email already sent for post $donation_post_id in period $billing_period");
+        return;
+    }
+
     $donor_email = get_post_meta($donation_post_id, 'email', true);
     $donor_name = get_post_meta($donation_post_id, 'name', true);
     $amount = get_post_meta($donation_post_id, 'amount', true);
     $next_date = get_post_meta($donation_post_id, 'next_payment_date', true);
     $recId = get_post_meta($donation_post_id, 'recId', true);
 
-    // Generate cancellation link
+    if (empty($donor_email) || !is_email($donor_email)) {
+        error_log("[EMAIL] Invalid email for post $donation_post_id, skipping monthly success email");
+        return;
+    }
+
     $cancel_link = generate_cancellation_link($recId);
 
-    // Compose the email
     $subject = "ყოველთვიური დონაცია - მადლობას გიხდით მხარდაჭერისთვის!";
     $message = "თქვენი ყოველთვიური კონტრიბუცია აძლიერებს პლათფორმას.<br>";
     $message .= "თანხა: <strong>" . esc_html($amount) . " GEL</strong>.<br>";
     $message .= "მომდევნო გადახდის თარიღი: <strong>" . date('Y-m-d', strtotime($next_date)) . "</strong>.<br><br>";
     if ($cancel_link) {
-        $message .= "გასაუქმებლად გადადით <a href='" .
+        $message .= "თუ გსურთ ყოველთვიური დონაციის გაუქმება, გადადით <a href='" .
             esc_url($cancel_link) . "'>ბმულზე</a><br><br>";
     }
 
     $message .= "პატივისცემით,<br>Mautskebeli.ge";
 
-    // Send the email
     send_email($donor_email, $subject, $message);
+
+    update_post_meta($donation_post_id, $lock_key, current_time('mysql'));
+    error_log("[EMAIL] Monthly success email sent and locked for post $donation_post_id in period $billing_period");
 }
 
 
@@ -1325,36 +1536,46 @@ function send_monthly_success_email($donation_post_id)
  */
 function send_recurring_payment_failed_email($donation_post_id, $next_retry_date = null)
 {
-    // Fetch donor info
+    $retry_count = (int) get_post_meta($donation_post_id, 'retry_count', true);
+    $lock_key = 'failed_email_retry_' . $retry_count;
+    $already_sent = get_post_meta($donation_post_id, $lock_key, true);
+    if ($already_sent) {
+        error_log("[EMAIL] Failed email already sent for post $donation_post_id retry $retry_count");
+        return;
+    }
+
     $donor_email = get_post_meta($donation_post_id, 'email', true);
     $donor_name = get_post_meta($donation_post_id, 'name', true);
     $amount = get_post_meta($donation_post_id, 'amount', true);
     $recId = get_post_meta($donation_post_id, 'recId', true);
 
-    // Compose the subject & body
+    if (empty($donor_email) || !is_email($donor_email)) {
+        error_log("[EMAIL] Invalid email for post $donation_post_id, skipping failed email");
+        return;
+    }
+
     $subject = "ყოველთვიური დონაცია - გადახდა ვერ მოხერხდა";
     $message = "ძვირფასო " . esc_html($donor_name) . ",<br><br>";
     $message .= "გადახდა ვერ მოხერხდა.<br>";
     $message .= "თანხა: <strong>" . esc_html($amount) . " GEL</strong>.<br><br>";
 
-    // If we passed a $next_retry_date, mention that we will retry again
     if ($next_retry_date) {
-        // Convert YYYYMMDD to a nicer format, e.g. 2025-03-03
         $readable_date = date('Y-m-d', strtotime($next_retry_date));
         $message .= "გადახდის მომდევნო მცდელობა: <strong>" . $readable_date . "</strong>-ში.<br><br>";
     }
 
-    // Provide a cancellation link if they prefer to stop
     $cancel_link = generate_cancellation_link($recId);
     if ($cancel_link) {
-        $message .= "გასაუქმებლად გადადით <a href='" .
+        $message .= "თუ გსურთ ყოველთვიური დონაციის გაუქმება, გადადით <a href='" .
             esc_url($cancel_link) . "'>ბმულზე</a><br><br>";
     }
 
     $message .= "პატივისცემით,<br>Mautskebeli.ge";
 
-    // Send the email
     send_email($donor_email, $subject, $message);
+
+    update_post_meta($donation_post_id, $lock_key, current_time('mysql'));
+    error_log("[EMAIL] Failed email sent and locked for post $donation_post_id retry $retry_count");
 }
 
 
@@ -1758,16 +1979,18 @@ function send_recurring_payment_reminder($user)
     $donation_amount = $user['donationAmount'];
     $donation_post_id = $user['donationPostId'];
 
-    // Check if reminder email has already been sent
-    $reminder_sent = get_post_meta($donation_post_id, 'reminder_email_sent', true);
-    if ($reminder_sent) {
-        error_log("Reminder email already sent for recId: $recId");
+    if (empty($donor_email) || !is_email($donor_email)) {
+        error_log("[EMAIL] Invalid email for post $donation_post_id, skipping reminder");
         return;
     }
 
-    // Fetch the raw date from meta
+    $reminder_sent = get_post_meta($donation_post_id, 'reminder_email_sent', true);
+    if ($reminder_sent) {
+        error_log("[EMAIL] Reminder already sent for recId: $recId");
+        return;
+    }
+
     $raw_date = get_post_meta($donation_post_id, 'next_payment_date', true);
-    // Normalize it
     $next_payment_date = normalize_date_to_ymd($raw_date);
 
     // Compare with "today + 2 days"
@@ -1782,7 +2005,7 @@ function send_recurring_payment_reminder($user)
         $message .= "თქვენი ყოველთვიური კონტრიბუცია აძლიერებს პლათფორმას.<br>";
         $message .= "დონაციის თანხა: " . esc_html($donation_amount) . " GEL.<br>";
         if ($cancel_link) {
-            $message .= "გასაუქმებლად გადადით <a href='" .
+            $message .= "თუ გსურთ ყოველთვიური დონაციის გაუქმება, გადადით <a href='" .
                 esc_url($cancel_link) . "'>ბმულზე</a><br><br>";
         }
 
@@ -2428,7 +2651,7 @@ function verify_payment_status($request)
 
                 /* ——— only add the paragraph when we **have** a link ——— */
                 if ($cancel_link) {
-                    $message .= "გასაუქმებლად გადადით <a href='" .
+                    $message .= "თუ გსურთ ყოველთვიური დონაციის გაუქმება, გადადით <a href='" .
                         esc_url($cancel_link) . "'>ბმულზე</a><br><br>";
                 }
 
@@ -2546,11 +2769,15 @@ function handle_paypal_donation_complete(WP_REST_Request $request)
     update_post_meta($post_id, 'currency', $currency);
     update_post_meta($post_id, 'is_donation', true);
 
-    $subject = 'მადლობას გიხდით მხარდაჭერისთვის!';
-    $message = "თქვენი კონტრიბუცია ({$amount} {$currency}) აძლიერებს პლათფორმას!<br><br>";
-    $message .= 'პატივისცემით,<br>Mautskebeli.ge';
-    send_email($donor_email, $subject, $message);
-    update_post_meta($post_id, 'email_sent', current_time('mysql'));
+    $email_lock = add_post_meta($post_id, 'email_sent', current_time('mysql'), true);
+    if ($email_lock) {
+        $subject = 'მადლობას გიხდით მხარდაჭერისთვის!';
+        $message = "თქვენი კონტრიბუცია ({$amount} {$currency}) აძლიერებს პლათფორმას!<br><br>";
+        $message .= 'პატივისცემით,<br>Mautskebeli.ge';
+        send_email($donor_email, $subject, $message);
+    } else {
+        error_log("[EMAIL] PayPal email already sent for post_id $post_id");
+    }
 
     return new WP_REST_Response([
         'status' => 'success',
@@ -2636,7 +2863,7 @@ function tbc_mark_donation_succeeded($order_id, $tbc_body)
             $message .= 'მომდევნო გადახდის თარიღი - ' .
                 date('d/m/Y', strtotime($next_date)) . '<br><br>';
             if ($cancel_link) {
-                $message .= "გასაუქმებლად გადადით <a href='" .
+                $message .= "თუ გსურთ ყოველთვიური დონაციის გაუქმება, გადადით <a href='" .
                     esc_url($cancel_link) . "'>ბმულზე</a><br><br>";
             }
             $message .= 'პატივისცემით,<br>Mautskebeli.ge';

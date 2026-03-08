@@ -59,7 +59,7 @@ const NewsCard = ({ news, index, featured = false }) => {
     return (
       <Link href={constructUrl()} className="group block lg:col-span-2 md:col-span-2">
         <article 
-          className="relative h-[380px] rounded-2xl overflow-hidden shadow-lg"
+          className="relative h-[260px] sm:h-[320px] lg:h-[380px] rounded-2xl overflow-hidden shadow-lg"
           style={{ 
             animationDelay: `${index * 100}ms`,
             animation: 'slideUp 0.6s ease-out forwards',
@@ -200,7 +200,7 @@ const NewsSection = () => {
         <div className="animate-pulse">
           <div className="h-8 bg-[#E0DBE8] rounded w-40 mb-6" />
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="lg:col-span-2 md:col-span-2 bg-[#E0DBE8] rounded-2xl h-[380px]" />
+            <div className="lg:col-span-2 md:col-span-2 bg-[#E0DBE8] rounded-2xl h-[260px] sm:h-[320px] lg:h-[380px]" />
             {[...Array(4)].map((_, i) => (
               <div key={i} className="bg-[#E0DBE8] rounded-xl h-80" />
             ))}

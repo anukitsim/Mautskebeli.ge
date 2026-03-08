@@ -7,6 +7,7 @@ import HomePageVideos from "../components/HomePageVideos";
 import MainNews from "../components/MainNews";
 import Navigation from "../components/Navigation";
 import Sidebar from "../components/Sidebar";
+// import HeroSideCards from "../components/HeroSideCards";
 import NewsSection from "../components/NewsSection";
 import { MenuProvider } from "../context/MenuContext";
 import DonationPopup from "../components/DonationPopup";
@@ -21,46 +22,56 @@ export default function Home() {
           <Navigation />
         </div>
 
-        {/* Main News Section - Hero Banner with Sidebar (same width as sections below) */}
-        <div className="mx-auto mt-8 flex flex-col md:flex-row gap-5 w-11/12 md:w-10/12 lg:mb-0 mb-[280px] items-stretch">
-          <Sidebar />
-          <MainNews />
+        {/* Hero Section */}
+        <div className="mx-auto mt-4 sm:mt-6 lg:mt-8 px-4 sm:px-0 w-full sm:w-11/12 md:w-10/12">
+          <div className="flex flex-row gap-5 items-stretch lg:min-h-[420px]">
+            <Sidebar />
+            <MainNews />
+          </div>
         </div>
 
-        {/* News Section - ახალი ამბები */}
-        <section className="container mx-auto px-4 lg:px-8 mt-24 lg:mt-32">
+        {/* Hero Bento Section (commented out - side cards next to main banner) */}
+        {/* <div className="mx-auto mt-8 w-11/12 md:w-10/12">
+          <div className="hero-bento-layout">
+            <div className="hero-bento-banner">
+              <MainNews />
+            </div>
+            <div className="hero-bento-cards">
+              <HeroSideCards />
+            </div>
+          </div>
+        </div> */}
+
+        {/* News Section */}
+        <section className="mt-8 sm:mt-12 lg:mt-16 px-4 sm:px-0 sm:w-11/12 md:w-10/12 mx-auto">
           <NewsSection />
         </section>
 
-        {/* Sections: same width as hero (w-11/12 md:w-10/12), podcast stays full width below */}
-        <div className="mx-auto w-11/12 md:w-10/12">
+        <div className="mx-auto px-4 sm:px-0 sm:w-11/12 md:w-10/12">
           <DonationPopup />
 
-          {/* Home Page Videos Section */}
-          <section className="px-0 mt-12 lg:mt-16">
+          <section className="mt-8 sm:mt-12 lg:mt-16">
             <HomePageVideos />
           </section>
 
-          {/* Home Page Statiebi Section */}
-          <section className="px-0 mt-12 lg:mt-16">
+          <section className="mt-8 sm:mt-12 lg:mt-16">
             <HomePageStatiebi />
           </section>
         </div>
 
-        {/* Home Page Podcast Section - full width, do not change */}
-        <div className="mt-12 lg:mt-16">
+        {/* Podcast Section - full width */}
+        <div className="mt-8 sm:mt-12 lg:mt-16">
           <HomePagePodcast />
         </div>
 
-        <div className="mx-auto w-11/12 md:w-10/12">
-          {/* Home Page Rcheuli Section */}
-          <section className="px-0 mt-12 lg:mt-16">
+        <div className="mx-auto px-4 sm:px-0 sm:w-11/12 md:w-10/12">
+          <section className="mt-8 sm:mt-12 lg:mt-16">
             <HomePageRcheuli />
           </section>
         </div>
 
-        {/* Donation Banner - full width, after მაუწყებელი გირჩევთ, before footer */}
-        <section className="mt-12 lg:mt-16 w-full">
+        {/* Donation Banner - full width */}
+        <section className="mt-8 sm:mt-12 lg:mt-16 w-full">
           <DonationBanner />
         </section>
 

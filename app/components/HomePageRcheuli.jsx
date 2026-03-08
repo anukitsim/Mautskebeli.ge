@@ -25,13 +25,26 @@ const extractVideoId = (videoUrl) => {
 
 const constructUrl = (post) => {
   const { post_id, post_type, acf_fields } = post;
-  const videoId = extractVideoId(acf_fields.video_url);
+  const videoId = extractVideoId(acf_fields?.video_url);
 
   if (videoId) {
     return `/${post_type}?videoId=${videoId}`;
   }
 
-  return `/all-articles/${post_id}`;
+  switch (post_type) {
+    case 'article':
+      return `/all-articles/${post_id}`;
+    case 'free-column':
+      return `/free-column/${post_id}`;
+    case 'mau-books':
+      return `/books/${post_id}`;
+    case 'targmani':
+      return `/translate/${post_id}`;
+    case 'sport-article':
+      return `/sport-articles/${post_id}`;
+    default:
+      return `/all-articles/${post_id}`;
+  }
 };
 
 const HomePageRcheuli = () => {
@@ -127,11 +140,11 @@ const HomePageRcheuli = () => {
                   <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent 
                                  opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   
-                  {/* Play icon - only for videos */}
+                  {/* Play icon - only for videos; larger on mobile for touch */}
                   {post.acf_fields.video_url && (
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="w-10 h-10 rounded-full bg-white/90 shadow-lg flex items-center justify-center">
-                        <svg className="w-4 h-4 text-[#AD88C6] ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+                      <div className="w-12 h-12 sm:w-14 sm:h-14 flex-shrink-0 rounded-full bg-white/90 shadow-lg flex items-center justify-center aspect-square">
+                        <svg className="w-5 h-5 sm:w-6 sm:h-6 text-[#AD88C6] ml-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24" preserveAspectRatio="xMidYMid meet">
                           <path d="M8 5v14l11-7z"/>
                         </svg>
                       </div>
@@ -180,13 +193,12 @@ const HomePageRcheuli = () => {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent 
                                opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 
-                {/* Play icon for videos */}
+                {/* Play icon for videos - always visible when video, no hover needed */}
                 {post.acf_fields.video_url && (
-                  <div className="absolute inset-0 flex items-center justify-center opacity-0 
-                                 group-hover:opacity-100 transition-all duration-300">
-                    <div className="w-12 h-12 rounded-full bg-white/90 shadow-lg flex items-center justify-center
-                                   transform scale-75 group-hover:scale-100 transition-transform duration-300">
-                      <svg className="w-5 h-5 text-[#AD88C6] ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-12 h-12 flex-shrink-0 rounded-full bg-white/90 shadow-lg flex items-center justify-center aspect-square
+                                   transition-transform duration-300 group-hover:scale-110">
+                      <svg className="w-5 h-5 text-[#AD88C6] ml-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24" preserveAspectRatio="xMidYMid meet">
                         <path d="M8 5v14l11-7z"/>
                       </svg>
                     </div>

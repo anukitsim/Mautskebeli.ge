@@ -17,9 +17,10 @@ const HomePagePodcast = () => {
             <Image
               src="/images/podcast-banner.svg"
               alt="Podcast Banner"
-              layout="responsive"
               width={1920}
               height={475}
+              sizes="100vw"
+              style={{ width: '100%', height: 'auto' }}
               quality={100}
               priority
             />
@@ -56,26 +57,28 @@ const HomePagePodcast = () => {
             <Image
               src="/images/mobile-banner.png"
               alt="Podcast Banner"
-              layout="responsive"
               width={800}
               height={420}
+              sizes="100vw"
+              style={{ width: '100%', height: 'auto' }}
               quality={100}
               priority
             />
           </Link>
         </div>
-        <div className="absolute top-10 right-5 flex justify-center items-center">
+        <div className="absolute top-4 sm:top-8 right-3 sm:right-5 flex justify-center items-center">
           <Link
             href="https://www.youtube.com/playlist?list=PL8wF1aEA4P8NJZUazilLH7ES-T-RQd3Cy"
             target="_blank"
-            className="transform transition-all duration-300 hover:scale-105"
+            className="inline-flex transition-all duration-300 hover:scale-105 active:scale-95"
           >
             <Image
               src="/images/mobile-youtube-banner.png"
-              alt="youtube"
-              width={558}
-              height={184}
-              className="drop-shadow-md"
+              alt="YouTube-ზე ფლეილისტის ნახვა"
+              width={280}
+              height={92}
+              sizes="(max-width: 640px) 200px, 260px"
+              className="drop-shadow-lg w-[200px] h-auto sm:w-[260px] object-contain"
             />
           </Link>
         </div>

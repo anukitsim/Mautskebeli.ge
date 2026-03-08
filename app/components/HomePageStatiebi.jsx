@@ -81,13 +81,13 @@ const HomePageStatiebi = () => {
       </div>
 
       {/* Horizontal scrolling section for mobile */}
-      <div className="flex lg:hidden overflow-x-auto space-x-4 no-scrollbar">
+      <div className="flex lg:hidden overflow-x-auto space-x-4 hide-scroll-bar">
         {articles.map((article, index) => {
           const imageUrl = article.acf.image ? article.acf.image : '/images/default-image.png';
           return (
             <Link href={article.slug ? `/all-articles/${article.slug}` : `/all-articles/${article.id}`} passHref key={article.id} className="group">
               <div 
-                className="flex-none w-[300px] bg-[#F6F4F8] rounded-xl border border-[#E0DBE8] overflow-hidden flex flex-col h-[500px]
+                className="flex-none w-[260px] sm:w-[300px] bg-[#F6F4F8] rounded-xl border border-[#E0DBE8] overflow-hidden flex flex-col h-[420px] sm:h-[480px]
                              shadow-sm hover:shadow-xl transition-all duration-500 hover:-translate-y-1"
                 style={{
                   animationDelay: `${index * 100}ms`,

@@ -156,7 +156,7 @@ const Footer = () => {
       </footer>
 
       {/* Mobile screen Footer */}
-      <footer className="flex lg:hidden bg-[#AD88C6] flex-col justify-center mt-[42px] gap-[32px] items-center">
+      <footer className="flex lg:hidden bg-[#AD88C6] flex-col justify-center mt-[32px] gap-[28px] items-center px-5 pb-6">
         <Image src="/images/footer-logo-good.svg" alt="logo" width={116} height={32} className="mt-[32px]" />
         <div className="flex flex-col justify-center items-center gap-[18px]">
           <h1 className="text-white text-[15px] font-bold">კონტაქტი</h1>
@@ -245,7 +245,7 @@ const Footer = () => {
           {/* Subscription form for Mobile */}
           <form onSubmit={handleSubmit} className="flex flex-col w-full gap-[10px]">
             <input
-              className="w-[90vw] h-[44px] pl-[18px] pr-[18px] border border-[#CBCBCB] rounded-[4px] text-[16px] placeholder-[#474F7A]"
+              className="w-full max-w-[90vw] h-[44px] pl-[18px] pr-[18px] border border-[#CBCBCB] rounded-[4px] text-[16px] placeholder-[#474F7A]"
               type="email"
               placeholder="ელ. ფოსტა"
               value={email}
@@ -257,7 +257,7 @@ const Footer = () => {
               required
             />
             <input
-              className="w-[90vw] h-[44px] pl-[18px] pr-[18px] border border-[#CBCBCB] rounded-[4px] text-[16px] placeholder-[#474F7A]"
+              className="w-full max-w-[90vw] h-[44px] pl-[18px] pr-[18px] border border-[#CBCBCB] rounded-[4px] text-[16px] placeholder-[#474F7A]"
               type="text"
               placeholder="სახელი"
               value={name}

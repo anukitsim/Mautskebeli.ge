@@ -94,7 +94,7 @@ const FeaturedNewsCard = ({ news, isLoaded }) => {
   );
 };
 
-// Side News Card (Small)
+// Side News Card (Small) — use vertical slide-up to avoid horizontal "glitch" on route change
 const SideNewsCard = ({ news, index, isLoaded }) => {
   const imageUrl = news.acf?.image || '/images/default-image.png';
   const hasVideo = news.acf?.video_url;
@@ -106,8 +106,8 @@ const SideNewsCard = ({ news, index, isLoaded }) => {
                   hover:bg-white hover:shadow-xl transition-all duration-300"
         style={{
           opacity: isLoaded ? 1 : 0,
-          transform: isLoaded ? 'translateX(0)' : 'translateX(30px)',
-          transition: `all 0.6s cubic-bezier(0.16, 1, 0.3, 1) ${(index + 1) * 150}ms`
+          transform: isLoaded ? 'translateY(0)' : 'translateY(24px)',
+          transition: `all 0.6s cubic-bezier(0.16, 1, 0.3, 1) ${(index + 1) * 100}ms`
         }}
       >
         {/* Image */}
@@ -290,9 +290,21 @@ export default function NewsPage() {
           />
         </div>
         
-        {/* Floating shapes */}
-        <div className="absolute top-10 left-10 w-64 h-64 rounded-full bg-[#AD88C6]/20 blur-3xl animate-float" />
-        <div className="absolute bottom-10 right-10 w-96 h-96 rounded-full bg-[#FECE27]/10 blur-3xl animate-float-delayed" />
+        {/* Floating shapes — fade in to avoid brief flash on route change */}
+        <div 
+          className="absolute top-10 left-10 w-64 h-64 rounded-full bg-[#AD88C6]/20 blur-3xl animate-float"
+          style={{
+            opacity: isLoaded ? 1 : 0,
+            transition: 'opacity 0.5s ease 0.2s'
+          }}
+        />
+        <div 
+          className="absolute bottom-10 right-10 w-96 h-96 rounded-full bg-[#FECE27]/10 blur-3xl animate-float-delayed"
+          style={{
+            opacity: isLoaded ? 1 : 0,
+            transition: 'opacity 0.5s ease 0.3s'
+          }}
+        />
         
         <div className="relative w-11/12 md:w-10/12 mx-auto py-16 lg:py-24">
           {/* Breadcrumb */}

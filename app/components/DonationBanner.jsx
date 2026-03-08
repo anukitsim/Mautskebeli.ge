@@ -32,8 +32,7 @@ const DonationBanner = () => {
   return (
     <section
       ref={sectionRef}
-      className="relative w-full overflow-hidden bg-gradient-to-br from-[#474F7A] via-[#5D6590] to-[#8C74B2] flex items-center"
-      style={{ aspectRatio: '1920 / 475' }}
+      className="relative w-full overflow-hidden bg-gradient-to-br from-[#474F7A] via-[#5D6590] to-[#8C74B2] flex items-center lg:min-h-[380px] xl:min-h-[420px]"
     >
       {/* Subtle dotted pattern */}
       <div
@@ -45,11 +44,11 @@ const DonationBanner = () => {
       />
 
       {/* Soft gradient orbs */}
-      <div className="absolute top-0 left-1/4 w-[400px] h-[400px] bg-[#AD88C6]/15 rounded-full blur-[80px] pointer-events-none" />
-      <div className="absolute bottom-0 right-1/4 w-[350px] h-[350px] bg-[#FECE27]/10 rounded-full blur-[70px] pointer-events-none" />
+      <div className="absolute top-0 left-1/4 w-[200px] h-[200px] sm:w-[300px] sm:h-[300px] lg:w-[400px] lg:h-[400px] bg-[#AD88C6]/15 rounded-full blur-[60px] lg:blur-[80px] pointer-events-none" />
+      <div className="absolute bottom-0 right-1/4 w-[180px] h-[180px] sm:w-[260px] sm:h-[260px] lg:w-[350px] lg:h-[350px] bg-[#FECE27]/10 rounded-full blur-[50px] lg:blur-[70px] pointer-events-none" />
 
       {/* Left-aligned layout: content left, CTA right on desktop */}
-      <div className="relative z-10 w-11/12 md:w-10/12 max-w-6xl mx-auto py-14 lg:py-16 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-10 lg:gap-14">
+      <div className="relative z-10 w-11/12 md:w-10/12 max-w-6xl mx-auto py-10 sm:py-12 lg:py-16 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 sm:gap-8 lg:gap-14">
         {/* Left block: icon + headline + line + second line — all left-aligned */}
         <div className="flex flex-col items-start text-left">
           <div

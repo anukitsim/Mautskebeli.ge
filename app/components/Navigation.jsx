@@ -108,10 +108,12 @@ const Navigation = ({ onVideoSelect }) => {
 
         <Search isSearchOpen={isSearchOpen} setIsSearchOpen={setIsSearchOpen} />
 
-        {/* Mobile Menu */}
-        <div
-          className={`${isMenuOpen ? "fixed" : "hidden"} top-32 left-0 h-full w-full bg-[#AD88C6] p-4 sm:hidden z-50 overflow-y-auto`}
-        >
+        {/* Mobile Menu - only mount when open to avoid purple flash on route change */}
+        {isMenuOpen && (
+          <div
+            className="fixed top-32 left-0 h-full w-full bg-[#AD88C6] p-4 sm:hidden z-50 overflow-y-auto"
+            style={{ animation: 'fadeIn 0.15s ease-out' }}
+          >
           <div className="text-white text-[15px] p-[24px] flex gap-[16px] flex-col">
             <div className="pb-4 border-b border-white/20">
               <LanguageSwitcher />
@@ -238,7 +240,8 @@ const Navigation = ({ onVideoSelect }) => {
               </Link>
             </ul>
           </div>
-        </div>
+          </div>
+        )}
       </div>
     </nav>
   );

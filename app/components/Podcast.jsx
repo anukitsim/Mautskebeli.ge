@@ -57,6 +57,86 @@ const getThumbnailUrl = (videoId) => {
   return videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : null;
 };
 
+// Skeleton loading — matches podcast layout (player + meta left, sidebar right), same style as news page
+const PodcastLoadingSkeleton = () => (
+  <div className="w-full px-4 pb-12">
+    <div className="max-w-[1280px] mx-auto pt-8">
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-8 lg:gap-10 items-start">
+        {/* Left: player + title + description + share */}
+        <div className="min-w-0 animate-pulse">
+          <div className="relative w-full rounded-2xl overflow-hidden" style={{ aspectRatio: "16/9" }}>
+            <div
+              className="absolute inset-0 bg-gradient-to-r from-[#E8E0EE] via-[#F6F4F8] to-[#E8E0EE] bg-[length:200%_100%] animate-shimmer"
+            />
+          </div>
+          <div className="mt-6 lg:mt-8 space-y-3">
+            <div className="h-7 bg-[#E8E0EE] rounded w-4/5" />
+            <div className="h-7 bg-[#E8E0EE] rounded w-full" />
+            <div className="space-y-2 pt-2">
+              <div className="h-4 bg-[#E8E0EE] rounded w-full" />
+              <div className="h-4 bg-[#E8E0EE] rounded w-full" />
+              <div className="h-4 bg-[#E8E0EE] rounded w-5/6" />
+              <div className="h-4 bg-[#E8E0EE] rounded w-4/5" />
+              <div className="h-4 bg-[#E8E0EE] rounded w-3/4" />
+            </div>
+            <div className="flex flex-wrap items-center gap-3 pt-4">
+              <div className="h-11 bg-[#E8E0EE] rounded-xl w-48" />
+              <div className="h-10 bg-[#E8E0EE] rounded-full w-10" />
+              <div className="h-10 bg-[#E8E0EE] rounded-full w-10" />
+              <div className="h-10 bg-[#E8E0EE] rounded-full w-10" />
+            </div>
+          </div>
+        </div>
+        {/* Right: sidebar list */}
+        <div className="hidden lg:block">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-1.5 h-7 bg-[#E8E0EE] rounded-full animate-pulse" />
+            <div className="h-4 bg-[#E8E0EE] rounded w-32 animate-pulse" />
+          </div>
+          <div className="space-y-1.5">
+            {[...Array(10)].map((_, i) => (
+              <div key={i} className="flex gap-3 p-2 rounded-xl">
+                <div className="w-[120px] h-[68px] bg-[#E8E0EE] rounded-lg flex-shrink-0 animate-pulse" />
+                <div className="flex-1 space-y-2 py-1">
+                  <div className="h-3 bg-[#E8E0EE] rounded w-full animate-pulse" />
+                  <div className="h-3 bg-[#E8E0EE] rounded w-4/5 animate-pulse" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+    {/* Mobile skeleton row */}
+    <div className="lg:hidden max-w-[1280px] mx-auto mt-10 px-2">
+      <div className="flex items-center gap-2 mb-4">
+        <div className="w-1.5 h-7 bg-[#E8E0EE] rounded-full animate-pulse" />
+        <div className="h-5 bg-[#E8E0EE] rounded w-36 animate-pulse" />
+      </div>
+      <div className="flex gap-4 overflow-hidden">
+        {[...Array(3)].map((_, i) => (
+          <div key={i} className="w-[280px] flex-shrink-0 animate-pulse">
+            <div className="aspect-video bg-[#E8E0EE] rounded-xl" />
+            <div className="p-4 space-y-2">
+              <div className="h-3 bg-[#E8E0EE] rounded w-full" />
+              <div className="h-3 bg-[#E8E0EE] rounded w-3/4" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+    <style jsx>{`
+      @keyframes shimmer {
+        0% { background-position: -200% 0; }
+        100% { background-position: 200% 0; }
+      }
+      .animate-shimmer {
+        animation: shimmer 1.5s ease-in-out infinite;
+      }
+    `}</style>
+  </div>
+);
+
 // Professional share block: below description (left column). Compact on mobile.
 const ShareBlock = ({ videoId, compact = false }) => {
   const [copied, setCopied] = useState(false);
@@ -312,16 +392,28 @@ const Podcast = () => {
   useEffect(() => {
     const fetchVideos = async () => {
       try {
-        const playlistResponse = await fetch(
-          `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=45&playlistId=${playlistId}&key=${apiKey}`
-        );
+        let allItems = [];
+        let nextPageToken = null;
 
-        if (!playlistResponse.ok) {
-          throw new Error("Failed to fetch videos from the playlist");
-        }
+        do {
+          const url = new URL("https://www.googleapis.com/youtube/v3/playlistItems");
+          url.searchParams.set("part", "snippet");
+          url.searchParams.set("maxResults", "50");
+          url.searchParams.set("playlistId", playlistId);
+          url.searchParams.set("key", apiKey);
+          if (nextPageToken) url.searchParams.set("pageToken", nextPageToken);
 
-        const playlistData = await playlistResponse.json();
-        const playlistVideos = playlistData.items.map((item) => ({
+          const playlistResponse = await fetch(url.toString());
+          if (!playlistResponse.ok) {
+            throw new Error("Failed to fetch videos from the playlist");
+          }
+
+          const playlistData = await playlistResponse.json();
+          allItems = allItems.concat(playlistData.items || []);
+          nextPageToken = playlistData.nextPageToken || null;
+        } while (nextPageToken);
+
+        const playlistVideos = allItems.map((item) => ({
           id: item.snippet.resourceId.videoId,
           snippet: item.snippet,
         }));
@@ -356,11 +448,7 @@ const Podcast = () => {
   }, [videos]);
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <Image src="/images/loader.svg" alt="loading" width={120} height={120} />
-      </div>
-    );
+    return <PodcastLoadingSkeleton />;
   }
 
   return (
@@ -377,7 +465,13 @@ const Podcast = () => {
             )}
 
             {/* Podcast format: left = player + meta + share below; right = other episodes (sidebar) */}
-            <div className="max-w-[1280px] mx-auto pt-3">
+            <div
+              className="max-w-[1280px] mx-auto pt-8"
+              style={{
+                animation: "slideUp 0.6s ease-out forwards",
+                opacity: 0,
+              }}
+            >
               <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-8 lg:gap-10 items-start">
                 {/* Left: player → title → description → share (all below) */}
                 <div ref={mainVideoRef} className="min-w-0">
@@ -425,7 +519,14 @@ const Podcast = () => {
             </div>
 
             {/* Mobile: other episodes — horizontal scroll below */}
-            <div className="lg:hidden max-w-[1280px] mx-auto mt-10 px-2">
+            <div
+              className="lg:hidden max-w-[1280px] mx-auto mt-10 px-2"
+              style={{
+                animation: "slideUp 0.6s ease-out forwards",
+                animationDelay: "120ms",
+                opacity: 0,
+              }}
+            >
               <div className="flex items-center gap-2 mb-4">
                 <div className="w-1.5 h-7 bg-[#AD88C6] rounded-full" />
                 <h3 className="text-[#474F7A] text-lg font-bold">სხვა ეპიზოდები</h3>

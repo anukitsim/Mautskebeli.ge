@@ -79,16 +79,16 @@ const VideoCard = ({ videoId, caption, onSelect, postType, isMobile, index }) =>
           />
           
 
-          {/* Play button overlay */}
+          {/* Play button overlay - always visible on mobile for touch targets */}
           <div 
             className="absolute inset-0 flex items-center justify-center 
                        bg-gradient-to-t from-black/50 via-black/20 to-transparent 
-                       opacity-0 group-hover:opacity-100 transition-all duration-300"
+                       opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-all duration-300"
             onClick={handlePlayClick}
       >
-            <div className="w-14 h-14 rounded-full bg-white/95 shadow-xl flex items-center justify-center
-                           transform scale-75 group-hover:scale-100 transition-transform duration-300">
-              <svg className="w-6 h-6 text-[#AD88C6] ml-1" fill="currentColor" viewBox="0 0 24 24">
+            <div className="w-14 h-14 flex-shrink-0 rounded-full bg-white/95 shadow-xl flex items-center justify-center aspect-square
+                           scale-100 lg:scale-75 lg:group-hover:scale-100 transition-transform duration-300">
+              <svg className="w-6 h-6 text-[#AD88C6] ml-1 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24" preserveAspectRatio="xMidYMid meet">
                 <path d="M8 5v14l11-7z"/>
               </svg>
             </div>
