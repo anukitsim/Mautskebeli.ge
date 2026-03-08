@@ -24,7 +24,7 @@ export default function Home() {
 
         {/* Hero Section */}
         <div className="mx-auto mt-4 sm:mt-6 lg:mt-8 px-4 sm:px-0 w-full sm:w-11/12 md:w-10/12">
-          <div className="flex flex-row gap-5 items-stretch lg:min-h-[420px]">
+          <div className="flex flex-row gap-5">
             <Sidebar />
             <MainNews />
           </div>

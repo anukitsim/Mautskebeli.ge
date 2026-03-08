@@ -79,11 +79,11 @@ const MainNewsClient = ({ slides }) => {
 
   return (
     <div
-      className="w-full h-full"
+      className="w-full flex flex-col"
       style={{ animation: 'slideUp 0.6s ease-out forwards', opacity: 0 }}
     >
       <section
-        className="relative w-full h-[280px] sm:h-[340px] md:h-[400px] lg:h-full lg:min-h-[420px] rounded-[16px] lg:rounded-[20px] overflow-hidden ring-1 ring-black/5 group"
+        className="relative w-full h-[280px] sm:h-[340px] md:h-[400px] lg:flex-1 lg:min-h-0 rounded-[16px] lg:rounded-[20px] overflow-hidden ring-1 ring-black/5 group"
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
         onTouchStart={handleMouseEnter}
