@@ -150,7 +150,7 @@ const MainNewsClient = ({ slides }) => {
         <button
           onClick={(e) => { e.preventDefault(); prevSlide(); }}
           className="group absolute left-3 lg:left-5 top-1/2 -translate-y-1/2 z-20
-                     w-10 h-10 lg:w-12 lg:h-12 rounded-full
+                     w-9 h-9 sm:w-10 sm:h-10 lg:w-12 lg:h-12 rounded-full aspect-square flex-shrink-0
                      bg-gradient-to-br from-white/15 to-white/5
                      backdrop-blur-md border border-white/20
                      flex items-center justify-center
@@ -160,14 +160,14 @@ const MainNewsClient = ({ slides }) => {
                      active:scale-95 opacity-70 hover:opacity-100"
           aria-label="Previous slide"
         >
-          <svg className="w-4 h-4 lg:w-5 lg:h-5 text-white ml-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+          <svg className="w-4 h-4 lg:w-5 lg:h-5 text-white flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5} preserveAspectRatio="xMidYMid meet">
             <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
           </svg>
         </button>
         <button
           onClick={(e) => { e.preventDefault(); nextSlide(); }}
           className="group absolute right-3 lg:right-5 top-1/2 -translate-y-1/2 z-20
-                     w-10 h-10 lg:w-12 lg:h-12 rounded-full
+                     w-9 h-9 sm:w-10 sm:h-10 lg:w-12 lg:h-12 rounded-full aspect-square flex-shrink-0
                      bg-gradient-to-br from-white/15 to-white/5
                      backdrop-blur-md border border-white/20
                      flex items-center justify-center
@@ -177,7 +177,7 @@ const MainNewsClient = ({ slides }) => {
                      active:scale-95 opacity-70 hover:opacity-100"
           aria-label="Next slide"
         >
-          <svg className="w-4 h-4 lg:w-5 lg:h-5 text-white ml-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+          <svg className="w-4 h-4 lg:w-5 lg:h-5 text-white flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5} preserveAspectRatio="xMidYMid meet">
             <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
           </svg>
         </button>

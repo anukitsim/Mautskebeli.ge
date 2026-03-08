@@ -62,8 +62,8 @@ const HomePageStatiebi = () => {
   }, []);
 
   return (
-    <section className="mx-auto flex flex-col px-4">
-      <div className="flex items-center justify-between mb-6 lg:mb-8">
+    <section className="mx-auto flex flex-col">
+      <div className="flex items-center justify-between mb-6 lg:mb-8 px-4 lg:px-0">
         <div className="flex items-center gap-3">
           <div className="w-1.5 h-10 bg-[#AD88C6] rounded-full" />
           <h2 className="text-[#474F7A] text-2xl lg:text-3xl font-bold">სტატიები</h2>
@@ -81,7 +81,7 @@ const HomePageStatiebi = () => {
       </div>
 
       {/* Horizontal scrolling section for mobile */}
-      <div className="flex lg:hidden overflow-x-auto space-x-4 hide-scroll-bar">
+      <div className="flex lg:hidden overflow-x-auto gap-4 hide-scroll-bar -mx-4 px-4">
         {articles.map((article, index) => {
           const imageUrl = article.acf.image ? article.acf.image : '/images/default-image.png';
           return (

@@ -66,7 +66,7 @@ const HomePagePodcast = () => {
             />
           </Link>
         </div>
-        <div className="absolute top-4 sm:top-8 right-3 sm:right-5 flex justify-center items-center">
+        <div className="absolute top-4 sm:top-8 right-2 sm:right-5 flex justify-center items-center">
           <Link
             href="https://www.youtube.com/playlist?list=PL8wF1aEA4P8NJZUazilLH7ES-T-RQd3Cy"
             target="_blank"
@@ -75,10 +75,10 @@ const HomePagePodcast = () => {
             <Image
               src="/images/mobile-youtube-banner.png"
               alt="YouTube-ზე ფლეილისტის ნახვა"
-              width={280}
-              height={92}
-              sizes="(max-width: 640px) 200px, 260px"
-              className="drop-shadow-lg w-[200px] h-auto sm:w-[260px] object-contain"
+              width={400}
+              height={132}
+              sizes="(max-width: 480px) 55vw, 300px"
+              className="drop-shadow-lg w-[55vw] max-w-[300px] h-auto object-contain"
             />
           </Link>
         </div>
