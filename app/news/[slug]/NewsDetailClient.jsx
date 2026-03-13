@@ -31,6 +31,14 @@ const extractVideoId = (videoUrl) => {
   return match ? match[1] : null;
 };
 
+const upgradeContentImages = (html) => {
+  if (!html) return html;
+  return html
+    .replace(/(<img[^>]*\s)width="[^"]*"/gi, '$1')
+    .replace(/(<img[^>]*\s)height="[^"]*"/gi, '$1')
+    .replace(/(src="[^"]*?)-\d+x\d+(\.\w{3,4}")/gi, '$1$2');
+};
+
 export default function NewsDetailClient() {
   const params = useParams();
   const [news, setNews] = useState(null);
@@ -333,7 +341,7 @@ export default function NewsDetailClient() {
                             prose-blockquote:rounded-r-lg prose-blockquote:py-4 prose-blockquote:px-6 prose-blockquote:my-8
                             prose-blockquote:text-[#8B7AA0] prose-blockquote:italic prose-blockquote:not-italic
                             [&>div]:mb-6"
-                  dangerouslySetInnerHTML={{ __html: news.acf.main_text }}
+                  dangerouslySetInnerHTML={{ __html: upgradeContentImages(news.acf.main_text) }}
                 />
               )}
 

@@ -991,6 +991,65 @@ a.scale-on-hover:hover {
   margin-bottom: 0;
 }
 
+.article-content img {
+  max-width: 100% !important;
+  width: 100% !important;
+  height: auto !important;
+  border-radius: 8px;
+  margin: 1.5rem 0;
+  display: block;
+  object-fit: contain;
+}
+
+.article-content figure {
+  max-width: 100%;
+  margin: 1.5rem 0;
+}
+
+.article-content figure img {
+  margin: 0;
+}
+
+.article-content figcaption {
+  font-size: 0.875rem;
+  color: #8B7AA0;
+  margin-top: 0.5rem;
+  text-align: center;
+}
+
+.article-content .wp-caption {
+  max-width: 100% !important;
+  width: auto !important;
+}
+
+.article-content .aligncenter {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.article-content .alignleft {
+  float: left;
+  margin-right: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.article-content .alignright {
+  float: right;
+  margin-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 640px) {
+  .article-content .alignleft,
+  .article-content .alignright {
+    float: none;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
 /* News Section Animations */
 @keyframes slideUp {
   from {

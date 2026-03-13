@@ -102,15 +102,17 @@ const Page = async ({ params }) => {
   // Use Cheerio to manipulate and enhance the HTML content
   const $ = load(sanitizedContent);
 
-  // Ensure all media sources have absolute URLs
   $('img, video, audio, source').each((i, elem) => {
-    const src = $(elem).attr('src');
+    let src = $(elem).attr('src');
     if (src && !src.startsWith('http')) {
-      $(elem).attr(
-        'src',
-        `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}${src}`
-      );
+      src = `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}${src}`;
     }
+    if (elem.tagName === 'img') {
+      src = src?.replace(/-\d+x\d+(?=\.\w{3,4}$)/, '');
+      $(elem).removeAttr('width');
+      $(elem).removeAttr('height');
+    }
+    $(elem).attr('src', src);
   });
 
   // Style blockquotes

@@ -24,8 +24,12 @@ const SportArticlePage = ({ params }) => {
       allowedTags: sanitizeHtml.defaults.allowedTags.concat(['img', 'span', 'h1', 'h2', 'h3']),
       allowedAttributes: {
         ...sanitizeHtml.defaults.allowedAttributes,
-        a: ['href', 'target', 'rel'], // Allow target and rel for links
-        img: ['src', 'alt'],
+        a: ['href', 'target', 'rel'],
+        img: ['src', 'alt', 'title', 'class', 'style'],
+        figure: ['class', 'style'],
+        figcaption: ['class'],
+        div: ['class', 'style'],
+        p: ['style', 'class'],
       },
       transformTags: {
         'a': (tagName, attribs) => {

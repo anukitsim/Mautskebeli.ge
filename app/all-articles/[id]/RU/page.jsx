@@ -67,10 +67,13 @@ function getSanitizedContent(content) {
     ],
     allowedAttributes: {
       a: ["href", "target", "rel"],
-      img: ["src", "alt", "title", "width", "height"],
+      img: ["src", "alt", "title", "class", "style"],
       span: ["style"],
-      p: ["style"],
-      blockquote: ["cite"],
+      p: ["style", "class"],
+      blockquote: ["cite", "style"],
+      figure: ["class", "style"],
+      figcaption: ["class"],
+      div: ["class", "style"],
     },
     allowedSchemes: ["http", "https", "mailto"],
     allowedSchemesByTag: {

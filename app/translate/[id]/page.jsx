@@ -105,19 +105,20 @@ function getSanitizedContent(content) {
     allowedTags: [
       "b", "i", "em", "strong", "a", "p", "blockquote",
       "ul", "ol", "li", "br", "span", "h1", "h2", "h3", "h4", "h5", "h6",
-      "img", "video", "source", "audio", "figure", "figcaption",
+      "img", "video", "source", "audio", "figure", "figcaption", "div",
     ],
     allowedAttributes: {
       a: ["href", "target", "rel"],
-      img: ["src", "alt", "title", "width", "height", "style"],
+      img: ["src", "alt", "title", "class", "style"],
       video: ["src", "controls", "width", "height", "poster", "style"],
       audio: ["src", "controls"],
       source: ["src", "type"],
       span: ["style"],
-      p: ["style"],
+      p: ["style", "class"],
       blockquote: ["cite", "style"],
-      figure: [],
-      figcaption: [],
+      figure: ["class", "style"],
+      figcaption: ["class"],
+      div: ["class", "style"],
     },
     allowedSchemes: ["http", "https", "data"],
     allowedStyles: {
@@ -145,6 +146,16 @@ function getSanitizedContent(content) {
       "border-left": "5px solid #ccc",
       "font-style": "italic",
     });
+  });
+  $("img").each((_, elem) => {
+    let src = $(elem).attr("src");
+    if (src && !src.startsWith("http")) {
+      src = `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL || "https://mautskebeli.wpenginepowered.com"}${src}`;
+    }
+    src = src?.replace(/-\d+x\d+(?=\.\w{3,4}$)/, "");
+    $(elem).attr("src", src);
+    $(elem).removeAttr("width");
+    $(elem).removeAttr("height");
   });
   return $.html();
 }

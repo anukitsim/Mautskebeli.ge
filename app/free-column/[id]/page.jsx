@@ -127,16 +127,20 @@ function getSanitizedContent(content) {
       'audio',
       'figure',
       'figcaption',
+      'div',
     ],
     allowedAttributes: {
       a: ['href', 'target', 'rel'],
-      img: ['src', 'alt', 'title', 'width', 'height', 'style'],
+      img: ['src', 'alt', 'title', 'class', 'style'],
       video: ['src', 'controls', 'width', 'height', 'poster', 'style'],
       audio: ['src', 'controls'],
       source: ['src', 'type'],
       span: ['style'],
-      p: ['style'],
+      p: ['style', 'class'],
       blockquote: ['cite', 'style'],
+      figure: ['class', 'style'],
+      figcaption: ['class'],
+      div: ['class', 'style'],
     },
     allowedSchemes: ['http', 'https', 'data'],
     allowedStyles: {
@@ -186,13 +190,16 @@ const FreeColumnPage = async ({ params }) => {
   const $ = load(sanitizedContent);
 
   $('img, video, audio, source').each((i, elem) => {
-    const src = $(elem).attr('src');
+    let src = $(elem).attr('src');
     if (src && !src.startsWith('http')) {
-      $(elem).attr(
-        'src',
-        `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}${src}`
-      );
+      src = `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}${src}`;
     }
+    if (elem.tagName === 'img') {
+      src = src?.replace(/-\d+x\d+(?=\.\w{3,4}$)/, '');
+      $(elem).removeAttr('width');
+      $(elem).removeAttr('height');
+    }
+    $(elem).attr('src', src);
   });
 
   sanitizedContent = $.html();
