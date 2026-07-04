@@ -15,38 +15,28 @@ import { LanguageProvider } from "../context/LanguageContext";
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="ka">
-      <head>
-      <link rel="icon" href="/favicon.ico" />
-      </head>
-      <body>
-        <LanguageProvider>
-       
+    <LanguageProvider>
+      {children}
+      <Footer />
 
-        {children}
-        <Footer />
-        
-        {/* Google Analytics */}
-        <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-C2ZPMYP4FY"
-          strategy="afterInteractive"
-        />
-        <Script
-          id="ga-init-ekonomika"
-          strategy="afterInteractive"
-          dangerouslySetInnerHTML={{
-            __html: `
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
-              gtag('js', new Date());
-              gtag('config', 'G-C2ZPMYP4FY', { send_page_view: false });
-            `
-          }}
-        />
-        <AnalyticsPageView />
-      
-        </LanguageProvider>
-      </body>
-    </html>
+      {/* Google Analytics */}
+      <Script
+        src="https://www.googletagmanager.com/gtag/js?id=G-C2ZPMYP4FY"
+        strategy="afterInteractive"
+      />
+      <Script
+        id="ga-init-ekonomika"
+        strategy="afterInteractive"
+        dangerouslySetInnerHTML={{
+          __html: `
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-C2ZPMYP4FY', { send_page_view: false });
+          `
+        }}
+      />
+      <AnalyticsPageView />
+    </LanguageProvider>
   );
 }

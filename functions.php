@@ -40,7 +40,10 @@ define('MSB_BACKFILL_DISABLED', true);
 
 
 // PhpSpreadsheet autoloader
-require_once get_stylesheet_directory() . '/vendor/autoload.php';
+$msb_vendor_autoload = get_stylesheet_directory() . '/vendor/autoload.php';
+if (file_exists($msb_vendor_autoload)) {
+    require_once $msb_vendor_autoload;
+}
 
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Pdf\Dompdf as PdfWriter;
@@ -3602,6 +3605,10 @@ function esd_export_pdf()
         wp_die('Permission denied');
     }
 
+    if (!class_exists('PhpOffice\PhpSpreadsheet\Spreadsheet')) {
+        wp_die('Export library (PhpSpreadsheet) is not installed on the server.');
+    }
+
     // 1) fetch succeeded donations
     $q = new WP_Query([
         'post_type' => 'donation',
@@ -3684,6 +3691,10 @@ function esd_export_xlsx()
         || !wp_verify_nonce($_POST['esd_nonce_xlsx'] ?? '', 'esd_export_xlsx')
     ) {
         wp_die('Permission denied');
+    }
+
+    if (!class_exists('PhpOffice\PhpSpreadsheet\Spreadsheet')) {
+        wp_die('Export library (PhpSpreadsheet) is not installed on the server.');
     }
 
     // 1) fetch succeeded donations
