@@ -1,7 +1,7 @@
 // app/sport-articles/[id]/page.jsx
 
 import Image from 'next/image';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import moment from 'moment';
 import 'moment/locale/ka';
 import { decode } from 'html-entities';
@@ -45,6 +45,25 @@ async function fetchArticle(slugOrId) {
       }
 
       return res.json();
+    }
+
+    // Not a current slug, and not numeric — it may be a FORMER slug (e.g.
+    // an article whose URL was cleaned up to a Latin slug). Check WordPress's
+    // own record of old slugs so links shared before the change still work.
+    const resolveUrl = `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/custom/v1/resolve-article-slug?post_type=sport-article&slug=${encodeURIComponent(decodedSlugOrId)}`;
+    const resolveRes = await fetch(resolveUrl, { next: { revalidate: 10 } });
+    if (resolveRes.ok) {
+      const resolved = await resolveRes.json();
+      if (resolved.found) {
+        return {
+          id: resolved.id,
+          slug: resolved.slug,
+          title: resolved.title,
+          date: resolved.date,
+          acf: resolved.acf,
+          _redirectFrom: decodedSlugOrId, // signals the page to 301 to the new slug
+        };
+      }
     }
 
     console.error(`Could not find sport article with slug: ${decodedSlugOrId}`);
@@ -170,6 +189,13 @@ const SportArticlePage = async ({ params }) => {
 
   if (!article) {
     notFound();
+  }
+
+  // This URL used a FORMER slug (e.g. shared before the URL was cleaned
+  // up) — send visitors to the current canonical URL instead of rendering
+  // under the stale one.
+  if (article._redirectFrom && article.slug) {
+    redirect(`/sport-articles/${article.slug}`);
   }
 
   article.formattedDate = formatDate(article.date);
