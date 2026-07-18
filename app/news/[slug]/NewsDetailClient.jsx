@@ -47,6 +47,7 @@ export default function NewsDetailClient() {
   const [error, setError] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [readProgress, setReadProgress] = useState(0);
+  const [copied, setCopied] = useState(false);
   const articleRef = useRef(null);
 
   const shareUrl = `https://www.mautskebeli.ge/news/${params.slug}`;
@@ -58,6 +59,16 @@ export default function NewsDetailClient() {
       ? `https://www.facebook.com/sharer/sharer.php?u=${encoded}`
       : `https://twitter.com/intent/tweet?url=${encoded}&text=${titleText}`;
     window.open(url, '_blank', 'width=600,height=400');
+  };
+
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy link:', err);
+    }
   };
 
   useEffect(() => {
@@ -323,6 +334,24 @@ export default function NewsDetailClient() {
                       <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
                     </svg>
                   </button>
+                  <div className="relative">
+                    <button
+                      onClick={handleCopyLink}
+                      aria-label="ბმულის კოპირება"
+                      className="w-9 h-9 flex items-center justify-center rounded-full bg-[#AD88C6]/10 text-[#AD88C6]
+                                hover:bg-[#AD88C6] hover:text-white transition-all duration-300 hover:scale-110"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                        <path d="M10 13a5 5 0 007.07 0l2.83-2.83a5 5 0 00-7.07-7.07l-1.5 1.5" />
+                        <path d="M14 11a5 5 0 00-7.07 0l-2.83 2.83a5 5 0 007.07 7.07l1.5-1.5" />
+                      </svg>
+                    </button>
+                    {copied && (
+                      <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-[#474F7A] text-white text-xs px-2 py-1 rounded whitespace-nowrap">
+                        დაკოპირდა!
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
@@ -413,6 +442,17 @@ export default function NewsDetailClient() {
                       <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
                     </svg>
                     X / Twitter
+                  </button>
+                  <button
+                    onClick={handleCopyLink}
+                    className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl bg-[#AD88C6] text-white
+                              font-medium text-sm hover:bg-[#9A75B3] transition-colors duration-300"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24">
+                      <path d="M10 13a5 5 0 007.07 0l2.83-2.83a5 5 0 00-7.07-7.07l-1.5 1.5" />
+                      <path d="M14 11a5 5 0 00-7.07 0l-2.83 2.83a5 5 0 007.07 7.07l1.5-1.5" />
+                    </svg>
+                    {copied ? 'დაკოპირდა!' : 'ბმული'}
                   </button>
                 </div>
               </div>

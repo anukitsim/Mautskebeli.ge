@@ -8,9 +8,21 @@ import Image from 'next/image';
 
 const ShareButtons = ({ freeColumnId, title }) => {
   const [showShareOptions, setShowShareOptions] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const shareUrl = `https://www.mautskebeli.ge/free-column/${freeColumnId}`;
 
   const closeShareOptions = () => {
     setShowShareOptions(false);
+  };
+
+  const handleCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy link:', err);
+    }
   };
 
   // Close modal on Escape key press
@@ -59,18 +71,29 @@ const ShareButtons = ({ freeColumnId, title }) => {
           >
             <h2 className="text-xl text-white font-bold mb-4">გააზიარე</h2>
             <div className="flex items-center pt-7 gap-5">
-              <FacebookShareButton
-                url={`https://www.mautskebeli.ge/free-column/${freeColumnId}`}
-                quote={title}
-              >
+              <FacebookShareButton url={shareUrl} quote={title}>
                 <FacebookIcon size={44} round={true} />
               </FacebookShareButton>
-              <TwitterShareButton
-                url={`https://www.mautskebeli.ge/free-column/${freeColumnId}`}
-                title={title}
-              >
+              <TwitterShareButton url={shareUrl} title={title}>
                 <TwitterIcon size={44} round={true} />
               </TwitterShareButton>
+              <div className="relative">
+                <button
+                  onClick={handleCopyLink}
+                  aria-label="ბმულის კოპირება"
+                  className="w-11 h-11 rounded-full bg-white/90 hover:bg-white flex items-center justify-center transition-colors"
+                >
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#474F7A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M10 13a5 5 0 007.07 0l2.83-2.83a5 5 0 00-7.07-7.07l-1.5 1.5" />
+                    <path d="M14 11a5 5 0 00-7.07 0l-2.83 2.83a5 5 0 007.07 7.07l1.5-1.5" />
+                  </svg>
+                </button>
+                {copied && (
+                  <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-black text-white text-xs px-2 py-1 rounded whitespace-nowrap">
+                    დაკოპირდა!
+                  </span>
+                )}
+              </div>
             </div>
           </div>
         </div>
