@@ -10,9 +10,29 @@ async function fetchNewsBySlug(slug) {
     );
     if (!res.ok) return null;
     const data = await res.json();
-    if (!data || data.length === 0) return null;
 
-    const newsItem = data[0];
+    let newsItem;
+    if (data && data.length > 0) {
+      newsItem = data[0];
+    } else {
+      // Not a current slug — it may be a FORMER slug (e.g. a news item
+      // whose URL was cleaned up to a Latin slug). Check WordPress's own
+      // record of old slugs so metadata still resolves for shared links.
+      const resolveRes = await fetch(
+        `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/custom/v1/resolve-article-slug?post_type=news&slug=${encodeURIComponent(slug)}`,
+        { next: { revalidate: 60 } }
+      );
+      if (!resolveRes.ok) return null;
+      const resolved = await resolveRes.json();
+      if (!resolved.found) return null;
+      newsItem = {
+        id: resolved.id,
+        slug: resolved.slug,
+        title: resolved.title,
+        date: resolved.date,
+        acf: resolved.acf,
+      };
+    }
 
     if (newsItem.acf?.image && typeof newsItem.acf.image === 'number') {
       try {
@@ -81,7 +101,7 @@ export async function generateMetadata({ params }) {
     : 'https://www.mautskebeli.ge/images/og-logo.jpg';
 
   const metadataBase = new URL('https://www.mautskebeli.ge');
-  const canonicalUrl = `/news/${slug}`;
+  const canonicalUrl = `/news/${news.slug || slug}`;
 
   return {
     metadataBase,

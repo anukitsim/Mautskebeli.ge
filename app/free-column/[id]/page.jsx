@@ -1,7 +1,7 @@
 // app/free-column/[id]/page.jsx
 
 import Image from 'next/image';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import moment from 'moment';
 import 'moment/locale/ka';
 import { decode } from 'html-entities';
@@ -20,25 +20,62 @@ const categories = [
 ];
 
 // Fetch the free column
-async function fetchFreeColumn(id) {
-  const apiUrl = `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/wp/v2/free-column/${id}?acf_format=standard&_fields=id,title,acf,date`;
+async function fetchFreeColumn(slugOrId) {
+  const decodedSlugOrId = decodeURIComponent(slugOrId);
+
+  let apiUrl = `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/wp/v2/free-column?slug=${encodeURIComponent(decodedSlugOrId)}&acf_format=standard&_fields=id,title,acf,date,slug`;
 
   try {
-    const res = await fetch(apiUrl, {
-      next: { revalidate: 10 }, // Adjust revalidation as needed
+    let res = await fetch(apiUrl, {
+      next: { revalidate: 10 },
     });
 
-    if (!res.ok) {
-      console.error(
-        `Failed to fetch free column with id ${id}: ${res.status} ${res.statusText}`
-      );
-      return null;
+    if (res.ok) {
+      const columns = await res.json();
+      if (columns && columns.length > 0) {
+        return columns[0];
+      }
     }
 
-    const freeColumn = await res.json();
-    return freeColumn;
+    const isNumeric = !isNaN(decodedSlugOrId) && !isNaN(parseFloat(decodedSlugOrId));
+
+    if (isNumeric) {
+      apiUrl = `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/wp/v2/free-column/${decodedSlugOrId}?acf_format=standard&_fields=id,title,acf,date,slug`;
+      res = await fetch(apiUrl, {
+        next: { revalidate: 10 },
+      });
+
+      if (!res.ok) {
+        console.error(`Failed to fetch free column with ID ${decodedSlugOrId}: ${res.status} ${res.statusText}`);
+        return null;
+      }
+
+      return res.json();
+    }
+
+    // Not a current slug, and not numeric — it may be a FORMER slug (e.g.
+    // a free column whose URL was cleaned up to a Latin slug). Check
+    // WordPress's own record of old slugs so shared links keep working.
+    const resolveUrl = `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/custom/v1/resolve-article-slug?post_type=free-column&slug=${encodeURIComponent(decodedSlugOrId)}`;
+    const resolveRes = await fetch(resolveUrl, { next: { revalidate: 10 } });
+    if (resolveRes.ok) {
+      const resolved = await resolveRes.json();
+      if (resolved.found) {
+        return {
+          id: resolved.id,
+          slug: resolved.slug,
+          title: resolved.title,
+          date: resolved.date,
+          acf: resolved.acf,
+          _redirectFrom: decodedSlugOrId,
+        };
+      }
+    }
+
+    console.error(`Could not find free column with slug: ${decodedSlugOrId}`);
+    return null;
   } catch (error) {
-    console.error(`Error fetching free column with id ${id}:`, error);
+    console.error(`Error fetching free column with slug/id ${decodedSlugOrId}:`, error);
     return null;
   }
 }
@@ -68,6 +105,7 @@ export async function generateMetadata({ params }) {
   imageUrl = imageUrl.split('?')[0];
 
   const metadataBase = new URL('https://www.mautskebeli.ge');
+  const canonicalPath = freeColumn.slug ? `/free-column/${freeColumn.slug}` : `/free-column/${id}`;
 
   return {
     metadataBase,
@@ -76,7 +114,7 @@ export async function generateMetadata({ params }) {
     openGraph: {
       title: decodedTitle,
       description: decodedDescription,
-      url: `/free-column/${id}`,
+      url: canonicalPath,
       type: 'article',
       images: [imageUrl],
       locale: 'ka_GE',
@@ -180,6 +218,10 @@ const FreeColumnPage = async ({ params }) => {
 
   if (!freeColumn) {
     notFound();
+  }
+
+  if (freeColumn._redirectFrom && freeColumn.slug) {
+    redirect(`/free-column/${freeColumn.slug}`);
   }
 
   freeColumn.formattedDate = formatDate(freeColumn.date);

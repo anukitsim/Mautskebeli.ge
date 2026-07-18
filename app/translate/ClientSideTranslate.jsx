@@ -163,7 +163,7 @@ export default function ClientSideTranslate({ initialTranslations }) {
 
               return (
                 <Link
-                  href={`/translate/${translation.id}`}
+                  href={`/translate/${translation.slug || translation.id}`}
                   key={translation.id || `translation-${index}`}
                   passHref
                 >

@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import moment from "moment";
 import "moment/locale/ka";
 import { decode } from "html-entities";
@@ -20,14 +20,49 @@ const categories = [
 /**
  * Server-side fetch for the translation
  */
-async function fetchTranslation(id) {
-  const apiUrl = `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/wp/v2/targmani/${id}?acf_format=standard&_fields=id,title,acf,date`;
+async function fetchTranslation(slugOrId) {
+  const decodedSlugOrId = decodeURIComponent(slugOrId);
+
+  let apiUrl = `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/wp/v2/targmani?slug=${encodeURIComponent(decodedSlugOrId)}&acf_format=standard`;
 
   try {
-    const res = await fetch(apiUrl, { next: { revalidate: 10 } });
-    if (!res.ok) return null;
-    const data = await res.json();
-    return data;
+    let res = await fetch(apiUrl, { next: { revalidate: 10 } });
+    if (res.ok) {
+      const translations = await res.json();
+      if (translations && translations.length > 0) {
+        return translations[0];
+      }
+    }
+
+    const isNumeric = !isNaN(decodedSlugOrId) && !isNaN(parseFloat(decodedSlugOrId));
+
+    if (isNumeric) {
+      apiUrl = `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/wp/v2/targmani/${decodedSlugOrId}?acf_format=standard`;
+      res = await fetch(apiUrl, { next: { revalidate: 10 } });
+      if (!res.ok) return null;
+      return res.json();
+    }
+
+    // Not a current slug, and not numeric — it may be a FORMER slug (e.g.
+    // a translation whose URL was cleaned up to a Latin slug). Check
+    // WordPress's own record of old slugs so shared links keep working.
+    const resolveUrl = `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/custom/v1/resolve-article-slug?post_type=targmani&slug=${encodeURIComponent(decodedSlugOrId)}`;
+    const resolveRes = await fetch(resolveUrl, { next: { revalidate: 10 } });
+    if (resolveRes.ok) {
+      const resolved = await resolveRes.json();
+      if (resolved.found) {
+        return {
+          id: resolved.id,
+          slug: resolved.slug,
+          title: resolved.title,
+          date: resolved.date,
+          acf: resolved.acf,
+          _redirectFrom: decodedSlugOrId,
+        };
+      }
+    }
+
+    return null;
   } catch (error) {
     return null;
   }
@@ -66,6 +101,7 @@ export async function generateMetadata({ params }) {
   imageUrl = imageUrl.split("?")[0];
 
   const metadataBase = new URL("https://www.mautskebeli.ge");
+  const canonicalPath = translation.slug ? `/translate/${translation.slug}` : `/translate/${id}`;
 
   return {
     metadataBase,
@@ -74,7 +110,7 @@ export async function generateMetadata({ params }) {
     openGraph: {
       title: decodedTitle,
       description: decodedDescription,
-      url: `/translate/${id}`,
+      url: canonicalPath,
       type: "article",
       images: [imageUrl],
       locale: "ka_GE",
@@ -168,6 +204,10 @@ export default async function TranslationPage({ params }) {
   const translation = await fetchTranslation(id);
 
   if (!translation) notFound();
+
+  if (translation._redirectFrom && translation.slug) {
+    redirect(`/translate/${translation.slug}`);
+  }
 
   const decodedTitle = decode(translation.title?.rendered || "");
   const formattedDate = formatDate(translation.date);

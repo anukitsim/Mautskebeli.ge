@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import NewsVideoPlayer from '@/app/components/NewsVideoPlayer';
@@ -41,6 +41,7 @@ const upgradeContentImages = (html) => {
 
 export default function NewsDetailClient() {
   const params = useParams();
+  const router = useRouter();
   const [news, setNews] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -95,14 +96,32 @@ export default function NewsDetailClient() {
         }
         
         const data = await response.json();
-        
-        if (!data || data.length === 0) {
+
+        let newsItem;
+        if (data && data.length > 0) {
+          newsItem = data[0];
+        } else {
+          // Not a current slug — it may be a FORMER slug (e.g. a news item
+          // whose URL was cleaned up to a Latin slug). Check WordPress's
+          // own record of old slugs so links shared before the change
+          // still work, and send the visitor to the current URL.
+          try {
+            const resolveResponse = await fetch(
+              `https://mautskebeli.wpenginepowered.com/wp-json/custom/v1/resolve-article-slug?post_type=news&slug=${encodeURIComponent(params.slug)}`
+            );
+            const resolved = resolveResponse.ok ? await resolveResponse.json() : { found: false };
+            if (resolved.found && resolved.slug) {
+              router.replace(`/news/${resolved.slug}`);
+              return;
+            }
+          } catch (resolveError) {
+            console.error('Error resolving former news slug:', resolveError);
+          }
+
           setError('ახალი ამბავი ვერ მოიძებნა');
           setLoading(false);
           return;
         }
-        
-        const newsItem = data[0];
         
         if (newsItem.acf?.image && typeof newsItem.acf.image === 'number') {
           try {

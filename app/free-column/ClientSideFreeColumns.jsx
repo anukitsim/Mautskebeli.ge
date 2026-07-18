@@ -48,7 +48,7 @@ export default function ClientSideFreeColumns({ initialFreeColumns }) {
 
   const getKey = (pageIndex, previousPageData) => {
     if (previousPageData && !previousPageData.length) return null; // No more free columns to load
-    return `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/wp/v2/free-column?acf_format=standard&_fields=id,title,acf,date&per_page=10&page=${pageIndex + 1}`;
+    return `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/wp/v2/free-column?acf_format=standard&_fields=id,title,acf,date,slug&per_page=10&page=${pageIndex + 1}`;
   };
 
   const { data, error, size, setSize, isValidating } = useSWRInfinite(getKey, fetcher, {
@@ -124,7 +124,7 @@ export default function ClientSideFreeColumns({ initialFreeColumns }) {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mt-5 mx-4 lg:mx-0">
             {Array.isArray(processedFreeColumns) && processedFreeColumns.length > 0 && processedFreeColumns.map((column) => (
-              <Link href={`/free-column/${column.id}`} passHref key={column.id}>
+              <Link href={`/free-column/${column.slug || column.id}`} passHref key={column.id}>
                 <div className="bg-[#F6F4F8] rounded-tl-[10px] rounded-tr-[10px] border border-[#B6A8CD] overflow-hidden cursor-pointer">
                   <div className="relative w-full h-[200px]">
                     <Image
