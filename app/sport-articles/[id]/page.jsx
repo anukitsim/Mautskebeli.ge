@@ -1,222 +1,249 @@
 // app/sport-articles/[id]/page.jsx
 
-import React from 'react';
+import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import moment from 'moment';
 import 'moment/locale/ka';
 import { decode } from 'html-entities';
 import sanitizeHtml from 'sanitize-html';
 import { load } from 'cheerio';
-import Image from 'next/image';
+import React from 'react';
 
-// Import the new Client Component
 import DynamicClientComponents from './DynamicClientComponents';
 
-export async function generateMetadata({ params }) {
-  const { id } = params;
+async function fetchArticle(slugOrId) {
+  // Decode the slug/ID in case it's URL-encoded (Georgian characters)
+  const decodedSlugOrId = decodeURIComponent(slugOrId);
+
+  // Try fetching by slug first (URL-encode it properly for the API)
+  let apiUrl = `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/wp/v2/sport-article?slug=${encodeURIComponent(decodedSlugOrId)}&acf_format=standard&_fields=id,title,acf,date,slug`;
 
   try {
-    const apiUrl = `https://www.mautskebeli.ge/api/sport-og?id=${id}`;
-    console.log(`Fetching OG tags from: ${apiUrl}`);
+    let res = await fetch(apiUrl, {
+      next: { revalidate: 10 },
+    });
 
-    const res = await fetch(apiUrl);
-
-    if (!res.ok) {
-      console.error(`Error fetching OG tags: ${res.statusText}`);
-      return {
-        title: 'Default Title',
-        description: 'Default description',
-        openGraph: {
-          title: 'Default Title',
-          description: 'Default description',
-          url: `https://www.mautskebeli.ge/sport-articles/${id}`,
-          images: [
-            {
-              url: '/images/default-og-image.jpg',
-              width: 1200,
-              height: 630,
-            },
-          ],
-          type: 'article',
-        },
-      };
+    if (res.ok) {
+      const articles = await res.json();
+      if (articles && articles.length > 0) {
+        return articles[0];
+      }
     }
 
-    const ogTags = await res.json();
-    console.log('OG Tags:', ogTags);
+    // If slug doesn't work, try by ID (for backward compatibility)
+    const isNumeric = !isNaN(decodedSlugOrId) && !isNaN(parseFloat(decodedSlugOrId));
 
-    return {
-      title: ogTags.title,
-      description: ogTags.description,
-      openGraph: {
-        title: ogTags.title,
-        description: ogTags.description,
-        url: ogTags.url,
-        images: [
-          {
-            url: ogTags.image,
-            width: 1200,
-            height: 630,
-          },
-        ],
-        type: 'article',
-      },
-    };
+    if (isNumeric) {
+      apiUrl = `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/wp/v2/sport-article/${decodedSlugOrId}?acf_format=standard&_fields=id,title,acf,date,slug`;
+      res = await fetch(apiUrl, {
+        next: { revalidate: 10 },
+      });
+
+      if (!res.ok) {
+        console.error(`Failed to fetch sport article with ID ${decodedSlugOrId}: ${res.status} ${res.statusText}`);
+        return null;
+      }
+
+      return res.json();
+    }
+
+    console.error(`Could not find sport article with slug: ${decodedSlugOrId}`);
+    return null;
   } catch (error) {
-    console.error('Unexpected error fetching metadata:', error);
-    return {
-      title: 'Default Title',
-      description: 'Default description',
-      openGraph: {
-        title: 'Default Title',
-        description: 'Default description',
-        url: `https://www.mautskebeli.ge/sport-articles/${id}`,
-        images: [
-          {
-            url: '/images/default-og-image.jpg',
-            width: 1200,
-            height: 630,
-          },
-        ],
-        type: 'article',
-      },
-    };
+    console.error(`Error fetching sport article with slug/id ${decodedSlugOrId}:`, error);
+    return null;
   }
 }
 
-const Page = async ({ params }) => {
+export async function generateMetadata({ params }) {
   const { id } = params;
-  const article = await fetchArticle(id); // Ensure fetchArticle is defined or imported
+  const article = await fetchArticle(id);
 
   if (!article) {
-    notFound();
+    return {
+      title: 'Article Not Found',
+      description: 'This article does not exist.',
+    };
   }
 
-  // Process article data
-  article.formattedDate = formatDate(article.date); // Ensure formatDate is defined or imported
-  article.title.rendered = decodeHTMLEntities(article.title.rendered); // Ensure decodeHTMLEntities is defined or imported
+  const decodedTitle = decode(article.title.rendered || '');
+  const description = article.acf.description || article.acf.sub_title || '';
+  const decodedDescription = decode(description);
 
-  // Sanitize and process the main text
-  let sanitizedContent = getSanitizedContent(article.acf['main-text']); // Ensure getSanitizedContent is defined or imported
+  let imageUrl = article.acf.image
+    ? article.acf.image.startsWith('http')
+      ? article.acf.image
+      : `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}${article.acf.image}`
+    : 'https://www.mautskebeli.ge/images/default-og-image.jpg';
 
-  // Use Cheerio to manipulate and enhance the HTML content
-  const $ = load(sanitizedContent);
+  imageUrl = imageUrl.split('?')[0];
 
-  $('img, video, audio, source').each((i, elem) => {
-    let src = $(elem).attr('src');
-    if (src && !src.startsWith('http')) {
-      src = `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}${src}`;
-    }
-    if (elem.tagName === 'img') {
-      src = src?.replace(/-\d+x\d+(?=\.\w{3,4}$)/, '');
-      $(elem).removeAttr('width');
-      $(elem).removeAttr('height');
-    }
-    $(elem).attr('src', src);
+  const metadataBase = new URL('https://www.mautskebeli.ge');
+  const canonicalPath = article.slug ? `/sport-articles/${article.slug}` : `/sport-articles/${id}`;
+
+  return {
+    metadataBase,
+    title: decodedTitle,
+    description: decodedDescription,
+    openGraph: {
+      title: decodedTitle,
+      description: decodedDescription,
+      url: canonicalPath,
+      type: 'article',
+      images: [imageUrl],
+      locale: 'ka_GE',
+      siteName: 'Mautskebeli',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: decodedTitle,
+      description: decodedDescription,
+      images: [imageUrl],
+    },
+  };
+}
+
+function formatDate(dateString) {
+  moment.locale('ka');
+  return moment(dateString).format('LL');
+}
+
+function decodeHTMLEntities(str) {
+  return decode(str);
+}
+
+function getSanitizedContent(content) {
+  const sanitized = sanitizeHtml(content, {
+    allowedTags: [
+      'b', 'i', 'em', 'strong', 'a', 'p', 'blockquote',
+      'ul', 'ol', 'li', 'br', 'span', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+      'img', 'video', 'source', 'audio', 'figure', 'figcaption', 'div',
+    ],
+    allowedAttributes: {
+      a: ['href', 'target', 'rel'],
+      img: ['src', 'alt', 'title', 'class', 'style'],
+      video: ['src', 'controls', 'width', 'height', 'poster', 'style'],
+      audio: ['src', 'controls'],
+      source: ['src', 'type'],
+      span: ['style'],
+      p: ['style', 'class'],
+      blockquote: ['cite', 'style'],
+      figure: ['class', 'style'],
+      figcaption: ['class'],
+      div: ['class', 'style'],
+    },
+    allowedSchemes: ['http', 'https', 'data'],
+    allowedStyles: {
+      '*': {
+        width: [/^\d+(?:px|%)$/],
+        height: [/^\d+(?:px|%)$/],
+        'max-width': [/^\d+(?:px|%)$/],
+        'max-height': [/^\d+(?:px|%)$/],
+        float: [/^(left|right|none)$/],
+        'object-fit': [/^(cover|contain|fill|none|scale-down)$/],
+        'font-size': [/^\d+(?:px|em|rem|%)$/],
+      },
+    },
+    allowVulnerableTags: false,
   });
 
-  // Style blockquotes
-  $('blockquote').each((i, elem) => {
+  const $ = load(sanitized);
+
+  $('blockquote').each((_, elem) => {
     $(elem).css('margin-left', '20px');
     $(elem).css('padding-left', '15px');
     $(elem).css('border-left', '5px solid #ccc');
     $(elem).css('font-style', 'italic');
   });
 
-  sanitizedContent = $.html();
+  $('a').each((_, elem) => {
+    $(elem).attr('target', '_blank');
+    $(elem).attr('rel', 'noopener noreferrer');
+  });
 
-  // Determine if the language dropdown should be shown
-  const showLanguageDropdown =
-    article.acf.language1 === true || article.acf.language2 === true;
+  return $.html();
+}
+
+const SportArticlePage = async ({ params }) => {
+  const { id } = params;
+  const article = await fetchArticle(id);
+
+  if (!article) {
+    notFound();
+  }
+
+  article.formattedDate = formatDate(article.date);
+  article.title.rendered = decodeHTMLEntities(article.title.rendered);
+
+  let sanitizedContent = getSanitizedContent(article.acf['main-text']);
+  const $ = load(sanitizedContent);
+
+  $('img').each((i, elem) => {
+    let src = $(elem).attr('src');
+
+    if (src && !src.startsWith('http')) {
+      src = `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}${src}`;
+    }
+
+    const highResSrc = src?.replace(/-\d+x\d+(?=\.\w{3,4}$)/, '');
+    $(elem).attr('src', highResSrc || src);
+    $(elem).removeAttr('width');
+    $(elem).removeAttr('height');
+
+    const imgHtml = $.html(elem);
+    const wrapped = `<a href="${highResSrc}" target="_blank" rel="noopener noreferrer">${imgHtml}</a>`;
+    $(elem).replaceWith(wrapped);
+  });
+
+  sanitizedContent = $.html();
 
   return (
     <section className="w-full mx-auto mt-10 px-4 lg:px-0 overflow-x-hidden relative">
       <div className="w-full lg:w-[60%] mx-auto bg-opacity-90 p-5 rounded-lg">
-        <div className="lg:flex hidden justify-start rounded-md space-x-6 px-20 gap-10 py-4 mt-[-12px] mb-10 font-noto-sans-georgian w-full mx-auto bg-[#AD88C6]">
-          {categories.map((category) => (
-            <a
-              key={category.name}
-              href={category.path}
-              className={`text-sm text-[#474F7A] ${
-                category.name === 'სტატიები'
-                  ? 'text-white font-bold'
-                  : 'text-[#474F7A] hover:scale-110'
-              }`}
-            >
-              {category.name}
-            </a>
-          ))}
+        <div className="lg:flex hidden justify-start rounded-md px-8 py-4 mt-[-12px] mb-10 font-noto-sans-georgian w-full mx-auto bg-[#AD88C6]">
+          <a href="/sporti" className="text-sm text-white font-bold hover:scale-110 transition-transform">
+            სპორტი
+          </a>
         </div>
+
         <div className="w-full h-auto mb-5">
           <Image
-            src={
-              article.acf.image ||
-              '/images/default-og-image.jpg'
-            }
+            src={article.acf.image || '/images/default-og-image.jpg'}
             alt={article.title.rendered}
             width={800}
             height={450}
             style={{ objectFit: 'cover' }}
             className="rounded-lg w-full"
           />
-
-          {/* Language Dropdown */}
-          {showLanguageDropdown && (
-            <DynamicClientComponents
-              id={id}
-              title={article.title.rendered}
-              showLanguageDropdown={showLanguageDropdown}
-            />
-          )}
         </div>
 
         <h1 className="font-alk-tall-mtavruli text-[32px] sm:text-[64px] font-light leading-none text-[#474F7A] mt-[24px] mb-5">
           {article.title.rendered}
         </h1>
-        <h3 className="font-alk-tall-mtavruli sm:text-[34px] lg:text-[34px] font-light leading-wide text-[#474F7A] mt-[24px] mb-5">
-          {article.acf.sub_title}
-        </h3>
-        <h2 className="font-noto-sans-georgian text-[16px] sm:text-[24px] font-extrabold text-[#AD88C6] leading-normal mb-5">
-          {article.acf['ავტორი']}
-        </h2>
+        {article.acf.sub_title && (
+          <h3 className="font-alk-tall-mtavruli sm:text-[34px] lg:text-[34px] font-light leading-wide text-[#474F7A] mt-[24px] mb-5">
+            {article.acf.sub_title}
+          </h3>
+        )}
+        {article.acf['ავტორი'] && (
+          <h2 className="font-noto-sans-georgian text-[16px] sm:text-[24px] font-extrabold text-[#AD88C6] leading-normal mb-5">
+            {article.acf['ავტორი']}
+          </h2>
+        )}
         <p className="text-[#474F7A] font-semibold pb-10">
           {article.formattedDate}
         </p>
-        {article.acf.full_article_pdf && (
-          <p className="text-[#474F7A] font-semibold pb-10">
-            იხილეთ სტატიის{' '}
-            <a
-              href={article.acf.full_article_pdf}
-              target="_blank"
-              rel="noopener noreferrer"
-              download
-              className="underline"
-            >
-              პდფ ვერსია
-            </a>
-          </p>
-        )}
 
         <div
           className="article-content text-[#474F7A] font-noto-sans-georgian text-[14px] sm:text-[16px] font-normal lg:text-justify leading-[30px] sm:leading-[35px] tracking-[0.32px] mt-5"
           dangerouslySetInnerHTML={{ __html: sanitizedContent }}
         ></div>
 
-        {/* Share Buttons */}
-        <DynamicClientComponents
-          id={id}
-          title={article.title.rendered}
-          showLanguageDropdown={false} // Hide language dropdown here if not needed
-        />
+        <DynamicClientComponents id={id} title={article.title.rendered} showLanguageDropdown={false} />
       </div>
-
-      {/* Scroll to Top Button */}
-      {/* Already handled within DynamicClientComponents */}
-      {/* Remove if DynamicClientComponents already includes ScrollToTopButton */}
-
       <footer className="h-[100px]"></footer>
     </section>
   );
 };
 
-export default Page;
+export default SportArticlePage;
