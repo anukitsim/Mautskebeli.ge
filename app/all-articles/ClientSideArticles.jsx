@@ -74,7 +74,7 @@ export default function ClientSideArticles({ initialArticles }) {
   // Decode titles & strip/truncate main text
   const processedArticles = useMemo(() => {
     return articles.map((article) => {
-      const decodedTitle = decodeHTMLEntities(article.title?.rendered || "Untitled Article");
+      const decodedTitle = decodeHTMLEntities(article.acf?.title || article.title?.rendered || "Untitled Article");
       const mainText = truncateText(
         decodeHTMLEntities(stripHtml(article.acf?.["main-text"] || "")),
         30

@@ -92,7 +92,11 @@ export async function generateMetadata({ params }) {
     };
   }
 
-  const decodedTitle = decode(freeColumn.title.rendered || '');
+  // Admins edit the "title" field in the meta box as the real editorial
+  // title; the native WP title (top of the editor) is a separate field
+  // that's easy to forget to keep in sync. Prefer the ACF field so the
+  // site shows whatever the admin actually intended.
+  const decodedTitle = decode(freeColumn.acf.title || freeColumn.title.rendered || '');
   const description = freeColumn.acf.description || freeColumn.acf.sub_title || '';
   const decodedDescription = decode(description);
 
@@ -225,7 +229,7 @@ const FreeColumnPage = async ({ params }) => {
   }
 
   freeColumn.formattedDate = formatDate(freeColumn.date);
-  freeColumn.title.rendered = decodeHTMLEntities(freeColumn.title.rendered);
+  freeColumn.title.rendered = decodeHTMLEntities(freeColumn.acf.title || freeColumn.title.rendered);
 
   let sanitizedContent = getSanitizedContent(freeColumn.acf['main-text']);
 

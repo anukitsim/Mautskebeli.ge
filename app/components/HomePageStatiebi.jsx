@@ -42,7 +42,7 @@ const HomePageStatiebi = () => {
           ...article,
           title: {
             ...article.title,
-            rendered: decodeHTMLEntities(article.title.rendered) // Decode HTML entities in titles
+            rendered: decodeHTMLEntities(article.acf?.title || article.title.rendered) // Decode HTML entities in titles
           },
           acf: {
             ...article.acf,

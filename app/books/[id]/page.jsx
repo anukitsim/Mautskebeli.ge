@@ -43,7 +43,11 @@ export async function generateMetadata({ params }) {
     };
   }
 
-  const decodedTitle = decode(book.title.rendered || '');
+  // Admins edit the "title" field in the meta box as the real editorial
+  // title; the native WP title (top of the editor) is a separate field
+  // that's easy to forget to keep in sync. Prefer the ACF field so the
+  // site shows whatever the admin actually intended.
+  const decodedTitle = decode(book.acf.title || book.title.rendered || '');
   const description = book.acf.text || book.acf.sub_title || '';
   const decodedDescription = decode(description);
 
@@ -153,7 +157,7 @@ const BookPage = async ({ params }) => {
   }
 
   book.formattedDate = formatDate(book.date);
-  book.title.rendered = decodeHTMLEntities(book.title.rendered);
+  book.title.rendered = decodeHTMLEntities(book.acf.title || book.title.rendered);
 
   const wpBase = process.env.NEXT_PUBLIC_WORDPRESS_API_URL || 'https://mautskebeli.wpenginepowered.com';
   let bookImageSrc = '/images/default-og-image.jpg';

@@ -64,7 +64,7 @@ export default function ClientSideFreeColumns({ initialFreeColumns }) {
       const processed = freeColumns.map((column) => ({
         ...column,
         title: {
-          rendered: decodeHTMLEntities(column.title.rendered)
+          rendered: decodeHTMLEntities(column.acf?.title || column.title.rendered)
         },
         acf: {
           ...column.acf,

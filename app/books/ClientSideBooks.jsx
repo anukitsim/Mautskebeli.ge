@@ -54,7 +54,7 @@ export default function ClientSideBooks({ initialBooks }) {
   // Process books for rendering
   const processedBooks = useMemo(() => {
     return books.map((book) => {
-      const decodedTitle = decodeHTMLEntities(book?.title?.rendered || "Untitled Book");
+      const decodedTitle = decodeHTMLEntities(book?.acf?.title || book?.title?.rendered || "Untitled Book");
       const mainText = truncateText(
         decodeHTMLEntities(stripHtml(book?.acf?.description || "")),
         30

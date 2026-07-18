@@ -85,7 +85,11 @@ export async function generateMetadata({ params }) {
     };
   }
 
-  const decodedTitle = decode(article.title.rendered || '');
+  // Admins edit the "title" field in the meta box as the real editorial
+  // title; the native WP title (top of the editor) is a separate field
+  // that's easy to forget to keep in sync. Prefer the ACF field so the
+  // site shows whatever the admin actually intended.
+  const decodedTitle = decode(article.acf.title || article.title.rendered || '');
   const description = article.acf.description || article.acf.sub_title || '';
   const decodedDescription = decode(description);
 
@@ -199,7 +203,7 @@ const SportArticlePage = async ({ params }) => {
   }
 
   article.formattedDate = formatDate(article.date);
-  article.title.rendered = decodeHTMLEntities(article.title.rendered);
+  article.title.rendered = decodeHTMLEntities(article.acf.title || article.title.rendered);
 
   let sanitizedContent = getSanitizedContent(article.acf['main-text']);
   const $ = load(sanitizedContent);

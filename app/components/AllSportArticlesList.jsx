@@ -98,7 +98,7 @@ const AllArticlesPage = () => {
                   </div>
                   <div className="p-[18px]">
                     <h2 className="text-[20px] font-bold mb-2" style={{ color: '#474F7A' }}>
-                      {article.title.rendered}
+                      {article.acf?.title || article.title.rendered}
                     </h2>
                     <span className="text-[#8D91AB] text-[14px] font-bold">
                       {article.acf['ავტორი']}

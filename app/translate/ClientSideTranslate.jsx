@@ -80,7 +80,7 @@ export default function ClientSideTranslate({ initialTranslations }) {
     return translations.map((translation) => {
       // Decode the title
       const decodedTitle = decodeHTMLEntities(
-        translation.title?.rendered || "Untitled Translation"
+        translation.acf?.title || translation.title?.rendered || "Untitled Translation"
       );
       // Truncate the main text for preview
       const mainTextRaw = translation.acf?.["main-text"] || "";
