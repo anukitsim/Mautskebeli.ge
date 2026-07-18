@@ -18,16 +18,42 @@ const categories = [
   { name: "თავისუფალი სვეტი", path: "/free-column" },
 ];
 
-async function fetchArticle(id) {
-  const apiUrl = `${
-    process.env.NEXT_PUBLIC_WORDPRESS_API_URL
-  }/wp/v2/article/${id}?acf_format=standard&_fields=id,title,acf,date&_=${new Date().getTime()}`;
-  const res = await fetch(apiUrl);
+async function fetchArticle(slugOrId) {
+  // Decode the slug/ID in case it's URL-encoded (Georgian characters)
+  const decodedSlugOrId = decodeURIComponent(slugOrId);
 
-  if (!res.ok) {
+  // Try fetching by slug first — article URLs use the Georgian slug, not
+  // the numeric WordPress post ID.
+  const slugUrl = `${
+    process.env.NEXT_PUBLIC_WORDPRESS_API_URL
+  }/wp/v2/article?slug=${encodeURIComponent(decodedSlugOrId)}&acf_format=standard&_fields=id,title,acf,date`;
+
+  try {
+    const slugRes = await fetch(slugUrl, { next: { revalidate: 10 } });
+    if (slugRes.ok) {
+      const articles = await slugRes.json();
+      if (articles && articles.length > 0) {
+        return articles[0];
+      }
+    }
+
+    // Fall back to numeric ID lookup for backward compatibility.
+    const isNumeric = !isNaN(decodedSlugOrId) && !isNaN(parseFloat(decodedSlugOrId));
+    if (isNumeric) {
+      const idUrl = `${
+        process.env.NEXT_PUBLIC_WORDPRESS_API_URL
+      }/wp/v2/article/${decodedSlugOrId}?acf_format=standard&_fields=id,title,acf,date`;
+      const idRes = await fetch(idUrl, { next: { revalidate: 10 } });
+      if (idRes.ok) {
+        return idRes.json();
+      }
+    }
+
+    return null;
+  } catch (error) {
+    console.error(`Error fetching article with slug/id ${decodedSlugOrId}:`, error);
     return null;
   }
-  return res.json();
 }
 
 function formatDate(dateString) {

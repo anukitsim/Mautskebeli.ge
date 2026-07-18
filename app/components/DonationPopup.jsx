@@ -9,9 +9,7 @@ const copy = {
   ka: {
     heading: "გააძლიერე მაუწყებელი, გააძლიერე წინააღმდეგობა!",
     body: [
-      "ივანიშვილის რეჟიმის მიზანია, საქართველოში გაქრეს მედია, რომელიც ხალხთან ერთად იბრძოლებს ჩაგვრისა და ექსპლუატაციის წინააღმდეგ, დაუპირისპირდება პოლიციურ რეჟიმს და უკომპრომისოდ ამხელს მსოფლიოში გაბატონებულ იმპერიალიზმს.",
-      "ამ მიზნის მისაღწევად, ის გვიზღუდავს მის კონტროლმიღმა არსებული რესურსების მოზიდვას და გვემუქრება ციხით.",
-      "ცხადია, ეს გვაძლევს ორმაგ მოტივაციას, გავაგრძელოთ უკომპრომისო ბრძოლა ოლიგარქიული სისტემის წინააღმდეგ. ამისთვის გვჭირდება თქვენი ყოველთვიური, თუნდაც მცირე, მაგრამ სტაბილური შემოწირულობა.",
+      "„მაუწყებელი“ არ ეკუთვნის ბიზნესჯგუფებს თუ პოლიტიკურ ელიტებს — ის სახალხო მედიაა. ამიტომ, ჩვენი არსებობისთვის სასიცოცხლოდ მნიშვნელოვანია თქვენი მხარდაჭერა. შემოგვიერთდით, თუნდაც მცირე, მაგრამ ყოველთვიური დონაციით.",
     ],
     cta: "გახდი ჩვენი შემომწირველი",
     langLabel: "EN",
@@ -20,9 +18,7 @@ const copy = {
   en: {
     heading: "Support us, Strengthen the resistance!",
     body: [
-      "The goal of Ivanishvili's regime is to eliminate media in Georgia that stands with the people, fights against oppression and exploitation, challenges the police state, and relentlessly exposes global imperialism.",
-      "To achieve this, they restrict our access to resources beyond their control and threaten us with imprisonment.",
-      "Clearly, this gives us double the motivation to continue our uncompromising fight against the oligarchic system. For this, we need your monthly support—even small but consistent donations make a difference.",
+      "\"Mautskebeli\" doesn't belong to business groups or political elites — it's media for the people. That's why your support is vital to our existence. Join us with a monthly donation, however small.",
     ],
     cta: "Support Us",
     langLabel: "KA",
