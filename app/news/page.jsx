@@ -421,7 +421,7 @@ export default function NewsPage() {
                   >
                     <h2 className="text-[#474F7A] font-bold text-xl flex items-center gap-3">
                       <span className="w-2 h-8 bg-gradient-to-b from-[#AD88C6] to-[#8C74B2] rounded-full" />
-                      ყველა ამბები
+                      ყველა ამბავი
                     </h2>
                     <div className="flex-1 h-px bg-gradient-to-r from-[#E8E0EE] to-transparent" />
                   </div>
