@@ -5103,3 +5103,170 @@ function msb_november_backfill_exists($recId) {
 // ============================================================================
 // END OF NOVEMBER BACKFILL TOOL
 // ============================================================================
+// ============================================================================
+// LATIN SLUG MIGRATION — transliteration + old/new slug resolution
+// Added 2026-07-18. Purely additive: does not modify any existing function,
+// route, or data. See project notes for background.
+// ============================================================================
+
+/**
+ * Georgian -> Latin transliteration, based on the Georgian National
+ * Romanization System (2002) — the same system used on Georgian road signs
+ * and in passports — with apostrophes dropped since they aren't URL-safe.
+ */
+function msb_transliterate_georgian($text) {
+    $map = array(
+        'ა' => 'a', 'ბ' => 'b', 'გ' => 'g', 'დ' => 'd', 'ე' => 'e', 'ვ' => 'v', 'ზ' => 'z',
+        'თ' => 't', 'ი' => 'i', 'კ' => 'k', 'ლ' => 'l', 'მ' => 'm', 'ნ' => 'n', 'ო' => 'o',
+        'პ' => 'p', 'ჟ' => 'zh', 'რ' => 'r', 'ს' => 's', 'ტ' => 't', 'უ' => 'u', 'ფ' => 'p',
+        'ქ' => 'k', 'ღ' => 'gh', 'ყ' => 'q', 'შ' => 'sh', 'ჩ' => 'ch', 'ც' => 'ts',
+        'ძ' => 'dz', 'წ' => 'ts', 'ჭ' => 'ch', 'ხ' => 'kh', 'ჯ' => 'j', 'ჰ' => 'h',
+    );
+
+    $result = '';
+    $chars = mb_str_split(mb_strtolower($text, 'UTF-8'), 1, 'UTF-8');
+    foreach ($chars as $ch) {
+        $result .= isset($map[$ch]) ? $map[$ch] : $ch;
+    }
+    return $result;
+}
+
+/**
+ * Build a clean, URL-safe Latin slug from a (possibly Georgian) title.
+ * Mirrors the approved prototype: max 45 chars, cut at a word boundary,
+ * trailing short connector words trimmed so it never ends mid-phrase.
+ */
+function msb_slugify_title($title) {
+    $max_length = 45;
+    $trailing_stopwords = array('da', 'an', 'ki', 'ro', 'rom', 'the', 'a');
+
+    $translit = msb_transliterate_georgian($title);
+    $cleaned = preg_replace('/[^a-z0-9\s-]/', '', $translit);
+    $cleaned = trim($cleaned);
+    $cleaned = preg_replace('/\s+/', '-', $cleaned);
+    $cleaned = preg_replace('/-+/', '-', $cleaned);
+    $cleaned = trim($cleaned, '-');
+
+    if (strlen($cleaned) > $max_length) {
+        $truncated = substr($cleaned, 0, $max_length);
+        $last_hyphen = strrpos($truncated, '-');
+        $cleaned = ($last_hyphen !== false && $last_hyphen > 0) ? substr($truncated, 0, $last_hyphen) : $truncated;
+    }
+
+    $parts = explode('-', $cleaned);
+    while (count($parts) > 1 && in_array(end($parts), $trailing_stopwords, true)) {
+        array_pop($parts);
+    }
+
+    return implode('-', $parts);
+}
+
+/**
+ * Read-only lookup: given a slug and post type, find the matching post
+ * whether the slug is its CURRENT slug or a FORMER one (WordPress core
+ * automatically remembers former slugs in '_wp_old_slug' postmeta whenever
+ * a post's slug changes via wp_update_post — this just exposes that via
+ * REST so the headless Next.js frontend can redirect old links to the new
+ * URL instead of 404ing).
+ */
+function msb_resolve_article_slug(WP_REST_Request $request) {
+    $slug = sanitize_title($request->get_param('slug'));
+    $allowed_post_types = array('article', 'sport-article', 'free-column', 'targmani', 'news');
+    $requested_post_type = $request->get_param('post_type');
+    $post_type = in_array($requested_post_type, $allowed_post_types, true) ? $requested_post_type : 'article';
+
+    if (empty($slug)) {
+        return new WP_Error('missing_slug', 'slug parameter is required', array('status' => 400));
+    }
+
+    // 1. Try current slug first (the common case).
+    $posts = get_posts(array(
+        'name' => $slug,
+        'post_type' => $post_type,
+        'post_status' => 'publish',
+        'numberposts' => 1,
+    ));
+
+    // 2. Not found as a current slug — check whether it's a FORMER slug.
+    if (empty($posts)) {
+        global $wpdb;
+        $post_id = $wpdb->get_var($wpdb->prepare(
+            "SELECT post_id FROM {$wpdb->postmeta}
+             WHERE meta_key = '_wp_old_slug' AND meta_value = %s
+             LIMIT 1",
+            $slug
+        ));
+
+        if ($post_id) {
+            $candidate = get_post($post_id);
+            if ($candidate && $candidate->post_type === $post_type && $candidate->post_status === 'publish') {
+                $posts = array($candidate);
+            }
+        }
+    }
+
+    if (empty($posts)) {
+        return rest_ensure_response(array('found' => false));
+    }
+
+    $post = $posts[0];
+    $acf = function_exists('get_fields') ? get_fields($post->ID) : array();
+
+    return rest_ensure_response(array(
+        'found' => true,
+        'id' => $post->ID,
+        'slug' => $post->post_name, // the CURRENT canonical slug
+        'requested_slug_is_current' => ($post->post_name === $slug),
+        'title' => array('rendered' => $post->post_title),
+        'date' => $post->post_date,
+        'acf' => $acf,
+    ));
+}
+
+add_action('rest_api_init', function () {
+    register_rest_route('custom/v1', '/resolve-article-slug', array(
+        'methods' => 'GET',
+        'callback' => 'msb_resolve_article_slug',
+        'permission_callback' => '__return_true',
+    ));
+});
+
+
+
+// ============================================================================
+// AUTO-LATIN-SLUG ON SAVE
+// Added 2026-08-02. When a post of one of these types is saved and
+// WordPress's own post_name is empty or percent-encoded (i.e. sanitize_title()
+// couldn't find a Latin form and fell back to raw URL-encoding the Georgian
+// title), replace it with the msb_slugify_title() transliteration instead.
+// A slug an editor set on purpose (anything without a % in it) is left alone,
+// so this never renames an already-clean or intentionally-Georgian slug.
+// ============================================================================
+add_filter('wp_insert_post_data', function ($data, $postarr) {
+    $target_types = array('article', 'sport-article', 'free-column', 'targmani', 'news');
+
+    if (!in_array($data['post_type'], $target_types, true)) {
+        return $data;
+    }
+    if (in_array($data['post_status'], array('auto-draft', 'trash'), true)) {
+        return $data;
+    }
+    if ($data['post_name'] !== '' && strpos($data['post_name'], '%') === false) {
+        return $data;
+    }
+
+    $title = $data['post_title'] !== '' ? $data['post_title'] : (isset($postarr['post_title']) ? $postarr['post_title'] : '');
+    if (trim($title) === '') {
+        return $data;
+    }
+
+    $slug = msb_slugify_title($title);
+    if ($slug === '') {
+        return $data;
+    }
+
+    $post_id = isset($postarr['ID']) ? (int) $postarr['ID'] : 0;
+    $data['post_name'] = wp_unique_post_slug($slug, $post_id, $data['post_status'], $data['post_type'], (int) $data['post_parent']);
+
+    return $data;
+}, 10, 2);
