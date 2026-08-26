@@ -211,11 +211,15 @@ export default function NewsVideoPlayer({ videoId }) {
           </div>
         )}
 
-        {/* Control bar */}
+        {/* Control bar - fades only, no translate-y slide. A vertical slide
+            moves the progress bar's hit-box while it's fading in, so a click
+            aimed at where it visually appears mid-animation can land ~16px
+            off and miss the scrubber entirely. Fading in place keeps the
+            hit-box stationary the instant it becomes clickable. */}
         {hasStarted && (
           <div
-            className={`absolute bottom-0 left-0 right-0 transition-all duration-300 ${
-              showControls ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'
+            className={`absolute bottom-0 left-0 right-0 transition duration-300 ${
+              showControls ? 'opacity-100' : 'opacity-0 pointer-events-none'
             }`}
             style={{ zIndex: 30 }}
             onMouseEnter={() => resetControlsTimer()}

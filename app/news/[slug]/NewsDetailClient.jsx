@@ -39,6 +39,60 @@ const upgradeContentImages = (html) => {
     .replace(/(src="[^"]*?)-\d+x\d+(\.\w{3,4}")/gi, '$1$2');
 };
 
+// When an editor pastes a YouTube link directly into the Main Text WYSIWYG,
+// WordPress auto-embeds it as a raw, fixed-size <iframe> (width="500"
+// height="281", no responsive wrapper) exactly where they typed it. That's
+// why position was always right but sizing looked broken. Rather than ask
+// editors to use a separate field or type a marker, we scan the article body
+// for any iframe WordPress created, pull the YouTube video ID out of its
+// src, and swap the raw iframe for our own responsive branded player - in
+// the exact spot the editor put it. This walks the HTML in order and returns
+// alternating text/video segments so multiple embeds in one article each get
+// their own player, and any non-YouTube iframe (a different embed provider)
+// is left untouched.
+const IFRAME_RE = /<iframe[\s\S]*?<\/iframe>/gi;
+const IFRAME_SRC_RE = /\bsrc\s*=\s*"([^"]+)"/i;
+
+const splitContentAtVideoEmbeds = (html) => {
+  if (!html) return [];
+  // WordPress wraps the auto-embedded iframe in its own <p> - unwrap it
+  // first so we don't leave an empty paragraph shell around our player.
+  const unwrapped = html.replace(/<p[^>]*>\s*(<iframe[\s\S]*?<\/iframe>)\s*<\/p>/gi, '$1');
+
+  const segments = [];
+  let lastIndex = 0;
+  let match;
+  IFRAME_RE.lastIndex = 0;
+  while ((match = IFRAME_RE.exec(unwrapped))) {
+    const before = unwrapped.slice(lastIndex, match.index);
+    if (before) segments.push({ type: 'html', html: before });
+
+    const srcMatch = match[0].match(IFRAME_SRC_RE);
+    const videoId = srcMatch ? extractVideoId(srcMatch[1]) : null;
+    segments.push(videoId ? { type: 'video', videoId } : { type: 'html', html: match[0] });
+
+    lastIndex = match.index + match[0].length;
+  }
+  const rest = unwrapped.slice(lastIndex);
+  if (rest) segments.push({ type: 'html', html: rest });
+
+  return segments;
+};
+
+const ARTICLE_CONTENT_CLASSNAME = `article-content text-[#474F7A] font-noto-sans-georgian text-[16px] lg:text-[18px]
+                            font-normal leading-[1.9] lg:leading-[2] tracking-[0.2px]
+                            prose prose-lg max-w-none
+                            prose-headings:text-[#474F7A] prose-headings:font-bold prose-headings:mt-8 prose-headings:mb-4
+                            prose-p:text-[#474F7A] prose-p:mb-6
+                            prose-a:text-[#AD88C6] prose-a:font-medium prose-a:no-underline hover:prose-a:underline
+                            prose-strong:text-[#474F7A] prose-strong:font-bold
+                            prose-ul:text-[#474F7A] prose-ol:text-[#474F7A]
+                            prose-li:mb-2
+                            prose-blockquote:border-l-4 prose-blockquote:border-[#AD88C6] prose-blockquote:bg-[#F6F4F8]
+                            prose-blockquote:rounded-r-lg prose-blockquote:py-4 prose-blockquote:px-6 prose-blockquote:my-8
+                            prose-blockquote:text-[#8B7AA0] prose-blockquote:italic prose-blockquote:not-italic
+                            [&>div]:mb-6`;
+
 export default function NewsDetailClient() {
   const params = useParams();
   const router = useRouter();
@@ -225,10 +279,14 @@ export default function NewsDetailClient() {
 
   if (!news) return null;
 
-  const videoId = extractVideoId(news.acf?.video_url);
-  const hasVideo = !!videoId;
   const hasImage = !!news.acf?.image;
   const title = decodeHTMLEntities(news.title?.rendered || news.title);
+
+  const mainTextHtml = news.acf?.main_text ? upgradeContentImages(news.acf.main_text) : '';
+  // Wherever a video ends up on the page is entirely up to where the author
+  // pasted it into the text - there's no separate field or fallback position
+  // that overrides that.
+  const contentSegments = splitContentAtVideoEmbeds(mainTextHtml);
 
   return (
     <>
@@ -368,29 +426,18 @@ export default function NewsDetailClient() {
                 </div>
               )}
 
-              {hasVideo && (
-                <div className="mb-8 lg:mb-10">
-                  <NewsVideoPlayer videoId={videoId} />
-                </div>
-              )}
-
-              {news.acf?.main_text && (
-                <div 
-                  className="article-content text-[#474F7A] font-noto-sans-georgian text-[16px] lg:text-[18px] 
-                            font-normal leading-[1.9] lg:leading-[2] tracking-[0.2px]
-                            prose prose-lg max-w-none
-                            prose-headings:text-[#474F7A] prose-headings:font-bold prose-headings:mt-8 prose-headings:mb-4
-                            prose-p:text-[#474F7A] prose-p:mb-6
-                            prose-a:text-[#AD88C6] prose-a:font-medium prose-a:no-underline hover:prose-a:underline
-                            prose-strong:text-[#474F7A] prose-strong:font-bold
-                            prose-ul:text-[#474F7A] prose-ol:text-[#474F7A]
-                            prose-li:mb-2
-                            prose-blockquote:border-l-4 prose-blockquote:border-[#AD88C6] prose-blockquote:bg-[#F6F4F8] 
-                            prose-blockquote:rounded-r-lg prose-blockquote:py-4 prose-blockquote:px-6 prose-blockquote:my-8
-                            prose-blockquote:text-[#8B7AA0] prose-blockquote:italic prose-blockquote:not-italic
-                            [&>div]:mb-6"
-                  dangerouslySetInnerHTML={{ __html: upgradeContentImages(news.acf.main_text) }}
-                />
+              {news.acf?.main_text && contentSegments.map((segment, index) =>
+                segment.type === 'video' ? (
+                  <div key={index} className="my-8 lg:my-10">
+                    <NewsVideoPlayer videoId={segment.videoId} />
+                  </div>
+                ) : (
+                  <div
+                    key={index}
+                    className={ARTICLE_CONTENT_CLASSNAME}
+                    dangerouslySetInnerHTML={{ __html: segment.html }}
+                  />
+                )
               )}
 
               {news.acf?.tags && news.acf.tags.trim() !== '' && (
