@@ -520,18 +520,24 @@ margin-right: 10px;
   transition: width 0.3s ease-out;
 }
 
-input[type=range] {
+/* Scoped to .v-volume-slider-container (the legacy vlite.js player's volume
+   control) - this used to be a bare input[type=range] selector, which applied
+   `width: 60%` to every range input on the site, including the seek bar and
+   volume slider on the current custom YouTube player. That silently made
+   those sliders' clickable area 60% of their visible width, so clicking or
+   dragging anywhere past that point didn't track the cursor. */
+.v-volume-slider-container input[type=range] {
   -webkit-appearance: none;
   width: 60%; /* Adjusted to fill the container */
 }
 
-input[type=range]::-webkit-slider-runnable-track {
+.v-volume-slider-container input[type=range]::-webkit-slider-runnable-track {
   background: rgba(255, 255, 255, 0.2);
   border-radius: 10px;
   height: 6px;
 }
 
-input[type=range]::-webkit-slider-thumb {
+.v-volume-slider-container input[type=range]::-webkit-slider-thumb {
   -webkit-appearance: none;
   height: 14px;
   width: 14px;
@@ -543,25 +549,25 @@ input[type=range]::-webkit-slider-thumb {
   transition: all 0.2s ease;
 }
 
-input[type=range]:hover::-webkit-slider-thumb {
+.v-volume-slider-container input[type=range]:hover::-webkit-slider-thumb {
   background: white;
   transform: scale(1.2);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
-input[type=range]:active::-webkit-slider-thumb {
+.v-volume-slider-container input[type=range]:active::-webkit-slider-thumb {
   transform: scale(1.3);
 }
 
 /* Firefox styles */
-input[type="range"]::-moz-range-track {
+.v-volume-slider-container input[type="range"]::-moz-range-track {
   background: rgba(255, 255, 255, 0.2);
   border-radius: 10px;
   height: 6px;
   border: none;
 }
 
-input[type="range"]::-moz-range-thumb {
+.v-volume-slider-container input[type="range"]::-moz-range-thumb {
   height: 14px;
   width: 14px;
   border-radius: 50%;
@@ -572,15 +578,15 @@ input[type="range"]::-moz-range-thumb {
   transition: all 0.2s ease;
 }
 
-input[type="range"]:hover::-moz-range-thumb {
+.v-volume-slider-container input[type="range"]:hover::-moz-range-thumb {
   transform: scale(1.2);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
-input[type="range"]::-moz-focus-inner {
+.v-volume-slider-container input[type="range"]::-moz-focus-inner {
   border: 0;
 }
-input[type="range"]::-moz-focus-outer {
+.v-volume-slider-container input[type="range"]::-moz-focus-outer {
   border: 0;
 }
 

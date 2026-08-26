@@ -2,6 +2,7 @@
 
 import "../style/globals.css";
 import { Noto_Sans_Georgian } from "next/font/google";
+import localFont from "next/font/local";
 import Script from "next/script";
 import AnalyticsPageView from "./components/AnalyticsPageView";
 import { LanguageProvider } from "./context/LanguageContext";
@@ -45,12 +46,25 @@ const notoSansGeorgian = Noto_Sans_Georgian({
   variable: "--font-noto-sans-georgian"
 });
 
+// FiraGO — homepage redesign only, self-hosted (SIL OFL licensed, see app/fonts/OFL.txt).
+// Kept separate from notoSansGeorgian above so untouched pages (translate, sport-articles, etc.)
+// keep rendering with their existing font until they're redesigned too.
+const firaGO = localFont({
+  src: [
+    { path: "./fonts/FiraGO-Regular.woff2", weight: "400", style: "normal" },
+    { path: "./fonts/FiraGO-Bold.woff2", weight: "700", style: "normal" },
+    { path: "./fonts/FiraGO-Heavy.woff2", weight: "900", style: "normal" }
+  ],
+  display: "swap",
+  variable: "--font-firago"
+});
+
 // ──────────────────────────
 //  Root Layout
 // ──────────────────────────
 export default function RootLayout({ children }) {
   return (
-    <html lang="ka" className={notoSansGeorgian.variable}>
+    <html lang="ka" className={`${notoSansGeorgian.variable} ${firaGO.variable}`}>
       <head>
         {/* Google Analytics - G-C2ZPMYP4FY - Placed in <head> for Search Console verification */}
         <Script
