@@ -364,9 +364,19 @@ export default function NewsDetailClient() {
           >
             <div className="px-6 lg:px-10 py-5 lg:py-6 border-b border-[#E8E0EE] bg-gradient-to-r from-[#F6F4F8] to-white">
               <div className="flex flex-wrap items-center gap-4 lg:gap-6">
+                {news.acf?.author && (
+                  <div className="flex items-center gap-2 text-[#8B7AA0]">
+                    <svg className="w-5 h-5 text-[#AD88C6]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
+                            d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/>
+                    </svg>
+                    <span className="font-medium text-sm lg:text-base">{news.acf.author}</span>
+                  </div>
+                )}
+
                 <div className="flex items-center gap-2 text-[#8B7AA0]">
                   <svg className="w-5 h-5 text-[#AD88C6]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} 
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
                           d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                   </svg>
                   <span className="font-medium text-sm lg:text-base">{formatDate(news.date)}</span>

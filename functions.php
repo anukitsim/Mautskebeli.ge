@@ -1358,7 +1358,7 @@ function handle_recurring_donation($data, $orderId)
             $subject = "ყოველთვიური დონაცია - გადახდა ვერ მოხერხდა";
             $message = "ძვირფასო " . esc_html($data['donorName']) . ",<br><br>";
             $message .= "გადახდა ვერ მოხერხდა, გთხოვთ თავიდან სცადოთ<br><br>";
-            $message .= "პატივისცემით,<br>Mautskebeli.ge ";
+            $message .= "მაუწყებლის გუნდი";
 
             send_email($data['donorEmail'], $subject, $message);
 
@@ -1512,15 +1512,16 @@ function send_monthly_success_email($donation_post_id)
     $cancel_link = generate_cancellation_link($recId);
 
     $subject = "ყოველთვიური დონაცია - მადლობას გიხდით მხარდაჭერისთვის!";
-    $message = "თქვენი ყოველთვიური კონტრიბუცია აძლიერებს პლათფორმას.<br>";
-    $message .= "თანხა: <strong>" . esc_html($amount) . " GEL</strong>.<br>";
-    $message .= "მომდევნო გადახდის თარიღი: <strong>" . date('Y-m-d', strtotime($next_date)) . "</strong>.<br><br>";
+    $message = "თქვენი ყოველთვიური მხარდაჭერა აძლიერებს „მაუწყებელს“.<br>";
+    $message .= "თანხა: " . esc_html($amount) . " GEL.<br>";
+    $message .= "მომდევნო გადახდის თარიღი: " . date('Y-m-d', strtotime($next_date)) . ".<br><br>";
     if ($cancel_link) {
         $message .= "თუ გსურთ ყოველთვიური დონაციის გაუქმება, გადადით <a href='" .
             esc_url($cancel_link) . "'>ბმულზე</a><br><br>";
     }
 
-    $message .= "პატივისცემით,<br>Mautskebeli.ge";
+    $message .= "დიდი მადლობა მხარდაჭერისთვის!<br><br>";
+    $message .= "მაუწყებლის გუნდი";
 
     send_email($donor_email, $subject, $message);
 
@@ -1573,7 +1574,7 @@ function send_recurring_payment_failed_email($donation_post_id, $next_retry_date
             esc_url($cancel_link) . "'>ბმულზე</a><br><br>";
     }
 
-    $message .= "პატივისცემით,<br>Mautskebeli.ge";
+    $message .= "მაუწყებლის გუნდი";
 
     send_email($donor_email, $subject, $message);
 
@@ -1608,7 +1609,7 @@ function send_cancellation_email($donation_post_id)
     $message = "ძვირფასო დონორო,<br><br>";
     $message .= "ყოველთვიური დონაცია გაუქმებულია.<br>";
     $message .= "გმადლობთ თანადგომისთვის!<br><br>";
-    $message .= "პატივისცემით,<br>Mautskebeli.ge";
+    $message .= "მაუწყებლის გუნდი";
 
     // Send the email
     send_email($donor_email, $subject, $message);
@@ -1979,6 +1980,7 @@ function send_recurring_payment_reminder($user)
 {
     $recId = $user['recId'];
     $donor_email = $user['donorEmail'];
+    $donor_name = !empty($user['donorName']) ? $user['donorName'] : 'დონორო';
     $donation_amount = $user['donationAmount'];
     $donation_post_id = $user['donationPostId'];
 
@@ -2002,17 +2004,17 @@ function send_recurring_payment_reminder($user)
     if ($next_payment_date === $today_plus_two) {
         $cancel_link = generate_cancellation_link($recId);
         $subject = "ყოველთვიური დონაცია - გადახდის თარიღი";
-        $message = "ძვირფასო დონორო,<br><br>";
-        $message .= "შეგახსენებთ, რომ თქვენი ყოველთვიური დონაციის გადახდის თარიღი ახლოვდება ("
-            . date('Y-m-d', strtotime($next_payment_date)) . ").<br>";
-        $message .= "თქვენი ყოველთვიური კონტრიბუცია აძლიერებს პლათფორმას.<br>";
-        $message .= "დონაციის თანხა: " . esc_html($donation_amount) . " GEL.<br>";
+        $message = "გამარჯობა " . esc_html($donor_name) . ", <br><br>";
+        $message .= "შეგახსენებთ, რომ თქვენი ყოველთვიური გადახდის თარიღი ახლოვდება "
+            . date('Y-m-d', strtotime($next_payment_date)) . ".<br>";
+        $message .= "თანხა: " . esc_html($donation_amount) . " GEL.<br>";
         if ($cancel_link) {
             $message .= "თუ გსურთ ყოველთვიური დონაციის გაუქმება, გადადით <a href='" .
                 esc_url($cancel_link) . "'>ბმულზე</a><br><br>";
         }
 
-        $message .= "პატივისცემით,<br>Mautskebeli.ge";
+        $message .= "დიდი მადლობა მხარდაჭერისთვის!<br><br>";
+        $message .= "მაუწყებლის გუნდი";
 
         send_email($donor_email, $subject, $message);
 
@@ -2647,10 +2649,11 @@ function verify_payment_status($request)
                 $recId = get_post_meta($order_id, 'recId', true);
                 $cancel_link = generate_cancellation_link($recId);
 
-                $subject = 'მადლობას გიხდით მხარდაჭერისთვის!';
-                $message = "თქვენი ყოველთვიური კონტრიბუცია აძლიერებს პლათფორმას.<br><br>";
-                $message .= 'მომდევნო გადახდის თარიღი - ' .
-                    date('d/m/Y', strtotime($next_date)) . '<br><br>';
+                $subject = 'ყოველთვიური დონაცია - მადლობას გიხდით მხარდაჭერისთვის!';
+                $message = "თქვენი ყოველთვიური მხარდაჭერა აძლიერებს „მაუწყებელს“.<br>";
+                $message .= 'თანხა: ' . esc_html($amount) . " GEL.<br>";
+                $message .= 'მომდევნო გადახდის თარიღი: ' .
+                    date('Y-m-d', strtotime($next_date)) . '.<br><br>';
 
                 /* ——— only add the paragraph when we **have** a link ——— */
                 if ($cancel_link) {
@@ -2658,13 +2661,13 @@ function verify_payment_status($request)
                         esc_url($cancel_link) . "'>ბმულზე</a><br><br>";
                 }
 
-
-                $message .= 'პატივისცემით,<br>Mautskebeli.ge';
+                $message .= 'დიდი მადლობა მხარდაჭერისთვის!<br><br>';
+                $message .= 'მაუწყებლის გუნდი';
 
             } else {  // One-time donation
                 $subject = 'მადლობას გიხდით მხარდაჭერისთვის!';
-                $message = "თქვენი კონტრიბუცია ({$amount} GEL) აძლიერებს პლათფორმას!<br><br>";
-                $message .= 'პატივისცემით,<br>Mautskebeli.ge';
+                $message = "თქვენი კონტრიბუცია ({$amount} GEL) აძლიერებს „მაუწყებელს“!<br><br>";
+                $message .= 'მაუწყებლის გუნდი';
             }
 
             send_email($donor_email, $subject, $message);
@@ -2775,8 +2778,8 @@ function handle_paypal_donation_complete(WP_REST_Request $request)
     $email_lock = add_post_meta($post_id, 'email_sent', current_time('mysql'), true);
     if ($email_lock) {
         $subject = 'მადლობას გიხდით მხარდაჭერისთვის!';
-        $message = "თქვენი კონტრიბუცია ({$amount} {$currency}) აძლიერებს პლათფორმას!<br><br>";
-        $message .= 'პატივისცემით,<br>Mautskebeli.ge';
+        $message = "თქვენი კონტრიბუცია ({$amount} {$currency}) აძლიერებს „მაუწყებელს“!<br><br>";
+        $message .= 'მაუწყებლის გუნდი';
         send_email($donor_email, $subject, $message);
     } else {
         error_log("[EMAIL] PayPal email already sent for post_id $post_id");
@@ -2861,20 +2864,22 @@ function tbc_mark_donation_succeeded($order_id, $tbc_body)
             $recId = get_post_meta($order_id, 'recId', true);
             $cancel_link = generate_cancellation_link($recId);
 
-            $subject = 'მადლობას გიხდით მხარდაჭერისთვის!';
-            $message = "თქვენი ყოველთვიური კონტრიბუცია აძლიერებს პლათფორმას.<br><br>";
-            $message .= 'მომდევნო გადახდის თარიღი - ' .
-                date('d/m/Y', strtotime($next_date)) . '<br><br>';
+            $subject = 'ყოველთვიური დონაცია - მადლობას გიხდით მხარდაჭერისთვის!';
+            $message = "თქვენი ყოველთვიური მხარდაჭერა აძლიერებს „მაუწყებელს“.<br>";
+            $message .= 'თანხა: ' . esc_html($amount) . " GEL.<br>";
+            $message .= 'მომდევნო გადახდის თარიღი: ' .
+                date('Y-m-d', strtotime($next_date)) . '.<br><br>';
             if ($cancel_link) {
                 $message .= "თუ გსურთ ყოველთვიური დონაციის გაუქმება, გადადით <a href='" .
                     esc_url($cancel_link) . "'>ბმულზე</a><br><br>";
             }
-            $message .= 'პატივისცემით,<br>Mautskebeli.ge';
+            $message .= 'დიდი მადლობა მხარდაჭერისთვის!<br><br>';
+            $message .= 'მაუწყებლის გუნდი';
 
         } else {
             $subject = 'მადლობას გიხდით მხარდაჭერისთვის!';
-            $message = "თქვენი კონტრიბუცია ({$amount} GEL) აძლიერებს პლათფორმას!<br><br>";
-            $message .= 'პატივისცემით,<br>Mautskebeli.ge';
+            $message = "თქვენი კონტრიბუცია ({$amount} GEL) აძლიერებს „მაუწყებელს“!<br><br>";
+            $message .= 'მაუწყებლის გუნდი';
         }
 
         send_email($donor_email, $subject, $message);
@@ -4510,7 +4515,12 @@ function create_news_post_type() {
         'label'                 => __('News', 'textdomain'),
         'description'           => __('News items for the homepage', 'textdomain'),
         'labels'                => $labels,
-        'supports'              => array('title', 'editor', 'excerpt', 'thumbnail', 'custom-fields'),
+        // No 'editor' support - actual article content lives in the ACF
+        // "Main Text" field below, not WordPress's native content box. That
+        // native editor was showing up empty on every News post and nothing
+        // on the frontend reads post_content for this post type - keeping
+        // it registered just gave editors two rich-text boxes to confuse.
+        'supports'              => array('title', 'excerpt', 'thumbnail', 'custom-fields'),
         'public'                => true,
         'show_ui'               => true,
         'show_in_menu'          => true,
