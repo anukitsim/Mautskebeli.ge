@@ -10,6 +10,8 @@ import { load } from 'cheerio';
 import React from 'react';
 
 import DynamicClientComponents from './DynamicClientComponents';
+import ReadingTracker from '../../components/ReadingTracker';
+import { createReadingTicket } from '@/utils/stats/ticket';
 
 const categories = [
   { name: 'სტატიები', path: '/all-articles' },
@@ -244,6 +246,8 @@ const ArticlePage = async ({ params }) => {
   const hasRu  = article.acf.language2 === true;
   const showLanguageDropdown = hasEng || hasRu;
 
+  // Reading statistics: null (no tracker) unless statistics are switched on.
+  const readingTicket = createReadingTicket({ type: 'article', postId: article.id, lang: 'ka' });
 
   return (
     <section className="w-full mx-auto mt-10 px-4 lg:px-0 overflow-x-hidden relative">
@@ -325,6 +329,7 @@ const ArticlePage = async ({ params }) => {
           hasRu={hasRu}
           currentLanguage="georgian"
           />
+        <ReadingTracker ticket={readingTicket} />
       </div>
       <footer className="h-[100px]"></footer>
     </section>
