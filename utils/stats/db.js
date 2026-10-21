@@ -1,12 +1,21 @@
 // utils/stats/db.js — connection to the statistics database (server only).
 //
-// The statistics database is separate from WordPress. If STATS_DATABASE_URL
-// is not set, statistics are switched off and nothing on the site changes.
+// The statistics database is separate from WordPress. If no database address
+// is set, statistics are switched off and nothing on the site changes.
 
 import { Pool } from 'pg';
 
+// STATS_DATABASE_URL (set by hand), or the pooled address that Vercel's Neon
+// integration creates with the custom prefix "STATS_DATABASE".
+export function statsDatabaseUrl() {
+  const url = process.env.STATS_DATABASE_URL || process.env.STATS_DATABASE_DATABASE_URL || '';
+  // Neon gives sslmode=require; ask explicitly for the strict certificate
+  // check that pg applies today, so a future pg version can't weaken it.
+  return url.replace('sslmode=require', 'sslmode=verify-full');
+}
+
 export function isStatsDbConfigured() {
-  return Boolean(process.env.STATS_DATABASE_URL);
+  return Boolean(statsDatabaseUrl());
 }
 
 // One pool per server instance (kept on globalThis so dev hot-reload
@@ -14,7 +23,7 @@ export function isStatsDbConfigured() {
 function getPool() {
   if (!globalThis.__mauStatsPool) {
     const pool = new Pool({
-      connectionString: process.env.STATS_DATABASE_URL,
+      connectionString: statsDatabaseUrl(),
       max: Number(process.env.STATS_DB_POOL_MAX || 3),
       idleTimeoutMillis: 10_000,
       connectionTimeoutMillis: 5_000,

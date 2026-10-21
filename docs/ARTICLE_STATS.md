@@ -59,7 +59,7 @@ scroll % are stored, changing the rule recalculates all past data.
 
 | Name | Where | Value |
 |---|---|---|
-| `STATS_DATABASE_URL` | Vercel **Production** | Neon **pooled** connection string |
+| `STATS_DATABASE_URL` | Vercel **Production** | Neon **pooled** connection string — or let the Vercel Neon integration create `STATS_DATABASE_DATABASE_URL` (custom prefix `STATS_DATABASE`), which the code also reads |
 | `STATS_SECRET` | Production | `openssl rand -base64 48` |
 | `NEXTAUTH_SECRET` | Production | `openssl rand -base64 48` (different!) |
 | `NEXTAUTH_URL` | Production | `https://www.mautskebeli.ge` |

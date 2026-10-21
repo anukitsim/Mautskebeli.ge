@@ -8,9 +8,13 @@ import dotenv from 'dotenv';
 
 dotenv.config({ path: '.env.local' });
 
-const url = process.env.STATS_DATABASE_URL;
+// Prefer the direct (unpooled) address for creating tables, if Vercel provided one.
+const url =
+  process.env.STATS_DATABASE_URL ||
+  process.env.STATS_DATABASE_DATABASE_URL_UNPOOLED ||
+  process.env.STATS_DATABASE_DATABASE_URL;
 if (!url) {
-  console.error('STATS_DATABASE_URL is not set.');
+  console.error('No statistics database address is set (STATS_DATABASE_URL).');
   process.exit(1);
 }
 
