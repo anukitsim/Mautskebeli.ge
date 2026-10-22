@@ -1,14 +1,12 @@
 // app/admin/_components/AdminShell.jsx — header, navigation and page frame.
 
 import Link from 'next/link';
-import StaffMarker from './StaffMarker';
 import SignOutButton from './SignOutButton';
 import { CONTENT_TYPES, TYPE_ORDER } from '@/utils/stats/content-types';
 
 const NAV = [
   { key: 'overview', href: '/admin/stats', label: 'მიმოხილვა' },
   ...TYPE_ORDER.map((type) => ({ key: type, href: `/admin/stats/${type}`, label: CONTENT_TYPES[type].label })),
-  { key: 'health', href: '/admin/stats/health', label: 'ფილტრის შემოწმება' },
 ];
 
 export default function AdminShell({ session, active, children }) {
@@ -30,7 +28,6 @@ export default function AdminShell({ session, active, children }) {
           </Link>
         ))}
       </nav>
-      <StaffMarker />
       {children}
     </div>
   );

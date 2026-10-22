@@ -105,8 +105,10 @@ async function getTicket(page) {
     return Boolean(a);
   }, SLUG);
   await sleep(6000);
-  const after = (await opens()).length;
+  const afterRows = await opens();
+  const after = afterRows.length;
   check('click from list → exactly 1 new open', clicked && after - before === 1, `clicked=${clicked} new=${after - before}`);
+  check('click from list → source "from within the site"', afterRows.at(-1)?.source === 'internal', `source=${afterRows.at(-1)?.source}`);
   await list.close();
 
   // 6. Bot → nothing counted.
@@ -155,7 +157,7 @@ async function getTicket(page) {
   });
   check('flood → logged once as "rate_limited"', flood === 80 && (await rejections()).rate_limited === 1);
 
-  // 11. Owner logged in → their device is not counted.
+  // 11. Owner logged in → their reading counts like everyone else's.
   await sleep(61000 - (Date.now() % 60000)); // wait for a fresh rate-limit minute
   const owner = await browser.createBrowserContext();
   const op = await newPage(owner);
@@ -164,12 +166,10 @@ async function getTicket(page) {
   await Promise.all([op.waitForNavigation({ waitUntil: 'networkidle2', timeout: 120000 }), op.click('form button[type=submit]')]);
   check('owner login → dashboard', op.url().includes('/admin/stats'), op.url());
   await sleep(2000);
-  const staff = (await op.cookies()).find((c) => c.name === 'mau_staff');
-  check('owner device marked', Boolean(staff));
   const n11 = (await opens()).length;
   await op.goto(`${BASE}/all-articles/${SLUG}`, { waitUntil: 'networkidle2' });
   await sleep(2500);
-  check('owner reading → not counted ("staff")', (await opens()).length === n11 && (await rejections()).staff >= 1);
+  check('owner reading → counted', (await opens()).length === n11 + 1);
 
   // 12. Not on the list → no access.
   const stranger = await browser.createBrowserContext();
@@ -181,8 +181,6 @@ async function getTicket(page) {
   await sleep(1000);
   const deniedText = await sp.evaluate(() => document.body.innerText);
   check('wrong email → refused', sp.url().includes('/admin/login') && /წვდომა არ აქვს/.test(deniedText), sp.url());
-  const apiStatus = await sp.evaluate(async () => (await fetch('/api/reading/staff', { method: 'POST' })).status);
-  check('stranger cannot mark device as staff', apiStatus === 401);
 
   if (!SKIP_SLOW) {
     // 13. Short visit (10 s) → a view, not a real read.
@@ -242,28 +240,81 @@ async function getTicket(page) {
     await ctx.close();
   }
 
+  // 16. Where from, and which device: one fresh reader per case.
+  await sleep(61000 - (Date.now() % 60000)); // fresh rate-limit minute
+  const SOURCES = [
+    { name: 'Facebook link', path: `/news/istoria-romelsats-ver-tsashli-chile-11`, referer: 'http://l.facebook.com/', want: ['facebook', 'l.facebook.com'] },
+    { name: 'Facebook tag in address', path: `/news/istoria-romelsats-ver-tsashli-chile-11?fbclid=abc123`, want: ['facebook', null] },
+    { name: 'Google search', path: `/free-column/4964`, referer: 'http://www.google.com/', want: ['google', 'google.com'] },
+    { name: 'Telegram tag (utm_source)', path: `/translate/atomuri-omi-da-katsobriobis-dasasruli?utm_source=telegram`, want: ['telegram', 'telegram'] },
+    { name: 'other website', path: `/books/474`, referer: 'http://netgazeti.ge/news/123/', want: ['other', 'netgazeti.ge'] },
+    { name: 'direct (no link)', path: `/all-articles/${SLUG}`, want: ['direct', null] },
+  ];
+  for (const s of SOURCES) {
+    const ctx = await browser.createBrowserContext();
+    const p = await newPage(ctx);
+    await p.goto(BASE + s.path, { waitUntil: 'networkidle2', timeout: 120000, ...(s.referer ? { referer: s.referer } : {}) });
+    await sleep(2500);
+    const vid = (await p.cookies()).find((c) => c.name === 'mau_rid')?.value;
+    const [row] = await q('SELECT source, referrer, device FROM stats_opens WHERE visitor_id = $1', [vid]);
+    check(`source: ${s.name} → ${s.want[0]}`, row?.source === s.want[0] && (row?.referrer ?? null) === s.want[1],
+      `source=${row?.source} referrer=${row?.referrer}`);
+    if (s.name === 'direct (no link)') check('device: desktop browser → computer', row?.device === 'desktop', `device=${row?.device}`);
+    await ctx.close();
+  }
+  {
+    const ctx = await browser.createBrowserContext();
+    const p = await ctx.newPage();
+    await p.setUserAgent('Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1');
+    await p.goto(`${BASE}/all-articles/${SLUG}`, { waitUntil: 'networkidle2', timeout: 120000 });
+    await sleep(2500);
+    const vid = (await p.cookies()).find((c) => c.name === 'mau_rid')?.value;
+    const [row] = await q('SELECT device FROM stats_opens WHERE visitor_id = $1', [vid]);
+    check('device: iPhone → phone', row?.device === 'mobile', `device=${row?.device}`);
+    await ctx.close();
+  }
+
   // Final: every dashboard page must show exactly what the database holds.
-  const COUNT_SQL = `count(*)::int views, count(DISTINCT visitor_id)::int readers,
-    count(DISTINCT (visitor_id, content_type, post_id)) FILTER (WHERE engaged_seconds >= 45 AND max_scroll >= 25)::int reads`;
+  // (Local site is plain http, so fake referrers above are http too: browsers drop https→http referrers.)
+  await sleep(5000); // let the last "leaving" updates of closed tabs arrive first
+  const COUNT_SQL = `count(*)::int views,
+    count(DISTINCT (visitor_id, content_type, post_id)) FILTER (WHERE engaged_seconds >= 45 AND max_scroll >= 25)::int reads,
+    coalesce(round(avg(engaged_seconds)), 0)::int avg_seconds`;
+  const dur = (s) => (s < 60 ? `${s}წმ` : s % 60 ? `${Math.floor(s / 60)}წთ${s % 60}წმ` : `${Math.floor(s / 60)}წთ`);
   const tilesOf = async (path) => {
     await op.goto(`${BASE}${path}`, { waitUntil: 'networkidle2' });
     return op.$$eval('.tile-value', (els) => els.slice(0, 3).map((e) => e.textContent.replace(/\s/g, '')));
   };
-  const same = (tiles, e) => tiles[0] === String(e.views) && tiles[1] === String(e.readers) && tiles[2] === String(e.reads);
+  const same = (tiles, e) => tiles[0] === String(e.views) && tiles[1] === String(e.reads) && tiles[2] === dur(e.avg_seconds);
+  const show = (e, tiles) => `db=${e.views}/${e.reads}/${dur(e.avg_seconds)} page=${tiles.join('/')}`;
 
   const [site] = await q(`SELECT ${COUNT_SQL} FROM stats_opens`);
   let tiles = await tilesOf('/admin/stats?period=all');
-  check('overview = database (all content)', same(tiles, site), `db=${site.views}/${site.readers}/${site.reads} page=${tiles.join('/')}`);
+  check('overview = database (all content)', same(tiles, site), show(site, tiles));
+
+  // The "where from" card on the overview must match the database too.
+  const dbSources = await q(`SELECT coalesce(source, 'unknown') AS key, count(*)::int AS views FROM stats_opens GROUP BY 1`);
+  const pageBars = await op.evaluate(() => {
+    const card = [...document.querySelectorAll('section.card')].find((s) => s.querySelector('h2')?.textContent === 'საიდან მოდიან');
+    return [...(card?.querySelectorAll('.hbar') || [])].map((b) => [b.children[0].textContent, b.querySelector('.hbar-value').textContent]);
+  });
+  const LABEL = { facebook: 'Facebook', google: 'Google', telegram: 'Telegram', other: 'სხვა საიტი', internal: 'საიტის შიგნიდან', direct: 'პირდაპირი / მესენჯერი' };
+  const sourcesOk = Object.entries(LABEL).every(([key, label]) => {
+    const db = dbSources.find((r) => r.key === key)?.views || 0;
+    const bar = pageBars.find(([l]) => l === label);
+    return db === 0 ? !bar : bar && bar[1].includes(`· ${db} ნახვა`);
+  });
+  check('overview "where from" = database', sourcesOk, JSON.stringify(dbSources.map((r) => `${r.key}:${r.views}`)));
 
   for (const type of ['article', 'news', 'free-column', 'translate', 'book']) {
     const [e] = await q(`SELECT ${COUNT_SQL} FROM stats_opens WHERE content_type = $1`, [type]);
     tiles = await tilesOf(`/admin/stats/${type}?period=all`);
-    check(`${type} list = database`, same(tiles, e), `db=${e.views}/${e.readers}/${e.reads} page=${tiles.join('/')}`);
+    check(`${type} list = database`, same(tiles, e), show(e, tiles));
   }
 
   const [item] = await q(`SELECT ${COUNT_SQL} FROM stats_opens WHERE content_type = 'article' AND post_id = $1`, [POST]);
   tiles = await tilesOf(`/admin/stats/article/${POST}?period=all`);
-  check('article detail = database', same(tiles, item), `db=${item.views}/${item.readers}/${item.reads} page=${tiles.join('/')}`);
+  check('article detail = database', same(tiles, item), show(item, tiles));
 
   await browser.close();
   await db.end();

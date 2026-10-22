@@ -1,14 +1,15 @@
-// app/admin/stats/[type]/page.jsx — one content type: totals + every item, sortable.
+// app/admin/stats/[type]/page.jsx — one content type: totals, audience, every item.
 
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { requireAdmin } from '../../_lib/guard';
 import AdminShell, { NotConfigured, PeriodChips } from '../../_components/AdminShell';
+import AudienceCards from '../../_components/AudienceCards';
 import HowWeCount from '../../_components/HowWeCount';
 import StatTiles from '../../_components/StatTiles';
-import { fmtDate, fmtDuration, fmtNumber, fmtPercent, readPeriod } from '../../_lib/format';
+import { fmtDate, fmtDuration, fmtNumber, readPeriod } from '../../_lib/format';
 import { isStatsEnabled } from '@/utils/stats/ticket';
-import { EMPTY_COUNTS, getPerPost, getTypeSummary } from '@/utils/stats/queries';
+import { EMPTY_COUNTS, getAudience, getPerPost, getTypeSummary } from '@/utils/stats/queries';
 import { fetchContentIndex } from '@/utils/stats/wordpress';
 import { CONTENT_TYPES, isContentType } from '@/utils/stats/content-types';
 import { PERIODS } from '@/utils/stats/config';
@@ -16,10 +17,9 @@ import { PERIODS } from '@/utils/stats/config';
 export const dynamic = 'force-dynamic';
 
 const SORTS = {
-  reads: { label: 'რეალურად წაკითხული', get: (r) => r.reads },
-  readers: { label: 'მკითხველები', get: (r) => r.readers },
-  views: { label: 'ნახვები', get: (r) => r.views },
-  rate: { label: 'წაკითხვის წილი', get: (r) => (r.readers ? r.reads / r.readers : -1) },
+  reads: { label: 'მკითხველი', get: (r) => r.reads },
+  views: { label: 'ნახვა', get: (r) => r.views },
+  time: { label: 'საშუალო დრო', get: (r) => (r.views ? r.avg_seconds : -1) },
   date: { label: 'გამოქვეყნება', get: (r) => (r.date ? Date.parse(r.date) : 0) },
 };
 
@@ -39,10 +39,11 @@ export default async function TypeStats({ params, searchParams }) {
   }
 
   const days = PERIODS[period].days;
-  const [summary, perPost, items] = await Promise.all([
+  const [summary, perPost, items, audience] = await Promise.all([
     getTypeSummary(type, days),
     getPerPost(type, days),
     fetchContentIndex(type),
+    getAudience({ type, days }),
   ]);
 
   // Every item from WordPress (also those nobody opened yet), plus any
@@ -79,7 +80,7 @@ export default async function TypeStats({ params, searchParams }) {
         </p>
         <div className="sort-mobile">
           დალაგება:
-          {['reads', 'readers', 'views', 'rate'].map((key) => (
+          {['reads', 'views', 'time', 'date'].map((key) => (
             <Link key={key} className="chip" href={q(key)} aria-current={sort === key ? 'true' : undefined}>
               {SORTS[key].label}
             </Link>
@@ -90,11 +91,9 @@ export default async function TypeStats({ params, searchParams }) {
             <thead>
               <tr>
                 <th scope="col">სათაური</th>
-                {th('views', 'ნახვები')}
-                {th('readers', 'მკითხველები')}
-                {th('reads', 'რეალურად წაკითხული')}
-                {th('rate', 'წაკითხვის წილი')}
-                <th className="num" scope="col">ტიპიური დრო</th>
+                {th('views', 'ნახვა')}
+                {th('reads', 'მკითხველი')}
+                {th('time', 'საშუალო დრო')}
               </tr>
             </thead>
             <tbody>
@@ -106,17 +105,17 @@ export default async function TypeStats({ params, searchParams }) {
                     </Link>
                     <div className="meta">{[r.author, fmtDate(r.date)].filter(Boolean).join(' · ')}</div>
                   </td>
-                  <td className="num" data-label="ნახვები">{fmtNumber(r.views)}</td>
-                  <td className="num" data-label="მკითხველები">{fmtNumber(r.readers)}</td>
-                  <td className="num" data-label="წაკითხული">{fmtNumber(r.reads)}</td>
-                  <td className="num" data-label="წაკითხვის წილი">{fmtPercent(r.reads, r.readers)}</td>
-                  <td className="num" data-label="ტიპიური დრო">{r.views ? fmtDuration(r.median_seconds) : '—'}</td>
+                  <td className="num" data-label="ნახვა">{fmtNumber(r.views)}</td>
+                  <td className="num" data-label="მკითხველი">{fmtNumber(r.reads)}</td>
+                  <td className="num" data-label="საშუალო დრო">{r.views ? fmtDuration(r.avg_seconds) : '—'}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
       </section>
+
+      <AudienceCards audience={audience} />
     </AdminShell>
   );
 }

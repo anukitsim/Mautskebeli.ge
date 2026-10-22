@@ -4,33 +4,18 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { requireAdmin } from '../../../_lib/guard';
 import AdminShell, { NotConfigured, PeriodChips } from '../../../_components/AdminShell';
+import AudienceCards from '../../../_components/AudienceCards';
 import DailyChart from '../../../_components/DailyChart';
+import HBars from '../../../_components/HBars';
 import StatTiles from '../../../_components/StatTiles';
 import { fmtDate, fmtDay, fmtNumber, fmtPercent, LANG_LABELS, readPeriod } from '../../../_lib/format';
 import { isStatsEnabled } from '@/utils/stats/ticket';
-import { getPostByLang, getPostDaily, getPostSummary, getPostTimeBuckets } from '@/utils/stats/queries';
+import { getAudience, getPostByLang, getPostDaily, getPostSummary, getPostTimeBuckets } from '@/utils/stats/queries';
 import { contentUrl, fetchContentIndex } from '@/utils/stats/wordpress';
 import { CONTENT_TYPES, isContentType } from '@/utils/stats/content-types';
 import { PERIODS } from '@/utils/stats/config';
 
 export const dynamic = 'force-dynamic';
-
-function HBars({ items }) {
-  const max = Math.max(1, ...items.map((i) => i.value));
-  return (
-    <div className="hbars">
-      {items.map((i) => (
-        <div className="hbar" key={i.label}>
-          <span>{i.label}</span>
-          <span className="hbar-track">
-            <span className="hbar-fill" style={{ width: `${(i.value / max) * 85}%` }} />
-            <span className="hbar-value">{i.text}</span>
-          </span>
-        </div>
-      ))}
-    </div>
-  );
-}
 
 export default async function ItemStats({ params, searchParams }) {
   const session = await requireAdmin();
@@ -48,12 +33,13 @@ export default async function ItemStats({ params, searchParams }) {
   }
 
   const days = PERIODS[period].days;
-  const [summary, byLang, daily, buckets, items] = await Promise.all([
+  const [summary, byLang, daily, buckets, items, audience] = await Promise.all([
     getPostSummary(type, postId, days),
     getPostByLang(type, postId, days),
     getPostDaily(type, postId, days),
     getPostTimeBuckets(type, postId, days),
     fetchContentIndex(type),
+    getAudience({ type, postId, days }),
   ]);
   const item = items.get(postId);
   const totalOpens = buckets.reduce((s, b) => s + b.n, 0);
@@ -74,11 +60,11 @@ export default async function ItemStats({ params, searchParams }) {
       </div>
 
       <PeriodChips basePath={`${base}/${postId}`} period={period} />
-      <StatTiles counts={summary} showTime />
+      <StatTiles counts={summary} />
 
       <section className="card">
         <h2>დღეების მიხედვით</h2>
-        <p className="sub">თბილისის დროით. „მკითხველი“ აქ ითვლება ყოველ დღეს ცალ-ცალკე.</p>
+        <p className="sub">თბილისის დროით.</p>
         <DailyChart data={daily.map((d) => ({ ...d, label: fmtDay(d.day) }))} />
       </section>
 
@@ -91,7 +77,7 @@ export default async function ItemStats({ params, searchParams }) {
               items={byLang.map((l) => ({
                 label: LANG_LABELS[l.lang] || l.lang,
                 value: l.views,
-                text: `${fmtNumber(l.views)} ნახვა · ${fmtNumber(l.readers)} მკითხველი · ${fmtNumber(l.reads)} წაკითხული`,
+                text: `${fmtNumber(l.views)} ნახვა · ${fmtNumber(l.reads)} მკითხველი`,
               }))}
             />
           ) : (
@@ -115,6 +101,8 @@ export default async function ItemStats({ params, searchParams }) {
           <p className="sub">ამ პერიოდში ჯერ არავის გაუხსნია.</p>
         )}
       </section>
+
+      <AudienceCards audience={audience} />
     </AdminShell>
   );
 }

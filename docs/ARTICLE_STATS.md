@@ -1,8 +1,10 @@
 # Article reading statistics — developer guide
 
-Owners-only dashboard at `/admin/stats` that shows, for every article:
-**views** (every open), **readers** (different browsers) and **real reads**
-(tab visible 45 s in one sitting + at least 25 % of the text scrolled).
+Owners-only dashboard at `/admin/stats` that shows, for every article, news
+item, free column, translation and book: **ნახვა / views** (every open),
+**მკითხველი / readers** (browsers that kept the tab visible 45 s in one sitting
+and scrolled at least 25 % of the text) and **საშუალო დრო / average time**,
+plus where visits came from (source), device and country.
 
 Counting is done by our own code and our own Postgres database. WordPress is
 only read for article titles.
@@ -28,7 +30,8 @@ reader's browser       ── ReadingTracker: "opened" + updates at 15/45/90/180
         │                  (visible time only) + one last update when leaving
         ▼
 POST /api/reading      ── flood guard → same-origin → size → not a bot (isbot)
-        │                  → ticket signature + age → not a staff device
+        │                  → ticket signature + age (owners' browsers count too)
+        │                  + source (referrer host / utm / fbclid), device (UA), country (x-vercel-ip-country)
         ▼
 stats_opens            ── 1 row per open (browser-made open_id), upserted:
                           highest seconds / scroll win, capped by real elapsed time
@@ -48,7 +51,7 @@ scroll % are stored, changing the rule recalculates all past data.
 | `utils/stats/*` | config, db pool, tickets, auth, queries, WordPress titles |
 | `app/components/ReadingTracker.jsx` | the browser part |
 | `app/(root)/api/reading/route.js` | receives signals |
-| `app/(root)/api/reading/staff/route.js` | marks an owner's device |
+| `utils/stats/audience.js` | source / device / country classification and labels |
 | `app/(root)/api/auth/[...nextauth]/route.js` | login (NextAuth v4) |
 | `app/admin/**` | dashboard |
 | `app/all-articles/[id]/{page,ENG/page,RU/page}.jsx` | tracker added (3 lines each) |
@@ -87,7 +90,8 @@ Leave them unset in **Preview** (stats off there), or use a separate Neon branch
    - open an article in a private window → `/admin/stats` shows +1 view, +1 reader;
    - stay 45 s and scroll a quarter → +1 real read;
    - an email not on the list cannot log in;
-   - `/admin/stats/health` shows rejections (bots appear within hours).
+   - refused signals (bots, fake tickets, floods) are counted per day in the
+     `stats_rejections` table (no dashboard page; query it directly).
 8. **Back up:** Neon free keeps 6 hours of history. Add a nightly `pg_dump`
    (e.g. GitHub Action) or use a paid Neon plan before relying on old data.
 
@@ -116,17 +120,22 @@ STATS_DEV_LOGIN=1
 Then `npm run stats:migrate`, `npx next dev -p 3100`, log in at `/admin/login`
 with `owner@example.com`, and run `npm run stats:test`.
 
-## Adding other content types
+## Adding another content type
 
-`news`, `free-column`, `translate` and `book` are already allowed by the
-database. For each: create a ticket in its detail page
-(`createReadingTicket({ type: 'news', postId, lang })`), render
-`<ReadingTracker ticket={…} contentSelector="…" />`, and add a dashboard tab
-that calls the same queries with that type.
+Add it to `utils/stats/content-types.js` (and to the `content_type` CHECK in
+`db/stats-schema.sql`), create a ticket in its detail page
+(`createReadingTicket({ type, postId, lang })`) and render
+`<ReadingTracker ticket={…} contentSelector="…" />`. The dashboard tab appears by itself.
 
 ## Known limits
 
 - One person on two devices = two readers; private windows / cleared cookies = new reader.
 - Readers who block JavaScript, or whose blocker blocks `/api/reading`, are not counted.
 - The flood guard is per server instance (in memory), not global.
-- Counting starts on launch day; there is no history before that.
+- Counting starts on launch day (2026-10-22); there is no history before that.
+  Source / device / country start when that feature was deployed; older rows show as "unknown".
+- Source: messengers (Messenger, Viber, WhatsApp) and typed/bookmarked addresses send no
+  referrer and appear as "direct". Browsers send only the referring site's name, never the page.
+- Country comes from the reader's connection (VPNs show the VPN's country).
+- **Schema change in this version:** run `npm run stats:migrate` against the production
+  database *before* deploying (adds the nullable source/referrer/device/country columns).
