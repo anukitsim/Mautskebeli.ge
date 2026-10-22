@@ -8,6 +8,8 @@ import { load } from 'cheerio';
 import React from 'react';
 
 import ShareButtons from './ShareButtons';
+import ReadingTracker from '../../components/ReadingTracker';
+import { createReadingTicket } from '@/utils/stats/ticket';
 
 // Fetch the book details
 async function fetchBook(id) {
@@ -156,6 +158,9 @@ const BookPage = async ({ params }) => {
     notFound();
   }
 
+  // Reading statistics: null (no tracker) unless statistics are switched on.
+  const readingTicket = createReadingTicket({ type: 'book', postId: book.id, lang: 'ka' });
+
   book.formattedDate = formatDate(book.date);
   book.title.rendered = decodeHTMLEntities(book.acf.title || book.title.rendered);
 
@@ -203,6 +208,7 @@ const BookPage = async ({ params }) => {
         </p>
 
         <div
+          data-reading-body
           className="text-[#474F7A] text-[14px] sm:text-[16px] font-normal lg:text-justify leading-[30px] sm:leading-[35px] mt-5"
           dangerouslySetInnerHTML={{ __html: sanitizedContent }}
         ></div>
@@ -211,6 +217,7 @@ const BookPage = async ({ params }) => {
         <div className="mt-10">
           <ShareButtons bookId={id} title={book.title.rendered} />
         </div>
+        <ReadingTracker ticket={readingTicket} contentSelector="[data-reading-body]" />
       </div>
     </section>
   );

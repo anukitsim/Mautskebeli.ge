@@ -12,7 +12,7 @@ export const READ_MIN_SCROLL = 25;
 // "Today", "this week" etc. are Tbilisi days, not the US server's days.
 export const STATS_TIMEZONE = 'Asia/Tbilisi';
 
-export const CONTENT_TYPES = ['article', 'news', 'free-column', 'translate', 'book'];
+// Content types (article, news, …) are listed in ./content-types.js.
 export const LANGS = ['ka', 'en', 'ru'];
 
 // Cookie that holds the anonymous random browser ID.

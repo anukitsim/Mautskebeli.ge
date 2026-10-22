@@ -210,17 +210,60 @@ async function getTicket(page) {
     check('scroll ~40% measured correctly', readRow && readRow.max_scroll >= 35 && readRow.max_scroll <= 45, `scroll=${readRow?.max_scroll}%`);
   }
 
-  // Final: the dashboard must show exactly what the database holds.
-  const [exp] = await q(
-    `SELECT count(*)::int views, count(DISTINCT visitor_id)::int readers,
-            count(DISTINCT visitor_id) FILTER (WHERE engaged_seconds >= 45 AND max_scroll >= 25)::int reads
-     FROM stats_opens WHERE post_id = $1`,
-    [POST]
-  );
-  await op.goto(`${BASE}/admin/stats/${POST}?period=all`, { waitUntil: 'networkidle2' });
-  const tiles = await op.$$eval('.tile-value', (els) => els.map((e) => e.textContent.replace(/\s/g, '')));
-  check('dashboard numbers = database numbers', tiles[0] === String(exp.views) && tiles[1] === String(exp.readers) && tiles[2] === String(exp.reads),
-    `db=${exp.views}/${exp.readers}/${exp.reads} page=${tiles.slice(0, 3).join('/')}`);
+  // 15. The other content types: each page counts under its own type and number.
+  const OTHER = [
+    { type: 'news', post: 5078, path: '/news/istoria-romelsats-ver-tsashli-chile-11', body: '[data-reading-body]' },
+    { type: 'free-column', post: 4964, path: '/free-column/4964', body: '.article-content' },
+    { type: 'translate', post: 4840, path: '/translate/atomuri-omi-da-katsobriobis-dasasruli', body: '.article-content' },
+    { type: 'book', post: 474, path: '/books/474', body: '[data-reading-body]' },
+  ];
+  for (const t of OTHER) {
+    const ctx = await browser.createBrowserContext();
+    const p = await openArticle(ctx, t.path, 3000);
+    const vid = (await p.cookies()).find((c) => c.name === 'mau_rid')?.value;
+    if (!SKIP_SLOW) {
+      // Scroll half-way through the text, then wait past the 15 s update.
+      await p.evaluate((sel) => {
+        const el = document.querySelector(sel);
+        if (!el) return;
+        const r = el.getBoundingClientRect();
+        window.scrollTo(0, window.scrollY + r.top + r.height * 0.5 - window.innerHeight);
+      }, t.body);
+      await sleep(15000);
+    }
+    const rows = await q('SELECT * FROM stats_opens WHERE visitor_id = $1', [vid]);
+    check(`${t.type}: 1 open → 1 row, type "${t.type}", number ${t.post}`,
+      rows.length === 1 && rows[0].content_type === t.type && rows[0].post_id === t.post && rows[0].lang === 'ka',
+      `rows=${rows.length} ${rows[0]?.content_type}/${rows[0]?.post_id}`);
+    if (!SKIP_SLOW) {
+      check(`${t.type}: time and scroll measured`, rows[0]?.engaged_seconds >= 15 && rows[0]?.max_scroll >= 40 && rows[0]?.max_scroll <= 60,
+        `seconds=${rows[0]?.engaged_seconds} scroll=${rows[0]?.max_scroll}%`);
+    }
+    await ctx.close();
+  }
+
+  // Final: every dashboard page must show exactly what the database holds.
+  const COUNT_SQL = `count(*)::int views, count(DISTINCT visitor_id)::int readers,
+    count(DISTINCT (visitor_id, content_type, post_id)) FILTER (WHERE engaged_seconds >= 45 AND max_scroll >= 25)::int reads`;
+  const tilesOf = async (path) => {
+    await op.goto(`${BASE}${path}`, { waitUntil: 'networkidle2' });
+    return op.$$eval('.tile-value', (els) => els.slice(0, 3).map((e) => e.textContent.replace(/\s/g, '')));
+  };
+  const same = (tiles, e) => tiles[0] === String(e.views) && tiles[1] === String(e.readers) && tiles[2] === String(e.reads);
+
+  const [site] = await q(`SELECT ${COUNT_SQL} FROM stats_opens`);
+  let tiles = await tilesOf('/admin/stats?period=all');
+  check('overview = database (all content)', same(tiles, site), `db=${site.views}/${site.readers}/${site.reads} page=${tiles.join('/')}`);
+
+  for (const type of ['article', 'news', 'free-column', 'translate', 'book']) {
+    const [e] = await q(`SELECT ${COUNT_SQL} FROM stats_opens WHERE content_type = $1`, [type]);
+    tiles = await tilesOf(`/admin/stats/${type}?period=all`);
+    check(`${type} list = database`, same(tiles, e), `db=${e.views}/${e.readers}/${e.reads} page=${tiles.join('/')}`);
+  }
+
+  const [item] = await q(`SELECT ${COUNT_SQL} FROM stats_opens WHERE content_type = 'article' AND post_id = $1`, [POST]);
+  tiles = await tilesOf(`/admin/stats/article/${POST}?period=all`);
+  check('article detail = database', same(tiles, item), `db=${item.views}/${item.readers}/${item.reads} page=${tiles.join('/')}`);
 
   await browser.close();
   await db.end();

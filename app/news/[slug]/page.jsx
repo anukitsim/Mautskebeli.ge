@@ -1,4 +1,6 @@
 import NewsDetailClient from './NewsDetailClient';
+import ReadingTracker from '../../components/ReadingTracker';
+import { createReadingTicket } from '@/utils/stats/ticket';
 
 const WP_API = 'https://mautskebeli.wpenginepowered.com/wp-json/wp/v2';
 
@@ -132,6 +134,29 @@ export async function generateMetadata({ params }) {
   };
 }
 
-export default function NewsDetailPage() {
-  return <NewsDetailClient />;
+// The news text itself is loaded in the browser by NewsDetailClient. The
+// server only looks the item up here (cached, same request as the metadata)
+// to sign the reading-statistics ticket. An old address is skipped: the
+// browser is about to jump to the new one, which then counts once.
+function sameSlug(a, b) {
+  try {
+    return decodeURIComponent(a || '') === decodeURIComponent(b || '');
+  } catch {
+    return a === b;
+  }
+}
+
+export default async function NewsDetailPage({ params }) {
+  const news = await fetchNewsBySlug(params.slug);
+  const readingTicket =
+    news && sameSlug(news.slug, params.slug)
+      ? createReadingTicket({ type: 'news', postId: news.id, lang: 'ka' })
+      : null;
+
+  return (
+    <>
+      <NewsDetailClient />
+      <ReadingTracker ticket={readingTicket} contentSelector="[data-reading-body]" />
+    </>
+  );
 }

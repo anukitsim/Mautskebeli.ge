@@ -1,135 +1,122 @@
-// app/admin/stats/page.jsx — overview: totals + every article, sortable.
+// app/admin/stats/page.jsx — overview: all content together, per type, top items.
 
 import Link from 'next/link';
 import { requireAdmin } from '../_lib/guard';
 import AdminShell, { NotConfigured, PeriodChips } from '../_components/AdminShell';
 import HowWeCount from '../_components/HowWeCount';
-import { fmtDate, fmtDuration, fmtNumber, fmtPercent, readPeriod } from '../_lib/format';
+import StatTiles from '../_components/StatTiles';
+import { fmtNumber, fmtPercent, readPeriod } from '../_lib/format';
 import { isStatsEnabled } from '@/utils/stats/ticket';
-import { getPerPost, getTypeSummary } from '@/utils/stats/queries';
-import { fetchArticleIndex } from '@/utils/stats/wordpress';
+import { EMPTY_COUNTS, getSiteSummary, getTopItems, getTypeBreakdown } from '@/utils/stats/queries';
+import { fetchContentIndex } from '@/utils/stats/wordpress';
+import { CONTENT_TYPES, TYPE_ORDER } from '@/utils/stats/content-types';
 import { PERIODS } from '@/utils/stats/config';
 
 export const dynamic = 'force-dynamic';
 
-const SORTS = {
-  reads: { label: 'რეალურად წაკითხული', get: (r) => r.reads },
-  readers: { label: 'მკითხველები', get: (r) => r.readers },
-  views: { label: 'ნახვები', get: (r) => r.views },
-  rate: { label: 'წაკითხვის წილი', get: (r) => (r.readers ? r.reads / r.readers : -1) },
-  date: { label: 'გამოქვეყნება', get: (r) => (r.date ? Date.parse(r.date) : 0) },
-};
-
 export default async function StatsOverview({ searchParams }) {
   const session = await requireAdmin();
   const period = readPeriod(searchParams);
-  const sort = SORTS[searchParams?.sort] ? searchParams.sort : 'reads';
 
   if (!isStatsEnabled()) {
     return (
-      <AdminShell session={session} active="articles">
+      <AdminShell session={session} active="overview">
         <NotConfigured />
       </AdminShell>
     );
   }
 
   const days = PERIODS[period].days;
-  const [summary, perPost, articles] = await Promise.all([
-    getTypeSummary('article', days),
-    getPerPost('article', days),
-    fetchArticleIndex(),
+  const [summary, byType, top] = await Promise.all([
+    getSiteSummary(days),
+    getTypeBreakdown(days),
+    getTopItems(days, 10),
   ]);
-
-  // Every article from WordPress (also those nobody opened yet), plus any
-  // counted post WordPress no longer returns (e.g. unpublished).
-  const ids = new Set([...articles.keys(), ...perPost.keys()]);
-  const rows = [...ids].map((id) => {
-    const a = articles.get(id);
-    const s = perPost.get(id) || { views: 0, readers: 0, reads: 0, median_seconds: 0 };
-    return { id, title: a?.title || `#${id} (WordPress-ში ვერ მოიძებნა)`, author: a?.author, date: a?.date, ...s };
-  });
-  rows.sort((x, y) => SORTS[sort].get(y) - SORTS[sort].get(x) || y.views - x.views);
-
-  const q = (s) => `/admin/stats?period=${period}&sort=${s}`;
-  const th = (key, label, cls = 'num') => (
-    <th className={cls} scope="col">
-      <Link href={q(key)} aria-current={sort === key ? 'true' : undefined}>
-        {label}
-        {sort === key ? ' ↓' : ''}
-      </Link>
-    </th>
+  // Titles only for the types that appear in the top list.
+  const topTypes = [...new Set(top.map((t) => t.content_type))];
+  const indexes = new Map(
+    await Promise.all(topTypes.map(async (type) => [type, await fetchContentIndex(type)]))
   );
 
   return (
-    <AdminShell session={session} active="articles">
-      <PeriodChips basePath="/admin/stats" period={period} extraQuery={`&sort=${sort}`} />
-
-      <div className="tiles">
-        <div className="tile">
-          <div className="tile-label">ნახვები</div>
-          <div className="tile-value">{fmtNumber(summary.views)}</div>
-          <div className="tile-note">ყველა გახსნა, ყველა სტატიაზე</div>
-        </div>
-        <div className="tile">
-          <div className="tile-label">მკითხველები</div>
-          <div className="tile-value">{fmtNumber(summary.readers)}</div>
-          <div className="tile-note">სხვადასხვა ბრაუზერი</div>
-        </div>
-        <div className="tile">
-          <div className="tile-label">რეალურად წაკითხული</div>
-          <div className="tile-value">{fmtNumber(summary.reads)}</div>
-          <div className="tile-note">{fmtPercent(summary.reads, summary.readers)} მკითხველებიდან</div>
-        </div>
-      </div>
-
+    <AdminShell session={session} active="overview">
+      <PeriodChips basePath="/admin/stats" period={period} />
+      <StatTiles counts={summary} />
       <HowWeCount />
 
       <section className="card">
-        <h2>სტატიები</h2>
-        <p className="sub">
-          {PERIODS[period].label} · {rows.length} სტატია · დააჭირეთ სვეტის სათაურს დასალაგებლად
-        </p>
-        <div className="sort-mobile">
-          დალაგება:
-          {['reads', 'readers', 'views', 'rate'].map((key) => (
-            <Link key={key} className="chip" href={q(key)} aria-current={sort === key ? 'true' : undefined}>
-              {SORTS[key].label}
-            </Link>
-          ))}
-        </div>
+        <h2>კონტენტის მიხედვით</h2>
+        <p className="sub">{PERIODS[period].label} · დააჭირეთ სახელს სრული სიისთვის</p>
         <div className="table-scroll">
           <table className="stats-table cards">
             <thead>
               <tr>
-                <th scope="col">სტატია</th>
-                {th('views', 'ნახვები')}
-                {th('readers', 'მკითხველები')}
-                {th('reads', 'რეალურად წაკითხული')}
-                {th('rate', 'წაკითხვის წილი')}
-                <th className="num" scope="col">ტიპიური დრო</th>
+                <th scope="col">ტიპი</th>
+                <th className="num" scope="col">ნახვები</th>
+                <th className="num" scope="col">მკითხველები</th>
+                <th className="num" scope="col">რეალურად წაკითხული</th>
+                <th className="num" scope="col">წაკითხვის წილი</th>
               </tr>
             </thead>
             <tbody>
-              {rows.map((r) => (
-                <tr key={r.id} className={r.views ? undefined : 'zero'}>
-                  <td>
-                    <Link className="title-link" href={`/admin/stats/${r.id}?period=${period}`}>
-                      {r.title}
-                    </Link>
-                    <div className="meta">
-                      {[r.author, fmtDate(r.date)].filter(Boolean).join(' · ')}
-                    </div>
-                  </td>
-                  <td className="num" data-label="ნახვები">{fmtNumber(r.views)}</td>
-                  <td className="num" data-label="მკითხველები">{fmtNumber(r.readers)}</td>
-                  <td className="num" data-label="წაკითხული">{fmtNumber(r.reads)}</td>
-                  <td className="num" data-label="წაკითხვის წილი">{fmtPercent(r.reads, r.readers)}</td>
-                  <td className="num" data-label="ტიპიური დრო">{r.views ? fmtDuration(r.median_seconds) : '—'}</td>
-                </tr>
-              ))}
+              {TYPE_ORDER.map((type) => {
+                const c = byType.get(type) || EMPTY_COUNTS;
+                return (
+                  <tr key={type} className={c.views ? undefined : 'zero'}>
+                    <td>
+                      <Link className="title-link" href={`/admin/stats/${type}?period=${period}`}>
+                        {CONTENT_TYPES[type].label}
+                      </Link>
+                    </td>
+                    <td className="num" data-label="ნახვები">{fmtNumber(c.views)}</td>
+                    <td className="num" data-label="მკითხველები">{fmtNumber(c.readers)}</td>
+                    <td className="num" data-label="წაკითხული">{fmtNumber(c.reads)}</td>
+                    <td className="num" data-label="წაკითხვის წილი">{fmtPercent(c.reads, c.reader_items)}</td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
+      </section>
+
+      <section className="card">
+        <h2>ყველაზე წაკითხული</h2>
+        <p className="sub">{PERIODS[period].label} · ყველა ტიპი ერთად, რეალური წაკითხვების მიხედვით</p>
+        {top.length ? (
+          <div className="table-scroll">
+            <table className="stats-table cards">
+              <thead>
+                <tr>
+                  <th scope="col">სათაური</th>
+                  <th className="num" scope="col">ნახვები</th>
+                  <th className="num" scope="col">მკითხველები</th>
+                  <th className="num" scope="col">რეალურად წაკითხული</th>
+                </tr>
+              </thead>
+              <tbody>
+                {top.map((t) => {
+                  const item = indexes.get(t.content_type)?.get(t.post_id);
+                  return (
+                    <tr key={`${t.content_type}-${t.post_id}`}>
+                      <td>
+                        <Link className="title-link" href={`/admin/stats/${t.content_type}/${t.post_id}?period=${period}`}>
+                          {item?.title || `#${t.post_id}`}
+                        </Link>
+                        <div className="meta">{CONTENT_TYPES[t.content_type]?.label}</div>
+                      </td>
+                      <td className="num" data-label="ნახვები">{fmtNumber(t.views)}</td>
+                      <td className="num" data-label="მკითხველები">{fmtNumber(t.readers)}</td>
+                      <td className="num" data-label="წაკითხული">{fmtNumber(t.reads)}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <p className="sub">ამ პერიოდში ჯერ არავის გაუხსნია.</p>
+        )}
       </section>
     </AdminShell>
   );

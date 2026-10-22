@@ -7,7 +7,8 @@
 
 import crypto from 'node:crypto';
 import { isStatsDbConfigured } from './db';
-import { CONTENT_TYPES, LANGS, TICKET_MAX_AGE_SECONDS } from './config';
+import { LANGS, TICKET_MAX_AGE_SECONDS } from './config';
+import { isContentType } from './content-types';
 
 function secret() {
   return process.env.STATS_SECRET || '';
@@ -29,7 +30,7 @@ function sign(body) {
 export function createReadingTicket({ type, postId, lang }) {
   if (!isStatsEnabled()) return null;
   const id = Number(postId);
-  if (!CONTENT_TYPES.includes(type) || !LANGS.includes(lang) || !Number.isInteger(id) || id <= 0) {
+  if (!isContentType(type) || !LANGS.includes(lang) || !Number.isInteger(id) || id <= 0) {
     return null;
   }
   const body = Buffer.from(
@@ -61,7 +62,7 @@ export function verifyReadingTicket(ticket) {
   }
   if (
     data?.v !== 1 ||
-    !CONTENT_TYPES.includes(data.t) ||
+    !isContentType(data.t) ||
     !LANGS.includes(data.l) ||
     !Number.isInteger(data.p) ||
     data.p <= 0 ||

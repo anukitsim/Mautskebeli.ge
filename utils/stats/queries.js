@@ -1,10 +1,13 @@
 // utils/stats/queries.js — the numbers shown on the dashboard (server only).
 //
 // Definitions (the same everywhere):
-//   views   = every time the page was opened
-//   readers = different browsers that opened it
-//   reads   = different browsers that, in one sitting, kept the tab visible
-//             READ_MIN_SECONDS and got READ_MIN_SCROLL % through the text
+//   views        = every time a page was opened
+//   readers      = different browsers that opened it
+//   reader_items = different (browser, item) pairs — for one item this equals readers
+//   reads        = (browser, item) pairs where, in one sitting, the tab was visible
+//                  READ_MIN_SECONDS and READ_MIN_SCROLL % of the text was passed.
+//                  For one item: different browsers that really read it.
+//                  For a total: the sum of the items' reads.
 //
 // `days` is the period length in Tbilisi days (1 = today), or null = all time.
 
@@ -15,27 +18,57 @@ import { READ_MIN_SCROLL, READ_MIN_SECONDS, STATS_TIMEZONE as TZ } from './confi
 const periodStart = (i) => `(CASE WHEN $${i}::int IS NULL THEN '-infinity'::timestamptz
   ELSE (date_trunc('day', now() AT TIME ZONE '${TZ}') - make_interval(days => $${i}::int - 1)) AT TIME ZONE '${TZ}' END)`;
 
-const isRead = (s, p) => `engaged_seconds >= $${s} AND max_scroll >= $${p}`;
-
 const COUNTS = (s, p) => `
   count(*)::int AS views,
   count(DISTINCT visitor_id)::int AS readers,
-  count(DISTINCT visitor_id) FILTER (WHERE ${isRead(s, p)})::int AS reads,
+  count(DISTINCT (visitor_id, content_type, post_id))::int AS reader_items,
+  count(DISTINCT (visitor_id, content_type, post_id))
+    FILTER (WHERE engaged_seconds >= $${s} AND max_scroll >= $${p})::int AS reads,
   coalesce(round(percentile_cont(0.5) WITHIN GROUP (ORDER BY engaged_seconds)), 0)::int AS median_seconds`;
 
-const EMPTY = { views: 0, readers: 0, reads: 0, median_seconds: 0 };
+export const EMPTY_COUNTS = { views: 0, readers: 0, reader_items: 0, reads: 0, median_seconds: 0 };
 
-/** Totals for one content type (e.g. all articles together). */
+/** Totals for all content together. */
+export async function getSiteSummary(days) {
+  const rows = await statsQuery(
+    `SELECT ${COUNTS(2, 3)} FROM stats_opens WHERE opened_at >= ${periodStart(1)}`,
+    [days, READ_MIN_SECONDS, READ_MIN_SCROLL]
+  );
+  return rows[0] || EMPTY_COUNTS;
+}
+
+/** Totals per content type: Map<type, counts>. */
+export async function getTypeBreakdown(days) {
+  const rows = await statsQuery(
+    `SELECT content_type, ${COUNTS(2, 3)} FROM stats_opens
+     WHERE opened_at >= ${periodStart(1)} GROUP BY content_type`,
+    [days, READ_MIN_SECONDS, READ_MIN_SCROLL]
+  );
+  return new Map(rows.map((r) => [r.content_type, r]));
+}
+
+/** The most-read items across all content types. */
+export async function getTopItems(days, limit = 10) {
+  return statsQuery(
+    `SELECT content_type, post_id, ${COUNTS(2, 3)} FROM stats_opens
+     WHERE opened_at >= ${periodStart(1)}
+     GROUP BY content_type, post_id
+     ORDER BY reads DESC, views DESC LIMIT $4`,
+    [days, READ_MIN_SECONDS, READ_MIN_SCROLL, limit]
+  );
+}
+
+/** Totals for one content type. */
 export async function getTypeSummary(type, days) {
   const rows = await statsQuery(
     `SELECT ${COUNTS(3, 4)} FROM stats_opens
      WHERE content_type = $1 AND opened_at >= ${periodStart(2)}`,
     [type, days, READ_MIN_SECONDS, READ_MIN_SCROLL]
   );
-  return rows[0] || EMPTY;
+  return rows[0] || EMPTY_COUNTS;
 }
 
-/** Numbers for every post that has at least one open: Map<postId, counts>. */
+/** Numbers for every item of a type that has at least one open: Map<postId, counts>. */
 export async function getPerPost(type, days) {
   const rows = await statsQuery(
     `SELECT post_id, ${COUNTS(3, 4)} FROM stats_opens
@@ -46,17 +79,17 @@ export async function getPerPost(type, days) {
   return new Map(rows.map((r) => [r.post_id, r]));
 }
 
-/** Totals for one post. */
+/** Totals for one item. */
 export async function getPostSummary(type, postId, days) {
   const rows = await statsQuery(
     `SELECT ${COUNTS(4, 5)} FROM stats_opens
      WHERE content_type = $1 AND post_id = $2 AND opened_at >= ${periodStart(3)}`,
     [type, postId, days, READ_MIN_SECONDS, READ_MIN_SCROLL]
   );
-  return rows[0] || EMPTY;
+  return rows[0] || EMPTY_COUNTS;
 }
 
-/** One post, split by language (ka / en / ru). */
+/** One item, split by language (ka / en / ru). */
 export async function getPostByLang(type, postId, days) {
   return statsQuery(
     `SELECT lang, ${COUNTS(4, 5)} FROM stats_opens
@@ -67,7 +100,7 @@ export async function getPostByLang(type, postId, days) {
 }
 
 /**
- * One post, day by day (Tbilisi days), with empty days filled in as 0.
+ * One item, day by day (Tbilisi days), with empty days filled in as 0.
  * Note: "readers" here is per day — someone reading on two days counts on both.
  */
 export async function getPostDaily(type, postId, days) {

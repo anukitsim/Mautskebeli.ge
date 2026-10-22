@@ -6,6 +6,8 @@ import { decode } from "html-entities";
 import sanitizeHtml from "sanitize-html";
 import { load } from "cheerio";
 import DynamicClientComponents from "./DynamicClientComponents";
+import ReadingTracker from "../../components/ReadingTracker";
+import { createReadingTicket } from "@/utils/stats/ticket";
 
 /**
  * Categories for the top links
@@ -222,6 +224,9 @@ export default async function TranslationPage({ params }) {
         : `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL || "https://mautskebeli.wpenginepowered.com"}${translation.acf.image}`)
     : "/images/default-og-image.jpg";
 
+  // Reading statistics: null (no tracker) unless statistics are switched on.
+  const readingTicket = createReadingTicket({ type: "translate", postId: translation.id, lang: "ka" });
+
   return (
     <section className="w-full mx-auto mt-10 px-4 lg:px-0 overflow-x-hidden relative">
       <div className="w-full lg:w-[60%] mx-auto bg-opacity-90 p-5 rounded-lg">
@@ -301,6 +306,7 @@ export default async function TranslationPage({ params }) {
 
         {/* Client-Only Share/Buttons */}
         <DynamicClientComponents id={id} title={decodedTitle} />
+        <ReadingTracker ticket={readingTicket} />
       </div>
     </section>
   );
