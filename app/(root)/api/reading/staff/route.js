@@ -5,7 +5,8 @@
 
 import { NextResponse } from 'next/server';
 import { getAdminSession } from '@/utils/stats/auth';
-import { COOKIE_MAX_AGE_SECONDS, STAFF_COOKIE } from '@/utils/stats/config';
+import { STAFF_COOKIE } from '@/utils/stats/config';
+import { statsCookieOptions } from '@/utils/stats/cookies';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -15,12 +16,6 @@ export async function POST() {
   if (!session) return new NextResponse(null, { status: 401 });
 
   const response = new NextResponse(null, { status: 204, headers: { 'Cache-Control': 'no-store' } });
-  response.cookies.set(STAFF_COOKIE, '1', {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    path: '/',
-    maxAge: COOKIE_MAX_AGE_SECONDS,
-  });
+  response.cookies.set(STAFF_COOKIE, '1', statsCookieOptions());
   return response;
 }

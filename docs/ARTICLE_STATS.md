@@ -65,6 +65,7 @@ scroll % are stored, changing the rule recalculates all past data.
 | `NEXTAUTH_URL` | Production | `https://www.mautskebeli.ge` |
 | `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Production | from Google Cloud (below) |
 | `STATS_ADMIN_EMAILS` | Production | `owner1@gmail.com,owner2@gmail.com` |
+| `STATS_COOKIE_DOMAIN` | Production | `mautskebeli.ge` — cookies cover both `mautskebeli.ge` and `www.` (the site answers on both; `/admin` and `/api/auth` are redirected to www in `next.config.js`) |
 | `STATS_DEV_LOGIN` | **never in Vercel** | `1` only in local `.env.local` |
 
 Leave them unset in **Preview** (stats off there), or use a separate Neon branch.

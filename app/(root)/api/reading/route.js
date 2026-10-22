@@ -16,8 +16,8 @@ import { NextResponse } from 'next/server';
 import { isbot } from 'isbot';
 import { statsQuery } from '@/utils/stats/db';
 import { isStatsEnabled, verifyReadingTicket } from '@/utils/stats/ticket';
+import { statsCookieOptions } from '@/utils/stats/cookies';
 import {
-  COOKIE_MAX_AGE_SECONDS,
   MAX_ENGAGED_SECONDS,
   STAFF_COOKIE,
   STATS_TIMEZONE,
@@ -153,13 +153,7 @@ export async function POST(request) {
   if (!hasValidCookie) {
     // Give the browser the ID actually stored for this open. If two first
     // signals raced each other before the cookie existed, both get the same ID.
-    response.cookies.set(VISITOR_COOKIE, rows[0].visitor_id, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      path: '/',
-      maxAge: COOKIE_MAX_AGE_SECONDS,
-    });
+    response.cookies.set(VISITOR_COOKIE, rows[0].visitor_id, statsCookieOptions());
   }
   return response;
 }

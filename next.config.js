@@ -17,7 +17,16 @@ const nextConfig = {
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
   },
   async redirects() {
-    return redirects.map(({ source, destination }) => {
+    // The owners' statistics dashboard and its login always run on www:
+    // login cookies belong to one address, and the site answers on both.
+    const statsAdminToWww = ['/admin', '/admin/:path*', '/api/auth/:path*'].map((source) => ({
+      source,
+      has: [{ type: 'host', value: 'mautskebeli.ge' }],
+      destination: `https://www.mautskebeli.ge${source}`,
+      permanent: false,
+    }));
+
+    return [...statsAdminToWww, ...redirects.map(({ source, destination }) => {
       const [path, query] = source.split('?');
       const sourceObj = { source: path, destination, permanent: true };
 
@@ -32,7 +41,7 @@ const nextConfig = {
       }
 
       return sourceObj;
-    });
+    })];
   },
 };
 
