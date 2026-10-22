@@ -11,6 +11,8 @@ import React from 'react';
 
 // Import the Client Component handling dynamic imports
 import DynamicClientComponents from './DynamicClientComponents';
+import ReadingTracker from '../../components/ReadingTracker';
+import { createReadingTicket } from '@/utils/stats/ticket';
 
 const categories = [
   { name: 'სტატიები', path: '/all-articles' },
@@ -253,6 +255,9 @@ const FreeColumnPage = async ({ params }) => {
   const showLanguageDropdown =
     freeColumn.acf.language1 === true || freeColumn.acf.language2 === true;
 
+  // Reading statistics: null (no tracker) unless statistics are switched on.
+  const readingTicket = createReadingTicket({ type: 'free-column', postId: freeColumn.id, lang: 'ka' });
+
   return (
     <section className="w-full mx-auto mt-10 px-4 lg:px-0 overflow-x-hidden relative">
       <div className="w-full lg:w-[60%] mx-auto bg-opacity-90 p-5 rounded-lg">
@@ -330,6 +335,7 @@ const FreeColumnPage = async ({ params }) => {
           title={freeColumn.title.rendered}
           showLanguageDropdown={false}
         />
+        <ReadingTracker ticket={readingTicket} />
       </div>
 
       <footer className="h-[100px]"></footer>

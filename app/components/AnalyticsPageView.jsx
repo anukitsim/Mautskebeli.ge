@@ -8,6 +8,7 @@ export default function AnalyticsPageView() {
 
   useEffect(() => {
     if (typeof window === 'undefined' || !window.gtag) return;
+    if (pathname?.startsWith('/admin')) return; // owners' dashboard is not site traffic
 
     window.gtag('event', 'page_view', {
       page_path: pathname,

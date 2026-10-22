@@ -424,7 +424,7 @@ export default function NewsDetailClient() {
               </div>
             </div>
 
-            <div className="px-6 lg:px-10 py-8 lg:py-10">
+            <div className="px-6 lg:px-10 py-8 lg:py-10" data-reading-body>
               {news.acf?.description && (
                 <div 
                   className="mb-8 lg:mb-10 relative pl-6 border-l-4 border-gradient"

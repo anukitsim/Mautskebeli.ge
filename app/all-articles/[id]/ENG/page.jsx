@@ -10,6 +10,8 @@ import { load } from "cheerio"; // Updated import
 import ShareButtons from "./ShareButtons";
 import LanguageDropdown from "./LanguageDropdown";
 import ScrollToTopButton from "./ScrollToTopButton";
+import ReadingTracker from "../../../components/ReadingTracker";
+import { createReadingTicket } from "@/utils/stats/ticket";
 
 const categories = [
   { name: "სტატიები", path: "/all-articles" },
@@ -137,6 +139,9 @@ const Language1Page = async ({ params }) => {
   const hasRu = Boolean(article.acf.language2_title);
   const showLanguageDropdown = hasEng || hasRu;
 
+  // Reading statistics: null (no tracker) unless statistics are switched on.
+  const readingTicket = createReadingTicket({ type: "article", postId: article.id, lang: "en" });
+
   return (
     <section className="w-full mx-auto mt-10 px-4 lg:px-0 overflow-x-hidden relative">
       <div className="w-full lg:w-[60%] mx-auto bg-opacity-90 p-5 rounded-lg">
@@ -210,6 +215,7 @@ const Language1Page = async ({ params }) => {
 
         {/* Share Buttons */}
         <ShareButtons articleId={article.id} title={article.title.rendered} />
+        <ReadingTracker ticket={readingTicket} />
       </div>
 
       {/* Scroll to Top Button */}
