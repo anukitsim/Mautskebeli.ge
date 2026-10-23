@@ -5,7 +5,8 @@
 // Renders nothing. When the page opens it sends "opened" to /api/reading,
 // then small updates while the tab is visible (15 s, 45 s, 90 s, 3, 5, 10 min)
 // and one last update when the reader leaves. Each update says how long the
-// tab has been visible and how far through the text the reader got.
+// tab has been visible, how far through the text the reader got, and where
+// the visit came from (see visitSource).
 // If the ticket is missing (statistics off), it does nothing at all.
 // Any error is swallowed: the tracker must never break the article page.
 
@@ -26,6 +27,30 @@ function randomId() {
   return `${h.slice(0, 8)}-${h.slice(8, 12)}-${h.slice(12, 16)}-${h.slice(16, 20)}-${h.slice(20)}`;
 }
 
+// Where did this visit come from? Only the referring site's name and the
+// landing address's utm/click tags are sent — never a full address.
+function visitSource() {
+  try {
+    const nav = performance.getEntriesByType('navigation')[0];
+    const landing = nav ? new URL(nav.name) : null;
+    // Reached by clicking inside the site (no page reload) → from our own site.
+    if (!landing || landing.pathname !== window.location.pathname) return { internal: true };
+    const ref = document.referrer ? new URL(document.referrer) : null;
+    if (ref && (ref.host === window.location.host || /(^|\.)mautskebeli\.ge$/.test(ref.hostname))) {
+      return { internal: true };
+    }
+    const q = landing.searchParams;
+    return {
+      ref: ref ? ref.hostname : '',
+      utm: q.get('utm_source') || '',
+      click: q.has('fbclid') ? 'fb' : q.has('gclid') ? 'g' : '',
+      touch: navigator.maxTouchPoints > 1,
+    };
+  } catch {
+    return {};
+  }
+}
+
 function Tracker({ ticket, contentSelector }) {
   // Kept in a ref so React's double effect run in development reuses the same ID.
   const openIdRef = useRef(null);
@@ -33,6 +58,7 @@ function Tracker({ ticket, contentSelector }) {
 
   useEffect(() => {
     const openId = openIdRef.current;
+    const src = visitSource();
     let visibleMs = 0;
     let lastTick = Date.now();
     let lastInput = Date.now();
@@ -56,7 +82,7 @@ function Tracker({ ticket, contentSelector }) {
         if (seconds === sentSeconds && maxScroll === sentScroll) return;
         sentSeconds = seconds;
         sentScroll = maxScroll;
-        const body = JSON.stringify({ ticket, openId, seconds, scroll: maxScroll });
+        const body = JSON.stringify({ ticket, openId, seconds, scroll: maxScroll, src });
         // When the page is closing, sendBeacon is the most likely to arrive.
         if (atExit && navigator.sendBeacon?.(ENDPOINT, new Blob([body], { type: 'application/json' }))) {
           return;

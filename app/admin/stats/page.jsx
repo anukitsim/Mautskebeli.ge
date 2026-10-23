@@ -1,13 +1,14 @@
-// app/admin/stats/page.jsx — overview: all content together, per type, top items.
+// app/admin/stats/page.jsx — overview: all content together, per type, audience, top items.
 
 import Link from 'next/link';
 import { requireAdmin } from '../_lib/guard';
 import AdminShell, { NotConfigured, PeriodChips } from '../_components/AdminShell';
+import AudienceCards from '../_components/AudienceCards';
 import HowWeCount from '../_components/HowWeCount';
 import StatTiles from '../_components/StatTiles';
-import { fmtNumber, fmtPercent, readPeriod } from '../_lib/format';
+import { fmtDuration, fmtNumber, readPeriod } from '../_lib/format';
 import { isStatsEnabled } from '@/utils/stats/ticket';
-import { EMPTY_COUNTS, getSiteSummary, getTopItems, getTypeBreakdown } from '@/utils/stats/queries';
+import { EMPTY_COUNTS, getAudience, getSiteSummary, getTopItems, getTypeBreakdown } from '@/utils/stats/queries';
 import { fetchContentIndex } from '@/utils/stats/wordpress';
 import { CONTENT_TYPES, TYPE_ORDER } from '@/utils/stats/content-types';
 import { PERIODS } from '@/utils/stats/config';
@@ -27,10 +28,11 @@ export default async function StatsOverview({ searchParams }) {
   }
 
   const days = PERIODS[period].days;
-  const [summary, byType, top] = await Promise.all([
+  const [summary, byType, top, audience] = await Promise.all([
     getSiteSummary(days),
     getTypeBreakdown(days),
     getTopItems(days, 10),
+    getAudience({ days }),
   ]);
   // Titles only for the types that appear in the top list.
   const topTypes = [...new Set(top.map((t) => t.content_type))];
@@ -52,10 +54,9 @@ export default async function StatsOverview({ searchParams }) {
             <thead>
               <tr>
                 <th scope="col">ტიპი</th>
-                <th className="num" scope="col">ნახვები</th>
-                <th className="num" scope="col">მკითხველები</th>
-                <th className="num" scope="col">რეალურად წაკითხული</th>
-                <th className="num" scope="col">წაკითხვის წილი</th>
+                <th className="num" scope="col">ნახვა</th>
+                <th className="num" scope="col">მკითხველი</th>
+                <th className="num" scope="col">საშუალო დრო</th>
               </tr>
             </thead>
             <tbody>
@@ -68,10 +69,9 @@ export default async function StatsOverview({ searchParams }) {
                         {CONTENT_TYPES[type].label}
                       </Link>
                     </td>
-                    <td className="num" data-label="ნახვები">{fmtNumber(c.views)}</td>
-                    <td className="num" data-label="მკითხველები">{fmtNumber(c.readers)}</td>
-                    <td className="num" data-label="წაკითხული">{fmtNumber(c.reads)}</td>
-                    <td className="num" data-label="წაკითხვის წილი">{fmtPercent(c.reads, c.reader_items)}</td>
+                    <td className="num" data-label="ნახვა">{fmtNumber(c.views)}</td>
+                    <td className="num" data-label="მკითხველი">{fmtNumber(c.reads)}</td>
+                    <td className="num" data-label="საშუალო დრო">{c.views ? fmtDuration(c.avg_seconds) : '—'}</td>
                   </tr>
                 );
               })}
@@ -82,16 +82,16 @@ export default async function StatsOverview({ searchParams }) {
 
       <section className="card">
         <h2>ყველაზე წაკითხული</h2>
-        <p className="sub">{PERIODS[period].label} · ყველა ტიპი ერთად, რეალური წაკითხვების მიხედვით</p>
+        <p className="sub">{PERIODS[period].label} · ყველა ტიპი ერთად, მკითხველების მიხედვით</p>
         {top.length ? (
           <div className="table-scroll">
             <table className="stats-table cards">
               <thead>
                 <tr>
                   <th scope="col">სათაური</th>
-                  <th className="num" scope="col">ნახვები</th>
-                  <th className="num" scope="col">მკითხველები</th>
-                  <th className="num" scope="col">რეალურად წაკითხული</th>
+                  <th className="num" scope="col">ნახვა</th>
+                  <th className="num" scope="col">მკითხველი</th>
+                  <th className="num" scope="col">საშუალო დრო</th>
                 </tr>
               </thead>
               <tbody>
@@ -105,9 +105,9 @@ export default async function StatsOverview({ searchParams }) {
                         </Link>
                         <div className="meta">{CONTENT_TYPES[t.content_type]?.label}</div>
                       </td>
-                      <td className="num" data-label="ნახვები">{fmtNumber(t.views)}</td>
-                      <td className="num" data-label="მკითხველები">{fmtNumber(t.readers)}</td>
-                      <td className="num" data-label="წაკითხული">{fmtNumber(t.reads)}</td>
+                      <td className="num" data-label="ნახვა">{fmtNumber(t.views)}</td>
+                      <td className="num" data-label="მკითხველი">{fmtNumber(t.reads)}</td>
+                      <td className="num" data-label="საშუალო დრო">{fmtDuration(t.avg_seconds)}</td>
                     </tr>
                   );
                 })}
@@ -118,6 +118,8 @@ export default async function StatsOverview({ searchParams }) {
           <p className="sub">ამ პერიოდში ჯერ არავის გაუხსნია.</p>
         )}
       </section>
+
+      <AudienceCards audience={audience} />
     </AdminShell>
   );
 }

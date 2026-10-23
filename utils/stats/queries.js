@@ -24,9 +24,9 @@ const COUNTS = (s, p) => `
   count(DISTINCT (visitor_id, content_type, post_id))::int AS reader_items,
   count(DISTINCT (visitor_id, content_type, post_id))
     FILTER (WHERE engaged_seconds >= $${s} AND max_scroll >= $${p})::int AS reads,
-  coalesce(round(percentile_cont(0.5) WITHIN GROUP (ORDER BY engaged_seconds)), 0)::int AS median_seconds`;
+  coalesce(round(avg(engaged_seconds)), 0)::int AS avg_seconds`;
 
-export const EMPTY_COUNTS = { views: 0, readers: 0, reader_items: 0, reads: 0, median_seconds: 0 };
+export const EMPTY_COUNTS = { views: 0, readers: 0, reader_items: 0, reads: 0, avg_seconds: 0 };
 
 /** Totals for all content together. */
 export async function getSiteSummary(days) {
@@ -153,17 +153,36 @@ export async function getPostTimeBuckets(type, postId, days) {
   return TIME_BUCKETS.map((b) => ({ ...b, n: byKey.get(b.key) || 0 }));
 }
 
-/** Filter health: accepted opens and rejected signals, by reason. */
-export async function getFilterHealth(days) {
-  const [accepted] = await statsQuery(
-    `SELECT count(*)::int AS opens FROM stats_opens WHERE opened_at >= ${periodStart(1)}`,
-    [days]
-  );
-  const rejected = await statsQuery(
-    `SELECT reason, sum(n)::int AS n FROM stats_rejections
-     WHERE ($1::int IS NULL OR day >= (now() AT TIME ZONE '${TZ}')::date - ($1::int - 1))
-     GROUP BY reason ORDER BY n DESC`,
-    [days]
-  );
-  return { opens: accepted?.opens || 0, rejected };
+/**
+ * Where from / which device / which country, for all content, one type, or
+ * one item (type and postId may be null). Each row: { key, views, reads }.
+ * Rows from before these were recorded are grouped as 'unknown'.
+ */
+export async function getAudience({ type = null, postId = null, days }) {
+  const where = `($1::text IS NULL OR content_type = $1) AND ($2::int IS NULL OR post_id = $2)
+                 AND opened_at >= ${periodStart(3)}`;
+  const params = [type, postId, days, READ_MIN_SECONDS, READ_MIN_SCROLL];
+  const byColumn = (column, limit) =>
+    statsQuery(
+      `SELECT coalesce(${column}, 'unknown') AS key,
+              count(*)::int AS views,
+              count(DISTINCT (visitor_id, content_type, post_id))
+                FILTER (WHERE engaged_seconds >= $4 AND max_scroll >= $5)::int AS reads
+       FROM stats_opens WHERE ${where}
+       GROUP BY 1 ORDER BY views DESC LIMIT ${limit}`,
+      params
+    );
+  const [sources, devices, countries, referrers] = await Promise.all([
+    byColumn('source', 20),
+    byColumn('device', 10),
+    byColumn('country', 12),
+    // The other websites (and campaign tags) that sent readers.
+    statsQuery(
+      `SELECT referrer AS key, count(*)::int AS views
+       FROM stats_opens WHERE ${where} AND referrer IS NOT NULL AND source IN ('other', 'search', 'email')
+       GROUP BY 1 ORDER BY views DESC LIMIT 8`,
+      params.slice(0, 3)
+    ),
+  ]);
+  return { sources, devices, countries, referrers };
 }

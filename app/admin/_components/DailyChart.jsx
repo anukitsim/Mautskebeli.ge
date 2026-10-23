@@ -58,8 +58,8 @@ export default function DailyChart({ data }) {
   return (
     <div>
       <div className="chart-legend" aria-hidden="true">
-        <span><i style={{ background: 'var(--viz-views)' }} />ნახვები</span>
-        <span><i style={{ background: 'var(--viz-reads)' }} />რეალურად წაკითხული</span>
+        <span><i style={{ background: 'var(--viz-views)' }} />ნახვა</span>
+        <span><i style={{ background: 'var(--viz-reads)' }} />მკითხველი</span>
       </div>
       <div className="chart-wrap" ref={wrapRef}>
         <svg
@@ -67,7 +67,7 @@ export default function DailyChart({ data }) {
           width={width}
           height={HEIGHT}
           role="img"
-          aria-label="დღიური ნახვები და რეალური წაკითხვები"
+          aria-label="დღიური ნახვა და მკითხველი"
         >
           {ticks.map((t) => (
             <g key={t}>
@@ -95,7 +95,7 @@ export default function DailyChart({ data }) {
                   width={slot}
                   height={plotH}
                   tabIndex={0}
-                  aria-label={`${d.label}: ${d.views} ნახვა, ${d.reads} რეალურად წაკითხული`}
+                  aria-label={`${d.label}: ${d.views} ნახვა, ${d.reads} მკითხველი`}
                   onPointerEnter={() => setActive(i)}
                   onPointerLeave={() => setActive(null)}
                   onFocus={() => setActive(i)}
@@ -115,8 +115,7 @@ export default function DailyChart({ data }) {
           >
             <div className="tip-date">{tip.label}</div>
             <div className="tip-row"><span className="key" style={{ background: 'var(--viz-views)' }} /><b>{tip.views}</b> ნახვა</div>
-            <div className="tip-row"><span className="key" style={{ background: 'var(--viz-reads)' }} /><b>{tip.reads}</b> რეალურად წაკითხული</div>
-            <div className="tip-row"><span className="key" /><b>{tip.readers}</b> მკითხველი</div>
+            <div className="tip-row"><span className="key" style={{ background: 'var(--viz-reads)' }} /><b>{tip.reads}</b> მკითხველი</div>
           </div>
         )}
       </div>
@@ -127,9 +126,8 @@ export default function DailyChart({ data }) {
             <thead>
               <tr>
                 <th scope="col">დღე</th>
-                <th className="num" scope="col">ნახვები</th>
-                <th className="num" scope="col">მკითხველები</th>
-                <th className="num" scope="col">რეალურად წაკითხული</th>
+                <th className="num" scope="col">ნახვა</th>
+                <th className="num" scope="col">მკითხველი</th>
               </tr>
             </thead>
             <tbody>
@@ -137,7 +135,6 @@ export default function DailyChart({ data }) {
                 <tr key={d.day}>
                   <td>{d.label}</td>
                   <td className="num">{d.views}</td>
-                  <td className="num">{d.readers}</td>
                   <td className="num">{d.reads}</td>
                 </tr>
               ))}

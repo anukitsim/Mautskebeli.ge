@@ -17,9 +17,7 @@ export const LANGS = ['ka', 'en', 'ru'];
 
 // Cookie that holds the anonymous random browser ID.
 export const VISITOR_COOKIE = 'mau_rid';
-// Cookie that marks an owner's device, so their own reading isn't counted.
-export const STAFF_COOKIE = 'mau_staff';
-// Fixed lifetime for both cookies: 13 months (not renewed on each visit).
+// Fixed lifetime: 13 months (not renewed on each visit).
 export const COOKIE_MAX_AGE_SECONDS = 395 * 24 * 60 * 60;
 
 // The page's signed ticket is accepted for this long after the page was made.

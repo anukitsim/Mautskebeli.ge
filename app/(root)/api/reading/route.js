@@ -1,14 +1,16 @@
 // app/(root)/api/reading/route.js — receives reading signals from article pages.
 //
-// The browser sends: { ticket, openId, seconds, scroll }
-//   ticket  – signed by our server when it built the page (which article, language)
+// The browser sends: { ticket, openId, seconds, scroll, src }
+//   ticket  – signed by our server when it built the page (which item, language)
 //   openId  – random ID the browser made for this one open of the page
 //   seconds – how long the tab has been visible so far
-//   scroll  – how far through the article text the reader got (%)
+//   scroll  – how far through the text the reader got (%)
+//   src     – where the visit came from (see utils/stats/audience.js)
 //
 // Checks, in order: statistics switched on → not flooding → request origin and
-// size → not a bot → ticket real and recent → not an owner's device.
-// Then one row per open is created or updated (never duplicated).
+// size → not a bot → ticket real and recent. Owners' browsers count like any other.
+// Then one row per open is created or updated (never duplicated); source,
+// device and country are stored when the row is created.
 // Always answers 204 with no body, so the page never waits or breaks.
 
 import crypto from 'node:crypto';
@@ -17,12 +19,8 @@ import { isbot } from 'isbot';
 import { statsQuery } from '@/utils/stats/db';
 import { isStatsEnabled, verifyReadingTicket } from '@/utils/stats/ticket';
 import { statsCookieOptions } from '@/utils/stats/cookies';
-import {
-  MAX_ENGAGED_SECONDS,
-  STAFF_COOKIE,
-  STATS_TIMEZONE,
-  VISITOR_COOKIE,
-} from '@/utils/stats/config';
+import { classifySource, countryFrom, deviceFrom } from '@/utils/stats/audience';
+import { MAX_ENGAGED_SECONDS, STATS_TIMEZONE, VISITOR_COOKIE } from '@/utils/stats/config';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -112,7 +110,12 @@ export async function POST(request) {
   const ticket = verifyReadingTicket(body.ticket);
   if (!ticket.ok) return reject(ticket.reason);
 
-  if (request.cookies.get(STAFF_COOKIE)?.value === '1') return reject('staff');
+  // Where from / which device / which country — stored once, when the row is created.
+  // (A page still running an older tracker sends no src: source stays unknown.)
+  const src = body.src && typeof body.src === 'object' ? body.src : null;
+  const { source, referrer } = src ? classifySource(src) : { source: null, referrer: null };
+  const device = deviceFrom(userAgent, src?.touch === true);
+  const country = countryFrom(request.headers.get('x-vercel-ip-country'));
 
   // Anonymous browser ID: reuse the cookie if valid, otherwise propose a new one.
   const cookieVisitor = request.cookies.get(VISITOR_COOKIE)?.value;
@@ -127,8 +130,9 @@ export async function POST(request) {
   let rows;
   try {
     rows = await statsQuery(
-      `INSERT INTO stats_opens (open_id, content_type, post_id, lang, visitor_id, engaged_seconds, max_scroll)
-       VALUES ($1, $2, $3, $4, $5, $6, $7)
+      `INSERT INTO stats_opens (open_id, content_type, post_id, lang, visitor_id, engaged_seconds, max_scroll,
+                                source, referrer, device, country)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
        ON CONFLICT (open_id) DO UPDATE SET
          last_seen_at    = now(),
          -- Highest value wins, but never more time than has passed since this open began.
@@ -140,7 +144,8 @@ export async function POST(request) {
          AND stats_opens.content_type = EXCLUDED.content_type
          AND stats_opens.lang = EXCLUDED.lang
        RETURNING visitor_id`,
-      [body.openId, ticket.data.type, ticket.data.postId, ticket.data.lang, visitorId, seconds, scroll]
+      [body.openId, ticket.data.type, ticket.data.postId, ticket.data.lang, visitorId, seconds, scroll,
+        source, referrer, device, country]
     );
   } catch (err) {
     console.error('[stats] could not save reading signal:', err.message);
