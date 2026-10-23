@@ -69,6 +69,7 @@ export async function generateMetadata({ params }) {
 
   return {
     metadataBase,
+    alternates: { canonical: `/books/${book.id || id}` },
     title: decodedTitle,
     description: decodedDescription,
     openGraph: {

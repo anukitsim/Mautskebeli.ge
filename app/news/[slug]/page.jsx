@@ -107,6 +107,7 @@ export async function generateMetadata({ params }) {
 
   return {
     metadataBase,
+    alternates: { canonical: canonicalUrl },
     title: `${decodedTitle} | მაუწყებელი`,
     description,
     openGraph: {
