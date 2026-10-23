@@ -1,120 +1,44 @@
 // app/sitemap.js
-// Dynamic sitemap for Google Search Console
+// Dynamic sitemap for Google: every page that has its own address.
+// (Category videos play inside their category page and have no own address,
+// so they can't be listed individually.)
 
-// Fetch all articles from WordPress (handles pagination)
-async function fetchAllArticles() {
+const WP = process.env.NEXT_PUBLIC_WORDPRESS_API_URL;
+const BASE_URL = 'https://www.mautskebeli.ge';
+
+// Fetch every item of one WordPress post type, page by page.
+// Stops at the last page WordPress reports, so it never asks for a page
+// that doesn't exist.
+async function fetchAll(route, fields = 'id,slug,modified') {
+  const items = [];
   try {
-    let allArticles = [];
-    let page = 1;
-    let hasMore = true;
-
-    while (hasMore) {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/wp/v2/article?_fields=slug,modified&per_page=100&page=${page}`,
-        { next: { revalidate: 3600 } } // Cache for 1 hour
-      );
-
+    for (let page = 1; page <= 50; page++) {
+      const response = await fetch(`${WP}/wp/v2/${route}?_fields=${fields}&per_page=100&page=${page}`, {
+        next: { revalidate: 3600 }, // cache for 1 hour
+      });
       if (!response.ok) {
-        console.error(`Failed to fetch articles page ${page} for sitemap`);
+        console.error(`Sitemap: could not fetch ${route} page ${page} (${response.status})`);
         break;
       }
-
-      const articles = await response.json();
-      
-      if (articles.length === 0) {
-        hasMore = false;
-      } else {
-        allArticles = [...allArticles, ...articles];
-        page++;
-      }
-
-      // Safety limit to prevent infinite loops
-      if (page > 50) break; // Max 5000 articles
+      items.push(...(await response.json()));
+      const totalPages = Number(response.headers.get('x-wp-totalpages') || 1);
+      if (page >= totalPages) break;
     }
-
-    console.log(`Fetched ${allArticles.length} articles for sitemap`);
-    return allArticles;
   } catch (error) {
-    console.error('Error fetching articles for sitemap:', error);
-    return [];
+    console.error(`Sitemap: error fetching ${route}:`, error.message);
   }
+  return items;
 }
 
-// Fetch all books from WordPress (handles pagination)
-async function fetchAllBooks() {
-  try {
-    let allBooks = [];
-    let page = 1;
-    let hasMore = true;
-
-    while (hasMore) {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/wp/v2/mau-books?_fields=slug,modified&per_page=100&page=${page}`,
-        { next: { revalidate: 3600 } }
-      );
-
-      if (!response.ok) {
-        break;
-      }
-
-      const books = await response.json();
-      
-      if (books.length === 0) {
-        hasMore = false;
-      } else {
-        allBooks = [...allBooks, ...books];
-        page++;
-      }
-
-      if (page > 20) break; // Max 2000 books
-    }
-
-    return allBooks;
-  } catch (error) {
-    console.error('Error fetching books for sitemap:', error);
-    return [];
-  }
-}
-
-// Fetch all translations (handles pagination)
-async function fetchAllTranslations() {
-  try {
-    let allTranslations = [];
-    let page = 1;
-    let hasMore = true;
-
-    while (hasMore) {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/wp/v2/translate?_fields=id,modified&per_page=100&page=${page}`,
-        { next: { revalidate: 3600 } }
-      );
-
-      if (!response.ok) {
-        break;
-      }
-
-      const translations = await response.json();
-      
-      if (translations.length === 0) {
-        hasMore = false;
-      } else {
-        allTranslations = [...allTranslations, ...translations];
-        page++;
-      }
-
-      if (page > 20) break; // Max 2000 translations
-    }
-
-    return allTranslations;
-  } catch (error) {
-    console.error('Error fetching translations for sitemap:', error);
-    return [];
-  }
-}
+const toRoutes = (items, path, priority = 0.7) =>
+  items.map((item) => ({
+    url: `${BASE_URL}${path(item)}`,
+    lastModified: item.modified ? new Date(item.modified) : new Date(),
+    changeFrequency: 'weekly',
+    priority,
+  }));
 
 export default async function sitemap() {
-  const baseUrl = 'https://www.mautskebeli.ge';
-  
   // Static pages
   const staticPages = [
     '',                    // Homepage
@@ -124,9 +48,9 @@ export default async function sitemap() {
     '/about-us',
     '/donation',
     '/live',
-    '/search',
     '/all-videos',
     '/all-articles',
+    '/news',
     '/all-sport-videos',
     '/sport-articles',
     '/free-column',
@@ -145,49 +69,34 @@ export default async function sitemap() {
   ];
 
   const staticRoutes = staticPages.map((route) => ({
-    url: `${baseUrl}${route}`,
+    url: `${BASE_URL}${route}`,
     lastModified: new Date(),
     changeFrequency: 'daily',
     priority: route === '' ? 1.0 : 0.8,
   }));
 
-  // Fetch dynamic content
-  const [articles, books, translations] = await Promise.all([
-    fetchAllArticles(),
-    fetchAllBooks(),
-    fetchAllTranslations(),
-  ]);
+  const [articles, news, freeColumns, translations, books, sportArticles, sportVideos, featuredVideos] =
+    await Promise.all([
+      fetchAll('article'),
+      fetchAll('news'),
+      fetchAll('free-column'),
+      fetchAll('targmani'),
+      fetchAll('mau-books', 'id,modified'),
+      fetchAll('sport-article'),
+      fetchAll('sporti-videos', 'id,modified'),
+      fetchAll('main', 'id,modified'),
+    ]);
 
-  // Create article routes with slugs
-  const articleRoutes = articles.map((article) => ({
-    url: `${baseUrl}/all-articles/${article.slug}`,
-    lastModified: new Date(article.modified),
-    changeFrequency: 'weekly',
-    priority: 0.7,
-  }));
-
-  // Create book routes
-  const bookRoutes = books.map((book) => ({
-    url: `${baseUrl}/books/${book.slug}`,
-    lastModified: new Date(book.modified),
-    changeFrequency: 'weekly',
-    priority: 0.7,
-  }));
-
-  // Create translation routes (use ID since they might not have slugs)
-  const translationRoutes = translations.map((translation) => ({
-    url: `${baseUrl}/translate/${translation.id}`,
-    lastModified: new Date(translation.modified),
-    changeFrequency: 'weekly',
-    priority: 0.7,
-  }));
-
-  // Combine all routes
+  // Each address below is the one its page actually answers on.
   return [
     ...staticRoutes,
-    ...articleRoutes,
-    ...bookRoutes,
-    ...translationRoutes,
+    ...toRoutes(articles, (a) => `/all-articles/${a.slug || a.id}`),
+    ...toRoutes(news, (n) => `/news/${n.slug}`, 0.8),
+    ...toRoutes(freeColumns, (c) => `/free-column/${c.slug || c.id}`),
+    ...toRoutes(translations, (t) => `/translate/${t.slug || t.id}`),
+    ...toRoutes(books, (b) => `/books/${b.id}`),
+    ...toRoutes(sportArticles, (s) => `/sport-articles/${s.slug || s.id}`),
+    ...toRoutes(sportVideos, (v) => `/all-sport-videos/${v.id}`, 0.6),
+    ...toRoutes(featuredVideos, (v) => `/${v.id}`, 0.6),
   ];
 }
-
