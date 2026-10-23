@@ -17,7 +17,7 @@ export default function AudienceCards({ audience }) {
   if (!total) {
     return (
       <section className="card">
-        <h2>საიდან მოდიან</h2>
+        <h2>ტრაფიკის წყაროები</h2>
         <p className="sub">ამ პერიოდში ჯერ არავის გაუხსნია.</p>
       </section>
     );
@@ -25,7 +25,7 @@ export default function AudienceCards({ audience }) {
   return (
     <>
       <section className="card">
-        <h2>საიდან მოდიან</h2>
+        <h2>ტრაფიკის წყაროები</h2>
         <p className="sub">
           რომელი ბმულით მოვიდა მკითხველი. „პირდაპირი / მესენჯერი“ — მისამართი აკრიფეს, შენახული ჰქონდათ, ან
           გაუგზავნეს Messenger-ით, Viber-ით ან WhatsApp-ით (ეს აპები წყაროს მალავენ).

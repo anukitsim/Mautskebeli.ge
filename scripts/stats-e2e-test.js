@@ -295,7 +295,7 @@ async function getTicket(page) {
   // The "where from" card on the overview must match the database too.
   const dbSources = await q(`SELECT coalesce(source, 'unknown') AS key, count(*)::int AS views FROM stats_opens GROUP BY 1`);
   const pageBars = await op.evaluate(() => {
-    const card = [...document.querySelectorAll('section.card')].find((s) => s.querySelector('h2')?.textContent === 'საიდან მოდიან');
+    const card = [...document.querySelectorAll('section.card')].find((s) => s.querySelector('h2')?.textContent === 'ტრაფიკის წყაროები');
     return [...(card?.querySelectorAll('.hbar') || [])].map((b) => [b.children[0].textContent, b.querySelector('.hbar-value').textContent]);
   });
   const LABEL = { facebook: 'Facebook', google: 'Google', telegram: 'Telegram', other: 'სხვა საიტი', internal: 'საიტის შიგნიდან', direct: 'პირდაპირი / მესენჯერი' };
