@@ -111,6 +111,7 @@ export async function generateMetadata({ params }) {
 
   return {
     metadataBase,
+    alternates: { canonical: canonicalPath },
     title: decodedTitle,
     description: decodedDescription,
     openGraph: {

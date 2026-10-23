@@ -28,7 +28,7 @@ async function fetchArticle(slugOrId) {
   // the numeric WordPress post ID.
   const slugUrl = `${
     process.env.NEXT_PUBLIC_WORDPRESS_API_URL
-  }/wp/v2/article?slug=${encodeURIComponent(decodedSlugOrId)}&acf_format=standard&_fields=id,title,acf,date`;
+  }/wp/v2/article?slug=${encodeURIComponent(decodedSlugOrId)}&acf_format=standard&_fields=id,title,acf,date,slug`;
 
   try {
     const slugRes = await fetch(slugUrl, { next: { revalidate: 10 } });
@@ -44,7 +44,7 @@ async function fetchArticle(slugOrId) {
     if (isNumeric) {
       const idUrl = `${
         process.env.NEXT_PUBLIC_WORDPRESS_API_URL
-      }/wp/v2/article/${decodedSlugOrId}?acf_format=standard&_fields=id,title,acf,date`;
+      }/wp/v2/article/${decodedSlugOrId}?acf_format=standard&_fields=id,title,acf,date,slug`;
       const idRes = await fetch(idUrl, { next: { revalidate: 10 } });
       if (idRes.ok) {
         return idRes.json();
@@ -145,12 +145,14 @@ export async function generateMetadata({ params }) {
   const description = extractDescription(sanitizedMainText, 30); // Extract the first 30 words (adjust as needed)
 
   return {
+    metadataBase: new URL("https://www.mautskebeli.ge"),
+    alternates: { canonical: `/all-articles/${article.slug || article.id}/RU` },
     title: `${article.acf.language2_title} - Russian Version`,
     description: description || "An article in Russian.",
     openGraph: {
       title: article.acf.language2_title,
       description: description,
-      url: `https://www.mautskebeli.ge/all-articles/${article.id}/RU`,
+      url: `https://www.mautskebeli.ge/all-articles/${article.slug || article.id}/RU`,
       images: [
         {
           url: article.acf.language2_image || "/images/default-og-image.jpg",
