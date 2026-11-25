@@ -4,7 +4,7 @@
 
 import { useState, useEffect } from 'react';
 
-const ScrollToTopButton = () => {
+const ScrollToTopButton = ({ label = 'საწყისზე დაბრუნება' }) => {
   const [showScrollButton, setShowScrollButton] = useState(false);
 
   useEffect(() => {
@@ -45,7 +45,7 @@ const ScrollToTopButton = () => {
         boxShadow: '0 0 20px 5px rgba(254, 206, 39, 0.5)',
       }}
     >
-      <span className="whitespace-nowrap">საწყისზე დაბრუნება</span>
+      <span className="whitespace-nowrap">{label}</span>
     </button>
   );
 };

@@ -5270,3 +5270,101 @@ add_filter('wp_insert_post_data', function ($data, $postarr) {
 
     return $data;
 }, 10, 2);
+
+
+// ─────────────────────────────────────────────────────────────────────
+// Article translations: Armenian (language3) and Azerbaijani (language4)
+//
+// English (language1_*) and Russian (language2_*) were created by hand in
+// the ACF admin. These two are registered here in code, with the SAME
+// field-name pattern, so the Next.js site reads them the same way:
+//   languageN            on/off: show this translation in the switcher
+//   languageN_title      title          (required for the page to exist)
+//   languageN_sub_title  subtitle
+//   languageN_ავტორი      author line
+//   languageN_image      cover image (optional, falls back to main image)
+//   languageN_main_text  article text
+// Frontend: app/all-articles/[id]/translations.js and [lang]/page.jsx
+// ─────────────────────────────────────────────────────────────────────
+add_action('acf/init', function () {
+    if (!function_exists('acf_add_local_field_group')) return;
+
+    $languages = array(
+        'language3' => array('label' => 'სომხური / Հայերեն',       'url' => 'HY'),
+        'language4' => array('label' => 'აზერბაიჯანული / Azərbaycanca', 'url' => 'AZ'),
+    );
+
+    $fields = array();
+    foreach ($languages as $name => $lang) {
+        $label = $lang['label'];
+        $fields[] = array(
+            'key'   => "field_article_{$name}_tab",
+            'label' => $label,
+            'name'  => '',
+            'type'  => 'tab',
+            'placement' => 'top',
+        );
+        $fields[] = array(
+            'key'   => "field_article_{$name}",
+            'label' => "{$label}: ჩართვა",
+            'name'  => $name,
+            'type'  => 'true_false',
+            'ui'    => 1,
+            'default_value' => 0,
+            'instructions' => "ჩართეთ, როცა თარგმანი მზადაა. სტატიაზე გამოჩნდება ენის ღილაკი. მისამართი: /all-articles/<slug>/{$lang['url']}",
+        );
+        $fields[] = array(
+            'key'   => "field_article_{$name}_title",
+            'label' => 'სათაური',
+            'name'  => "{$name}_title",
+            'type'  => 'text',
+            'instructions' => 'სავალდებულოა: სათაურის გარეშე თარგმანი არ გამოჩნდება.',
+        );
+        $fields[] = array(
+            'key'   => "field_article_{$name}_sub_title",
+            'label' => 'ქვესათაური',
+            'name'  => "{$name}_sub_title",
+            'type'  => 'text',
+        );
+        $fields[] = array(
+            'key'   => "field_article_{$name}_author",
+            'label' => 'ავტორი',
+            'name'  => "{$name}_ავტორი",
+            'type'  => 'text',
+        );
+        $fields[] = array(
+            'key'   => "field_article_{$name}_image",
+            'label' => 'სურათი',
+            'name'  => "{$name}_image",
+            'type'  => 'image',
+            'return_format' => 'url',
+            'preview_size'  => 'medium',
+            'instructions'  => 'არასავალდებულო. ცარიელის შემთხვევაში გამოჩნდება მთავარი სურათი.',
+        );
+        $fields[] = array(
+            'key'   => "field_article_{$name}_main_text",
+            'label' => 'ტექსტი',
+            'name'  => "{$name}_main_text",
+            'type'  => 'wysiwyg',
+            'tabs'  => 'all',
+            'toolbar' => 'full',
+            'media_upload' => 1,
+        );
+    }
+
+    acf_add_local_field_group(array(
+        'key'      => 'group_article_translations_hy_az',
+        'title'    => 'თარგმანები: სომხური და აზერბაიჯანული',
+        'fields'   => $fields,
+        'location' => array(
+            array(
+                array('param' => 'post_type', 'operator' => '==', 'value' => 'article'),
+            ),
+        ),
+        'menu_order'   => 50,
+        'position'     => 'normal',
+        'style'        => 'default',
+        'active'       => true,
+        'show_in_rest' => 1,
+    ));
+});
