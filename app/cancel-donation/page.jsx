@@ -1,4 +1,5 @@
 "use client";
+import { useLanguage } from "@/app/context/LanguageContext";
 
 import React, { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
@@ -9,6 +10,7 @@ export const dynamic = "force-dynamic";
 
 // Wrapper component that uses useSearchParams
 const CancelDonationWrapper = () => {
+  const { t, localize } = useLanguage();
     const searchParams = useSearchParams();
     const recId = searchParams.get('recId');
     const token = searchParams.get('token') || '';
@@ -56,7 +58,7 @@ const CancelDonationWrapper = () => {
     if (loading) {
         return (
             <div className="flex justify-center items-center h-screen">
-                <p>მოთხოვნა მუშავდება...</p>
+                <p>{t("მოთხოვნა მუშავდება...")}</p>
             </div>
         );
     }

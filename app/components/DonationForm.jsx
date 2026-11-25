@@ -1,4 +1,5 @@
 "use client";
+import { useLanguage } from "@/app/context/LanguageContext";
 
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import Image from "next/image";
@@ -64,16 +65,14 @@ const PaymentMessage = ({ message, isError, onClose }) => {
 // Recurring Payment Modal (if needed)
 // -------------------------
 const Modal = ({ show, handleClose, handleConfirm }) => {
+  const { t, localize } = useLanguage();
   if (!show) return null;
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50" onClick={handleClose}>
       <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full" onClick={(e) => e.stopPropagation()}>
-        <h2 className="text-xl font-semibold mb-4">ყოველთვიური გადახდა</h2>
+        <h2 className="text-xl font-semibold mb-4">{t("ყოველთვიური გადახდა")}</h2>
         <p className="mb-6">
-          ბარათის მონაცემები შეინახება და ყოველთვიურად ავტომატურად ჩამოგეჭრებათ
-          მითითებული თანხა. გადახდის დღემდე 2 დღით ადრე მიიღებთ გამაფრთხილებელ
-          შეტყობინებას. გამოწერის გაუქმება შეგიძლიათ ნებისმიერ დროს. თუკი
-          ეთანხმებით, დააჭირეთ ღილაკს - ვადასტურებ
+          {t("ბარათის მონაცემები შეინახება და ყოველთვიურად ავტომატურად ჩამოგეჭრებათ მითითებული თანხა. გადახდის დღემდე 2 დღით ადრე მიიღებთ გამაფრთხილებელ შეტყობინებას. გამოწერის გაუქმება შეგიძლიათ ნებისმიერ დროს. თუკი ეთანხმებით, დააჭირეთ ღილაკს - ვადასტურებ")}
         </p>
         <div className="flex justify-end gap-4">
          
@@ -81,7 +80,7 @@ const Modal = ({ show, handleClose, handleConfirm }) => {
             className="bg-[#AD88C6] text-white p-2 rounded hover:bg-[#9B7EBD]"
             onClick={handleConfirm}
           >
-            ვადასტურებ
+            {t("ვადასტურებ")}
           </button>
         </div>
       </div>
@@ -93,6 +92,7 @@ const Modal = ({ show, handleClose, handleConfirm }) => {
 // DonationForm Component
 // -------------------------
 const DonationForm = () => {
+  const { t, localize } = useLanguage();
   const [formData, setFormData] = useState({
     donationAmount: "",
     donorName: "",
@@ -337,7 +337,7 @@ const DonationForm = () => {
           width={20}
           height={20}
         />
-        <h1 className="text-[18px] font-semibold">დონაცია</h1>
+        <h1 className="text-[18px] font-semibold">{t("დონაცია")}</h1>
       </div>
 
       <PaymentMessage
@@ -372,7 +372,7 @@ const DonationForm = () => {
           }
         `}
               >
-                {label}
+                {t(label)}
               </button>
             );
           })}
@@ -413,7 +413,7 @@ const DonationForm = () => {
           name="donationAmount"
           value={formData.donationAmount}
           onChange={handleInputChange}
-          placeholder="ლარი"
+          placeholder={t("ლარი")}
           min="1"
           max="50000"
           step="1"
@@ -426,7 +426,7 @@ const DonationForm = () => {
           name="donorName"
           value={formData.donorName}
           onChange={handleInputChange}
-          placeholder="სახელი *"
+          placeholder={t("სახელი *")}
           className="p-3 rounded-lg border border-gray-300 w-full"
           required
         />
@@ -436,7 +436,7 @@ const DonationForm = () => {
           name="donorEmail"
           value={formData.donorEmail}
           onChange={handleInputChange}
-          placeholder="ელ-ფოსტა *"
+          placeholder={t("ელ-ფოსტა *")}
           className="p-3 rounded-lg border border-gray-300 w-full"
           required
         />
@@ -446,7 +446,7 @@ const DonationForm = () => {
           name="donorPhone"
           value={formData.donorPhone}
           onChange={handleInputChange}
-          placeholder="ტელეფონის ნომერი"
+          placeholder={t("ტელეფონის ნომერი")}
           className="p-3 rounded-lg border border-gray-300 w-full"
         />
 
@@ -463,16 +463,13 @@ const DonationForm = () => {
               onChange={handleRecurringChange}
               className="mr-2"
             />
-            ყოველთვიური გადახდა
+            {t("ყოველთვიური გადახდა")}
           </label>
           {showTooltip && (
             <div className="absolute z-10 top-full left-0 mt-2 w-72 p-3 bg-white border border-gray-300 rounded shadow-md text-sm text-gray-700">
-              <p className="font-semibold mb-2">ყოველთვიური გადახდა</p>
+              <p className="font-semibold mb-2">{t("ყოველთვიური გადახდა")}</p>
               <p>
-                ბარათის მონაცემები შეინახება და ყოველთვიურად ავტომატურად
-                ჩამოგეჭრებათ მითითებული თანხა. გადახდის დღემდე 2 დ" + "ღით ადრე
-                მიიღებთ გამაფრთხილებელ შეტყობინებას. გამოწერის გაუქმება
-                შეგიძლიათ ნებისმიერ დროს."
+                {t("ბარათის მონაცემები შეინახება და ყოველთვიურად ავტომატურად ჩამოგეჭრებათ მითითებული თანხა. გადახდის დღემდე 2 დღით ადრე მიიღებთ გამაფრთხილებელ შეტყობინებას. გამოწერის გაუქმება შეგიძლიათ ნებისმიერ დროს.")}
               </p>
             </div>
           )}
@@ -485,7 +482,7 @@ const DonationForm = () => {
           className="bg-[#AD88C6] w-full text-white p-3 rounded-lg mt-4 hover:scale-105 transition-transform duration-300 disabled:opacity-50"
           disabled={loading}
         >
-          {loading ? "მუშაობდა.." : "გადახდა"}
+          {loading ? t("მუშაობდა..") : t("გადახდა")}
         </button>
 
         {/* -------------------------
@@ -494,7 +491,7 @@ const DonationForm = () => {
         {!formData.isRecurring && (
           <>
             <p className="text-xs text-gray-500 text-center -mb-3">
-              PayPal გადახდა ხორციელდება USD ვალუტაში
+              {t("PayPal გადახდა ხორციელდება USD ვალუტაში")}
             </p>
             <PayPalButton
               getDonationData={getDonationData}
@@ -511,27 +508,23 @@ const DonationForm = () => {
             }`}
             onClick={() => setShowTerms(!showTerms)}
           >
-            {showTerms ? "დახურვა" : "მომსახურების პირობები"}
+            {showTerms ? t("დახურვა") : t("მომსახურების პირობები")}
           </p>
           {showTerms && (
             <div className="text-sm text-gray-700 mt-2">
               <p>
-                <strong>მომსახურების პირობები:</strong>
+                <strong>{t("მომსახურების პირობები:")}</strong>
               </p>
               <p>
-                1. დონაცია არის ნებაყოფლობითი და არ ექვემდებარება დაბრუნებას.
+                {t("1. დონაცია არის ნებაყოფლობითი და არ ექვემდებარება დაბრუნებას.")}
                 <br />
-                2. შეგიძლიათ აირჩიოთ ერთჯერადი ან ყოველთვიური დონაცია.
+                {t("2. შეგიძლიათ აირჩიოთ ერთჯერადი ან ყოველთვიური დონაცია.")}
                 <br />
-                3. ყოველთვიური დონაცია ავტომატურად ჩამოიჭრება თქვენს მიერ
-                მითითებული ბარათიდან, ხოლო გადახდის წინ მიიღებთ გამაფრთხილებელ
-                შეტყობინებას.
+                {t("3. ყოველთვიური დონაცია ავტომატურად ჩამოიჭრება თქვენს მიერ მითითებული ბარათიდან, ხოლო გადახდის წინ მიიღებთ გამაფრთხილებელ შეტყობინებას.")}
                 <br />
-                4. ყოველთვიური დონაციის გაუქმება შეგიძლიათ ნებისმიერ დროს,
-                გაუქმების ბმული გამოგეგზავნებათ ელ-ფოსტაზე.
+                {t("4. ყოველთვიური დონაციის გაუქმება შეგიძლიათ ნებისმიერ დროს, გაუქმების ბმული გამოგეგზავნებათ ელ-ფოსტაზე.")}
                 <br />
-                5. ყველა გადახდა უსაფრთხოდ მუშავდება TBC ბანკის სისტემებით. ჩვენ
-                არ ვინახავთ ბარათის ინფორმაციის მონაცემთა ბაზაში.
+                {t("5. ყველა გადახდა უსაფრთხოდ მუშავდება TBC ბანკის სისტემებით. ჩვენ არ ვინახავთ ბარათის ინფორმაციის მონაცემთა ბაზაში.")}
               </p>
             </div>
           )}
@@ -542,35 +535,29 @@ const DonationForm = () => {
             }`}
             onClick={() => setShowPrivacy(!showPrivacy)}
           >
-            {showPrivacy ? "დახურვა" : "კონფიდენციალურობის პოლიტიკა"}
+            {showPrivacy ? t("დახურვა") : t("კონფიდენციალურობის პოლიტიკა")}
           </p>
           {showPrivacy && (
             <div className="text-sm text-gray-700 mt-2">
               <p>
-                <strong>კონფიდენციალურობის პოლიტიკა:</strong>
+                <strong>{t("კონფიდენციალურობის პოლიტიკა:")}</strong>
               </p>
               <p>
-                1. ჩვენ ვაგროვებთ მხოლოდ იმ მონაცემებს, რომლებიც საჭიროა
-                ტრანზაქციის დასამუშავებლად: სახელი, ელ-ფოსტა და (სურვილისამებრ)
-                ტელეფონის ნომერი.
+                {t("1. ჩვენ ვაგროვებთ მხოლოდ იმ მონაცემებს, რომლებიც საჭიროა ტრანზაქციის დასამუშავებლად: სახელი, ელ-ფოსტა და (სურვილისამებრ) ტელეფონის ნომერი.")}
                 <br />
-                2. თქვენი ბარათის მონაცემები უსაფრთხოდ მუშავდება TBC ბანკის
-                მიერ. ჩვენ არ ვინახავთ ბარათის დეტალებს ჩვენს მონაცემთა ბაზაში.
+                {t("2. თქვენი ბარათის მონაცემები უსაფრთხოდ მუშავდება TBC ბანკის მიერ. ჩვენ არ ვინახავთ ბარათის დეტალებს ჩვენს მონაცემთა ბაზაში.")}
                 <br />
-                3. თქვენი მონაცემები არ გადაეცემა მესამე მხარეებს სარეკლამო
-                მიზნებისთვის.
+                {t("3. თქვენი მონაცემები არ გადაეცემა მესამე მხარეებს სარეკლამო მიზნებისთვის.")}
                 <br />
-                4. ყოველთვიური დონაციის შემთხვევაში, ბარათის ინფორმაცია ინახება
-                ბანკის სისტემებში მომდევნო გადახდებისთვის.
+                {t("4. ყოველთვიური დონაციის შემთხვევაში, ბარათის ინფორმაცია ინახება ბანკის სისტემებში მომდევნო გადახდებისთვის.")}
                 <br />
-                5. თქვენ გაქვთ უფლება მოითხოვოთ თქვენი მონაცემების წაშლა ან
-                შეცვლა ნებისმიერ დროს.
+                {t("5. თქვენ გაქვთ უფლება მოითხოვოთ თქვენი მონაცემების წაშლა ან შეცვლა ნებისმიერ დროს.")}
               </p>
             </div>
           )}
 
           <p className="text-xs font-light text-gray-700 mt-10">
-            მიმღები: შპს. მაუწყებელი 2021
+            {t("მიმღები: შპს. მაუწყებელი 2021")}
           </p>
         </div>
       </form>

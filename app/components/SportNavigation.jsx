@@ -1,4 +1,5 @@
 'use client';
+import { useLanguage } from "@/app/context/LanguageContext";
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -8,6 +9,7 @@ import Search from './Search';
 import LanguageSwitcher from './LanguageSwitcher';
 
 const SportNavigation = () => {
+  const { t, localize } = useLanguage();
   const { isMenuOpen, setIsMenuOpen } = useMenu();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isCategoriesOpen, setIsCategoriesOpen] = useState(false);
@@ -69,12 +71,12 @@ const SportNavigation = () => {
           {navItems.map((item) => (
             <Link
               key={item.label}
-              href={item.href}
+              href={localize(item.href)}
               className="nav-item relative px-5 py-4 font-medium transition-all duration-200 group text-[#474F7A]/90 hover:text-[#5F4AA5]"
             >
               <span className="absolute inset-0 bg-transparent group-hover:bg-[#FECE27]/20 transition-colors duration-200 rounded-sm" />
               <span className="absolute bottom-2 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-[#FECE27] group-hover:w-3/4 transition-all duration-300 rounded-full" />
-              <span className="relative">{item.label}</span>
+              <span className="relative">{t(item.label)}</span>
             </Link>
           ))}
         </ul>
@@ -92,17 +94,17 @@ const SportNavigation = () => {
             {navItems.map((item) => (
               <Link
                 key={item.label}
-                href={item.href}
+                href={localize(item.href)}
                 className="py-2 hover:translate-x-1 transition-transform duration-200"
               >
-                {item.label}
+                {t(item.label)}
               </Link>
             ))}
             <button
               onClick={toggleCategories}
               className="text-white text-[15px] flex items-center gap-2 py-2 mt-2"
             >
-              კატეგორიები
+              {t("კატეგორიები")}
               <svg
                 className={`w-4 h-4 transition-transform ${isCategoriesOpen ? 'rotate-180' : ''}`}
                 fill="currentColor"
@@ -112,41 +114,41 @@ const SportNavigation = () => {
               </svg>
             </button>
             <ul className={`${isCategoriesOpen ? 'flex' : 'hidden'} flex-col gap-4 pl-4`}>
-              <Link href="/shroma" className="flex flex-row gap-3 items-center">
+              <Link href={localize("/shroma")} className="flex flex-row gap-3 items-center">
                 <Image src="/images/shroma-white.svg" alt="" width={20} height={20} />
-                <span>შრომა</span>
+                <span>{t("შრომა")}</span>
               </Link>
-              <Link href="/mecniereba" className="flex flex-row gap-3 items-center">
+              <Link href={localize("/mecniereba")} className="flex flex-row gap-3 items-center">
                 <Image src="/images/mecniereba-white.svg" alt="" width={20} height={20} />
-                <span>მეცნიერება</span>
+                <span>{t("მეცნიერება")}</span>
               </Link>
-              <Link href="/ekonomika" className="flex flex-row gap-3 items-center">
+              <Link href={localize("/ekonomika")} className="flex flex-row gap-3 items-center">
                 <Image src="/images/ekonomika-white.svg" alt="" width={20} height={20} />
-                <span>ეკონომიკა</span>
+                <span>{t("ეკონომიკა")}</span>
               </Link>
-              <Link href="/medicina" className="flex flex-row gap-3 items-center">
+              <Link href={localize("/medicina")} className="flex flex-row gap-3 items-center">
                 <Image src="/images/medicina-white.svg" alt="" width={20} height={20} />
-                <span>მედიცინა</span>
+                <span>{t("მედიცინა")}</span>
               </Link>
-              <Link href="/xelovneba" className="flex flex-row gap-3 items-center">
+              <Link href={localize("/xelovneba")} className="flex flex-row gap-3 items-center">
                 <Image src="/images/xelovneba-white.svg" alt="" width={20} height={20} />
-                <span>ხელოვნება</span>
+                <span>{t("ხელოვნება")}</span>
               </Link>
-              <Link href="/kalaki" className="flex flex-row gap-3 items-center">
+              <Link href={localize("/kalaki")} className="flex flex-row gap-3 items-center">
                 <Image src="/images/kalaki-white.svg" alt="" width={20} height={20} />
-                <span>ქალაქი</span>
+                <span>{t("ქალაქი")}</span>
               </Link>
-              <Link href="/resursebi" className="flex flex-row gap-3 items-center">
+              <Link href={localize("/resursebi")} className="flex flex-row gap-3 items-center">
                 <Image src="/images/resursebi-white.svg" alt="" width={20} height={20} />
-                <span>რესურსები</span>
+                <span>{t("რესურსები")}</span>
               </Link>
-              <Link href="/msoflio" className="flex flex-row gap-3 items-center">
+              <Link href={localize("/msoflio")} className="flex flex-row gap-3 items-center">
                 <Image src="/images/msoflio-white.svg" alt="" width={20} height={20} />
-                <span>მსოფლიო</span>
+                <span>{t("მსოფლიო")}</span>
               </Link>
-              <Link href="/saxli" className="flex flex-row gap-3 items-center">
+              <Link href={localize("/saxli")} className="flex flex-row gap-3 items-center">
                 <Image src="/images/saxli-white.svg" alt="" width={20} height={20} />
-                <span>სახლი ყველას</span>
+                <span>{t("სახლი ყველას")}</span>
               </Link>
             </ul>
           </div>

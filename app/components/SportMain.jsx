@@ -1,4 +1,5 @@
 'use client';
+import { useLanguage } from "@/app/context/LanguageContext";
 
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
@@ -22,6 +23,7 @@ const BulletsNavigation = ({ slides, currentSlide, onSelectSlide }) => {
 };
 
 const SportMain = () => {
+  const { t, localize } = useLanguage();
   const [slides, setSlides] = useState([]);
   const [currentSlide, setCurrentSlide] = useState(0);
 
@@ -76,7 +78,7 @@ const SportMain = () => {
               />
               <div className="absolute bottom-5 left-5 text-white">
                 <h2 className="text-[#FECE27] text-[20px] font-extrabold">
-                  დღის მთავარი ამბები
+                  {t("დღის მთავარი ამბები")}
                 </h2>
                 <p className="text-[#fff] lg:text-[72px] sm:text-[30px]">
                   {slide.title.rendered.split(' ').slice(0, 7).join(' ')}
@@ -121,7 +123,7 @@ const SportMain = () => {
               />
               <div className="absolute top-48 left-24 text-white">
                 <h2 className="bg-[#FECE27] text-[#474F7A] rounded-[4px] pl-[8px] pr-[8px] pt-[4px] pb-[4px] text-[12px] font-extrabold">
-                  დღის მთავარი ამბები
+                  {t("დღის მთავარი ამბები")}
                 </h2>
                 <p className="text-[#fff] lg:text-[72px] mt-5 sm:text-[30px]">
                   {slide.title.rendered.split(' ').slice(0, 7).join(' ')}

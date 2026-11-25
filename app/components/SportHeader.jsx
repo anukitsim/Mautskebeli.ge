@@ -1,10 +1,12 @@
 "use client";
+import { useLanguage } from "@/app/context/LanguageContext";
 
 import Image from "next/image";
 import Link from "next/link";
 import LanguageSwitcher from "./LanguageSwitcher";
 
 const SportHeader = () => {
+  const { t, localize } = useLanguage();
   return (
     <header className="relative h-16 sm:h-20 w-full flex flex-col items-start overflow-visible border-b border-white/10">
       <div className="absolute inset-0 bg-[#AD88C6]" />
@@ -19,10 +21,10 @@ const SportHeader = () => {
         }}
       />
       <div className="relative z-10 w-11/12 sm:w-10/12 mx-auto mt-3 sm:mt-5 flex justify-between items-center overflow-visible h-1/2">
-        <Link href="/" className="flex-shrink-0">
+        <Link href={localize("/")} className="flex-shrink-0">
           <Image
             src="/images/sport-logo.svg"
-            alt="სპორტი logo"
+            alt={t("სპორტი logo")}
             width={116}
             height={40}
             className="w-[90px] h-[31px] sm:w-[116px] sm:h-[40px]"
@@ -31,7 +33,7 @@ const SportHeader = () => {
         </Link>
         <div className="flex gap-2 sm:gap-4 items-center overflow-visible">
           <Link
-            href="/donation"
+            href={localize("/donation")}
             className="relative inline-flex items-center gap-1.5 sm:gap-2.5 text-[10px] sm:text-xs font-semibold
               px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-full
               bg-[#FECE27] text-[#5F4AA5]
@@ -46,7 +48,7 @@ const SportHeader = () => {
               height={16}
               className="w-[16px] h-[16px] sm:w-[20px] sm:h-[20px]"
             />
-            <span className="hidden sm:inline">გააძლიერე მაუწყებელი</span>
+            <span className="hidden sm:inline">{t("გააძლიერე მაუწყებელი")}</span>
           </Link>
           <LanguageSwitcher variant="header" />
         </div>

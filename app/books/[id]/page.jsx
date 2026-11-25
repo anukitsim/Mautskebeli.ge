@@ -1,3 +1,8 @@
+import { getLang } from "@/utils/i18n/server";
+import { englishIfNeeded } from '@/utils/translate/server';
+import MachineTranslationNote from '@/app/components/MachineTranslationNote';
+import { translateUi } from "@/utils/i18n/dictionary";
+import { localizePath } from "@/utils/i18n/paths";
 import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import moment from 'moment';
@@ -36,7 +41,7 @@ async function fetchBook(id) {
 // Generate Metadata for the Book
 export async function generateMetadata({ params }) {
   const { id } = params;
-  const book = await fetchBook(id);
+  const book = await englishIfNeeded(await fetchBook(id));
 
   if (!book) {
     return {
@@ -91,6 +96,7 @@ export async function generateMetadata({ params }) {
 }
 
 function formatDate(dateString) {
+  if (getLang() === 'en') return new Intl.DateTimeFormat('en-GB', { dateStyle: 'long', timeZone: 'UTC' }).format(new Date(`${dateString}Z`));
   moment.locale('ka');
   return moment(dateString).format('LL');
 }
@@ -152,8 +158,11 @@ function getSanitizedContent(content) {
 }
 
 const BookPage = async ({ params }) => {
+  const lang = getLang();
+  const t = (ka) => translateUi(lang, ka);
+  const localize = (path) => localizePath(path, lang);
   const { id } = params;
-  const book = await fetchBook(id);
+  const book = await englishIfNeeded(await fetchBook(id));
 
   if (!book) {
     notFound();
@@ -208,6 +217,7 @@ const BookPage = async ({ params }) => {
           {book.formattedDate}
         </p>
 
+        <MachineTranslationNote />
         <div
           data-reading-body
           className="text-[#474F7A] text-[14px] sm:text-[16px] font-normal lg:text-justify leading-[30px] sm:leading-[35px] mt-5"

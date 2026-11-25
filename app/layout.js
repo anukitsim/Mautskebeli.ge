@@ -1,5 +1,6 @@
 // app/layout.js - Root Layout for entire application
 
+import { localizeMetadata } from '@/utils/i18n/metadata';
 import "../style/globals.css";
 import { Noto_Sans_Georgian } from "next/font/google";
 import localFont from "next/font/local";
@@ -11,7 +12,7 @@ import { getLang } from "@/utils/i18n/server";
 // ──────────────────────────
 //  Metadata (title, OG, etc.)
 // ──────────────────────────
-export const metadata = {
+const metadataKa = {
   title:       "მაუწყებელი",
   description: "მედია პლატფორმა მაუწყებელი",
   app_id:      "1819807585106457",
@@ -33,6 +34,11 @@ export const metadata = {
     images: ["/images/logo.png"]
   }
 };
+
+// English pages get the English title (utils/i18n/metadata.js).
+export function generateMetadata() {
+  return localizeMetadata(metadataKa);
+}
 
 // ──────────────────────────
 //  Google Font

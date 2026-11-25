@@ -1,15 +1,17 @@
 // app/free-column/[id]/ShareButtons.jsx
 
 'use client';
+import { useLanguage } from "@/app/context/LanguageContext";
 
 import { useState, useEffect } from 'react';
 import { FacebookShareButton, FacebookIcon, TwitterShareButton, TwitterIcon } from 'next-share';
 import Image from 'next/image';
 
 const ShareButtons = ({ freeColumnId, title }) => {
+  const { t, localize } = useLanguage();
   const [showShareOptions, setShowShareOptions] = useState(false);
   const [copied, setCopied] = useState(false);
-  const shareUrl = `https://www.mautskebeli.ge/free-column/${freeColumnId}`;
+  const shareUrl = `https://www.mautskebeli.ge${localize(`/free-column/${freeColumnId}`)}`;
 
   const closeShareOptions = () => {
     setShowShareOptions(false);
@@ -69,7 +71,7 @@ const ShareButtons = ({ freeColumnId, title }) => {
             style={{ backgroundColor: 'rgba(0, 0, 0, 0.30)' }}
             onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside the modal
           >
-            <h2 className="text-xl text-white font-bold mb-4">გააზიარე</h2>
+            <h2 className="text-xl text-white font-bold mb-4">{t("გააზიარე")}</h2>
             <div className="flex items-center pt-7 gap-5">
               <FacebookShareButton url={shareUrl} quote={title}>
                 <FacebookIcon size={44} round={true} />
@@ -80,7 +82,7 @@ const ShareButtons = ({ freeColumnId, title }) => {
               <div className="relative">
                 <button
                   onClick={handleCopyLink}
-                  aria-label="ბმულის კოპირება"
+                  aria-label={t("ბმულის კოპირება")}
                   className="w-11 h-11 rounded-full bg-white/90 hover:bg-white flex items-center justify-center transition-colors"
                 >
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#474F7A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -90,7 +92,7 @@ const ShareButtons = ({ freeColumnId, title }) => {
                 </button>
                 {copied && (
                   <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-black text-white text-xs px-2 py-1 rounded whitespace-nowrap">
-                    დაკოპირდა!
+                    {t("დაკოპირდა!")}
                   </span>
                 )}
               </div>

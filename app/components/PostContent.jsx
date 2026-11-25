@@ -1,10 +1,12 @@
 "use client";
+import { useLanguage } from "@/app/context/LanguageContext";
 
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import AlbumSlider from './AlbumSlider';
 
 const PostContent = ({ post, error }) => {
+  const { t, localize } = useLanguage();
   const [showShareOptions, setShowShareOptions] = useState(false);
 
   useEffect(() => {
@@ -84,7 +86,7 @@ const PostContent = ({ post, error }) => {
                 width={24}
                 height={24}
               />
-              გაზიარება
+              {t("გაზიარება")}
             </button>
             <a
               href={generatePermalink(post.id)}
@@ -99,13 +101,13 @@ const PostContent = ({ post, error }) => {
                 width={24}
                 height={24}
               />
-              იხილე პოსტი
+              {t("იხილე პოსტი")}
             </a>
           </div>
           {showShareOptions && (
             <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
               <div className="rounded-lg p-6 w-80">
-                <h2 className="text-xl text-white font-bold mb-4">გააზიარე</h2>
+                <h2 className="text-xl text-white font-bold mb-4">{t("გააზიარე")}</h2>
                 <button
                   onClick={shareOnFacebook}
                   className="w-full text-left px-4 py-2 mb-2 text-[#474F7A] bg-white hover:bg-gray-200 rounded"
@@ -134,7 +136,7 @@ const PostContent = ({ post, error }) => {
                   onClick={() => setShowShareOptions(false)}
                   className="w-full text-left px-4 py-2 mt-4 text-[#474F7A] bg-white hover:bg-gray-200 rounded"
                 >
-                  გათიშვა
+                  {t("გათიშვა")}
                 </button>
               </div>
             </div>

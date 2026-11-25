@@ -1,10 +1,12 @@
 'use client';
+import { useLanguage } from "@/app/context/LanguageContext";
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 
 const AllArticlesPage = () => {
+  const { t, localize } = useLanguage();
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -73,7 +75,7 @@ const AllArticlesPage = () => {
   return (
     <section className="mx-auto flex flex-col overflow-hidden">
       <div className="w-full sm:w-11/12 md:w-10/12 lg:w-10/12 xl:w-9/12 mx-auto">
-        <p className="text-[#474F7A] text-[24px] font-bold mt-5 lg:mt-20 pl-4 lg:pl-2">ყველა სტატია</p>
+        <p className="text-[#474F7A] text-[24px] font-bold mt-5 lg:mt-20 pl-4 lg:pl-2">{t("ყველა სტატია")}</p>
         <button onClick={refreshArticles} className="mb-5 p-2 bg-[#AD88C6] text-white rounded">
           Refresh Articles
         </button>
@@ -111,7 +113,7 @@ const AllArticlesPage = () => {
                         {article.acf.translator} 
                       </span>
                       <button className="text-white text-[12px] mt-[16px] bg-[#AD88C6] rounded-[6px] pt-[10px] pb-[10px] pl-[12px] pr-[12px]">
-                        ნახეთ სრულად
+                        {t("ნახეთ სრულად")}
                       </button>
                     </div>
                   </div>

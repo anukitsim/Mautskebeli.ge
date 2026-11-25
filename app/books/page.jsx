@@ -1,3 +1,4 @@
+import { englishIfNeeded } from '@/utils/translate/server';
 import ClientSideBooks from './ClientSideBooks';
 
 // Server-side function to fetch the initial books with caching disabled
@@ -9,7 +10,7 @@ async function fetchInitialBooks() {
   if (!res.ok) {
     throw new Error('Failed to fetch books');
   }
-  return res.json();
+  return englishIfNeeded(await res.json());
 }
 
 // Server Component: Fetches data server-side and passes it to the client component

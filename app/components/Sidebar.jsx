@@ -1,7 +1,10 @@
+"use client";
+import { useLanguage } from "@/app/context/LanguageContext";
 import Link from "next/link";
 import Image from "next/image";
 
 const Sidebar = () => {
+  const { t, localize } = useLanguage();
   return (
     <aside
       className="lg:flex lg:flex-col hidden items-start justify-center lg:w-3/12 py-8 px-6 rounded-[16px] border border-lilac-20 bg-lilac-20/20 shadow-md md:w-64 flex-shrink-0 self-stretch min-h-0"
@@ -15,11 +18,11 @@ const Sidebar = () => {
       }}
     >
       <div className="flex flex-col gap-7 w-full">
-      <Link href="/shroma" className="flex flex-row gap-3">
+      <Link href={localize("/shroma")} className="flex flex-row gap-3">
         <Image src="/images/shroma.svg" alt="shroma" width={0} height={0} style={{ width: 'auto', height: '20px' }} />
-        <span className="text-[#222] text-[15px]">შრომა</span>
+        <span className="text-[#222] text-[15px]">{t("შრომა")}</span>
       </Link>
-      <Link href="/mecniereba" className="flex flex-row gap-3">
+      <Link href={localize("/mecniereba")} className="flex flex-row gap-3">
         <Image
           src="/images/mecniereba.svg"
           alt="mecniereba"
@@ -27,9 +30,9 @@ const Sidebar = () => {
           height={0}
           style={{ width: 'auto', height: '20px' }}
         />
-        <span className="text-[#222] text-[15px]">მეცნიერება</span>
+        <span className="text-[#222] text-[15px]">{t("მეცნიერება")}</span>
       </Link>
-      <Link href="/ekonomika" className="flex flex-row gap-3">
+      <Link href={localize("/ekonomika")} className="flex flex-row gap-3">
         <Image
           src="/images/ekonomika.svg"
           alt="ekonomika"
@@ -37,9 +40,9 @@ const Sidebar = () => {
           height={0}
           style={{ width: 'auto', height: '20px' }}
         />
-        <span className="text-[#222] text-[15px]">ეკონომიკა</span>
+        <span className="text-[#222] text-[15px]">{t("ეკონომიკა")}</span>
       </Link>
-      <Link href="/medicina" className="flex flex-row gap-3">
+      <Link href={localize("/medicina")} className="flex flex-row gap-3">
         <Image
           src="/images/medicina.svg"
           alt="medicina"
@@ -47,9 +50,9 @@ const Sidebar = () => {
           height={0}
           style={{ width: 'auto', height: '20px' }}
         />
-        <span className="text-[#222] text-[15px]">მედიცინა</span>
+        <span className="text-[#222] text-[15px]">{t("მედიცინა")}</span>
       </Link>
-      <Link href="/xelovneba" className="flex flex-row gap-3">
+      <Link href={localize("/xelovneba")} className="flex flex-row gap-3">
         <Image
           src="/images/xelovneba.svg"
           alt="xelovneba"
@@ -57,9 +60,9 @@ const Sidebar = () => {
           height={0}
           style={{ width: 'auto', height: '20px' }}
         />
-        <span className="text-[#222] text-[15px]">ხელოვნება</span>
+        <span className="text-[#222] text-[15px]">{t("ხელოვნება")}</span>
       </Link>
-      <Link href="/kalaki" className="flex flex-row gap-3">
+      <Link href={localize("/kalaki")} className="flex flex-row gap-3">
         <Image
           src="/images/qalaqi.svg"
           alt="qalaqi"
@@ -67,9 +70,9 @@ const Sidebar = () => {
           height={0}
           style={{ width: 'auto', height: '20px' }}
         />
-        <span className="text-[#222] text-[15px]">ქალაქი</span>
+        <span className="text-[#222] text-[15px]">{t("ქალაქი")}</span>
       </Link>
-      <Link href="/resursebi" className="flex flex-row gap-3">
+      <Link href={localize("/resursebi")} className="flex flex-row gap-3">
         <Image
           src="/images/resursebi.svg"
           alt="msoplio"
@@ -77,9 +80,9 @@ const Sidebar = () => {
           height={0}
           style={{ width: 'auto', height: '20px' }}
         />
-        <span className="text-[#222] text-[15px]">რესურსები</span>
+        <span className="text-[#222] text-[15px]">{t("რესურსები")}</span>
       </Link>
-      <Link href="/msoflio" className="flex flex-row gap-3">
+      <Link href={localize("/msoflio")} className="flex flex-row gap-3">
         <Image
           src="/images/msoflio.svg"
           alt="msoflio"
@@ -87,9 +90,9 @@ const Sidebar = () => {
           height={0}
           style={{ width: 'auto', height: '20px' }}
         />
-        <span className="text-[#222] text-[15px]">მსოფლიო</span>
+        <span className="text-[#222] text-[15px]">{t("მსოფლიო")}</span>
       </Link>
-      <Link href="/saxli" className="flex flex-row gap-3">
+      <Link href={localize("/saxli")} className="flex flex-row gap-3">
         <Image
           src="/images/saxli.svg"
           alt="`saxli`-yvelas"
@@ -97,7 +100,7 @@ const Sidebar = () => {
           height={0}
           style={{ width: 'auto', height: '20px' }}
         />
-        <span className="text-[#222] text-[15px]">სახლი ყველას</span>
+        <span className="text-[#222] text-[15px]">{t("სახლი ყველას")}</span>
       </Link>
       </div>
     </aside>

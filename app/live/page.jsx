@@ -1,3 +1,6 @@
+import { getLang } from "@/utils/i18n/server";
+import { translateUi } from "@/utils/i18n/dictionary";
+import { localizePath } from "@/utils/i18n/paths";
 import Image from "next/image"
 import Link from "next/link"
 
@@ -5,6 +8,9 @@ import Link from "next/link"
 export const dynamic = 'force-dynamic'
 
 const page = () => {
+  const lang = getLang();
+  const t = (ka) => translateUi(lang, ka);
+  const localize = (path) => localizePath(path, lang);
   return (
     <>
     <section className='w-10/12 mx-auto flex lg:flex-row flex-col justify-center gap-[20px] mt-[100px]'>
@@ -15,7 +21,7 @@ const page = () => {
               width={270}
               height={180}
             />
-            <p>მაუწყებელი პოდკასტი</p>
+            <p>{t("მაუწყებელი პოდკასტი")}</p>
         </Link>
         <Link href='/facebook-live' className='lg:w-4/12 w-full hover:scale-105 h-[280px] flex-col rounded-[16px] border border-[#E0DBE8] flex justify-center items-center'>
         <Image
@@ -24,7 +30,7 @@ const page = () => {
               width={270}
               height={180}
             />
-             <p>მაუწყებელი ფეისბუქზე</p>
+             <p>{t("მაუწყებელი ფეისბუქზე")}</p>
         </Link>
     </section>
     </>

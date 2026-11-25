@@ -24,6 +24,8 @@ import {
   getPublishedTranslations,
   articleUrl,
 } from '../translations';
+import { getLang } from '@/utils/i18n/server';
+import { translateUi } from '@/utils/i18n/dictionary';
 import ReadingTracker from '../../../components/ReadingTracker';
 import { createReadingTicket } from '@/utils/stats/ticket';
 
@@ -138,6 +140,7 @@ const TranslatedArticlePage = async ({ params }) => {
 
   const content = prepareArticleHtml(mainText);
   const ui = translation.ui;
+  const t = (ka) => translateUi(getLang(), ka);
 
   // Reading statistics. The stats database only accepts ka/en/ru for now,
   // so Armenian/Azerbaijani pages get no ticket (null = no tracker) until
@@ -170,7 +173,7 @@ const TranslatedArticlePage = async ({ params }) => {
                   : 'text-[#474F7A] hover:scale-110'
               }`}
             >
-              {category.name}
+              {t(category.name)}
             </a>
           ))}
         </div>

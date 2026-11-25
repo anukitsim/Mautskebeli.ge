@@ -1,11 +1,12 @@
 // app/free-column/layout.jsx
 
+import { localizeMetadata } from '@/utils/i18n/metadata';
 import Header from "../components/Header";
 import Navigation from "../components/Navigation";
 import { MenuProvider } from "@/app/context/MenuContext";
 import Footer from "../components/Footer";
 
-export const metadata = {
+const metadataKa = {
   title: "Mautskebeli - Free Columns",
   description: "Browse free columns on Mautskebeli.",
   openGraph: {
@@ -15,6 +16,11 @@ export const metadata = {
     siteName: "Mautskebeli",
   },
 };
+
+// English pages get the English title (utils/i18n/metadata.js).
+export function generateMetadata() {
+  return localizeMetadata(metadataKa);
+}
 
 // The <html>, <body>, Google Analytics and LanguageProvider come from
 // app/layout.js. A section layout must not add them again: a second

@@ -120,6 +120,101 @@ export const EN = {
   'მოთხოვნილი ამბავი ვერ მოიძებნა.': 'The requested news item could not be found.',
   'მოხდა შეცდომა. სცადეთ თავიდან.': 'Something went wrong. Please try again.',
 
+  // About us (hand-translated)
+  '„მაუწყებელი"': '“Mautskebeli”',
+  'დამოუკიდებელი ონლაინ მედია პლატფორმაა, რომელიც შეიქმნა იმ ადამიანების, თემებისა და ბრძოლების გასაშუქებლად, რომლებიც ხშირად დომინანტური მედიის დღის წესრიგს მიღმა რჩება. ჩვენი მიზანია კრიტიკული ჟურნალისტიკისა და სოციალური თხრობის საშუალებით საზოგადოებრივ დებატებში შემოვიტანოთ სოციალური უთანასწორობის, შრომითი ექსპლუატაციის, მიგრაციის, ადამიანის უფლებების და დემოკრატიის საკითხები.':
+    'is an independent online media platform created to cover the people, issues and struggles that often remain outside the agenda of the dominant media. Our aim is to bring social inequality, labour exploitation, migration, human rights and democracy into public debate through critical journalism and social storytelling.',
+  '„მაუწყებელი" მუშაობს პრინციპით, რომ ჟურნალისტიკა მხოლოდ ინფორმაციის მიწოდება არ არის, არამედ პასუხისმგებლობა, ზრუნვა და წინააღმდეგობის ფორმაა. ჩვენ ვაკავშირებთ ყოველდღიურობას ფართო სტრუქტურულ პროცესებთან — გლობალურ კაპიტალიზმთან, იმპერიალიზმსა და კოლონიალურ ძალაუფლების ფორმებთან, რომლებიც განსაზღვრავენ შრომის პირობებს, რესურსების განაწილებასა და ადამიანების გადაადგილებას. ჩვენ უარვყოფთ ნეიტრალურობის ილუზიას და ღიად ვიკავებთ მხარეს სოციალური სამართლიანობის სასარგებლოდ.':
+    '“Mautskebeli” works on the principle that journalism is not only the delivery of information, but a form of responsibility, care and resistance. We connect everyday life with broader structural processes — global capitalism, imperialism and colonial forms of power that shape working conditions, the distribution of resources and the movement of people. We reject the illusion of neutrality and openly take the side of social justice.',
+  '„მაუწყებელი" ფუნქციონირებს არაიერარქიული პრინციპებით. ჩვენ არ გვაქვს მკაცრი სარედაქციო ვერტიკალი, გადაწყვეტილებები მიიღება კოლექტიურად, თანამშრომლობისა და ურთიერთპასუხისმგებლობის საფუძველზე. ეს მიდგომა წარმოადგენს როგორც სამუშაო მეთოდს, ისე პოლიტიკურ პოზიციას, რომელიც ეწინააღმდეგება ძალაუფლების კონცენტრაციასა და დახურულ ინსტიტუციურ სტრუქტურებს.':
+    '“Mautskebeli” operates on non-hierarchical principles. We have no rigid editorial chain of command; decisions are made collectively, based on cooperation and mutual responsibility. This approach is both a way of working and a political position that opposes the concentration of power and closed institutional structures.',
+  'პლატფორმა მუშაობს დამოუკიდებლად, კომერციული და პოლიტიკური გავლენის გარეშე. „მაუწყებელი" არ ემსახურება ელიტურ ინტერესებს, ჩვენი ერთგულება მიმართულია საზოგადოებრივი ინტერესის, შრომითი ღირსებისა და სოციალური სამართლიანობისკენ.':
+    'The platform works independently, free from commercial and political influence. “Mautskebeli” does not serve elite interests; our commitment is to the public interest, the dignity of labour and social justice.',
+  'ჩვენ გვჯერა, რომ მედია შეიძლება იყოს სივრცე სოლიდარობისთვის, კრიტიკული აზრისთვის და კოლექტიური წინააღმდეგობისთვის.':
+    'We believe that media can be a space for solidarity, critical thought and collective resistance.',
+
+  // Donation page and form (hand-translated)
+  '"მაუწყებელს"': '"Mautskebeli"',
+  'თქვენი მხარდაჭერა სჭირდება!': 'needs your support!',
+  '“მაუწყებელი” დამოუკიდებელი სახალხო მედიაა, რომელსაც დღის წესრიგში შემოაქვს საზოგადოებისთვის მნიშვნელოვანი პოლიტიკური და სოციალური საკითხები.':
+    '“Mautskebeli” is an independent people’s media outlet that brings politically and socially important issues onto the public agenda.',
+  'ჩვენ ვაგრძელებთ მშრომელების დემოკრატიისა და თანასწორობისთვის ბრძოლის ტრადიციას - ბრძოლას იმ სიკეთეებისთვის, რომლებიც კაპიტალის მფლობელების ნებით არ მოგვცემია.':
+    'We continue the tradition of working people’s struggle for democracy and equality — a struggle for the gains that were never handed to us by the owners of capital.',
+  'დამოუკიდებელი და უკომპრომისო საქმიანობისათვის თქვენი მხარდაჭერა გვჭირდება.': 'We need your support to keep our work independent and uncompromising.',
+  'გააძლიერე სახალხო მედია': 'Strengthen people’s media',
+  'თქვენი დახმარებით ჩვენ შევძლებთ მაუწყებლობის გაფართოებას და მეტი ადამიანის ინფორმირებას, რაც არსებულ პოლიტიკურ გარემოში გადამწყვეტი მნიშვნელობისაა.':
+    'With your help we can broaden our reach and inform more people, which is crucial in the current political climate.',
+  '“მაუწყებლის” ფინანსურად გაძლიერება შეგიძლიათ, როგორც ერთდჯერადად, ასევე ყოველთვიურად. ჩვენთვის განსაკუთრებით მნიშვნელოვანია ყოველთვიური მხარდაჭერის პრაქტიკა, რაც მოგვცემს განვითარების საშუალებას.':
+    'You can support “Mautskebeli” financially with a one-time or a monthly donation. Monthly support matters to us most, because it allows us to grow.',
+  'გააძლიერე წინააღმდეგობა!': 'Strengthen the resistance!',
+  'ბარათის მონაცემები შეინახება და ყოველთვიურად ავტომატურად ჩამოგეჭრებათ მითითებული თანხა. გადახდის დღემდე 2 დღით ადრე მიიღებთ გამაფრთხილებელ შეტყობინებას. გამოწერის გაუქმება შეგიძლიათ ნებისმიერ დროს. თუკი ეთანხმებით, დააჭირეთ ღილაკს - ვადასტურებ':
+    'Your card details will be saved and the chosen amount will be charged automatically every month. You will get a reminder 2 days before each payment. You can cancel at any time. If you agree, press "I confirm".',
+  'ბარათის მონაცემები შეინახება და ყოველთვიურად ავტომატურად ჩამოგეჭრებათ მითითებული თანხა. გადახდის დღემდე 2 დღით ადრე მიიღებთ გამაფრთხილებელ შეტყობინებას. გამოწერის გაუქმება შეგიძლიათ ნებისმიერ დროს.':
+    'Your card details will be saved and the chosen amount will be charged automatically every month. You will get a reminder 2 days before each payment. You can cancel at any time.',
+  'ვადასტურებ': 'I confirm',
+  'მუშაობდა..': 'Processing…',
+  '1. ჩვენ ვაგროვებთ მხოლოდ იმ მონაცემებს, რომლებიც საჭიროა ტრანზაქციის დასამუშავებლად: სახელი, ელ-ფოსტა და (სურვილისამებრ) ტელეფონის ნომერი.':
+    '1. We only collect the data needed to process the transaction: name, email and (optionally) phone number.',
+  'PayPal გადახდა ხორციელდება USD ვალუტაში': 'PayPal payments are made in USD',
+  '1. დონაცია არის ნებაყოფლობითი და არ ექვემდებარება დაბრუნებას.': '1. Donations are voluntary and non-refundable.',
+  '2. შეგიძლიათ აირჩიოთ ერთჯერადი ან ყოველთვიური დონაცია.': '2. You can choose a one-time or a monthly donation.',
+  '3. ყოველთვიური დონაცია ავტომატურად ჩამოიჭრება თქვენს მიერ მითითებული ბარათიდან, ხოლო გადახდის წინ მიიღებთ გამაფრთხილებელ შეტყობინებას.':
+    '3. Monthly donations are charged automatically to the card you entered, and you will get a reminder before each payment.',
+  '4. ყოველთვიური დონაციის გაუქმება შეგიძლიათ ნებისმიერ დროს, გაუქმების ბმული გამოგეგზავნებათ ელ-ფოსტაზე.':
+    '4. You can cancel a monthly donation at any time; a cancellation link is sent to your email.',
+  '5. ყველა გადახდა უსაფრთხოდ მუშავდება TBC ბანკის სისტემებით. ჩვენ არ ვინახავთ ბარათის ინფორმაციის მონაცემთა ბაზაში.':
+    '5. All payments are processed securely by TBC Bank’s systems. We do not store card information in our database.',
+  '2. თქვენი ბარათის მონაცემები უსაფრთხოდ მუშავდება TBC ბანკის მიერ. ჩვენ არ ვინახავთ ბარათის დეტალებს ჩვენს მონაცემთა ბაზაში.':
+    '2. Your card details are processed securely by TBC Bank. We do not store card details in our database.',
+  '3. თქვენი მონაცემები არ გადაეცემა მესამე მხარეებს სარეკლამო მიზნებისთვის.': '3. Your data is not shared with third parties for advertising.',
+  '4. ყოველთვიური დონაციის შემთხვევაში, ბარათის ინფორმაცია ინახება ბანკის სისტემებში მომდევნო გადახდებისთვის.':
+    '4. For monthly donations, card information is kept in the bank’s systems for the next payments.',
+  '5. თქვენ გაქვთ უფლება მოითხოვოთ თქვენი მონაცემების წაშლა ან შეცვლა ნებისმიერ დროს.':
+    '5. You have the right to ask for your data to be deleted or changed at any time.',
+  'მიმღები: შპს. მაუწყებელი 2021': 'Recipient: Mautskebeli 2021 LLC',
+
+  // Lists, search, videos
+  'წიგნები ხელმისაწვდომია თქვენთვის. შეისწავლეთ კოლექცია.': 'Books available to you. Explore the collection.',
+  'გთავაზობთ სხვადასხვა თემატიკის თარგმანებს.': 'Translations on a range of topics.',
+  'ნახეთ სრულად': 'Read in full',
+  'ნახეთ სრულად →': 'Read in full →',
+  'ყველა →': 'All →',
+  'ყველა ამბავი': 'All news',
+  'უახლესი': 'Latest',
+  'დღის მთავარი ამბები': 'Today’s top stories',
+  'სატესტო რეჟიმი': 'Test mode',
+  'მთავარ გვერდზე დაბრუნება': 'Back to the homepage',
+  'გააზიარე სოციალურ ქსელში': 'Share on social media',
+  'გაზიარება': 'Share',
+  'კოპირებულია': 'Copied',
+  'იხილე პოსტი': 'View post',
+  'გათიშვა': 'Close',
+  'YouTube-ზე გადასვლა': 'Go to YouTube',
+  'YouTube - ზე გადასვლა': 'Go to YouTube',
+  'სპორტი logo': 'Sport logo',
+  'პდფ ვერსია': 'PDF version',
+  'შედეგები ვერ მოიძებნა': 'No results found',
+  'სცადეთ სხვა საძიებო სიტყვა ან შეამოწმეთ მართლწერა.': 'Try a different search term or check the spelling.',
+  'ნაჩვენებია შედეგები, სადაც საძიებო სიტყვა გვხვდება სათაურში, ავტორში ან ტექსტში. მონიშნული ყვითლად.':
+    'Showing results where the search term appears in the title, author or text, highlighted in yellow.',
+
+  '„მაუწყებელი“ მიზნად ისახავს საზოგადოებრივად მნიშვნელოვანი, მაგრამ პოლიტიკური დღის წესრიგის მიერ უგულებელყოფილი საკითხების წინ წამოწევას და გთავაზობთ ანალიტიკურ სტატიებს.':
+    '“Mautskebeli” brings forward issues that matter to society but are ignored by the political agenda, and offers analytical articles.',
+
+  // Section titles and descriptions (browser tab, share previews)
+  'მაუწყებელი • Mautskebeli ': 'Mautskebeli',
+  'მაუწყებელი – სტატიები.': 'Mautskebeli – Articles.',
+  'სტატისტიკა – მაუწყებელი': 'Statistics – Mautskebeli',
+  'მეცნიერების სიახლეები და ამბები': 'Science news and stories',
+  'ქალაქის სიახლეები და ამბები': 'City news and stories',
+  'რესურსების სიახლეები და ამბები': 'Resources: news and stories',
+  'მსოფლიოს სიახლეები და ამბები': 'World news and stories',
+  'ხელოვნების სიახლეები და ამბები': 'Arts news and stories',
+  'საბინაო საკითხები და ამბები': 'Housing issues and stories',
+  'მაუწყებელი სპორტი, სტატიები და ვიდეოები': 'Mautskebeli Sport: articles and videos',
+  'უახლესი ამბები და სიახლეები მაუწყებელისგან': 'The latest news from Mautskebeli',
+  'მაუწყებლის პოდკასტები': 'Mautskebeli podcasts',
+
   // Language names
   'ქართული': 'Georgian',
   'ენა': 'Language',

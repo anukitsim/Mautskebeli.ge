@@ -1,4 +1,5 @@
 "use client";
+import { useLanguage } from "@/app/context/LanguageContext";
 
 import React, { useEffect, useState, useRef, Suspense, useCallback } from "react";
 import CustomYoutubePlayer from "../components/CustomYoutube";
@@ -51,6 +52,7 @@ const VideoCard = ({ videoId, acf, onSelect }) => {
 };
 
 function ShromaVideos() {
+  const { t, localize } = useLanguage();
   const [videos, setVideos] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
@@ -187,7 +189,7 @@ function ShromaVideos() {
                           width={24}
                           height={24}
                         />
-                        YouTube - ზე გადასვლა
+                        {t("YouTube - ზე გადასვლა")}
                       </button>
                     </a>
                     <button
@@ -200,13 +202,13 @@ function ShromaVideos() {
                         width={24}
                         height={24}
                       />
-                      გაზიარება
+                      {t("გაზიარება")}
                     </button>
                     {showShareOptions && (
                       <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 1000 }} className="bg-gray-800 bg-opacity-50 flex items-center justify-center">
                         <div ref={shareOptionsRef} className="rounded-lg p-6 w-80" style={{backgroundColor: "rgba(0, 0, 0, 0.30)",}}>
                           <h2 className="text-xl text-white font-bold mb-4">
-                            გააზიარე
+                            {t("გააზიარე")}
                           </h2>
                           <div className="flex items-center pt-7 gap-5 ">
                             <button

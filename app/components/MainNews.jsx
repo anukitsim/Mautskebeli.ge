@@ -1,3 +1,4 @@
+import { englishIfNeeded } from '@/utils/translate/server';
 // app/components/MainNews.jsx (Server Component)
 import React from "react";
 import MainNewsClient from "./MainNewsClient";
@@ -46,7 +47,7 @@ const MainNews = async () => {
       throw new Error("Network response was not ok");
     }
 
-    let data = await response.json();
+    let data = await englishIfNeeded(await response.json());
 
     // Sort by date (descending)
     data.sort((a, b) => new Date(b.date) - new Date(a.date));

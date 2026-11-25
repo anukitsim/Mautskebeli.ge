@@ -3,6 +3,9 @@
 // (Category videos play inside their category page and have no own address,
 // so they can't be listed individually.)
 
+import { isMachineTranslationOn } from '@/utils/translate';
+import { localizePath } from '@/utils/i18n/paths';
+
 const WP = process.env.NEXT_PUBLIC_WORDPRESS_API_URL;
 const BASE_URL = 'https://www.mautskebeli.ge';
 
@@ -88,7 +91,7 @@ export default async function sitemap() {
     ]);
 
   // Each address below is the one its page actually answers on.
-  return [
+  const entries = [
     ...staticRoutes,
     ...toRoutes(articles, (a) => `/all-articles/${a.slug || a.id}`),
     ...toRoutes(news, (n) => `/news/${n.slug}`, 0.8),
@@ -99,4 +102,13 @@ export default async function sitemap() {
     ...toRoutes(sportVideos, (v) => `/all-sport-videos/${v.id}`, 0.6),
     ...toRoutes(featuredVideos, (v) => `/${v.id}`, 0.6),
   ];
+
+  // English site: every page also has an English twin at /en/... (tells
+  // Google both versions exist; see middleware.js).
+  if (!isMachineTranslationOn()) return entries;
+  return entries.map((entry) => {
+    const path = entry.url.slice(BASE_URL.length) || '/';
+    const en = `${BASE_URL}${localizePath(path, 'en')}`;
+    return { ...entry, alternates: { languages: { ka: entry.url, en } } };
+  });
 }

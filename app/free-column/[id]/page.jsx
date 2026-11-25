@@ -1,3 +1,8 @@
+import { getLang } from "@/utils/i18n/server";
+import { englishIfNeeded } from '@/utils/translate/server';
+import MachineTranslationNote from '@/app/components/MachineTranslationNote';
+import { translateUi } from "@/utils/i18n/dictionary";
+import { localizePath } from "@/utils/i18n/paths";
 // app/free-column/[id]/page.jsx
 
 import Image from 'next/image';
@@ -85,7 +90,7 @@ async function fetchFreeColumn(slugOrId) {
 // Generate Metadata for the Free Column
 export async function generateMetadata({ params }) {
   const { id } = params;
-  const freeColumn = await fetchFreeColumn(id);
+  const freeColumn = await englishIfNeeded(await fetchFreeColumn(id));
 
   if (!freeColumn) {
     return {
@@ -137,6 +142,7 @@ export async function generateMetadata({ params }) {
 }
 
 function formatDate(dateString) {
+  if (getLang() === 'en') return new Intl.DateTimeFormat('en-GB', { dateStyle: 'long', timeZone: 'UTC' }).format(new Date(`${dateString}Z`));
   moment.locale('ka');
   return moment(dateString).format('LL');
 }
@@ -220,8 +226,11 @@ function getSanitizedContent(content) {
 }
 
 const FreeColumnPage = async ({ params }) => {
+  const lang = getLang();
+  const t = (ka) => translateUi(lang, ka);
+  const localize = (path) => localizePath(path, lang);
   const { id } = params;
-  const freeColumn = await fetchFreeColumn(id);
+  const freeColumn = await englishIfNeeded(await fetchFreeColumn(id));
 
   if (!freeColumn) {
     notFound();
@@ -266,14 +275,14 @@ const FreeColumnPage = async ({ params }) => {
           {categories.map((category) => (
             <a
               key={category.name}
-              href={category.path}
+              href={localize(category.path)}
               className={`text-sm text-[#474F7A] ${
                 category.name === 'თავისუფალი სვეტი'
                   ? 'text-white font-bold'
                   : 'text-[#474F7A] hover:scale-110'
               }`}
             >
-              {category.name}
+              {t(category.name)}
             </a>
           ))}
         </div>
@@ -315,17 +324,18 @@ const FreeColumnPage = async ({ params }) => {
           <p className="text-[#474F7A] font-semibold pb-10">
             იხილეთ თავისუფალი სვეტის{' '}
             <a
-              href={freeColumn.acf.full_column_pdf}
+              href={localize(freeColumn.acf.full_column_pdf)}
               target="_blank"
               rel="noopener noreferrer"
               download
               className="underline"
             >
-              პდფ ვერსია
+              {t("პდფ ვერსია")}
             </a>
           </p>
         )}
 
+        <MachineTranslationNote />
         <div
           className="article-content text-[#474F7A] font-noto-sans-georgian text-[14px] sm:text-[16px] font-normal lg:text-justify leading-[30px] sm:leading-[35px] tracking-[0.32px] mt-5"
           dangerouslySetInnerHTML={{ __html: sanitizedContent }}
