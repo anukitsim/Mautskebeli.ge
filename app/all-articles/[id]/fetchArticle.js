@@ -1,12 +1,14 @@
 // app/all-articles/[id]/fetchArticle.js
-// Shared by the Georgian article page and the translated pages ([lang]).
+// Loads one post by slug, numeric id, or a FORMER slug (then _redirectFrom
+// is set so the page can redirect). Shared by articles and free columns,
+// their Georgian pages and their translated pages ([lang]).
 
-export async function fetchArticle(slugOrId) {
+export async function fetchPost(postType, slugOrId) {
   // Decode the slug/ID in case it's URL-encoded (Georgian characters)
   const decodedSlugOrId = decodeURIComponent(slugOrId);
   
   // Try fetching by slug first (URL-encode it properly for the API)
-  let apiUrl = `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/wp/v2/article?slug=${encodeURIComponent(decodedSlugOrId)}&acf_format=standard&_fields=id,title,acf,date,slug`;
+  let apiUrl = `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/wp/v2/${postType}?slug=${encodeURIComponent(decodedSlugOrId)}&acf_format=standard&_fields=id,title,acf,date,slug`;
 
   try {
     let res = await fetch(apiUrl, {
@@ -25,7 +27,7 @@ export async function fetchArticle(slugOrId) {
     const isNumeric = !isNaN(decodedSlugOrId) && !isNaN(parseFloat(decodedSlugOrId));
     
     if (isNumeric) {
-      apiUrl = `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/wp/v2/article/${decodedSlugOrId}?acf_format=standard&_fields=id,title,acf,date,slug`;
+      apiUrl = `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/wp/v2/${postType}/${decodedSlugOrId}?acf_format=standard&_fields=id,title,acf,date,slug`;
       res = await fetch(apiUrl, {
         next: { revalidate: 10 },
       });
@@ -42,7 +44,7 @@ export async function fetchArticle(slugOrId) {
     // Not a current slug, and not numeric — it may be a FORMER slug (e.g.
     // an article whose URL was cleaned up to a Latin slug). Check WordPress's
     // own record of old slugs so links shared before the change still work.
-    const resolveUrl = `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/custom/v1/resolve-article-slug?post_type=article&slug=${encodeURIComponent(decodedSlugOrId)}`;
+    const resolveUrl = `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/custom/v1/resolve-article-slug?post_type=${postType}&slug=${encodeURIComponent(decodedSlugOrId)}`;
     const resolveRes = await fetch(resolveUrl, { next: { revalidate: 10 } });
     if (resolveRes.ok) {
       const resolved = await resolveRes.json();
@@ -64,4 +66,8 @@ export async function fetchArticle(slugOrId) {
     console.error(`Error fetching article with slug/id ${decodedSlugOrId}:`, error);
     return null;
   }
+}
+
+export function fetchArticle(slugOrId) {
+  return fetchPost('article', slugOrId);
 }

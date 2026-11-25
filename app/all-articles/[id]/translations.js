@@ -106,7 +106,12 @@ export function getPublishedTranslations(acf) {
   );
 }
 
-export function articleUrl(slug, translation) {
-  const base = `/all-articles/${slug}`;
+// /<section>/<slug> or /<section>/<slug>/HY — section is /all-articles or /free-column.
+export function postUrl(basePath, slug, translation) {
+  const base = `${basePath}/${slug}`;
   return translation && translation.path ? `${base}/${translation.path}` : base;
+}
+
+export function articleUrl(slug, translation) {
+  return postUrl('/all-articles', slug, translation);
 }

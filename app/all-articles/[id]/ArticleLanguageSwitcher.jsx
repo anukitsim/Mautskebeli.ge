@@ -5,7 +5,7 @@
 // search engines can follow them to the translated versions.
 
 import Link from 'next/link';
-import { ORIGINAL, TRANSLATIONS, articleUrl } from './translations';
+import { ORIGINAL, TRANSLATIONS, postUrl } from './translations';
 
 function GlobeIcon() {
   return (
@@ -31,8 +31,9 @@ function GlobeIcon() {
  * @param slug          article slug (or id) used in the URL
  * @param current       ORIGINAL or one entry of TRANSLATIONS
  * @param published     translations that should be listed
+ * @param basePath      /all-articles (default) or /free-column
  */
-export default function ArticleLanguageSwitcher({ slug, current, published }) {
+export default function ArticleLanguageSwitcher({ slug, current, published, basePath = '/all-articles' }) {
   // Keep the order from translations.js, and always include the page
   // the reader is on right now.
   const shown = [
@@ -60,7 +61,7 @@ export default function ArticleLanguageSwitcher({ slug, current, published }) {
               <Link
                 // ?lang=ka: readers on the English site can still open the
                 // Georgian original (middleware.js switches their choice).
-                href={lang === ORIGINAL ? `${articleUrl(slug, lang)}?lang=ka` : articleUrl(slug, lang)}
+                href={lang === ORIGINAL ? `${postUrl(basePath, slug, lang)}?lang=ka` : postUrl(basePath, slug, lang)}
                 hrefLang={lang.code}
                 lang={lang.code}
                 aria-current={isCurrent ? 'page' : undefined}

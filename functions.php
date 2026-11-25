@@ -5273,7 +5273,7 @@ add_filter('wp_insert_post_data', function ($data, $postarr) {
 
 
 // ─────────────────────────────────────────────────────────────────────
-// Article translations box: English, Russian, Armenian, Azerbaijani
+// Translations box (articles + free columns): English, Russian, Armenian, Azerbaijani
 //
 // One box ("თარგმანები") with a tab per language. Every language uses
 // the same field-name pattern, which is what the Next.js site reads:
@@ -5366,9 +5366,13 @@ add_action('acf/init', function () {
         'key'      => MSB_TRANSLATIONS_GROUP,
         'title'    => 'თარგმანები',
         'fields'   => $fields,
+        // Articles OR free columns (each inner array is one "or" rule).
         'location' => array(
             array(
                 array('param' => 'post_type', 'operator' => '==', 'value' => 'article'),
+            ),
+            array(
+                array('param' => 'post_type', 'operator' => '==', 'value' => 'free-column'),
             ),
         ),
         'menu_order'   => 50,
@@ -5383,7 +5387,8 @@ add_action('acf/init', function () {
 // Hide the OLD English/Russian fields (from the main article box) on the
 // article edit screen, because the translations box above now shows the
 // same data. Hidden fields are not sent when saving, so they can't
-// overwrite anything. Free columns keep their own fields as they are.
+// overwrite anything. Same for free columns (their old language1/2
+// toggles were never used: no free column had them switched on).
 add_filter('acf/prepare_field', function ($field) {
     // By now ACF has turned 'name' into an input name like acf[field_abc];
     // the real field name (language1_title …) is kept in '_name'.
@@ -5399,9 +5404,9 @@ add_filter('acf/prepare_field', function ($field) {
 
     $screen = function_exists('get_current_screen') ? get_current_screen() : null;
     $post_type = $screen && !empty($screen->post_type) ? $screen->post_type : get_post_type();
-    if ($post_type !== 'article') {
+    if (!in_array($post_type, array('article', 'free-column'), true)) {
         return $field;
     }
 
-    return false; // old copy on an article: don't show it
+    return false; // old copy on an article / free column: don't show it
 });

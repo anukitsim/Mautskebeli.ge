@@ -16,6 +16,9 @@ import React from 'react';
 
 // Import the Client Component handling dynamic imports
 import DynamicClientComponents from './DynamicClientComponents';
+import ArticleLanguageSwitcher from '@/app/all-articles/[id]/ArticleLanguageSwitcher';
+import { ORIGINAL, getPublishedTranslations, postUrl } from '@/app/all-articles/[id]/translations';
+import { isMachineTranslationOn } from '@/utils/translate';
 import ReadingTracker from '../../components/ReadingTracker';
 import { createReadingTicket } from '@/utils/stats/ticket';
 
@@ -116,11 +119,23 @@ export async function generateMetadata({ params }) {
   imageUrl = imageUrl.split('?')[0];
 
   const metadataBase = new URL('https://www.mautskebeli.ge');
-  const canonicalPath = freeColumn.slug ? `/free-column/${freeColumn.slug}` : `/free-column/${id}`;
+  const georgianPath = freeColumn.slug ? `/free-column/${freeColumn.slug}` : `/free-column/${id}`;
+  const lang = getLang();
+  const canonicalPath = localizePath(georgianPath, lang);
+  // Language versions: hand-made translations + the machine-translated English.
+  const published = getPublishedTranslations(freeColumn.acf);
+  const machineEnglish = isMachineTranslationOn() && !published.some((tr) => tr.code === 'en');
+  const languages = published.length || machineEnglish
+    ? {
+        ka: georgianPath,
+        ...(machineEnglish && { en: localizePath(georgianPath, 'en') }),
+        ...Object.fromEntries(published.map((tr) => [tr.code, postUrl('/free-column', freeColumn.slug || id, tr)])),
+      }
+    : undefined;
 
   return {
     metadataBase,
-    alternates: { canonical: canonicalPath },
+    alternates: { canonical: canonicalPath, ...(languages && { languages }) },
     title: decodedTitle,
     description: decodedDescription,
     openGraph: {
@@ -129,7 +144,7 @@ export async function generateMetadata({ params }) {
       url: canonicalPath,
       type: 'article',
       images: [imageUrl],
-      locale: 'ka_GE',
+      locale: lang === 'en' ? 'en_US' : 'ka_GE',
       siteName: 'Mautskebeli',
     },
     twitter: {
@@ -230,14 +245,22 @@ const FreeColumnPage = async ({ params }) => {
   const t = (ka) => translateUi(lang, ka);
   const localize = (path) => localizePath(path, lang);
   const { id } = params;
-  const freeColumn = await englishIfNeeded(await fetchFreeColumn(id));
+  const original = await fetchFreeColumn(id);
+  // English site + a hand-made English translation: show that page.
+  const humanEnglish = lang === 'en' && original
+    ? getPublishedTranslations(original.acf).find((tr) => tr.code === 'en')
+    : null;
+  if (humanEnglish) {
+    redirect(localize(postUrl('/free-column', original.slug || id, humanEnglish)));
+  }
+  const freeColumn = await englishIfNeeded(original);
 
   if (!freeColumn) {
     notFound();
   }
 
   if (freeColumn._redirectFrom && freeColumn.slug) {
-    redirect(`/free-column/${freeColumn.slug}`);
+    redirect(localize(`/free-column/${freeColumn.slug}`));
   }
 
   freeColumn.formattedDate = formatDate(freeColumn.date);
@@ -262,11 +285,10 @@ const FreeColumnPage = async ({ params }) => {
 
   sanitizedContent = $.html();
 
-  const showLanguageDropdown =
-    freeColumn.acf.language1 === true || freeColumn.acf.language2 === true;
+  const publishedTranslations = getPublishedTranslations(freeColumn.acf);
 
   // Reading statistics: null (no tracker) unless statistics are switched on.
-  const readingTicket = createReadingTicket({ type: 'free-column', postId: freeColumn.id, lang: 'ka' });
+  const readingTicket = createReadingTicket({ type: 'free-column', postId: freeColumn.id, lang });
 
   return (
     <section className="w-full mx-auto mt-10 px-4 lg:px-0 overflow-x-hidden relative">
@@ -299,11 +321,12 @@ const FreeColumnPage = async ({ params }) => {
             className="rounded-lg w-full"
           />
 
-          {showLanguageDropdown && (
-            <DynamicClientComponents
-              id={id}
-              title={freeColumn.title.rendered}
-              showLanguageDropdown={showLanguageDropdown}
+          {lang !== 'en' && (
+            <ArticleLanguageSwitcher
+              slug={freeColumn.slug || id}
+              current={ORIGINAL}
+              published={publishedTranslations}
+              basePath="/free-column"
             />
           )}
         </div>
@@ -344,7 +367,6 @@ const FreeColumnPage = async ({ params }) => {
         <DynamicClientComponents
           id={id}
           title={freeColumn.title.rendered}
-          showLanguageDropdown={false}
         />
         <ReadingTracker ticket={readingTicket} />
       </div>
