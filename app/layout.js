@@ -6,6 +6,7 @@ import localFont from "next/font/local";
 import Script from "next/script";
 import AnalyticsPageView from "./components/AnalyticsPageView";
 import { LanguageProvider } from "./context/LanguageContext";
+import { getLang } from "@/utils/i18n/server";
 
 // ──────────────────────────
 //  Metadata (title, OG, etc.)
@@ -63,8 +64,10 @@ const firaGO = localFont({
 //  Root Layout
 // ──────────────────────────
 export default function RootLayout({ children }) {
+  // "ka" or "en" — set by middleware.js from the address (/en/... = English).
+  const lang = getLang();
   return (
-    <html lang="ka" className={`${notoSansGeorgian.variable} ${firaGO.variable}`}>
+    <html lang={lang} className={`${notoSansGeorgian.variable} ${firaGO.variable}`}>
       <head>
         {/* Google Analytics - G-C2ZPMYP4FY - Placed in <head> for Search Console verification */}
         <Script
@@ -85,7 +88,7 @@ export default function RootLayout({ children }) {
         />
       </head>
       <body>
-        <LanguageProvider>
+        <LanguageProvider initialLanguage={lang}>
           {children}
           {/* SPA route-change tracker */}
           <AnalyticsPageView />

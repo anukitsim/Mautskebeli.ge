@@ -1281,3 +1281,16 @@ mark.search-hl {
   font-weight: 600;
   border-radius: 2px;
 }
+
+/* ─── English site (/en/...) ───────────────────────────────────────────
+   The Georgian fonts (Noto Sans Georgian subset, ALK Tall Mtavruli) have
+   no Latin letters, so English pages use FiraGO, which has Latin and
+   Georgian. One rule here instead of changing every component. */
+html[lang="en"] body,
+html[lang="en"] .font-noto-sans-georgian {
+  font-family: var(--font-firago), var(--font-noto-sans-georgian), sans-serif;
+}
+html[lang="en"] .font-alk-tall-mtavruli {
+  font-family: var(--font-firago), "ALK Tall Mtavruli", sans-serif;
+  font-weight: 700;
+}

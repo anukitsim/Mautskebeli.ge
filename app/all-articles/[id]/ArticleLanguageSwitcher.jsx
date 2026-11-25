@@ -58,7 +58,9 @@ export default function ArticleLanguageSwitcher({ slug, current, published }) {
           return (
             <li key={lang.code}>
               <Link
-                href={articleUrl(slug, lang)}
+                // ?lang=ka: readers on the English site can still open the
+                // Georgian original (middleware.js switches their choice).
+                href={lang === ORIGINAL ? `${articleUrl(slug, lang)}?lang=ka` : articleUrl(slug, lang)}
                 hrefLang={lang.code}
                 lang={lang.code}
                 aria-current={isCurrent ? 'page' : undefined}

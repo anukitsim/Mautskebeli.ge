@@ -1,4 +1,5 @@
 "use client";
+import { useLanguage } from "@/app/context/LanguageContext";
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
@@ -12,6 +13,7 @@ const Navigation = ({ onVideoSelect }) => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isCategoriesOpen, setIsCategoriesOpen] = useState(false);
   const router = useRouter();
+  const { t, localize } = useLanguage();
 
   const toggleMenu = () => {
     if (!isMenuOpen) setIsSearchOpen(false);
@@ -94,14 +96,14 @@ const Navigation = ({ onVideoSelect }) => {
           {navItems.map((item) => (
             <Link
               key={item.label}
-              href={item.href}
+              href={localize(item.href)}
               className="nav-item relative px-5 py-4 text-white/90 hover:text-white font-medium transition-all duration-200 group"
             >
               {/* Hover background */}
               <span className="absolute inset-0 bg-white/0 group-hover:bg-white/10 transition-colors duration-200 rounded-sm" />
               {/* Underline effect */}
               <span className="absolute bottom-2 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-[#FECE27] group-hover:w-3/4 transition-all duration-300 rounded-full" />
-              <span className="relative">{item.label}</span>
+              <span className="relative">{t(item.label)}</span>
             </Link>
           ))}
         </ul>
@@ -121,17 +123,17 @@ const Navigation = ({ onVideoSelect }) => {
             {navItems.map((item) => (
               <Link
                 key={item.label}
-                href={item.href}
+                href={localize(item.href)}
                 className="py-2 hover:translate-x-1 transition-transform duration-200"
               >
-                {item.label}
+                {t(item.label)}
               </Link>
             ))}
             <button
               onClick={toggleCategories}
               className="text-white text-[15px] flex items-center gap-2 py-2"
             >
-              კატეგორიები
+              {t("კატეგორიები")}
               <svg
                 className={`w-4 h-4 transition-transform transform ${isCategoriesOpen ? "rotate-180" : "rotate-0"}`}
                 fill="white"
@@ -148,7 +150,7 @@ const Navigation = ({ onVideoSelect }) => {
             <ul
               className={`${isCategoriesOpen ? "block" : "hidden"} flex flex-col gap-4 pl-4`}
             >
-              <Link href="/shroma" className="flex flex-row gap-3">
+              <Link href={localize("/shroma")} className="flex flex-row gap-3">
                 <Image
                   src="/images/shroma-white.svg"
                   alt="shroma"
@@ -156,9 +158,9 @@ const Navigation = ({ onVideoSelect }) => {
                   height={0}
                   style={{ width: "auto", height: "20px" }}
                 />
-                <span className="text-white text-[15px]">შრომა</span>
+                <span className="text-white text-[15px]">{t("შრომა")}</span>
               </Link>
-              <Link href="/mecniereba" className="flex flex-row gap-3">
+              <Link href={localize("/mecniereba")} className="flex flex-row gap-3">
                 <Image
                   src="/images/mecniereba-white.svg"
                   alt="mecniereba"
@@ -166,9 +168,9 @@ const Navigation = ({ onVideoSelect }) => {
                   height={0}
                   style={{ width: "auto", height: "20px" }}
                 />
-                <span className="text-white text-[15px]">მეცნიერება</span>
+                <span className="text-white text-[15px]">{t("მეცნიერება")}</span>
               </Link>
-              <Link href="/ekonomika" className="flex flex-row gap-3">
+              <Link href={localize("/ekonomika")} className="flex flex-row gap-3">
                 <Image
                   src="/images/ekonomika-white.svg"
                   alt="ekonomika"
@@ -176,9 +178,9 @@ const Navigation = ({ onVideoSelect }) => {
                   height={0}
                   style={{ width: "auto", height: "20px" }}
                 />
-                <span className="text-white text-[15px]">ეკონომიკა</span>
+                <span className="text-white text-[15px]">{t("ეკონომიკა")}</span>
               </Link>
-              <Link href="/medicina" className="flex flex-row gap-3">
+              <Link href={localize("/medicina")} className="flex flex-row gap-3">
                 <Image
                   src="/images/medicina-white.svg"
                   alt="medicina"
@@ -186,9 +188,9 @@ const Navigation = ({ onVideoSelect }) => {
                   height={0}
                   style={{ width: "auto", height: "20px" }}
                 />
-                <span className="text-white text-[15px]">მედიცინა</span>
+                <span className="text-white text-[15px]">{t("მედიცინა")}</span>
               </Link>
-              <Link href="/xelovneba" className="flex flex-row gap-3">
+              <Link href={localize("/xelovneba")} className="flex flex-row gap-3">
                 <Image
                   src="/images/xelovneba-white.svg"
                   alt="xelovneba"
@@ -196,9 +198,9 @@ const Navigation = ({ onVideoSelect }) => {
                   height={0}
                   style={{ width: "auto", height: "20px" }}
                 />
-                <span className="text-white text-[15px]">ხელოვნება</span>
+                <span className="text-white text-[15px]">{t("ხელოვნება")}</span>
               </Link>
-              <Link href="/kalaki" className="flex flex-row gap-3">
+              <Link href={localize("/kalaki")} className="flex flex-row gap-3">
                 <Image
                   src="/images/kalaki-white.svg"
                   alt="qalaqi"
@@ -206,9 +208,9 @@ const Navigation = ({ onVideoSelect }) => {
                   height={0}
                   style={{ width: "auto", height: "20px" }}
                 />
-                <span className="text-white text-[15px]">ქალაქი</span>
+                <span className="text-white text-[15px]">{t("ქალაქი")}</span>
               </Link>
-              <Link href="/resursebi" className="flex flex-row gap-3">
+              <Link href={localize("/resursebi")} className="flex flex-row gap-3">
                 <Image
                   src="/images/resursebi-white.svg"
                   alt="resursebi"
@@ -216,9 +218,9 @@ const Navigation = ({ onVideoSelect }) => {
                   height={0}
                   style={{ width: "auto", height: "20px" }}
                 />
-                <span className="text-white text-[15px]">რესურსები</span>
+                <span className="text-white text-[15px]">{t("რესურსები")}</span>
               </Link>
-              <Link href="/msoflio" className="flex flex-row gap-3">
+              <Link href={localize("/msoflio")} className="flex flex-row gap-3">
                 <Image
                   src="/images/msoflio-white.svg"
                   alt="msoflio"
@@ -226,9 +228,9 @@ const Navigation = ({ onVideoSelect }) => {
                   height={0}
                   style={{ width: "auto", height: "20px" }}
                 />
-                <span className="text-white text-[15px]">მსოფლიო</span>
+                <span className="text-white text-[15px]">{t("მსოფლიო")}</span>
               </Link>
-              <Link href="/saxli" className="flex flex-row gap-3">
+              <Link href={localize("/saxli")} className="flex flex-row gap-3">
                 <Image
                   src="/images/saxli-white.svg"
                   alt="saxli-yvelas"
@@ -236,7 +238,7 @@ const Navigation = ({ onVideoSelect }) => {
                   height={0}
                   style={{ width: "auto", height: "20px" }}
                 />
-                <span className="text-white text-[15px] ">სახლი ყველას</span>
+                <span className="text-white text-[15px] ">{t("სახლი ყველას")}</span>
               </Link>
             </ul>
           </div>

@@ -1,10 +1,12 @@
 'use client';
 
+import { useLanguage } from "@/app/context/LanguageContext";
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import NewsVideoPlayer from '@/app/components/NewsVideoPlayer';
+import MachineTranslationNote from '@/app/components/MachineTranslationNote';
 
 const decodeHTMLEntities = (str) => {
   if (typeof window === 'undefined') return str || '';
@@ -13,14 +15,14 @@ const decodeHTMLEntities = (str) => {
   return doc.documentElement.textContent;
 };
 
-const formatDate = (dateString) => {
+const formatDate = (dateString, t = (x) => x) => {
   if (!dateString) return '';
   const date = new Date(dateString);
   const months = [
     'იანვარი', 'თებერვალი', 'მარტი', 'აპრილი', 'მაისი', 'ივნისი',
     'ივლისი', 'აგვისტო', 'სექტემბერი', 'ოქტომბერი', 'ნოემბერი', 'დეკემბერი'
   ];
-  return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
+  return `${date.getDate()} ${t(months[date.getMonth()])} ${date.getFullYear()}`;
 };
 
 const extractVideoId = (videoUrl) => {
@@ -93,18 +95,22 @@ const ARTICLE_CONTENT_CLASSNAME = `article-content text-[#474F7A] font-noto-sans
                             prose-blockquote:text-[#8B7AA0] prose-blockquote:italic prose-blockquote:not-italic
                             [&>div]:mb-6`;
 
-export default function NewsDetailClient() {
+// initialNews: on English pages the server sends the item already
+// translated (see page.jsx); then nothing is fetched here. Georgian pages
+// load it in the browser as before.
+export default function NewsDetailClient({ initialNews = null, translationComplete = true }) {
   const params = useParams();
+  const { t, localize } = useLanguage();
   const router = useRouter();
-  const [news, setNews] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [news, setNews] = useState(initialNews);
+  const [loading, setLoading] = useState(!initialNews);
   const [error, setError] = useState(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [readProgress, setReadProgress] = useState(0);
   const [copied, setCopied] = useState(false);
   const articleRef = useRef(null);
 
-  const shareUrl = `https://www.mautskebeli.ge/news/${params.slug}`;
+  const shareUrl = `https://www.mautskebeli.ge${localize(`/news/${params.slug}`)}`;
 
   const openShare = (platform) => {
     const encoded = encodeURIComponent(shareUrl);
@@ -147,6 +153,10 @@ export default function NewsDetailClient() {
   }, []);
 
   useEffect(() => {
+    if (initialNews) {
+      setTimeout(() => setIsLoaded(true), 100);
+      return;
+    }
     const fetchNews = async () => {
       if (!params.slug) return;
       
@@ -176,7 +186,7 @@ export default function NewsDetailClient() {
             );
             const resolved = resolveResponse.ok ? await resolveResponse.json() : { found: false };
             if (resolved.found && resolved.slug) {
-              router.replace(`/news/${resolved.slug}`);
+              router.replace(localize(`/news/${resolved.slug}`));
               return;
             }
           } catch (resolveError) {
@@ -257,10 +267,10 @@ export default function NewsDetailClient() {
                     d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
             </svg>
           </div>
-          <h1 className="text-2xl lg:text-3xl font-bold text-[#474F7A] mb-4">{error}</h1>
-          <p className="text-[#8B7AA0] mb-8">სამწუხაროდ, მოთხოვნილი ამბავი ვერ მოიძებნა</p>
+          <h1 className="text-2xl lg:text-3xl font-bold text-[#474F7A] mb-4">{t(error)}</h1>
+          <p className="text-[#8B7AA0] mb-8">{t("სამწუხაროდ, მოთხოვნილი ამბავი ვერ მოიძებნა")}</p>
           <Link 
-            href="/news" 
+            href={localize("/news")} 
             className="group inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-[#AD88C6] to-[#8C74B2] 
                       text-white rounded-full font-medium shadow-lg shadow-[#AD88C6]/25
                       hover:shadow-xl hover:shadow-[#AD88C6]/30 hover:-translate-y-0.5
@@ -270,7 +280,7 @@ export default function NewsDetailClient() {
                  fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
-            ყველა ამბავი
+            {t("ყველა ამბავი")}
           </Link>
         </div>
       </div>
@@ -322,7 +332,7 @@ export default function NewsDetailClient() {
           <div className="absolute inset-0 flex flex-col justify-end">
             <div className="max-w-6xl mx-auto w-full px-4 lg:px-8 pb-12 lg:pb-20">
               <Link 
-                href="/news" 
+                href={localize("/news")} 
                 className="inline-flex items-center gap-2 text-white/80 hover:text-white mb-6
                           transition-colors duration-300 text-sm font-medium backdrop-blur-sm
                           bg-white/10 rounded-full px-4 py-2 hover:bg-white/20"
@@ -335,7 +345,7 @@ export default function NewsDetailClient() {
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
-                ახალი ამბები
+                {t("ახალი ამბები")}
               </Link>
 
               <h1 
@@ -379,11 +389,11 @@ export default function NewsDetailClient() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5}
                           d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
                   </svg>
-                  <span className="font-medium text-sm lg:text-base">{formatDate(news.date)}</span>
+                  <span className="font-medium text-sm lg:text-base">{formatDate(news.date, t)}</span>
                 </div>
 
                 <div className="hidden lg:flex items-center gap-2 ml-auto">
-                  <span className="text-xs text-[#8B7AA0] mr-2">გააზიარე:</span>
+                  <span className="text-xs text-[#8B7AA0] mr-2">{t("გააზიარე:")}</span>
                   <button
                     onClick={() => openShare('facebook')}
                     className="w-9 h-9 flex items-center justify-center rounded-full bg-[#1877F2]/10 text-[#1877F2] 
@@ -405,7 +415,7 @@ export default function NewsDetailClient() {
                   <div className="relative">
                     <button
                       onClick={handleCopyLink}
-                      aria-label="ბმულის კოპირება"
+                      aria-label={t("ბმულის კოპირება")}
                       className="w-9 h-9 flex items-center justify-center rounded-full bg-[#AD88C6]/10 text-[#AD88C6]
                                 hover:bg-[#AD88C6] hover:text-white transition-all duration-300 hover:scale-110"
                     >
@@ -416,7 +426,7 @@ export default function NewsDetailClient() {
                     </button>
                     {copied && (
                       <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-[#474F7A] text-white text-xs px-2 py-1 rounded whitespace-nowrap">
-                        დაკოპირდა!
+                        {t("დაკოპირდა!")}
                       </span>
                     )}
                   </div>
@@ -425,6 +435,7 @@ export default function NewsDetailClient() {
             </div>
 
             <div className="px-6 lg:px-10 py-8 lg:py-10" data-reading-body>
+              <MachineTranslationNote complete={translationComplete} className="mt-0" />
               {news.acf?.description && (
                 <div 
                   className="mb-8 lg:mb-10 relative pl-6 border-l-4 border-gradient"
@@ -477,7 +488,7 @@ export default function NewsDetailClient() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} 
                           d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
                   </svg>
-                  გააზიარე სოციალურ ქსელში
+                  {t("გააზიარე სოციალურ ქსელში")}
                 </p>
                 <div className="flex gap-3">
                   <button
@@ -509,7 +520,7 @@ export default function NewsDetailClient() {
                       <path d="M10 13a5 5 0 007.07 0l2.83-2.83a5 5 0 00-7.07-7.07l-1.5 1.5" />
                       <path d="M14 11a5 5 0 00-7.07 0l-2.83 2.83a5 5 0 007.07 7.07l1.5-1.5" />
                     </svg>
-                    {copied ? 'დაკოპირდა!' : 'ბმული'}
+                    {copied ? t('დაკოპირდა!') : t('ბმული')}
                   </button>
                 </div>
               </div>
@@ -525,7 +536,7 @@ export default function NewsDetailClient() {
             }}
           >
             <Link 
-              href="/news" 
+              href={localize("/news")} 
               className="group inline-flex items-center gap-3 px-8 py-4 
                         bg-gradient-to-r from-[#AD88C6] to-[#8C74B2] text-white rounded-full 
                         font-medium shadow-lg shadow-[#AD88C6]/25
@@ -536,7 +547,7 @@ export default function NewsDetailClient() {
                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
-              ყველა ამბავი
+              {t("ყველა ამბავი")}
             </Link>
           </div>
         </div>
