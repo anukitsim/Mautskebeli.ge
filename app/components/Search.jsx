@@ -1,9 +1,11 @@
 'use client';
+import { useLanguage } from "@/app/context/LanguageContext";
 import React, { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
 const Search = ({ isSearchOpen, setIsSearchOpen, variant = 'default' }) => {
+  const { t, localize } = useLanguage();
   const [searchQuery, setSearchQuery] = useState('');
   const [isExpanded, setIsExpanded] = useState(false);
   const router = useRouter();
@@ -68,7 +70,7 @@ const Search = ({ isSearchOpen, setIsSearchOpen, variant = 'default' }) => {
       <div className={`${isSearchOpen ? 'flex' : 'hidden'} absolute top-[-5px] right-5 mt-1 mr-4 bg-white p-2 rounded-lg shadow-lg border border-[#E0DBE8] z-40`}>
         <input
           type="text"
-          placeholder="ძიება..."
+          placeholder={t("ძიება...")}
           className="text-[#474F7A] outline-none min-w-[140px]"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
@@ -111,7 +113,7 @@ const Search = ({ isSearchOpen, setIsSearchOpen, variant = 'default' }) => {
             <input
               ref={inputRef}
               type="text"
-              placeholder="ძიება..."
+              placeholder={t("ძიება...")}
               className="w-full py-2 pr-4 text-[#474F7A] placeholder:text-[#9B8FB0] bg-transparent border-none outline-none text-sm"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}

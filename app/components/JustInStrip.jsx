@@ -1,4 +1,5 @@
 'use client';
+import { useLanguage } from "@/app/context/LanguageContext";
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -60,6 +61,7 @@ const PodcastItem = ({ episode, index }) => {
 
 // Podcast Sidebar Component
 const JustInStrip = () => {
+  const { t, localize } = useLanguage();
   const [episodes, setEpisodes] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -123,13 +125,13 @@ const JustInStrip = () => {
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#AD88C6] opacity-75"></span>
             <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#AD88C6]"></span>
           </span>
-          <h2 className="text-[#474F7A] text-base font-bold">პოდკასტი</h2>
+          <h2 className="text-[#474F7A] text-base font-bold">{t("პოდკასტი")}</h2>
         </div>
         <Link 
-          href="/podcast" 
+          href={localize("/podcast")} 
           className="text-[#AD88C6] text-xs font-semibold hover:underline"
         >
-          ყველა →
+          {t("ყველა →")}
         </Link>
       </div>
 

@@ -1,4 +1,5 @@
 "use client";
+import { useLanguage } from "@/app/context/LanguageContext";
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 
@@ -29,7 +30,10 @@ const copy = {
 export default function DonationPopup() {
   const [showClose, setShowClose] = useState(false);
   const [visible, setVisible] = useState(false);
-  const [lang, setLang] = useState("ka");
+  // Start in the page's language (English on /en pages); the KA/EN
+  // button still switches the popup text.
+  const { language: siteLanguage } = useLanguage();
+  const [lang, setLang] = useState(siteLanguage);
   const bannerRef = useRef(null);
   const hide = useCallback(() => setVisible(false), []);
 

@@ -1,13 +1,9 @@
-import "../../../style/globals.css"
 
 import { MenuProvider } from "@/app/context/MenuContext";
-import { LanguageProvider } from "@/app/context/LanguageContext";
 
 import SportHeader from "@/app/components/SportHeader";
 import SportNavigation from "@/app/components/SportNavigation";
 import SportFooter from "@/app/components/SportFooter";
-import Script from 'next/script';
-import AnalyticsPageView from '@/app/components/AnalyticsPageView';
 
 export async function generateMetadata({ params }) {
   return {
@@ -19,46 +15,23 @@ export async function generateMetadata({ params }) {
   };
 }
 
-export default function RootLayout({ children }) {
+// The <html>, <body>, Google Analytics and LanguageProvider come from
+// app/layout.js. A section layout must not add them again: a second
+// <html> inside <body> breaks hydration, and a second AnalyticsPageView
+// counts every visit twice.
+export default function SportVideoLayout({ children }) {
   return (
-    <html lang="ka">
-      <head>
-      <link rel="icon" href="/favicon.ico" />
-      </head>
-      <body className='bg-[#AD88C6]'>
-        <LanguageProvider>
+    <div className="min-h-screen bg-[#AD88C6]">
       <MenuProvider>
-          <div className="sticky top-0 z-50">
-           <SportHeader />
-            <SportNavigation />
-          </div>
-        </MenuProvider>
-        {children}
-        <div className="mt-40 bg-[#AD88C6]">
-        <SportFooter />
+        <div className="sticky top-0 z-50">
+          <SportHeader />
+          <SportNavigation />
         </div>
-       
-        {/* Google Analytics */}
-        <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-C2ZPMYP4FY"
-          strategy="afterInteractive"
-        />
-        <Script
-          id="ga-init-sport-video-id"
-          strategy="afterInteractive"
-          dangerouslySetInnerHTML={{
-            __html: `
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
-              gtag('js', new Date());
-              gtag('config', 'G-C2ZPMYP4FY', { send_page_view: false });
-            `
-          }}
-        />
-        <AnalyticsPageView />
-      
-        </LanguageProvider>
-      </body>
-    </html>
+      </MenuProvider>
+      {children}
+      <div className="mt-40 bg-[#AD88C6]">
+        <SportFooter />
+      </div>
+    </div>
   );
 }

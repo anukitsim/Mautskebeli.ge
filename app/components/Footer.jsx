@@ -1,5 +1,6 @@
 "use client";
 
+import { useLanguage } from "@/app/context/LanguageContext";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from 'react';
@@ -12,6 +13,7 @@ const scrollToTop = () => {
 };
 
 const Footer = () => {
+  const { t, localize } = useLanguage();
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
   const [message, setMessage] = useState('');
@@ -50,7 +52,7 @@ const Footer = () => {
       <footer className="lg:flex hidden w-9/12 h-[300px] mb-[35px] mx-auto mt-[69px] gap-[40px]">
         {/* Desktop version of the footer */}
         <div className="h-full w-1/2 flex flex-col gap-[18px]">
-          <h1 className="text-[#AD88C6] text-[16px] font-bold">კონტაქტი</h1>
+          <h1 className="text-[#AD88C6] text-[16px] font-bold">{t("კონტაქტი")}</h1>
           <div className="flex gap-[10px] text-[#474F7A] text-[16px]">
             <Image src="/images/mail.svg" alt="mail" width={20} height={20}  style={{ objectFit: "contain",  width: "20px", height: "20px" }} />
             <a href="mailto:platformforsj@gmail.com" className="text-[16px]">platformforsj@gmail.com</a>
@@ -61,7 +63,7 @@ const Footer = () => {
           </div>
           <div className="flex gap-[10px] text-[#474F7A]">
             <Image src="/images/location.svg" alt="location" width={20} height={20} style={{ objectFit: "contain",  width: "20px", height: "20px" }} />
-            <a href="https://www.google.com/maps/search/?api=1&query=Kostava+30,+Batumi" target="_blank" className="text-[16px] whitespace-nowrap">ბათუმი, კოსტავას 30</a>
+            <a href="https://www.google.com/maps/search/?api=1&query=Kostava+30,+Batumi" target="_blank" className="text-[16px] whitespace-nowrap">{t("ბათუმი, კოსტავას 30")}</a>
           </div>
           <Link href='/'>
           <Image src="/images/IMG_0311.svg" alt="logo" width={116} height={32} className="mt-[32px]" />
@@ -69,14 +71,14 @@ const Footer = () => {
          
         </div>
         <div className="h-full w-1/3 flex flex-col gap-[18px]">
-          <h1 className="text-[#AD88C6] text-[16px] font-bold">ნავიგაცია</h1>
-          <Link href="/about-us" className="text-[#474F7A]">ჩვენ შესახებ</Link>
-          <Link href="/all-videos" className="text-[#474F7A]">ვიდეოები</Link>
-          <Link href="/text" className="text-[#474F7A]">ტექსტი</Link>
-          <Link href="/news" className="text-[#474F7A]">ახალი ამბები</Link>
+          <h1 className="text-[#AD88C6] text-[16px] font-bold">{t("ნავიგაცია")}</h1>
+          <Link href={localize("/about-us")} className="text-[#474F7A]">{t("ჩვენ შესახებ")}</Link>
+          <Link href={localize("/all-videos")} className="text-[#474F7A]">{t("ვიდეოები")}</Link>
+          <Link href={localize("/text")} className="text-[#474F7A]">{t("ტექსტი")}</Link>
+          <Link href={localize("/news")} className="text-[#474F7A]">{t("ახალი ამბები")}</Link>
         </div>
         <div className="h-full w-1/3 flex flex-col gap-[16px]">
-          <h1 className="text-[#AD88C6] text-[16px] font-bold">გამოგვიწერე</h1>
+          <h1 className="text-[#AD88C6] text-[16px] font-bold">{t("გამოგვიწერე")}</h1>
           <Link href='https://www.facebook.com/mautskebeli.ge' target='_blank' className="flex gap-[10px] text-[16px] text-[#474F7A]">
             <Image src="/images/fb.svg" alt="Facebook" width={25} height={10} style={{ objectFit: "contain", width: "20px", height: "20px" }} />
             <span>Facebook</span>
@@ -103,13 +105,13 @@ const Footer = () => {
           </div>
         </div>
         <div className="h-full w-1/2 flex flex-col gap-[16px]">
-          <h1 className="text-[#AD88C6] text-[16px] font-bold">გამოიწერე სიახლეები</h1>
+          <h1 className="text-[#AD88C6] text-[16px] font-bold">{t("გამოიწერე სიახლეები")}</h1>
           {/* Subscription form for Desktop */}
           <form onSubmit={handleSubmit} className="flex flex-col gap-[10px] mt-2">
             <input
               className="w-full h-[44px] pl-[18px] pr-[18px] pt-[8px] pb-[8px] border border-[#CBCBCB] rounded-[4px] text-[16px]"
               type="email"
-              placeholder="ელ. ფოსტა"
+              placeholder={t("ელ. ფოსტა")}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               style={{ fontFamily: "Noto Sans Georgian, sans-serif" }}
@@ -118,7 +120,7 @@ const Footer = () => {
             <input
               className="w-full h-[44px] pl-[18px] pr-[18px] pt-[8px] pb-[8px] border border-[#CBCBCB] rounded-[4px] text-[16px]"
               type="text"
-              placeholder="სახელი"
+              placeholder={t("სახელი")}
               value={name}
               onChange={(e) => setName(e.target.value)}
               style={{ fontFamily: "Noto Sans Georgian, sans-serif" }}
@@ -129,20 +131,20 @@ const Footer = () => {
               className="h-[44px] mt-4 bg-[#AD88C6] rounded-[4px] text-white text-[16px] flex items-center justify-center gap-[10px] px-[18px]"
               style={{ fontFamily: "Noto Sans Georgian, sans-serif" }}
             >
-              გამოიწერე
+              {t("გამოიწერე")}
             </button>
           </form>
           <p className="text-[#6E6893] text-[14px] mt-4">
-            სიახლეების მიმღებთა სიიდან ამოწერა ყოველთვის შეგიძლიათ
+            {t("სიახლეების მიმღებთა სიიდან ამოწერა ყოველთვის შეგიძლიათ")}
           </p>
-          {message && <p className="text-[#AD88C6] text-[16px]">{message}</p>}
+          {message && <p className="text-[#AD88C6] text-[16px]">{t(message)}</p>}
            {/* Scroll to top button */}
            <button
             onClick={scrollToTop}
             className="mt-[35px] self-end justify-self-end p-2 text-[#474F7A] text-[16px] cursor-pointer flex items-center justify-center"
             aria-label="Scroll to top"
           >
-            საწყისზე დაბრუნება
+            {t("საწყისზე დაბრუნება")}
             <div className="flex justify-center items-center ml-2">
               <Image
                 src="/images/top.svg"
@@ -159,7 +161,7 @@ const Footer = () => {
       <footer className="flex lg:hidden bg-[#AD88C6] flex-col justify-center mt-[32px] gap-[28px] items-center px-5 pb-6">
         <Image src="/images/footer-logo-good.svg" alt="logo" width={116} height={32} className="mt-[32px]" />
         <div className="flex flex-col justify-center items-center gap-[18px]">
-          <h1 className="text-white text-[15px] font-bold">კონტაქტი</h1>
+          <h1 className="text-white text-[15px] font-bold">{t("კონტაქტი")}</h1>
           <div className="flex gap-[10px]  text-[#474F7A] text-[15px]">
             <Image src="/images/mail.svg" alt="mail" width={20} height={20} style={{ objectFit: "contain",  width: "20px", height: "20px" }} />
             <a href="mailto:platformforsj@gmail.com" className="text-[16px]">platformforsj@gmail.com</a>
@@ -170,11 +172,11 @@ const Footer = () => {
           </div>
           <div className="flex gap-[10px]  text-[#474F7A] text-[15px]">
             <Image src="/images/location.svg" alt="location" width={20} height={20} style={{ objectFit: "contain",  width: "20px", height: "20px" }} />
-            <a href="https://www.google.com/maps/search/?api=1&query=Kostava+30,+Batumi" target="_blank" className="text-[16px] whitespace-nowrap">ბათუმი, კოსტავას 30</a>
+            <a href="https://www.google.com/maps/search/?api=1&query=Kostava+30,+Batumi" target="_blank" className="text-[16px] whitespace-nowrap">{t("ბათუმი, კოსტავას 30")}</a>
           </div>
         </div>
         <div className="flex flex-col justify-center items-center gap-[18px]">
-          <h1 className="text-white text-[15px] font-bold">გამოგვიწერე</h1>
+          <h1 className="text-white text-[15px] font-bold">{t("გამოგვიწერე")}</h1>
           <div className="flex gap-[16px] text-[#474F7A]">
             <Link href='https://www.facebook.com/mautskebeli.ge' target='_blank' className="flex gap-[6px] text-[16px]">
               <Image
@@ -241,13 +243,13 @@ const Footer = () => {
           </div>
         </div>
         <div className="flex flex-col justify-center items-center gap-[18px]">
-          <h1 className="text-white text-[15px] font-bold">გამოიწერე</h1>
+          <h1 className="text-white text-[15px] font-bold">{t("გამოიწერე")}</h1>
           {/* Subscription form for Mobile */}
           <form onSubmit={handleSubmit} className="flex flex-col w-full gap-[10px]">
             <input
               className="w-full max-w-[90vw] h-[44px] pl-[18px] pr-[18px] border border-[#CBCBCB] rounded-[4px] text-[16px] placeholder-[#474F7A]"
               type="email"
-              placeholder="ელ. ფოსტა"
+              placeholder={t("ელ. ფოსტა")}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               style={{
@@ -259,7 +261,7 @@ const Footer = () => {
             <input
               className="w-full max-w-[90vw] h-[44px] pl-[18px] pr-[18px] border border-[#CBCBCB] rounded-[4px] text-[16px] placeholder-[#474F7A]"
               type="text"
-              placeholder="სახელი"
+              placeholder={t("სახელი")}
               value={name}
               onChange={(e) => setName(e.target.value)}
               style={{
@@ -273,21 +275,21 @@ const Footer = () => {
               className="h-[44px] bg-[#FECE27] rounded-[4px] text-[#474F7A] text-[16px] font-bold flex items-center justify-center"
               style={{ fontFamily: "Noto Sans Georgian, sans-serif" }}
             >
-              გამოიწერე
+              {t("გამოიწერე")}
             </button>
-            {message && <p className="text-[#6E6893] text-[14px] mt-4">{message}</p>}
+            {message && <p className="text-[#6E6893] text-[14px] mt-4">{t(message)}</p>}
           </form>
         </div>
         <div className="flex flex-col justify-center items-center gap-[18px]">
-          <h1 className="text-white text-[15px] font-bold">ნავიგაცია</h1>
+          <h1 className="text-white text-[15px] font-bold">{t("ნავიგაცია")}</h1>
           <div className="flex gap-[42px]">
             <div className="flex flex-col gap-[12px] text-[#474F7A] text-[15px]">
-              <Link href="/about-us">ჩვენ შესახებ</Link>
-              <Link href="/all-videos">ვიდეოები</Link>
+              <Link href={localize("/about-us")}>{t("ჩვენ შესახებ")}</Link>
+              <Link href={localize("/all-videos")}>{t("ვიდეოები")}</Link>
             </div>
             <div className="flex flex-col gap-[12px] text-[#474F7A] text-[15px]">
-              <Link href="/news">ახალი ამბები</Link>
-              <Link href="/text">ტექსტი</Link>
+              <Link href={localize("/news")}>{t("ახალი ამბები")}</Link>
+              <Link href={localize("/text")}>{t("ტექსტი")}</Link>
             </div>
           </div>
           <button
@@ -295,7 +297,7 @@ const Footer = () => {
             className="mt-[35px] self-end justify-self-end p-2 text-[#474F7A] text-[16px] cursor-pointer flex items-center justify-center"
             aria-label="Scroll to top"
           >
-            საწყისზე დაბრუნება
+            {t("საწყისზე დაბრუნება")}
             <div className="flex justify-center items-center ml-2">
               <Image
                 src="/images/top.svg"

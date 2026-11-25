@@ -1,3 +1,8 @@
+import { getLang } from "@/utils/i18n/server";
+import { englishIfNeeded } from '@/utils/translate/server';
+import MachineTranslationNote from '@/app/components/MachineTranslationNote';
+import { translateUi } from "@/utils/i18n/dictionary";
+import { localizePath } from "@/utils/i18n/paths";
 import Image from "next/image";
 import { notFound, redirect } from "next/navigation";
 import moment from "moment";
@@ -76,7 +81,7 @@ async function fetchTranslation(slugOrId) {
  */
 export async function generateMetadata({ params }) {
   const { id } = params;
-  const translation = await fetchTranslation(id);
+  const translation = await englishIfNeeded(await fetchTranslation(id));
 
   if (!translation) {
     return {
@@ -136,6 +141,7 @@ export async function generateMetadata({ params }) {
  * Format date with Georgian locale
  */
 function formatDate(dateString) {
+  if (getLang() === 'en') return new Intl.DateTimeFormat('en-GB', { dateStyle: 'long', timeZone: 'UTC' }).format(new Date(`${dateString}Z`));
   moment.locale("ka");
   return moment(dateString).format("LL");
 }
@@ -207,8 +213,11 @@ function getSanitizedContent(content) {
  * Single Translation Page (Server Component)
  */
 export default async function TranslationPage({ params }) {
+  const lang = getLang();
+  const t = (ka) => translateUi(lang, ka);
+  const localize = (path) => localizePath(path, lang);
   const { id } = params;
-  const translation = await fetchTranslation(id);
+  const translation = await englishIfNeeded(await fetchTranslation(id));
 
   if (!translation) notFound();
 
@@ -236,14 +245,14 @@ export default async function TranslationPage({ params }) {
           {categories.map((category) => (
             <a
               key={category.name}
-              href={category.path}
+              href={localize(category.path)}
               className={`text-sm text-[#474F7A] ${
                 category.name === "თარგმანი"
                   ? "text-white font-bold"
                   : "text-[#474F7A] hover:scale-110"
               }`}
             >
-              {category.name}
+              {t(category.name)}
             </a>
           ))}
         </div>
@@ -288,18 +297,19 @@ export default async function TranslationPage({ params }) {
           <p className="text-[#474F7A] font-semibold pb-10">
             იხილეთ სტატიის{" "}
             <a
-              href={translation.acf.full_article_pdf}
+              href={localize(translation.acf.full_article_pdf)}
               target="_blank"
               rel="noopener noreferrer"
               download
               className="underline"
             >
-              პდფ ვერსია
+              {t("პდფ ვერსია")}
             </a>
           </p>
         )}
 
         {/* Main Text Content */}
+        <MachineTranslationNote />
         <div
           className="article-content text-[#474F7A] font-noto-sans-georgian text-[14px] sm:text-[16px] font-normal lg:text-justify leading-[30px] sm:leading-[35px] tracking-[0.32px] mt-5"
           dangerouslySetInnerHTML={{ __html: sanitizedContent }}

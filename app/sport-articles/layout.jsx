@@ -1,13 +1,19 @@
+import { localizeMetadata } from '@/utils/i18n/metadata';
 import { MenuProvider } from "@/app/context/MenuContext";
 
 import SportHeader from '../components/SportHeader';
 import SportNavigation from '../components/SportNavigation';
 import SportFooter from '../components/SportFooter';
 
-export const metadata = {
+const metadataKa = {
   title: "mautskebeli.ge",
   description: "მედია პლატფორმა მაუწყებელი",
 };
+
+// English pages get the English title (utils/i18n/metadata.js).
+export function generateMetadata() {
+  return localizeMetadata(metadataKa);
+}
 
 export default function SportArticlesLayout({ children }) {
   return (

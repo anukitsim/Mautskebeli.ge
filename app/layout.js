@@ -1,16 +1,18 @@
 // app/layout.js - Root Layout for entire application
 
+import { localizeMetadata } from '@/utils/i18n/metadata';
 import "../style/globals.css";
 import { Noto_Sans_Georgian } from "next/font/google";
 import localFont from "next/font/local";
 import Script from "next/script";
 import AnalyticsPageView from "./components/AnalyticsPageView";
 import { LanguageProvider } from "./context/LanguageContext";
+import { getLang } from "@/utils/i18n/server";
 
 // ──────────────────────────
 //  Metadata (title, OG, etc.)
 // ──────────────────────────
-export const metadata = {
+const metadataKa = {
   title:       "მაუწყებელი",
   description: "მედია პლატფორმა მაუწყებელი",
   app_id:      "1819807585106457",
@@ -32,6 +34,11 @@ export const metadata = {
     images: ["/images/logo.png"]
   }
 };
+
+// English pages get the English title (utils/i18n/metadata.js).
+export function generateMetadata() {
+  return localizeMetadata(metadataKa);
+}
 
 // ──────────────────────────
 //  Google Font
@@ -63,8 +70,10 @@ const firaGO = localFont({
 //  Root Layout
 // ──────────────────────────
 export default function RootLayout({ children }) {
+  // "ka" or "en" — set by middleware.js from the address (/en/... = English).
+  const lang = getLang();
   return (
-    <html lang="ka" className={`${notoSansGeorgian.variable} ${firaGO.variable}`}>
+    <html lang={lang} className={`${notoSansGeorgian.variable} ${firaGO.variable}`}>
       <head>
         {/* Google Analytics - G-C2ZPMYP4FY - Placed in <head> for Search Console verification */}
         <Script
@@ -85,7 +94,7 @@ export default function RootLayout({ children }) {
         />
       </head>
       <body>
-        <LanguageProvider>
+        <LanguageProvider initialLanguage={lang}>
           {children}
           {/* SPA route-change tracker */}
           <AnalyticsPageView />

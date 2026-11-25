@@ -1,14 +1,20 @@
 // app/news/layout.jsx - Layout for news pages
 
+import { localizeMetadata } from '@/utils/i18n/metadata';
 import Header from "../components/Header";
 import Navigation from "../components/Navigation";
 import Footer from "../components/Footer";
 import { MenuProvider } from "../context/MenuContext";
 
-export const metadata = {
+const metadataKa = {
   title: "ახალი ამბები | მაუწყებელი",
   description: "უახლესი ამბები და სიახლეები მაუწყებელისგან",
 };
+
+// English pages get the English title (utils/i18n/metadata.js).
+export function generateMetadata() {
+  return localizeMetadata(metadataKa);
+}
 
 export default function NewsLayout({ children }) {
   return (

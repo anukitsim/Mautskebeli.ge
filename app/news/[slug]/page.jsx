@@ -1,4 +1,7 @@
+import { cache } from 'react';
 import NewsDetailClient from './NewsDetailClient';
+import { getLang } from '@/utils/i18n/server';
+import { isMachineTranslationOn, translateContent } from '@/utils/translate';
 import ReadingTracker from '../../components/ReadingTracker';
 import { createReadingTicket } from '@/utils/stats/ticket';
 
@@ -54,6 +57,31 @@ async function fetchNewsBySlug(slug) {
   }
 }
 
+// English page: the same news item with its texts machine-translated.
+// cache(): generateMetadata and the page share one translation per request.
+const getEnglishNews = cache(async (slug) => {
+  const news = await fetchNewsBySlug(slug);
+  if (!news) return { news: null, complete: true };
+  const acf = news.acf || {};
+  const { text, html, complete } = await translateContent({
+    text: {
+      title: decodeEntities(news.title?.rendered || news.title || ''),
+      description: acf.description,
+      author: acf.author,
+      tags: acf.tags,
+    },
+    html: { main_text: acf.main_text },
+  });
+  return {
+    complete,
+    news: {
+      ...news,
+      title: { rendered: text.title },
+      acf: { ...acf, description: text.description, author: text.author, tags: text.tags, main_text: html.main_text },
+    },
+  };
+});
+
 function stripHtml(str) {
   if (!str) return '';
   return str.replace(/<[^>]*>/g, '');
@@ -74,7 +102,8 @@ function decodeEntities(str) {
 
 export async function generateMetadata({ params }) {
   const { slug } = params;
-  const news = await fetchNewsBySlug(slug);
+  const lang = getLang();
+  const news = lang === 'en' ? (await getEnglishNews(slug)).news : await fetchNewsBySlug(slug);
 
   if (!news) {
     return {
@@ -103,12 +132,18 @@ export async function generateMetadata({ params }) {
     : 'https://www.mautskebeli.ge/images/og-logo.jpg';
 
   const metadataBase = new URL('https://www.mautskebeli.ge');
-  const canonicalUrl = `/news/${news.slug || slug}`;
+  const georgianUrl = `/news/${news.slug || slug}`;
+  const englishUrl = `/en${georgianUrl}`;
+  const canonicalUrl = lang === 'en' ? englishUrl : georgianUrl;
+  const siteName = lang === 'en' ? 'Mautskebeli' : 'მაუწყებელი';
 
   return {
     metadataBase,
-    alternates: { canonical: canonicalUrl },
-    title: `${decodedTitle} | მაუწყებელი`,
+    alternates: {
+      canonical: canonicalUrl,
+      ...(isMachineTranslationOn() && { languages: { ka: georgianUrl, en: englishUrl } }),
+    },
+    title: `${decodedTitle} | ${siteName}`,
     description,
     openGraph: {
       title: decodedTitle,
@@ -123,8 +158,8 @@ export async function generateMetadata({ params }) {
           alt: decodedTitle,
         },
       ],
-      locale: 'ka_GE',
-      siteName: 'მაუწყებელი',
+      locale: lang === 'en' ? 'en_US' : 'ka_GE',
+      siteName,
     },
     twitter: {
       card: 'summary_large_image',
@@ -148,15 +183,20 @@ function sameSlug(a, b) {
 }
 
 export default async function NewsDetailPage({ params }) {
-  const news = await fetchNewsBySlug(params.slug);
+  const lang = getLang();
+  const english = lang === 'en' ? await getEnglishNews(params.slug) : null;
+  const news = english ? english.news : await fetchNewsBySlug(params.slug);
   const readingTicket =
     news && sameSlug(news.slug, params.slug)
-      ? createReadingTicket({ type: 'news', postId: news.id, lang: 'ka' })
+      ? createReadingTicket({ type: 'news', postId: news.id, lang })
       : null;
 
   return (
     <>
-      <NewsDetailClient />
+      <NewsDetailClient
+        initialNews={english ? english.news : null}
+        translationComplete={english ? english.complete : true}
+      />
       <ReadingTracker ticket={readingTicket} contentSelector="[data-reading-body]" />
     </>
   );

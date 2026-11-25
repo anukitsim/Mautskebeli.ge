@@ -1,3 +1,4 @@
+import { englishIfNeeded } from '@/utils/translate/server';
 /**
  * This is the server component for /translate
  * It fetches initial data from WP, then renders ClientSideTranslate with that data.
@@ -14,7 +15,7 @@ async function fetchInitialTranslations() {
   if (!res.ok) {
     throw new Error("Failed to fetch initial translations");
   }
-  return res.json();
+  return englishIfNeeded(await res.json());
 }
 
 export default async function TranslatePage() {

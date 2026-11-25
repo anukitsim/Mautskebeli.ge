@@ -12,7 +12,8 @@ export const CONTENT_TYPES = {
     author: 'ავტორი',
     path: (item, lang = 'ka') => {
       const base = `/all-articles/${item.slug || item.id}`;
-      return lang === 'en' ? `${base}/ENG` : lang === 'ru' ? `${base}/RU` : base;
+      const suffix = { en: 'ENG', ru: 'RU', hy: 'HY', az: 'AZ' }[lang];
+      return suffix ? `${base}/${suffix}` : base;
     },
   },
   news: {
@@ -25,7 +26,11 @@ export const CONTENT_TYPES = {
     label: 'თავისუფალი სვეტი',
     wp: 'free-column',
     author: 'ავტორი',
-    path: (item) => `/free-column/${item.slug || item.id}`,
+    path: (item, lang = 'ka') => {
+      const base = `/free-column/${item.slug || item.id}`;
+      const suffix = { en: 'ENG', ru: 'RU', hy: 'HY', az: 'AZ' }[lang];
+      return suffix ? `${base}/${suffix}` : base;
+    },
   },
   translate: {
     label: 'თარგმანი',

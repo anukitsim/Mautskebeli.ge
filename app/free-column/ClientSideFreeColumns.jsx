@@ -1,6 +1,7 @@
 // app/free-column/ClientSideFreeColumns.jsx
 
 'use client';
+import { useLanguage } from "@/app/context/LanguageContext";
 
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
@@ -38,6 +39,7 @@ const truncateText = (text, limit) => {
 };
 
 export default function ClientSideFreeColumns({ initialFreeColumns }) {
+  const { t, localize } = useLanguage();
   const loadMoreRef = useRef(null);
   
   // Ensure processedFreeColumns is initialized with an array
@@ -110,11 +112,11 @@ export default function ClientSideFreeColumns({ initialFreeColumns }) {
       <div className="w-full sm:w-11/12 md:w-10/12 lg:w-10/12 xl:w-9/12 mx-auto">
         <div className="flex justify-between items-center">
           <p className="text-[#474F7A] text-[24px] font-bold mt-5 lg:mt-14 pl-4 lg:pl-2">
-            თავისუფალი სვეტი
+            {t("თავისუფალი სვეტი")}
           </p>
         </div>
         <p className="text-[#8D91AB] text-wrap pl-4 text-[14px] font-bold lg:pl-2 pt-5 w-11/12 lg:w-9/12 lg:text-justify mb-10">
-          „მაუწყებელი“ მიზნად ისახავს საზოგადოებრივად მნიშვნელოვანი, მაგრამ პოლიტიკური დღის წესრიგის მიერ უგულებელყოფილი საკითხების წინ წამოწევას და გთავაზობთ ანალიტიკურ სტატიებს.
+          {t("„მაუწყებელი“ მიზნად ისახავს საზოგადოებრივად მნიშვნელოვანი, მაგრამ პოლიტიკური დღის წესრიგის მიერ უგულებელყოფილი საკითხების წინ წამოწევას და გთავაზობთ ანალიტიკურ სტატიებს.")}
         </p>
 
         {isValidating && processedFreeColumns.length === 0 ? (
@@ -148,7 +150,7 @@ export default function ClientSideFreeColumns({ initialFreeColumns }) {
                     </p>
                     <div className="flex flex-col justify-end pt-[30px] items-end">
                       <button className="text-white text-[12px] mt-[16px] bg-[#AD88C6] rounded-[6px] pt-[10px] pb-[10px] pl-[12px] pr-[12px]">
-                        ნახეთ სრულად
+                        {t("ნახეთ სრულად")}
                       </button>
                     </div>
                   </div>

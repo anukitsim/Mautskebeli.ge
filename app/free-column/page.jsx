@@ -1,5 +1,6 @@
 // app/free-column/page.jsx
 
+import { englishIfNeeded } from '@/utils/translate/server';
 import ClientSideFreeColumns from './ClientSideFreeColumns';
 
 // Server-side function to fetch the initial free columns with caching disabled
@@ -11,7 +12,7 @@ async function fetchInitialFreeColumns() {
   if (!res.ok) {
     throw new Error('Failed to fetch free columns');
   }
-  return res.json();
+  return englishIfNeeded(await res.json());
 }
 
 // Server Component: Fetches data server-side and passes it to the client component

@@ -1,15 +1,12 @@
 // app/free-column/layout.jsx
 
-import "../../style/globals.css";
+import { localizeMetadata } from '@/utils/i18n/metadata';
 import Header from "../components/Header";
 import Navigation from "../components/Navigation";
 import { MenuProvider } from "@/app/context/MenuContext";
-import { LanguageProvider } from "../context/LanguageContext";
 import Footer from "../components/Footer";
-import Script from 'next/script';
-import AnalyticsPageView from '../components/AnalyticsPageView';
 
-export const metadata = {
+const metadataKa = {
   title: "Mautskebeli - Free Columns",
   description: "Browse free columns on Mautskebeli.",
   openGraph: {
@@ -20,41 +17,24 @@ export const metadata = {
   },
 };
 
-export default function RootLayout({ children }) {
+// English pages get the English title (utils/i18n/metadata.js).
+export function generateMetadata() {
+  return localizeMetadata(metadataKa);
+}
+
+// The <html>, <body>, Google Analytics and LanguageProvider come from
+// app/layout.js. A section layout must not add them again: a second
+// <html> inside <body> breaks hydration, and a second AnalyticsPageView
+// counts every visit twice.
+export default function FreeColumnLayout({ children }) {
   return (
-    <html lang="ka">
-      <body>
-        <LanguageProvider>
-        <MenuProvider>
-          <div className="sticky top-0 z-50">
-            <Header />
-            <Navigation />
-          </div>
-          {children}
-          <Footer />
-        </MenuProvider>
-        
-        {/* Google Analytics */}
-        <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-C2ZPMYP4FY"
-          strategy="afterInteractive"
-        />
-        <Script
-          id="ga-init-free-column"
-          strategy="afterInteractive"
-          dangerouslySetInnerHTML={{
-            __html: `
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
-              gtag('js', new Date());
-              gtag('config', 'G-C2ZPMYP4FY', { send_page_view: false });
-            `
-          }}
-        />
-        <AnalyticsPageView />
-      
-        </LanguageProvider>
-      </body>
-    </html>
+    <MenuProvider>
+      <div className="sticky top-0 z-50">
+        <Header />
+        <Navigation />
+      </div>
+      {children}
+      <Footer />
+    </MenuProvider>
   );
 }

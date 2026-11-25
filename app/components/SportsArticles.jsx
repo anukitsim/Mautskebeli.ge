@@ -1,10 +1,12 @@
 'use client';
+import { useLanguage } from "@/app/context/LanguageContext";
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 
 const SportsArticles = ({ compact = false }) => {
+  const { t, localize } = useLanguage();
   const [articles, setArticles] = useState([]);
 
   const stripHtml = (html) => {
@@ -35,14 +37,14 @@ const SportsArticles = ({ compact = false }) => {
       <div className="flex items-center justify-between mb-6 lg:mb-8">
         <div className="flex items-center gap-3">
           <div className="w-1.5 h-10 bg-[#FECE27] rounded-full" />
-          <h2 className="text-white text-2xl lg:text-3xl font-bold drop-shadow-sm">სტატიები</h2>
+          <h2 className="text-white text-2xl lg:text-3xl font-bold drop-shadow-sm">{t("სტატიები")}</h2>
         </div>
         <Link
-          href="/sport-articles"
+          href={localize("/sport-articles")}
           className="text-white/90 text-sm font-semibold hover:text-[#FECE27]
                      transition-colors duration-300 flex items-center gap-2 group"
         >
-          <span>ნახე ყველა</span>
+          <span>{t("ნახე ყველა")}</span>
           <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
           </svg>
@@ -55,7 +57,7 @@ const SportsArticles = ({ compact = false }) => {
           const imageUrl = article.acf?.image || '/images/default-image.png';
           const href = `/sport-articles/${article.id}`;
           return (
-            <Link href={href} key={article.id} className="group flex-none w-[300px]">
+            <Link href={localize(href)} key={article.id} className="group flex-none w-[300px]">
               <div className="bg-[#F6F4F8] rounded-xl border border-[#E0DBE8] overflow-hidden flex flex-col h-[500px]
                              shadow-sm hover:shadow-xl transition-all duration-500 hover:-translate-y-1">
                 <div className="relative w-full h-[200px] flex-shrink-0 overflow-hidden">
@@ -80,7 +82,7 @@ const SportsArticles = ({ compact = false }) => {
                   <div className="flex justify-end pt-4 mt-auto">
                     <span className="text-[#5F4AA5] text-xs font-semibold bg-[#FECE27] rounded-full py-2 px-4
                                    group-hover:bg-[#FECE27]/90 group-hover:shadow-md transition-all duration-300">
-                      ნახეთ სრულად
+                      {t("ნახეთ სრულად")}
                     </span>
                   </div>
                 </div>
@@ -96,7 +98,7 @@ const SportsArticles = ({ compact = false }) => {
           const imageUrl = article.acf?.image || '/images/default-image.png';
           const href = `/sport-articles/${article.id}`;
           return (
-            <Link href={href} key={article.id} className="group">
+            <Link href={localize(href)} key={article.id} className="group">
               <div className="bg-[#F6F4F8] rounded-xl border border-[#E0DBE8] overflow-hidden flex flex-col h-[490px]
                              shadow-sm hover:shadow-xl transition-all duration-500 hover:-translate-y-1">
                 <div className="relative w-full h-[200px] flex-shrink-0 overflow-hidden">
@@ -121,7 +123,7 @@ const SportsArticles = ({ compact = false }) => {
                   <div className="flex justify-end pt-4 mt-auto">
                     <span className="text-[#5F4AA5] text-xs font-semibold bg-[#FECE27] rounded-full py-2 px-4
                                    group-hover:bg-[#FECE27]/90 group-hover:shadow-md transition-all duration-300">
-                      ნახეთ სრულად
+                      {t("ნახეთ სრულად")}
                     </span>
                   </div>
                 </div>

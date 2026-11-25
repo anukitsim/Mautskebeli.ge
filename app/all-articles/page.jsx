@@ -1,5 +1,6 @@
 // app/all-articles/page.jsx (Server Component)
 
+import { englishIfNeeded } from '@/utils/translate/server';
 import ClientSideArticles from './ClientSideArticles';
 
 // Server-side function to fetch the initial articles with caching disabled
@@ -11,7 +12,7 @@ async function fetchInitialArticles() {
   if (!res.ok) {
     throw new Error('Failed to fetch articles');
   }
-  return res.json();
+  return englishIfNeeded(await res.json());
 }
 
 // Server Component: Fetches data server-side and passes it to the client component

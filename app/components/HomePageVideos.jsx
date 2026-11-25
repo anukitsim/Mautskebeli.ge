@@ -1,4 +1,5 @@
 'use client';
+import { useLanguage } from "@/app/context/LanguageContext";
 
 import React, { useEffect, useState, useCallback } from "react";
 import Modal from "react-modal";
@@ -42,6 +43,7 @@ const getThumbnailUrl = (videoId) => {
 
 // Video Card - matching news section style
 const VideoCard = ({ videoId, caption, onSelect, postType, isMobile, index }) => {
+  const { t, localize } = useLanguage();
   const thumbnailUrl = getThumbnailUrl(videoId);
   const category = categoryColors[postType] || categoryColors.default;
   const videoPageUrl = `/${postType}?videoId=${videoId}`;
@@ -57,7 +59,7 @@ const VideoCard = ({ videoId, caption, onSelect, postType, isMobile, index }) =>
   };
 
   return (
-    <Link href={videoPageUrl} className="group block">
+    <Link href={localize(videoPageUrl)} className="group block">
       <article 
         className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-2xl 
                    transition-all duration-500 transform hover:-translate-y-2
@@ -111,7 +113,7 @@ const VideoCard = ({ videoId, caption, onSelect, postType, isMobile, index }) =>
               className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-semibold
                          text-[#AD88C6] bg-[#AD88C6]/10 border border-[#AD88C6]/30"
             >
-              {category.label}
+              {t(category.label)}
             </span>
           </div>
       </div>
@@ -121,6 +123,7 @@ const VideoCard = ({ videoId, caption, onSelect, postType, isMobile, index }) =>
 };
 
 function HomePageVideos() {
+  const { t, localize } = useLanguage();
   const [latestVideos, setLatestVideos] = useState([]);
   const [selectedVideoId, setSelectedVideoId] = useState(null);
   const [modalIsOpen, setModalIsOpen] = useState(false);
@@ -222,14 +225,14 @@ function HomePageVideos() {
       <div className="flex items-center justify-between mb-6 lg:mb-8">
         <div className="flex items-center gap-3">
           <div className="w-1.5 h-10 bg-[#AD88C6] rounded-full" />
-          <h2 className="text-[#474F7A] text-2xl lg:text-3xl font-bold">ვიდეო</h2>
+          <h2 className="text-[#474F7A] text-2xl lg:text-3xl font-bold">{t("ვიდეო")}</h2>
         </div>
         <Link 
-          href="/all-videos" 
+          href={localize("/all-videos")} 
           className="text-[#474F7A] text-sm font-semibold hover:text-[#AD88C6] 
                      transition-colors duration-300 flex items-center gap-2 group"
         >
-          <span>ნახე ყველა</span>
+          <span>{t("ნახე ყველა")}</span>
           <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
           </svg>

@@ -5,13 +5,49 @@ import { notFound, redirect } from 'next/navigation';
 import moment from 'moment';
 import 'moment/locale/ka';
 import { decode } from 'html-entities';
-import sanitizeHtml from 'sanitize-html';
-import { load } from 'cheerio';
-import React from 'react';
+import React, { cache } from 'react';
 
 import DynamicClientComponents from './DynamicClientComponents';
+import { fetchArticle } from './fetchArticle';
+import { prepareArticleHtml } from './articleContent';
+import ArticleLanguageSwitcher from './ArticleLanguageSwitcher';
+import { ORIGINAL, TRANSLATIONS, getPublishedTranslations, articleUrl } from './translations';
 import ReadingTracker from '../../components/ReadingTracker';
 import { createReadingTicket } from '@/utils/stats/ticket';
+import { getLang } from '@/utils/i18n/server';
+import { translateUi } from '@/utils/i18n/dictionary';
+import { localizePath } from '@/utils/i18n/paths';
+import { isMachineTranslationOn, translateContent } from '@/utils/translate';
+import MachineTranslationNote from '../../components/MachineTranslationNote';
+
+// English site (/en/all-articles/...): an article with a hand-made English
+// translation (language1) shows that one; otherwise its texts are machine-
+// translated. cache(): metadata and page share one translation per request.
+const getEnglishArticle = cache(async (id) => {
+  const article = await fetchArticle(id);
+  if (!article) return null;
+  const human = getPublishedTranslations(article.acf).find((t) => t.code === 'en') || null;
+  if (human) return { article, human, complete: true };
+  const acf = article.acf || {};
+  const { text, html, complete } = await translateContent({
+    text: {
+      title: decode(acf.title || article.title?.rendered || ''),
+      sub_title: acf.sub_title,
+      author: acf['ავტორი'],
+      description: acf.description,
+    },
+    html: { main: acf['main-text'] },
+  });
+  return {
+    human: null,
+    complete,
+    article: {
+      ...article,
+      title: { rendered: text.title },
+      acf: { ...acf, title: text.title, sub_title: text.sub_title, ['ავტორი']: text.author, description: text.description, ['main-text']: html.main },
+    },
+  };
+});
 
 const categories = [
   { name: 'სტატიები', path: '/all-articles' },
@@ -20,74 +56,11 @@ const categories = [
   { name: 'თავისუფალი სვეტი', path: '/free-column' },
 ];
 
-async function fetchArticle(slugOrId) {
-  // Decode the slug/ID in case it's URL-encoded (Georgian characters)
-  const decodedSlugOrId = decodeURIComponent(slugOrId);
-  
-  // Try fetching by slug first (URL-encode it properly for the API)
-  let apiUrl = `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/wp/v2/article?slug=${encodeURIComponent(decodedSlugOrId)}&acf_format=standard&_fields=id,title,acf,date,slug`;
-
-  try {
-    let res = await fetch(apiUrl, {
-      next: { revalidate: 10 },
-    });
-
-    if (res.ok) {
-      const articles = await res.json();
-      if (articles && articles.length > 0) {
-        return articles[0];
-      }
-    }
-
-    // If slug doesn't work, try by ID (for backward compatibility)
-    // Check if it's a number (ID) or string (slug)
-    const isNumeric = !isNaN(decodedSlugOrId) && !isNaN(parseFloat(decodedSlugOrId));
-    
-    if (isNumeric) {
-      apiUrl = `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/wp/v2/article/${decodedSlugOrId}?acf_format=standard&_fields=id,title,acf,date,slug`;
-      res = await fetch(apiUrl, {
-        next: { revalidate: 10 },
-      });
-
-    if (!res.ok) {
-        console.error(`Failed to fetch article with ID ${decodedSlugOrId}: ${res.status} ${res.statusText}`);
-      return null;
-    }
-
-    const article = await res.json();
-    return article;
-    }
-
-    // Not a current slug, and not numeric — it may be a FORMER slug (e.g.
-    // an article whose URL was cleaned up to a Latin slug). Check WordPress's
-    // own record of old slugs so links shared before the change still work.
-    const resolveUrl = `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/custom/v1/resolve-article-slug?post_type=article&slug=${encodeURIComponent(decodedSlugOrId)}`;
-    const resolveRes = await fetch(resolveUrl, { next: { revalidate: 10 } });
-    if (resolveRes.ok) {
-      const resolved = await resolveRes.json();
-      if (resolved.found) {
-        return {
-          id: resolved.id,
-          slug: resolved.slug,
-          title: resolved.title,
-          date: resolved.date,
-          acf: resolved.acf,
-          _redirectFrom: decodedSlugOrId, // signals the page to 301 to the new slug
-        };
-      }
-    }
-
-    console.error(`Could not find article with slug: ${decodedSlugOrId}`);
-    return null;
-  } catch (error) {
-    console.error(`Error fetching article with slug/id ${decodedSlugOrId}:`, error);
-    return null;
-  }
-}
-
 export async function generateMetadata({ params }) {
   const { id } = params;
-  const article = await fetchArticle(id);
+  const lang = getLang();
+  const english = lang === 'en' ? await getEnglishArticle(id) : null;
+  const article = english ? english.article : await fetchArticle(id);
 
   if (!article) {
     return {
@@ -115,20 +88,34 @@ export async function generateMetadata({ params }) {
   const metadataBase = new URL('https://www.mautskebeli.ge');
 
   // Use slug for canonical URL if available, fallback to ID
-  const canonicalPath = article.slug ? `/all-articles/${article.slug}` : `/all-articles/${id}`;
+  const georgianPath = article.slug ? `/all-articles/${article.slug}` : `/all-articles/${id}`;
+  const canonicalPath = lang === 'en' ? localizePath(georgianPath, 'en') : georgianPath;
+
+  // Tell search engines about the translated versions of this article.
+  const published = getPublishedTranslations(article.acf);
+  const machineEnglish = isMachineTranslationOn() && !published.some((t) => t.code === 'en');
+  const languages = published.length || machineEnglish
+    ? {
+        ka: georgianPath,
+        ...(machineEnglish && { en: localizePath(georgianPath, 'en') }),
+        ...Object.fromEntries(
+          published.map((t) => [t.code, articleUrl(article.slug || id, t)])
+        ),
+      }
+    : undefined;
 
   return {
     metadataBase,
-    alternates: { canonical: canonicalPath },
     title: decodedTitle,
     description: decodedDescription,
+    alternates: { canonical: canonicalPath, ...(languages && { languages }) },
     openGraph: {
       title: decodedTitle,
       description: decodedDescription,
       url: canonicalPath,
       type: 'article',
       images: [imageUrl],
-      locale: 'ka_GE',
+      locale: lang === 'en' ? 'en_US' : 'ka_GE',
       siteName: 'Mautskebeli',
     },
     twitter: {
@@ -140,7 +127,10 @@ export async function generateMetadata({ params }) {
   };
 }
 
-function formatDate(dateString) {
+function formatDate(dateString, lang = 'ka') {
+  if (lang === 'en') {
+    return new Intl.DateTimeFormat('en-GB', { dateStyle: 'long', timeZone: 'UTC' }).format(new Date(`${dateString}Z`));
+  }
   moment.locale('ka');
   return moment(dateString).format('LL');
 }
@@ -149,61 +139,16 @@ function decodeHTMLEntities(str) {
   return decode(str);
 }
 
-function getSanitizedContent(content) {
-  const sanitized = sanitizeHtml(content, {
-    allowedTags: [
-      'b', 'i', 'em', 'strong', 'a', 'p', 'blockquote',
-      'ul', 'ol', 'li', 'br', 'span', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-      'img', 'video', 'source', 'audio', 'figure', 'figcaption', 'div',
-    ],
-    allowedAttributes: {
-      a: ['href', 'target', 'rel'],
-      img: ['src', 'alt', 'title', 'class', 'style'],
-      video: ['src', 'controls', 'width', 'height', 'poster', 'style'],
-      audio: ['src', 'controls'],
-      source: ['src', 'type'],
-      span: ['style'],
-      p: ['style', 'class'],
-      blockquote: ['cite', 'style'],
-      figure: ['class', 'style'],
-      figcaption: ['class'],
-      div: ['class', 'style'],
-    },
-    allowedSchemes: ['http', 'https', 'data'],
-    allowedStyles: {
-      '*': {
-        width: [/^\d+(?:px|%)$/],
-        height: [/^\d+(?:px|%)$/],
-        'max-width': [/^\d+(?:px|%)$/],
-        'max-height': [/^\d+(?:px|%)$/],
-        float: [/^(left|right|none)$/],
-        'object-fit': [/^(cover|contain|fill|none|scale-down)$/],
-        'font-size': [/^\d+(?:px|em|rem|%)$/],
-      },
-    },
-    allowVulnerableTags: false,
-  });
-
-  const $ = load(sanitized);
-
-  $('blockquote').each((_, elem) => {
-    $(elem).css('margin-left', '20px');
-    $(elem).css('padding-left', '15px');
-    $(elem).css('border-left', '5px solid #ccc');
-    $(elem).css('font-style', 'italic');
-  });
-
-  $('a').each((_, elem) => {
-    $(elem).attr('target', '_blank');
-    $(elem).attr('rel', 'noopener noreferrer');
-  });
-
-  return $.html();
-}
-
 const ArticlePage = async ({ params }) => {
   const { id } = params;
-  const article = await fetchArticle(id);
+  const lang = getLang();
+  const t = (ka) => translateUi(lang, ka);
+  const english = lang === 'en' ? await getEnglishArticle(id) : null;
+  // Hand-made English exists: show that page instead of a machine translation.
+  if (english?.human) {
+    redirect(localizePath(articleUrl(english.article.slug || id, english.human), 'en'));
+  }
+  const article = english ? english.article : await fetchArticle(id);
 
   if (!article) {
     notFound();
@@ -213,42 +158,20 @@ const ArticlePage = async ({ params }) => {
   // up) — send visitors to the current canonical URL instead of rendering
   // under the stale one.
   if (article._redirectFrom && article.slug) {
-    redirect(`/all-articles/${article.slug}`);
+    redirect(localizePath(`/all-articles/${article.slug}`, lang));
   }
 
-  article.formattedDate = formatDate(article.date);
-  article.title.rendered = decodeHTMLEntities(article.acf.title || article.title.rendered);
+  const formattedDate = formatDate(article.date, lang);
+  const title = english ? article.title.rendered : decodeHTMLEntities(article.acf.title || article.title.rendered);
 
-  let sanitizedContent = getSanitizedContent(article.acf['main-text']);
-  const $ = load(sanitizedContent);
+  const sanitizedContent = prepareArticleHtml(article.acf['main-text']);
 
-  $('img').each((i, elem) => {
-    let src = $(elem).attr('src');
-
-    if (src && !src.startsWith('http')) {
-      src = `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}${src}`;
-    }
-
-    const highResSrc = src?.replace(/-\d+x\d+(?=\.\w{3,4}$)/, '');
-    $(elem).attr('src', highResSrc || src);
-    $(elem).removeAttr('width');
-    $(elem).removeAttr('height');
-
-    const imgHtml = $.html(elem);
-    const wrapped = `<a href="${highResSrc}" target="_blank" rel="noopener noreferrer">${imgHtml}</a>`;
-    $(elem).replaceWith(wrapped);
-  });
-
- 
-  sanitizedContent = $.html();
-
-  /* ─────────────────── translation flags ─────────────────── */
-  const hasEng = article.acf.language1 === true;
-  const hasRu  = article.acf.language2 === true;
-  const showLanguageDropdown = hasEng || hasRu;
+  /* ─────────────────── translations ─────────────────── */
+  const publishedTranslations = getPublishedTranslations(article.acf);
+  const urlSlug = article.slug || id;
 
   // Reading statistics: null (no tracker) unless statistics are switched on.
-  const readingTicket = createReadingTicket({ type: 'article', postId: article.id, lang: 'ka' });
+  const readingTicket = createReadingTicket({ type: 'article', postId: article.id, lang });
 
   return (
     <section className="w-full mx-auto mt-10 px-4 lg:px-0 overflow-x-hidden relative">
@@ -257,14 +180,14 @@ const ArticlePage = async ({ params }) => {
           {categories.map((category) => (
             <a
               key={category.name}
-              href={category.path}
+              href={localizePath(category.path, lang)}
               className={`text-sm text-[#474F7A] ${
                 category.name === 'სტატიები'
                   ? 'text-white font-bold'
                   : 'text-[#474F7A] hover:scale-110'
               }`}
             >
-              {category.name}
+              {t(category.name)}
             </a>
           ))}
         </div>
@@ -272,26 +195,25 @@ const ArticlePage = async ({ params }) => {
         <div className="w-full h-auto mb-5">
           <Image
             src={article.acf.image || '/images/default-og-image.jpg'}
-            alt={article.title.rendered}
+            alt={title}
             width={800}
             height={450}
             style={{ objectFit: 'cover' }}
             className="rounded-lg w-full"
           />
-          {showLanguageDropdown && (
-            <DynamicClientComponents
-            id={id}
-            title={article.title.rendered}
-            showLanguageDropdown={showLanguageDropdown}
-            hasEng={hasEng}
-            hasRu={hasRu}
-            currentLanguage="georgian"
+          {english ? (
+            <MachineTranslationNote complete={english.complete} />
+          ) : (
+            <ArticleLanguageSwitcher
+              slug={urlSlug}
+              current={ORIGINAL}
+              published={publishedTranslations}
             />
           )}
         </div>
 
         <h1 className="font-alk-tall-mtavruli text-[32px] sm:text-[64px] font-light leading-none text-[#474F7A] mt-[24px] mb-5">
-          {article.title.rendered}
+          {title}
         </h1>
         <h3 className="font-alk-tall-mtavruli sm:text-[34px] lg:text-[34px] font-light leading-wide text-[#474F7A] mt-[24px] mb-5">
           {article.acf.sub_title}
@@ -300,11 +222,11 @@ const ArticlePage = async ({ params }) => {
           {article.acf['ავტორი']}
         </h2>
         <p className="text-[#474F7A] font-semibold pb-10">
-          {article.formattedDate}
+          {formattedDate}
         </p>
         {article.acf.full_article_pdf && (
           <p className="text-[#474F7A] font-semibold pb-10">
-            იხილეთ სტატიის{' '}
+            {lang === 'en' ? null : <>იხილეთ სტატიის{' '}</>}
             <a
               href={article.acf.full_article_pdf}
               target="_blank"
@@ -312,7 +234,7 @@ const ArticlePage = async ({ params }) => {
               download
               className="underline"
             >
-              პდფ ვერსია
+              {lang === 'en' ? t('იხილეთ სტატიის პდფ ვერსია') : 'პდფ ვერსია'}
             </a>
           </p>
         )}
@@ -322,14 +244,14 @@ const ArticlePage = async ({ params }) => {
           dangerouslySetInnerHTML={{ __html: sanitizedContent }}
         ></div>
 
-       <DynamicClientComponents
+        <DynamicClientComponents
           id={id}
-          title={article.title.rendered}
-          showLanguageDropdown={false}
-          hasEng={hasEng}
-          hasRu={hasRu}
-          currentLanguage="georgian"
-          />
+          title={title}
+          {...(english && {
+            path: localizePath(articleUrl(urlSlug, ORIGINAL), 'en'),
+            ui: TRANSLATIONS.find((tr) => tr.code === 'en').ui,
+          })}
+        />
         <ReadingTracker ticket={readingTicket} />
       </div>
       <footer className="h-[100px]"></footer>

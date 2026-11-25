@@ -1,4 +1,5 @@
 "use client";
+import { useLanguage } from "@/app/context/LanguageContext";
 
 import React, { useEffect, useState, useRef, Suspense, useCallback } from "react";
 import CustomYoutubePlayer from "../components/CustomYoutube";
@@ -146,6 +147,7 @@ const fetchAllVideos = async () => {
 };
 
 function XelovnebaVideos() {
+  const { t, localize } = useLanguage();
   const [videos, setVideos] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [loading, setLoading] = useState(true);
@@ -287,14 +289,14 @@ function XelovnebaVideos() {
                {categories.map((category) => (
                  <a
                    key={category.name}
-                   href={category.path}
+                   href={localize(category.path)}
                    className={`text-md  text-[#474F7A] ${
                      category.name === currentCategory
                        ? "font-bold"
                        : "text-[#474F7A]  hover:scale-110"
                    }`}
                  >
-                   {category.name}
+                   {t(category.name)}
                  </a>
                ))}
              </div>
@@ -322,7 +324,7 @@ function XelovnebaVideos() {
                           width={24}
                           height={24}
                         />
-                        YouTube - ზე გადასვლა
+                        {t("YouTube - ზე გადასვლა")}
                       </button>
                     </a>
                     <button
@@ -335,7 +337,7 @@ function XelovnebaVideos() {
                         width={24}
                         height={24}
                       />
-                      გაზიარება
+                      {t("გაზიარება")}
                     </button>
                     {showShareOptions && (
                       <div
@@ -344,7 +346,7 @@ function XelovnebaVideos() {
                       >
                         <div ref={shareOptionsRef} className="rounded-lg p-6 w-80" style={{backgroundColor: "rgba(0, 0, 0, 0.30)",}}>
                           <h2 className="text-xl text-white font-bold mb-4">
-                            გააზიარე
+                            {t("გააზიარე")}
                           </h2>
                           <div className="flex items-center pt-7 gap-5 ">
                             <button

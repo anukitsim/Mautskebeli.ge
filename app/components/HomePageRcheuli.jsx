@@ -1,4 +1,5 @@
 'use client';
+import { useLanguage } from "@/app/context/LanguageContext";
 
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
@@ -48,6 +49,7 @@ const constructUrl = (post) => {
 };
 
 const HomePageRcheuli = () => {
+  const { t, localize } = useLanguage();
   const [posts, setPosts] = useState([]);
 
   useEffect(() => {
@@ -108,7 +110,7 @@ const HomePageRcheuli = () => {
     <>
       <div className="flex items-center gap-3 mb-6 lg:mb-8">
         <div className="w-1.5 h-10 bg-[#AD88C6] rounded-full" />
-        <h2 className="text-[#474F7A] text-2xl lg:text-3xl font-bold">მაუწყებელი გირჩევთ</h2>
+        <h2 className="text-[#474F7A] text-2xl lg:text-3xl font-bold">{t("მაუწყებელი გირჩევთ")}</h2>
       </div>
 
       {/* Mobile - Horizontal Scroll */}

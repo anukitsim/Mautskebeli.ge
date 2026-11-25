@@ -1,50 +1,24 @@
 "use client";
-import "../../style/globals.css";
 import React from "react";
 import Header from "../components/Header";
 import Navigation from "../components/Navigation";
 
 import { MenuProvider } from "../context/MenuContext";
-import { LanguageProvider } from "../context/LanguageContext";
-import Script from 'next/script';
-import AnalyticsPageView from '../components/AnalyticsPageView';
 
-export default function RootLayout({ children }) {
+// The <html>, <body>, Google Analytics and LanguageProvider come from
+// app/layout.js. A section layout must not add them again: a second
+// <html> inside <body> breaks hydration, and a second AnalyticsPageView
+// counts every visit twice.
+export default function CancelDonationLayout({ children }) {
   return (
-    <html lang="ka">
-      <body>
-        <LanguageProvider>
-        <MenuProvider>
-          <div className="sticky top-0 z-50">
-            <Header />
-            <Navigation />
-          </div>
-          <div className="pt-20"> {/* Adjust padding as needed */}
-            {children}
-          </div>
-        </MenuProvider>
-        
-        {/* Google Analytics */}
-        <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-C2ZPMYP4FY"
-          strategy="afterInteractive"
-        />
-        <Script
-          id="ga-init-cancel-donation"
-          strategy="afterInteractive"
-          dangerouslySetInnerHTML={{
-            __html: `
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
-              gtag('js', new Date());
-              gtag('config', 'G-C2ZPMYP4FY', { send_page_view: false });
-            `
-          }}
-        />
-        <AnalyticsPageView />
-      
-        </LanguageProvider>
-      </body>
-    </html>
+    <MenuProvider>
+      <div className="sticky top-0 z-50">
+        <Header />
+        <Navigation />
+      </div>
+      <div className="pt-20">
+        {children}
+      </div>
+    </MenuProvider>
   );
 }

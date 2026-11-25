@@ -1,10 +1,12 @@
 'use client';
+import { useLanguage } from "@/app/context/LanguageContext";
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 
 const HomePageStatiebi = () => {
+  const { t, localize } = useLanguage();
   const [articles, setArticles] = useState([]);
 
   const stripHtml = (html) => {
@@ -66,14 +68,14 @@ const HomePageStatiebi = () => {
       <div className="flex items-center justify-between mb-6 lg:mb-8 px-4 lg:px-0">
         <div className="flex items-center gap-3">
           <div className="w-1.5 h-10 bg-[#AD88C6] rounded-full" />
-          <h2 className="text-[#474F7A] text-2xl lg:text-3xl font-bold">სტატიები</h2>
+          <h2 className="text-[#474F7A] text-2xl lg:text-3xl font-bold">{t("სტატიები")}</h2>
         </div>
         <Link 
-          href="/all-articles" 
+          href={localize("/all-articles")} 
           className="text-[#474F7A] text-sm font-semibold hover:text-[#AD88C6] 
                      transition-colors duration-300 flex items-center gap-2 group"
         >
-          <span>ნახე ყველა</span>
+          <span>{t("ნახე ყველა")}</span>
           <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
           </svg>
@@ -125,7 +127,7 @@ const HomePageStatiebi = () => {
                       className="text-white text-xs bg-[#AD88C6] rounded-full py-2 px-4
                                  group-hover:bg-[#8B6AAE] transition-colors duration-300"
                     >
-                      ნახეთ სრულად
+                      {t("ნახეთ სრულად")}
                     </span>
                   </div>
                 </div>
@@ -180,7 +182,7 @@ const HomePageStatiebi = () => {
                       className="text-white text-xs bg-[#AD88C6] rounded-full py-2 px-4
                                  group-hover:bg-[#8B6AAE] transition-colors duration-300"
                     >
-                      ნახეთ სრულად
+                      {t("ნახეთ სრულად")}
                     </span>
                   </div>
                 </div>

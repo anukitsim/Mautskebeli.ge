@@ -1,4 +1,5 @@
 'use client';
+import { useLanguage } from "@/app/context/LanguageContext";
 
 import React, { useEffect, useState, Suspense, useCallback } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
@@ -34,6 +35,7 @@ const BADGE = {
 };
 
 function Badges({ matchedIn }) {
+  const { t } = useLanguage();
   if (!matchedIn?.length) return null;
   return (
     <div className="flex flex-wrap gap-1.5 mb-2">
@@ -46,7 +48,7 @@ function Badges({ matchedIn }) {
             className={`inline-flex items-center text-[11px] font-semibold px-2 py-0.5 rounded-full border ${b.cls}`}
           >
             <span className="w-1.5 h-1.5 rounded-full bg-current opacity-70 mr-1" aria-hidden />
-            {b.label}
+            {t(b.label)}
           </span>
         );
       })}
@@ -55,12 +57,13 @@ function Badges({ matchedIn }) {
 }
 
 function ResultCard({ item }) {
+  const { t, localize } = useLanguage();
   const titleHtml = toHtml(item.titleHighlighted || item.title || '');
   const authorHtml = item.authorHighlighted ? toHtml(item.authorHighlighted) : null;
   const excerptHtml = item.excerptHighlighted ? toHtml(item.excerptHighlighted) : null;
 
   return (
-    <Link href={item.link} className="block group">
+    <Link href={localize(item.link)} className="block group">
       <div className="bg-white rounded-xl border border-[#E0DBE8] overflow-hidden hover:shadow-lg hover:border-[#AD88C6]/50 transition-all duration-200">
         <div className="relative w-full h-[190px] bg-[#F6F4F8]">
           <Image
@@ -96,7 +99,7 @@ function ResultCard({ item }) {
             </p>
           )}
           <span className="inline-block mt-3 text-[13px] font-semibold text-[#AD88C6] group-hover:underline">
-            ნახეთ სრულად →
+            {t("ნახეთ სრულად →")}
           </span>
         </div>
       </div>
@@ -138,6 +141,7 @@ const Loader = () => (
 );
 
 function SearchResults({ searchQuery }) {
+  const { t, localize } = useLanguage();
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -191,7 +195,7 @@ function SearchResults({ searchQuery }) {
   if (!searchQuery || searchQuery.length < 2) {
     return (
       <div className="max-w-3xl mx-auto px-4 py-12 text-center">
-        <p className="text-[#474F7A] text-lg">შეიყვანეთ მინიმუმ 2 სიმბოლო ძიებისთვის.</p>
+        <p className="text-[#474F7A] text-lg">{t("შეიყვანეთ მინიმუმ 2 სიმბოლო ძიებისთვის.")}</p>
       </div>
     );
   }
@@ -225,17 +229,16 @@ function SearchResults({ searchQuery }) {
         </span>
       </div>
       <p className="text-[13px] text-[#9B8FB0] mb-6">
-        ნაჩვენებია შედეგები, სადაც საძიებო სიტყვა გვხვდება სათაურში, ავტორში ან ტექსტში.
-        მონიშნული ყვითლად.
+        {t("ნაჩვენებია შედეგები, სადაც საძიებო სიტყვა გვხვდება სათაურში, ავტორში ან ტექსტში. მონიშნული ყვითლად.")}
       </p>
 
       {total === 0 && (
         <div className="mt-8 py-16 text-center rounded-xl border border-[#E0DBE8] bg-[#FAFAFA]">
           <p className="text-[20px] font-semibold text-[#474F7A] mb-2">
-            შედეგები ვერ მოიძებნა
+            {t("შედეგები ვერ მოიძებნა")}
           </p>
           <p className="text-[15px] text-[#8D91AB] max-w-md mx-auto">
-            სცადეთ სხვა საძიებო სიტყვა ან შეამოწმეთ მართლწერა.
+            {t("სცადეთ სხვა საძიებო სიტყვა ან შეამოწმეთ მართლწერა.")}
           </p>
         </div>
       )}

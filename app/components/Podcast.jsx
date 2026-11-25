@@ -1,4 +1,5 @@
 "use client";
+import { useLanguage } from "@/app/context/LanguageContext";
 
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import CustomYoutubePlayer from "./CustomYoutube";
@@ -139,6 +140,7 @@ const PodcastLoadingSkeleton = () => (
 
 // Professional share block: below description (left column). Compact on mobile.
 const ShareBlock = ({ videoId, compact = false }) => {
+  const { t, localize } = useLanguage();
   const [copied, setCopied] = useState(false);
   const shareUrl = `https://www.youtube.com/watch?v=${videoId}`;
 
@@ -168,23 +170,23 @@ const ShareBlock = ({ videoId, compact = false }) => {
   return (
     <div className={compact ? "flex flex-col gap-4" : "rounded-2xl border border-[#E0DBE8] bg-[#F9F8FA] p-5 lg:p-6"}>
       <a
-        href={shareUrl}
+        href={localize(shareUrl)}
         target="_blank"
         rel="noopener noreferrer"
         className="inline-flex items-center justify-center gap-2.5 w-full py-3 px-4 rounded-xl bg-[#FECE27] text-[#474F7A] font-semibold text-[15px] hover:bg-[#F5D84A] hover:shadow-md active:scale-[0.98] transition-all duration-200"
       >
         <IconYouTube />
-        YouTube-ზე გადასვლა
+        {t("YouTube-ზე გადასვლა")}
       </a>
       <div className={compact ? "flex flex-wrap items-center gap-3" : "pt-4 mt-4 border-t border-[#E0DBE8]/60 flex items-center flex-wrap gap-3"}>
         <span className="text-[#6B7280] text-sm font-medium">
-          გაზიარება
+          {t("გაზიარება")}
         </span>
         <div className="flex items-center gap-2">
           {shareLinks.map(({ label, href, icon: Icon }) => (
             <a
               key={label}
-              href={href}
+              href={localize(href)}
               target="_blank"
               rel="noopener noreferrer"
               aria-label={label}
@@ -204,7 +206,7 @@ const ShareBlock = ({ videoId, compact = false }) => {
           </button>
           {copied && (
             <span className="text-xs text-[#AD88C6] font-medium animate-pulse">
-              კოპირებულია
+              {t("კოპირებულია")}
             </span>
           )}
         </div>
@@ -215,6 +217,7 @@ const ShareBlock = ({ videoId, compact = false }) => {
 
 // Sidebar episode row: thumbnail + title, for "other episodes" list (YouTube-style)
 const SidebarEpisodeItem = ({ video, channelId, isActive, onSelect }) => {
+  const { t, localize } = useLanguage();
   const href = `/podcast?chId=${channelId}&videoId=${video.id}`;
   const thumbnailUrl = getThumbnailUrl(video.id);
   const decodeTitle = (text) => {
@@ -226,7 +229,7 @@ const SidebarEpisodeItem = ({ video, channelId, isActive, onSelect }) => {
 
   return (
     <Link
-      href={href}
+      href={localize(href)}
       onClick={() => onSelect(video.id)}
       className={`flex gap-3 p-2 rounded-xl transition-colors duration-200 group ${
         isActive
@@ -261,6 +264,7 @@ const SidebarEpisodeItem = ({ video, channelId, isActive, onSelect }) => {
 
 // Card for mobile horizontal scroll / grid (unchanged)
 const VideoCard = ({ videoId, caption, onSelect, channelId, index }) => {
+  const { t, localize } = useLanguage();
   const thumbnailUrl = getThumbnailUrl(videoId);
   const href = `/podcast?chId=${channelId}&videoId=${videoId}`;
 
@@ -271,7 +275,7 @@ const VideoCard = ({ videoId, caption, onSelect, channelId, index }) => {
   };
 
   return (
-    <Link href={href} className="group block" onClick={() => onSelect(videoId)}>
+    <Link href={localize(href)} className="group block" onClick={() => onSelect(videoId)}>
       <article
         className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-2xl
                    transition-all duration-500 transform hover:-translate-y-2
@@ -315,6 +319,7 @@ const VideoCard = ({ videoId, caption, onSelect, channelId, index }) => {
 };
 
 const Podcast = () => {
+  const { t, localize } = useLanguage();
   const searchParams = useSearchParams();
   const idInQueryParams = searchParams.get("chId");
   const [videos, setVideos] = useState([]);
@@ -459,7 +464,7 @@ const Podcast = () => {
             {isLive && selectedVideoId === liveStream?.id && (
               <div className="max-w-[1280px] mx-auto px-2">
                 <h1 className="text-[#FECE27] text-[20px] font-extrabold mt-5 mb-4 animate-pulse">
-                  პირდაპირი ეთერი
+                  {t("პირდაპირი ეთერი")}
                 </h1>
               </div>
             )}
@@ -501,7 +506,7 @@ const Podcast = () => {
                 <aside className="hidden lg:block sticky top-24">
                   <div className="flex items-center gap-2 mb-3">
                     <div className="w-1.5 h-7 bg-[#AD88C6] rounded-full" />
-                    <h3 className="text-[#474F7A] text-base font-bold">სხვა ეპიზოდები</h3>
+                    <h3 className="text-[#474F7A] text-base font-bold">{t("სხვა ეპიზოდები")}</h3>
                   </div>
                   <div className="max-h-[calc(100vh-8rem)] overflow-y-auto overflow-x-hidden pr-1 space-y-1.5 [scrollbar-width:thin] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-[#E0DBE8]/20 [&::-webkit-scrollbar-thumb]:bg-[#AD88C6]/40 [&::-webkit-scrollbar-thumb]:rounded-full">
                     {videos.map((video) => (
@@ -529,7 +534,7 @@ const Podcast = () => {
             >
               <div className="flex items-center gap-2 mb-4">
                 <div className="w-1.5 h-7 bg-[#AD88C6] rounded-full" />
-                <h3 className="text-[#474F7A] text-lg font-bold">სხვა ეპიზოდები</h3>
+                <h3 className="text-[#474F7A] text-lg font-bold">{t("სხვა ეპიზოდები")}</h3>
               </div>
               <div className="flex overflow-x-auto hide-scroll-bar gap-4 pb-4 -mx-4 px-4">
                 {videos.map((video, index) => (

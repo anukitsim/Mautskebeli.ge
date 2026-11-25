@@ -1,4 +1,5 @@
 'use client';
+import { useLanguage } from "@/app/context/LanguageContext";
 
 import React, { useEffect, useState, useCallback } from 'react';
 import Modal from 'react-modal';
@@ -26,6 +27,7 @@ const getThumbnailUrl = (videoId) =>
   `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
 
 const VideoCard = ({ videoId, postId, caption, onSelect, isMobile, index }) => {
+  const { t, localize } = useLanguage();
   const thumbnailUrl = getThumbnailUrl(videoId);
   const videoPageUrl = `/all-sport-videos/${postId}`;
 
@@ -40,7 +42,7 @@ const VideoCard = ({ videoId, postId, caption, onSelect, isMobile, index }) => {
   };
 
   return (
-    <Link href={videoPageUrl} className="group block">
+    <Link href={localize(videoPageUrl)} className="group block">
       <article
         className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-2xl
                    transition-all duration-500 transform hover:-translate-y-2
@@ -82,7 +84,7 @@ const VideoCard = ({ videoId, postId, caption, onSelect, isMobile, index }) => {
                          group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
             <span className="inline-block px-2.5 py-0.5 rounded-full text-[10px] font-semibold
                            text-[#5F4AA5] bg-[#FECE27]/20 border border-[#FECE27]/40">
-              სპორტი
+              {t("სპორტი")}
             </span>
           </div>
         </div>
@@ -92,6 +94,7 @@ const VideoCard = ({ videoId, postId, caption, onSelect, isMobile, index }) => {
 };
 
 function SportHomePageVideos({ compact = false }) {
+  const { t, localize } = useLanguage();
   const [videos, setVideos] = useState([]);
   const [selectedVideoId, setSelectedVideoId] = useState(null);
   const [modalIsOpen, setModalIsOpen] = useState(false);
@@ -150,14 +153,14 @@ function SportHomePageVideos({ compact = false }) {
         <div className="flex items-center justify-between mb-6 lg:mb-8">
           <div className="flex items-center gap-3">
             <div className="w-1.5 h-10 bg-[#FECE27] rounded-full" />
-            <h2 className="text-white text-2xl lg:text-3xl font-bold drop-shadow-sm">ვიდეო</h2>
+            <h2 className="text-white text-2xl lg:text-3xl font-bold drop-shadow-sm">{t("ვიდეო")}</h2>
           </div>
           <Link
-            href="/all-sport-videos"
+            href={localize("/all-sport-videos")}
             className="text-white/90 text-sm font-semibold hover:text-[#FECE27]
                        transition-colors duration-300 flex items-center gap-2 group"
           >
-            <span>ნახე ყველა</span>
+            <span>{t("ნახე ყველა")}</span>
             <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>

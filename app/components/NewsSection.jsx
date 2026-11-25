@@ -1,4 +1,5 @@
 'use client';
+import { useLanguage } from "@/app/context/LanguageContext";
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -22,14 +23,14 @@ const extractVideoId = (videoUrl) => {
 };
 
 // Format date in Georgian
-const formatDate = (dateString) => {
+const formatDate = (dateString, t = (x) => x) => {
   if (!dateString) return '';
   const date = new Date(dateString);
   const months = [
     'იანვარი', 'თებერვალი', 'მარტი', 'აპრილი', 'მაისი', 'ივნისი',
     'ივლისი', 'აგვისტო', 'სექტემბერი', 'ოქტომბერი', 'ნოემბერი', 'დეკემბერი'
   ];
-  return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
+  return `${date.getDate()} ${t(months[date.getMonth()])} ${date.getFullYear()}`;
 };
 
 // Normalize image from API (can be URL string, media ID, or object with url)
@@ -46,6 +47,7 @@ const getNewsImageUrl = (news) => {
 
 // News Card Component - Bigger version for grid
 const NewsCard = ({ news, index, featured = false }) => {
+  const { t, localize } = useLanguage();
   const imageUrl = getNewsImageUrl(news);
   const hasVideo = news.acf?.video_url;
   
@@ -57,7 +59,7 @@ const NewsCard = ({ news, index, featured = false }) => {
   if (featured) {
     // Featured card - larger, spans 2 columns on desktop
     return (
-      <Link href={constructUrl()} className="group block lg:col-span-2 md:col-span-2">
+      <Link href={localize(constructUrl())} className="group block lg:col-span-2 md:col-span-2">
         <article 
           className="relative h-[260px] sm:h-[320px] lg:h-[380px] rounded-2xl overflow-hidden shadow-lg"
           style={{ 
@@ -83,7 +85,7 @@ const NewsCard = ({ news, index, featured = false }) => {
           {/* Content overlay */}
           <div className="absolute bottom-0 left-0 right-0 p-6 z-10">
             {/* Date */}
-            <p className="text-white/60 text-sm mb-2">{formatDate(news.date)}</p>
+            <p className="text-white/60 text-sm mb-2">{formatDate(news.date, t)}</p>
 
             {/* Title - same font as main banner (ALK Tall Mtavruli) */}
             <h3 className="font-alk-tall-mtavruli text-white text-[1.4rem] lg:text-[1.85rem] font-light leading-tight mb-2 
@@ -95,7 +97,7 @@ const NewsCard = ({ news, index, featured = false }) => {
             <div className="flex items-center gap-2 text-white/70 text-sm font-medium 
                            opacity-0 transform translate-y-2 group-hover:opacity-100 
                            group-hover:translate-y-0 transition-all duration-300">
-              <span>წაიკითხე მეტი</span>
+              <span>{t("წაიკითხე მეტი")}</span>
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
@@ -113,7 +115,7 @@ const NewsCard = ({ news, index, featured = false }) => {
 
   // Standard card
   return (
-    <Link href={constructUrl()} className="group block">
+    <Link href={localize(constructUrl())} className="group block">
       <article 
         className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-2xl 
                    transition-all duration-500 transform hover:-translate-y-2
@@ -143,7 +145,7 @@ const NewsCard = ({ news, index, featured = false }) => {
         {/* Content */}
         <div className="p-5">
           {/* Date */}
-          <p className="text-[#8B7AA0] text-xs mb-2">{formatDate(news.date)}</p>
+          <p className="text-[#8B7AA0] text-xs mb-2">{formatDate(news.date, t)}</p>
           
           {/* Title - same font as main banner (ALK Tall Mtavruli) */}
           <h3 className="font-alk-tall-mtavruli text-[#474F7A] text-xl font-light leading-snug tracking-wide line-clamp-2 
@@ -155,7 +157,7 @@ const NewsCard = ({ news, index, featured = false }) => {
           <div className="flex items-center gap-2 text-[#AD88C6] text-sm font-medium 
                          opacity-0 transform translate-x-[-10px] group-hover:opacity-100 
                          group-hover:translate-x-0 transition-all duration-300">
-            <span>წაიკითხე</span>
+            <span>{t("წაიკითხე")}</span>
             <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
@@ -168,6 +170,7 @@ const NewsCard = ({ news, index, featured = false }) => {
 
 // Main News Section Component
 const NewsSection = () => {
+  const { t, localize } = useLanguage();
   const [news, setNews] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -219,14 +222,14 @@ const NewsSection = () => {
       <div className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-3">
           <div className="w-1.5 h-10 bg-[#AD88C6] rounded-full" />
-          <h2 className="text-[#474F7A] text-2xl lg:text-3xl font-bold">ახალი ამბები</h2>
+          <h2 className="text-[#474F7A] text-2xl lg:text-3xl font-bold">{t("ახალი ამბები")}</h2>
         </div>
         <Link 
-          href="/news" 
+          href={localize("/news")} 
           className="text-[#474F7A] text-sm font-semibold hover:text-[#AD88C6] 
                      transition-colors duration-300 flex items-center gap-2 group"
         >
-          <span>ნახე ყველა</span>
+          <span>{t("ნახე ყველა")}</span>
           <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
           </svg>

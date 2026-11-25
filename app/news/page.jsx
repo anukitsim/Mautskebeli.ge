@@ -1,4 +1,5 @@
 'use client';
+import { useLanguage } from "@/app/context/LanguageContext";
 
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
@@ -13,18 +14,19 @@ const decodeHTMLEntities = (str) => {
 };
 
 // Format date in Georgian
-const formatDate = (dateString) => {
+const formatDate = (dateString, t = (x) => x) => {
   if (!dateString) return '';
   const date = new Date(dateString);
   const months = [
     'იანვარი', 'თებერვალი', 'მარტი', 'აპრილი', 'მაისი', 'ივნისი',
     'ივლისი', 'აგვისტო', 'სექტემბერი', 'ოქტომბერი', 'ნოემბერი', 'დეკემბერი'
   ];
-  return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
+  return `${date.getDate()} ${t(months[date.getMonth()])} ${date.getFullYear()}`;
 };
 
 // Featured News Card (Large)
 const FeaturedNewsCard = ({ news, isLoaded }) => {
+  const { t, localize } = useLanguage();
   const imageUrl = news.acf?.image || '/images/default-image.png';
   const hasVideo = news.acf?.video_url;
 
@@ -58,7 +60,7 @@ const FeaturedNewsCard = ({ news, isLoaded }) => {
           <div className="flex flex-wrap gap-3 mb-4">
             <span className="px-4 py-1.5 rounded-full text-xs font-semibold text-white bg-[#AD88C6] 
                            backdrop-blur-sm shadow-lg shadow-[#AD88C6]/30">
-              ამბები
+              {t("ამბები")}
             </span>
           </div>
           
@@ -74,12 +76,12 @@ const FeaturedNewsCard = ({ news, isLoaded }) => {
               <span className="font-medium">{news.acf.author}</span>
             )}
             <span className="w-1 h-1 rounded-full bg-white/50" />
-            <span>{formatDate(news.date)}</span>
+            <span>{formatDate(news.date, t)}</span>
           </div>
           
           {/* Read indicator */}
           <div className="mt-6 flex items-center gap-3 text-white group-hover:gap-4 transition-all duration-300">
-            <span className="font-medium">წაიკითხე სრულად</span>
+            <span className="font-medium">{t("წაიკითხე სრულად")}</span>
             <div className="w-10 h-10 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center
                           group-hover:bg-[#AD88C6] transition-all duration-300">
               <svg className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-0.5" 
@@ -96,6 +98,7 @@ const FeaturedNewsCard = ({ news, isLoaded }) => {
 
 // Side News Card (Small) — use vertical slide-up to avoid horizontal "glitch" on route change
 const SideNewsCard = ({ news, index, isLoaded }) => {
+  const { t } = useLanguage();
   const imageUrl = news.acf?.image || '/images/default-image.png';
   const hasVideo = news.acf?.video_url;
 
@@ -123,7 +126,7 @@ const SideNewsCard = ({ news, index, isLoaded }) => {
         
         {/* Content */}
         <div className="flex-1 min-w-0">
-          <p className="text-[#8B7AA0] text-xs mb-1">{formatDate(news.date)}</p>
+          <p className="text-[#8B7AA0] text-xs mb-1">{formatDate(news.date, t)}</p>
           <h3 className="text-[#474F7A] text-sm font-bold leading-snug line-clamp-2 
                         group-hover:text-[#AD88C6] transition-colors duration-300">
             {decodeHTMLEntities(news.title)}
@@ -136,6 +139,7 @@ const SideNewsCard = ({ news, index, isLoaded }) => {
 
 // Regular News Card
 const NewsCard = ({ news, index, isLoaded }) => {
+  const { t, localize } = useLanguage();
   const imageUrl = news.acf?.image || '/images/default-image.png';
   const hasVideo = news.acf?.video_url;
 
@@ -188,7 +192,7 @@ const NewsCard = ({ news, index, isLoaded }) => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} 
                     d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
             </svg>
-            <span>{formatDate(news.date)}</span>
+            <span>{formatDate(news.date, t)}</span>
           </div>
           
           {/* Title */}
@@ -200,7 +204,7 @@ const NewsCard = ({ news, index, isLoaded }) => {
 
           {/* Read more indicator */}
           <div className="flex items-center justify-between pt-4 border-t border-[#E8E0EE]">
-            <span className="text-[#AD88C6] text-sm font-medium">წაიკითხე</span>
+            <span className="text-[#AD88C6] text-sm font-medium">{t("წაიკითხე")}</span>
             <div className="w-8 h-8 rounded-full bg-[#F6F4F8] flex items-center justify-center
                           group-hover:bg-[#AD88C6] transition-all duration-300">
               <svg className="w-4 h-4 text-[#AD88C6] group-hover:text-white transition-colors duration-300" 
@@ -234,6 +238,7 @@ const LoadingSkeleton = () => (
 
 // Main News Page Component
 export default function NewsPage() {
+  const { t, localize } = useLanguage();
   const [news, setNews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -316,11 +321,11 @@ export default function NewsPage() {
               transition: 'all 0.6s cubic-bezier(0.16, 1, 0.3, 1)'
             }}
           >
-            <Link href="/" className="hover:text-white transition-colors">მთავარი</Link>
+            <Link href={localize("/")} className="hover:text-white transition-colors">{t("მთავარი")}</Link>
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
-            <span className="text-white">ამბები</span>
+            <span className="text-white">{t("ამბები")}</span>
           </nav>
           
           {/* Title with yellow line below */}
@@ -332,7 +337,7 @@ export default function NewsPage() {
             }}
           >
             <h1 className="font-alk-tall-mtavruli text-[36px] lg:text-[56px] font-light text-white mb-2 drop-shadow-lg">
-              ამბები
+              {t("ამბები")}
             </h1>
             <div 
               className="h-1 bg-[#FECE27] rounded-full"
@@ -399,7 +404,7 @@ export default function NewsPage() {
                           }}
                         >
                           <span className="w-1 h-6 bg-[#AD88C6] rounded-full" />
-                          უახლესი
+                          {t("უახლესი")}
                         </h3>
                         {sideNews.map((item, index) => (
                           <SideNewsCard key={item.id} news={item} index={index} isLoaded={isLoaded} />
@@ -421,7 +426,7 @@ export default function NewsPage() {
                   >
                     <h2 className="text-[#474F7A] font-bold text-xl flex items-center gap-3">
                       <span className="w-2 h-8 bg-gradient-to-b from-[#AD88C6] to-[#8C74B2] rounded-full" />
-                      ყველა ამბავი
+                      {t("ყველა ამბავი")}
                     </h2>
                     <div className="flex-1 h-px bg-gradient-to-r from-[#E8E0EE] to-transparent" />
                   </div>
@@ -453,9 +458,9 @@ export default function NewsPage() {
                           d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9.5a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 12h10"/>
                   </svg>
                 </div>
-                <h2 className="text-2xl font-bold text-[#474F7A] mb-8">სატესტო რეჟიმი</h2>
+                <h2 className="text-2xl font-bold text-[#474F7A] mb-8">{t("სატესტო რეჟიმი")}</h2>
                 <Link 
-                  href="/"
+                  href={localize("/")}
                   className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#AD88C6] to-[#8C74B2] 
                             text-white rounded-full font-medium shadow-lg shadow-[#AD88C6]/25
                             hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
@@ -463,7 +468,7 @@ export default function NewsPage() {
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                   </svg>
-                  მთავარ გვერდზე დაბრუნება
+                  {t("მთავარ გვერდზე დაბრუნება")}
                 </Link>
               </div>
             )}

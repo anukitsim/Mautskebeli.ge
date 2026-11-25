@@ -1,13 +1,19 @@
+import { localizeMetadata } from '@/utils/i18n/metadata';
 import "../../style/globals.css";
 import { LanguageProvider } from "../context/LanguageContext";
 import Footer from "../components/Footer";
 import Script from 'next/script';
 import AnalyticsPageView from '../components/AnalyticsPageView';
 
-export const metadata = {
+const metadataKa = {
   title: "რესურსები - მაუწყებელი",
   description: "რესურსების სიახლეები და ამბები",
 };
+
+// English pages get the English title (utils/i18n/metadata.js).
+export function generateMetadata() {
+  return localizeMetadata(metadataKa);
+}
 
 export default function RootLayout({ children }) {
   return (

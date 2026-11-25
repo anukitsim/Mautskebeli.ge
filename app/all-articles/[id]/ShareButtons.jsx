@@ -6,10 +6,18 @@ import { useState, useEffect } from 'react';
 import { FacebookShareButton, FacebookIcon, TwitterShareButton, TwitterIcon } from 'next-share';
 import Image from 'next/image';
 
-const ShareButtons = ({ articleId, title }) => {
+const DEFAULT_LABELS = {
+  share: 'გააზიარე',
+  copyLink: 'ბმულის კოპირება',
+  copied: 'დაკოპირდა!',
+};
+
+// `path` (optional): page path to share, e.g. /all-articles/<slug>/HY.
+// `labels` (optional): texts in the page's language.
+const ShareButtons = ({ articleId, title, path, labels = DEFAULT_LABELS }) => {
   const [showShareOptions, setShowShareOptions] = useState(false);
   const [copied, setCopied] = useState(false);
-  const shareUrl = `https://www.mautskebeli.ge/all-articles/${articleId}`;
+  const shareUrl = `https://www.mautskebeli.ge${path || `/all-articles/${articleId}`}`;
 
   const closeShareOptions = () => {
     setShowShareOptions(false);
@@ -69,7 +77,7 @@ const ShareButtons = ({ articleId, title }) => {
             style={{ backgroundColor: 'rgba(0, 0, 0, 0.30)' }}
             onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside the modal
           >
-            <h2 className="text-xl text-white font-bold mb-4">გააზიარე</h2>
+            <h2 className="text-xl text-white font-bold mb-4">{labels.share}</h2>
             <div className="flex items-center pt-7 gap-5">
               <FacebookShareButton url={shareUrl} quote={title}>
                 <FacebookIcon size={44} round={true} />
@@ -80,7 +88,7 @@ const ShareButtons = ({ articleId, title }) => {
               <div className="relative">
                 <button
                   onClick={handleCopyLink}
-                  aria-label="ბმულის კოპირება"
+                  aria-label={labels.copyLink}
                   className="w-11 h-11 rounded-full bg-white/90 hover:bg-white flex items-center justify-center transition-colors"
                 >
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#474F7A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -90,7 +98,7 @@ const ShareButtons = ({ articleId, title }) => {
                 </button>
                 {copied && (
                   <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-black text-white text-xs px-2 py-1 rounded whitespace-nowrap">
-                    დაკოპირდა!
+                    {labels.copied}
                   </span>
                 )}
               </div>

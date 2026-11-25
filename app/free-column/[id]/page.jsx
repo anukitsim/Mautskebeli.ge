@@ -1,3 +1,8 @@
+import { getLang } from "@/utils/i18n/server";
+import { englishIfNeeded } from '@/utils/translate/server';
+import MachineTranslationNote from '@/app/components/MachineTranslationNote';
+import { translateUi } from "@/utils/i18n/dictionary";
+import { localizePath } from "@/utils/i18n/paths";
 // app/free-column/[id]/page.jsx
 
 import Image from 'next/image';
@@ -11,6 +16,9 @@ import React from 'react';
 
 // Import the Client Component handling dynamic imports
 import DynamicClientComponents from './DynamicClientComponents';
+import ArticleLanguageSwitcher from '@/app/all-articles/[id]/ArticleLanguageSwitcher';
+import { ORIGINAL, getPublishedTranslations, postUrl } from '@/app/all-articles/[id]/translations';
+import { isMachineTranslationOn } from '@/utils/translate';
 import ReadingTracker from '../../components/ReadingTracker';
 import { createReadingTicket } from '@/utils/stats/ticket';
 
@@ -85,7 +93,7 @@ async function fetchFreeColumn(slugOrId) {
 // Generate Metadata for the Free Column
 export async function generateMetadata({ params }) {
   const { id } = params;
-  const freeColumn = await fetchFreeColumn(id);
+  const freeColumn = await englishIfNeeded(await fetchFreeColumn(id));
 
   if (!freeColumn) {
     return {
@@ -111,11 +119,23 @@ export async function generateMetadata({ params }) {
   imageUrl = imageUrl.split('?')[0];
 
   const metadataBase = new URL('https://www.mautskebeli.ge');
-  const canonicalPath = freeColumn.slug ? `/free-column/${freeColumn.slug}` : `/free-column/${id}`;
+  const georgianPath = freeColumn.slug ? `/free-column/${freeColumn.slug}` : `/free-column/${id}`;
+  const lang = getLang();
+  const canonicalPath = localizePath(georgianPath, lang);
+  // Language versions: hand-made translations + the machine-translated English.
+  const published = getPublishedTranslations(freeColumn.acf);
+  const machineEnglish = isMachineTranslationOn() && !published.some((tr) => tr.code === 'en');
+  const languages = published.length || machineEnglish
+    ? {
+        ka: georgianPath,
+        ...(machineEnglish && { en: localizePath(georgianPath, 'en') }),
+        ...Object.fromEntries(published.map((tr) => [tr.code, postUrl('/free-column', freeColumn.slug || id, tr)])),
+      }
+    : undefined;
 
   return {
     metadataBase,
-    alternates: { canonical: canonicalPath },
+    alternates: { canonical: canonicalPath, ...(languages && { languages }) },
     title: decodedTitle,
     description: decodedDescription,
     openGraph: {
@@ -124,7 +144,7 @@ export async function generateMetadata({ params }) {
       url: canonicalPath,
       type: 'article',
       images: [imageUrl],
-      locale: 'ka_GE',
+      locale: lang === 'en' ? 'en_US' : 'ka_GE',
       siteName: 'Mautskebeli',
     },
     twitter: {
@@ -137,6 +157,7 @@ export async function generateMetadata({ params }) {
 }
 
 function formatDate(dateString) {
+  if (getLang() === 'en') return new Intl.DateTimeFormat('en-GB', { dateStyle: 'long', timeZone: 'UTC' }).format(new Date(`${dateString}Z`));
   moment.locale('ka');
   return moment(dateString).format('LL');
 }
@@ -220,15 +241,26 @@ function getSanitizedContent(content) {
 }
 
 const FreeColumnPage = async ({ params }) => {
+  const lang = getLang();
+  const t = (ka) => translateUi(lang, ka);
+  const localize = (path) => localizePath(path, lang);
   const { id } = params;
-  const freeColumn = await fetchFreeColumn(id);
+  const original = await fetchFreeColumn(id);
+  // English site + a hand-made English translation: show that page.
+  const humanEnglish = lang === 'en' && original
+    ? getPublishedTranslations(original.acf).find((tr) => tr.code === 'en')
+    : null;
+  if (humanEnglish) {
+    redirect(localize(postUrl('/free-column', original.slug || id, humanEnglish)));
+  }
+  const freeColumn = await englishIfNeeded(original);
 
   if (!freeColumn) {
     notFound();
   }
 
   if (freeColumn._redirectFrom && freeColumn.slug) {
-    redirect(`/free-column/${freeColumn.slug}`);
+    redirect(localize(`/free-column/${freeColumn.slug}`));
   }
 
   freeColumn.formattedDate = formatDate(freeColumn.date);
@@ -253,11 +285,10 @@ const FreeColumnPage = async ({ params }) => {
 
   sanitizedContent = $.html();
 
-  const showLanguageDropdown =
-    freeColumn.acf.language1 === true || freeColumn.acf.language2 === true;
+  const publishedTranslations = getPublishedTranslations(freeColumn.acf);
 
   // Reading statistics: null (no tracker) unless statistics are switched on.
-  const readingTicket = createReadingTicket({ type: 'free-column', postId: freeColumn.id, lang: 'ka' });
+  const readingTicket = createReadingTicket({ type: 'free-column', postId: freeColumn.id, lang });
 
   return (
     <section className="w-full mx-auto mt-10 px-4 lg:px-0 overflow-x-hidden relative">
@@ -266,14 +297,14 @@ const FreeColumnPage = async ({ params }) => {
           {categories.map((category) => (
             <a
               key={category.name}
-              href={category.path}
+              href={localize(category.path)}
               className={`text-sm text-[#474F7A] ${
                 category.name === 'თავისუფალი სვეტი'
                   ? 'text-white font-bold'
                   : 'text-[#474F7A] hover:scale-110'
               }`}
             >
-              {category.name}
+              {t(category.name)}
             </a>
           ))}
         </div>
@@ -290,11 +321,12 @@ const FreeColumnPage = async ({ params }) => {
             className="rounded-lg w-full"
           />
 
-          {showLanguageDropdown && (
-            <DynamicClientComponents
-              id={id}
-              title={freeColumn.title.rendered}
-              showLanguageDropdown={showLanguageDropdown}
+          {lang !== 'en' && (
+            <ArticleLanguageSwitcher
+              slug={freeColumn.slug || id}
+              current={ORIGINAL}
+              published={publishedTranslations}
+              basePath="/free-column"
             />
           )}
         </div>
@@ -315,17 +347,18 @@ const FreeColumnPage = async ({ params }) => {
           <p className="text-[#474F7A] font-semibold pb-10">
             იხილეთ თავისუფალი სვეტის{' '}
             <a
-              href={freeColumn.acf.full_column_pdf}
+              href={localize(freeColumn.acf.full_column_pdf)}
               target="_blank"
               rel="noopener noreferrer"
               download
               className="underline"
             >
-              პდფ ვერსია
+              {t("პდფ ვერსია")}
             </a>
           </p>
         )}
 
+        <MachineTranslationNote />
         <div
           className="article-content text-[#474F7A] font-noto-sans-georgian text-[14px] sm:text-[16px] font-normal lg:text-justify leading-[30px] sm:leading-[35px] tracking-[0.32px] mt-5"
           dangerouslySetInnerHTML={{ __html: sanitizedContent }}
@@ -334,7 +367,6 @@ const FreeColumnPage = async ({ params }) => {
         <DynamicClientComponents
           id={id}
           title={freeColumn.title.rendered}
-          showLanguageDropdown={false}
         />
         <ReadingTracker ticket={readingTicket} />
       </div>

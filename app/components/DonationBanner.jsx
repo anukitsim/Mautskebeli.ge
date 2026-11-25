@@ -1,10 +1,12 @@
 'use client';
+import { useLanguage } from "@/app/context/LanguageContext";
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 
 const DonationBanner = () => {
+  const { t, localize } = useLanguage();
   const [mounted, setMounted] = useState(false);
   const [lineInView, setLineInView] = useState(false);
   const sectionRef = useRef(null);
@@ -69,7 +71,7 @@ const DonationBanner = () => {
                 className={`font-alk-tall-mtavruli text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-white tracking-wide leading-snug ${transition} ${base}`}
                 style={{ transitionDelay: '200ms' }}
               >
-                გააძლიერე მაუწყებელი
+                {t("გააძლიერე მაუწყებელი")}
               </h2>
               {/* Yellow underline - longer (220px), left to right */}
               <div
@@ -83,7 +85,7 @@ const DonationBanner = () => {
                 className={`font-alk-tall-mtavruli text-xl sm:text-2xl lg:text-3xl font-bold text-white/95 tracking-wide leading-snug ${transition} ${base}`}
                 style={{ transitionDelay: '450ms' }}
               >
-                გააძლიერე წინააღმდეგობა!
+                {t("გააძლიერე წინააღმდეგობა!")}
               </p>
             </div>
           </div>
@@ -92,7 +94,7 @@ const DonationBanner = () => {
         {/* Right block: CTA - aligned to end on desktop */}
         <div className={`flex-shrink-0 lg:self-center ${transition} ${base}`} style={{ transitionDelay: '600ms' }}>
           <Link
-            href="/donation"
+            href={localize("/donation")}
             className="group inline-flex items-center gap-3 px-8 py-4 lg:px-10 lg:py-4
                        bg-[#FECE27] text-[#474F7A] rounded-full
                        text-base lg:text-lg font-bold
@@ -108,7 +110,7 @@ const DonationBanner = () => {
               height={24}
               className="w-6 h-6"
             />
-            <span>გააძლიერე მაუწყებელი</span>
+            <span>{t("გააძლიერე მაუწყებელი")}</span>
           </Link>
         </div>
       </div>

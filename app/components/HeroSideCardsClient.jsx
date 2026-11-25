@@ -1,4 +1,5 @@
 'use client';
+import { useLanguage } from "@/app/context/LanguageContext";
 
 import React from 'react';
 import Link from 'next/link';
@@ -82,6 +83,7 @@ const CTA_ICONS = {
 };
 
 const HeroSideCardsClient = ({ cards }) => {
+  const { t, localize } = useLanguage();
   if (!cards || cards.length === 0) {
     return (
       <div className="flex flex-col gap-4 w-full h-full">
@@ -106,7 +108,7 @@ const HeroSideCardsClient = ({ cards }) => {
         const ctaIcon = CTA_ICONS[card.categoryType] || CTA_ICONS.news;
 
         return (
-          <Link key={card.id} href={card.href} className="group block flex-1 min-h-0">
+          <Link key={card.id} href={localize(card.href)} className="group block flex-1 min-h-0">
             <article
               className="relative h-full rounded-2xl overflow-hidden shadow-xl"
               style={{

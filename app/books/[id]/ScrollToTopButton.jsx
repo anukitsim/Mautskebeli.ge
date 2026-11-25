@@ -1,10 +1,12 @@
 // app/books/[id]/ScrollToTopButton.jsx
 
 'use client';
+import { useLanguage } from "@/app/context/LanguageContext";
 
 import { useState, useEffect } from 'react';
 
 const ScrollToTopButton = () => {
+  const { t, localize } = useLanguage();
   const [showScrollButton, setShowScrollButton] = useState(false);
 
   useEffect(() => {
@@ -45,7 +47,7 @@ const ScrollToTopButton = () => {
         boxShadow: '0 0 20px 5px rgba(254, 206, 39, 0.5)',
       }}
     >
-      <span className="whitespace-nowrap">საწყისზე დაბრუნება</span>
+      <span className="whitespace-nowrap">{t("საწყისზე დაბრუნება")}</span>
     </button>
   );
 };

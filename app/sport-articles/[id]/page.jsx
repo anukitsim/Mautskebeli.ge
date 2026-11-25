@@ -1,3 +1,8 @@
+import { getLang } from "@/utils/i18n/server";
+import { englishIfNeeded } from '@/utils/translate/server';
+import MachineTranslationNote from '@/app/components/MachineTranslationNote';
+import { translateUi } from "@/utils/i18n/dictionary";
+import { localizePath } from "@/utils/i18n/paths";
 // app/sport-articles/[id]/page.jsx
 
 import Image from 'next/image';
@@ -76,7 +81,7 @@ async function fetchArticle(slugOrId) {
 
 export async function generateMetadata({ params }) {
   const { id } = params;
-  const article = await fetchArticle(id);
+  const article = await englishIfNeeded(await fetchArticle(id));
 
   if (!article) {
     return {
@@ -128,6 +133,7 @@ export async function generateMetadata({ params }) {
 }
 
 function formatDate(dateString) {
+  if (getLang() === 'en') return new Intl.DateTimeFormat('en-GB', { dateStyle: 'long', timeZone: 'UTC' }).format(new Date(`${dateString}Z`));
   moment.locale('ka');
   return moment(dateString).format('LL');
 }
@@ -189,8 +195,11 @@ function getSanitizedContent(content) {
 }
 
 const SportArticlePage = async ({ params }) => {
+  const lang = getLang();
+  const t = (ka) => translateUi(lang, ka);
+  const localize = (path) => localizePath(path, lang);
   const { id } = params;
-  const article = await fetchArticle(id);
+  const article = await englishIfNeeded(await fetchArticle(id));
 
   if (!article) {
     notFound();
@@ -232,8 +241,8 @@ const SportArticlePage = async ({ params }) => {
     <section className="w-full mx-auto mt-10 px-4 lg:px-0 overflow-x-hidden relative">
       <div className="w-full lg:w-[60%] mx-auto bg-opacity-90 p-5 rounded-lg">
         <div className="lg:flex hidden justify-start rounded-md px-8 py-4 mt-[-12px] mb-10 font-noto-sans-georgian w-full mx-auto bg-[#AD88C6]">
-          <a href="/sporti" className="text-sm text-white font-bold hover:scale-110 transition-transform">
-            სპორტი
+          <a href={localize("/sporti")} className="text-sm text-white font-bold hover:scale-110 transition-transform">
+            {t("სპორტი")}
           </a>
         </div>
 
@@ -265,6 +274,7 @@ const SportArticlePage = async ({ params }) => {
           {article.formattedDate}
         </p>
 
+        <MachineTranslationNote />
         <div
           className="article-content text-[#474F7A] font-noto-sans-georgian text-[14px] sm:text-[16px] font-normal lg:text-justify leading-[30px] sm:leading-[35px] tracking-[0.32px] mt-5"
           dangerouslySetInnerHTML={{ __html: sanitizedContent }}
