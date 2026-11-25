@@ -5368,3 +5368,54 @@ add_action('acf/init', function () {
         'show_in_rest' => 1,
     ));
 });
+
+
+// ─────────────────────────────────────────────────────────────────────
+// Clear labels for the English (language1_*) and Russian (language2_*)
+// fields on the article edit screen, matching the Armenian/Azerbaijani
+// box above. Only the label editors SEE changes: the field names, the
+// saved data and the website stay exactly the same.
+// ─────────────────────────────────────────────────────────────────────
+add_filter('acf/prepare_field', function ($field) {
+    if (empty($field['name']) || !preg_match('/^language([12])(?:_(.+))?$/u', $field['name'], $m)) {
+        return $field;
+    }
+
+    // Only on articles (free columns have their own language1/2 toggles).
+    $screen = function_exists('get_current_screen') ? get_current_screen() : null;
+    $post_type = $screen && !empty($screen->post_type) ? $screen->post_type : get_post_type();
+    if ($post_type !== 'article') {
+        return $field;
+    }
+
+    $languages = array(
+        '1' => array('label' => 'ინგლისური / English', 'url' => 'ENG'),
+        '2' => array('label' => 'რუსული / Русский',   'url' => 'RU'),
+    );
+    $lang = $languages[$m[1]];
+    $part = isset($m[2]) ? $m[2] : '';
+
+    $labels = array(
+        ''          => 'ჩართვა',
+        'title'     => 'სათაური',
+        'sub_title' => 'ქვესათაური',
+        'ავტორი'     => 'ავტორი',
+        'image'     => 'სურათი',
+        'main_text' => 'ტექსტი',
+    );
+    if (!isset($labels[$part])) {
+        return $field;
+    }
+
+    $field['label'] = $lang['label'] . ': ' . $labels[$part];
+
+    if ($part === '') {
+        $field['instructions'] = "ჩართეთ, როცა თარგმანი მზადაა. სტატიაზე გამოჩნდება ენის ღილაკი. მისამართი: /all-articles/<slug>/{$lang['url']}";
+    } elseif ($part === 'title') {
+        $field['instructions'] = 'სავალდებულოა: სათაურის გარეშე თარგმანი არ გამოჩნდება.';
+    } elseif ($part === 'image') {
+        $field['instructions'] = 'არასავალდებულო. ცარიელის შემთხვევაში გამოჩნდება მთავარი სურათი.';
+    }
+
+    return $field;
+});
