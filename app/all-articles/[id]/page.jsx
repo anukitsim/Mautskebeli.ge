@@ -5,11 +5,13 @@ import { notFound, redirect } from 'next/navigation';
 import moment from 'moment';
 import 'moment/locale/ka';
 import { decode } from 'html-entities';
-import sanitizeHtml from 'sanitize-html';
-import { load } from 'cheerio';
 import React from 'react';
 
 import DynamicClientComponents from './DynamicClientComponents';
+import { fetchArticle } from './fetchArticle';
+import { prepareArticleHtml } from './articleContent';
+import ArticleLanguageSwitcher from './ArticleLanguageSwitcher';
+import { ORIGINAL, getPublishedTranslations, articleUrl } from './translations';
 import ReadingTracker from '../../components/ReadingTracker';
 import { createReadingTicket } from '@/utils/stats/ticket';
 
@@ -19,71 +21,6 @@ const categories = [
   { name: 'მაუწყებელი წიგნები', path: '/books' },
   { name: 'თავისუფალი სვეტი', path: '/free-column' },
 ];
-
-async function fetchArticle(slugOrId) {
-  // Decode the slug/ID in case it's URL-encoded (Georgian characters)
-  const decodedSlugOrId = decodeURIComponent(slugOrId);
-  
-  // Try fetching by slug first (URL-encode it properly for the API)
-  let apiUrl = `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/wp/v2/article?slug=${encodeURIComponent(decodedSlugOrId)}&acf_format=standard&_fields=id,title,acf,date,slug`;
-
-  try {
-    let res = await fetch(apiUrl, {
-      next: { revalidate: 10 },
-    });
-
-    if (res.ok) {
-      const articles = await res.json();
-      if (articles && articles.length > 0) {
-        return articles[0];
-      }
-    }
-
-    // If slug doesn't work, try by ID (for backward compatibility)
-    // Check if it's a number (ID) or string (slug)
-    const isNumeric = !isNaN(decodedSlugOrId) && !isNaN(parseFloat(decodedSlugOrId));
-    
-    if (isNumeric) {
-      apiUrl = `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/wp/v2/article/${decodedSlugOrId}?acf_format=standard&_fields=id,title,acf,date,slug`;
-      res = await fetch(apiUrl, {
-        next: { revalidate: 10 },
-      });
-
-    if (!res.ok) {
-        console.error(`Failed to fetch article with ID ${decodedSlugOrId}: ${res.status} ${res.statusText}`);
-      return null;
-    }
-
-    const article = await res.json();
-    return article;
-    }
-
-    // Not a current slug, and not numeric — it may be a FORMER slug (e.g.
-    // an article whose URL was cleaned up to a Latin slug). Check WordPress's
-    // own record of old slugs so links shared before the change still work.
-    const resolveUrl = `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}/custom/v1/resolve-article-slug?post_type=article&slug=${encodeURIComponent(decodedSlugOrId)}`;
-    const resolveRes = await fetch(resolveUrl, { next: { revalidate: 10 } });
-    if (resolveRes.ok) {
-      const resolved = await resolveRes.json();
-      if (resolved.found) {
-        return {
-          id: resolved.id,
-          slug: resolved.slug,
-          title: resolved.title,
-          date: resolved.date,
-          acf: resolved.acf,
-          _redirectFrom: decodedSlugOrId, // signals the page to 301 to the new slug
-        };
-      }
-    }
-
-    console.error(`Could not find article with slug: ${decodedSlugOrId}`);
-    return null;
-  } catch (error) {
-    console.error(`Error fetching article with slug/id ${decodedSlugOrId}:`, error);
-    return null;
-  }
-}
 
 export async function generateMetadata({ params }) {
   const { id } = params;
@@ -117,11 +54,22 @@ export async function generateMetadata({ params }) {
   // Use slug for canonical URL if available, fallback to ID
   const canonicalPath = article.slug ? `/all-articles/${article.slug}` : `/all-articles/${id}`;
 
+  // Tell search engines about the translated versions of this article.
+  const published = getPublishedTranslations(article.acf);
+  const languages = published.length
+    ? {
+        ka: canonicalPath,
+        ...Object.fromEntries(
+          published.map((t) => [t.code, articleUrl(article.slug || id, t)])
+        ),
+      }
+    : undefined;
+
   return {
     metadataBase,
-    alternates: { canonical: canonicalPath },
     title: decodedTitle,
     description: decodedDescription,
+    alternates: { canonical: canonicalPath, ...(languages && { languages }) },
     openGraph: {
       title: decodedTitle,
       description: decodedDescription,
@@ -149,58 +97,6 @@ function decodeHTMLEntities(str) {
   return decode(str);
 }
 
-function getSanitizedContent(content) {
-  const sanitized = sanitizeHtml(content, {
-    allowedTags: [
-      'b', 'i', 'em', 'strong', 'a', 'p', 'blockquote',
-      'ul', 'ol', 'li', 'br', 'span', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
-      'img', 'video', 'source', 'audio', 'figure', 'figcaption', 'div',
-    ],
-    allowedAttributes: {
-      a: ['href', 'target', 'rel'],
-      img: ['src', 'alt', 'title', 'class', 'style'],
-      video: ['src', 'controls', 'width', 'height', 'poster', 'style'],
-      audio: ['src', 'controls'],
-      source: ['src', 'type'],
-      span: ['style'],
-      p: ['style', 'class'],
-      blockquote: ['cite', 'style'],
-      figure: ['class', 'style'],
-      figcaption: ['class'],
-      div: ['class', 'style'],
-    },
-    allowedSchemes: ['http', 'https', 'data'],
-    allowedStyles: {
-      '*': {
-        width: [/^\d+(?:px|%)$/],
-        height: [/^\d+(?:px|%)$/],
-        'max-width': [/^\d+(?:px|%)$/],
-        'max-height': [/^\d+(?:px|%)$/],
-        float: [/^(left|right|none)$/],
-        'object-fit': [/^(cover|contain|fill|none|scale-down)$/],
-        'font-size': [/^\d+(?:px|em|rem|%)$/],
-      },
-    },
-    allowVulnerableTags: false,
-  });
-
-  const $ = load(sanitized);
-
-  $('blockquote').each((_, elem) => {
-    $(elem).css('margin-left', '20px');
-    $(elem).css('padding-left', '15px');
-    $(elem).css('border-left', '5px solid #ccc');
-    $(elem).css('font-style', 'italic');
-  });
-
-  $('a').each((_, elem) => {
-    $(elem).attr('target', '_blank');
-    $(elem).attr('rel', 'noopener noreferrer');
-  });
-
-  return $.html();
-}
-
 const ArticlePage = async ({ params }) => {
   const { id } = params;
   const article = await fetchArticle(id);
@@ -219,33 +115,11 @@ const ArticlePage = async ({ params }) => {
   article.formattedDate = formatDate(article.date);
   article.title.rendered = decodeHTMLEntities(article.acf.title || article.title.rendered);
 
-  let sanitizedContent = getSanitizedContent(article.acf['main-text']);
-  const $ = load(sanitizedContent);
+  const sanitizedContent = prepareArticleHtml(article.acf['main-text']);
 
-  $('img').each((i, elem) => {
-    let src = $(elem).attr('src');
-
-    if (src && !src.startsWith('http')) {
-      src = `${process.env.NEXT_PUBLIC_WORDPRESS_API_URL}${src}`;
-    }
-
-    const highResSrc = src?.replace(/-\d+x\d+(?=\.\w{3,4}$)/, '');
-    $(elem).attr('src', highResSrc || src);
-    $(elem).removeAttr('width');
-    $(elem).removeAttr('height');
-
-    const imgHtml = $.html(elem);
-    const wrapped = `<a href="${highResSrc}" target="_blank" rel="noopener noreferrer">${imgHtml}</a>`;
-    $(elem).replaceWith(wrapped);
-  });
-
- 
-  sanitizedContent = $.html();
-
-  /* ─────────────────── translation flags ─────────────────── */
-  const hasEng = article.acf.language1 === true;
-  const hasRu  = article.acf.language2 === true;
-  const showLanguageDropdown = hasEng || hasRu;
+  /* ─────────────────── translations ─────────────────── */
+  const publishedTranslations = getPublishedTranslations(article.acf);
+  const urlSlug = article.slug || id;
 
   // Reading statistics: null (no tracker) unless statistics are switched on.
   const readingTicket = createReadingTicket({ type: 'article', postId: article.id, lang: 'ka' });
@@ -278,16 +152,11 @@ const ArticlePage = async ({ params }) => {
             style={{ objectFit: 'cover' }}
             className="rounded-lg w-full"
           />
-          {showLanguageDropdown && (
-            <DynamicClientComponents
-            id={id}
-            title={article.title.rendered}
-            showLanguageDropdown={showLanguageDropdown}
-            hasEng={hasEng}
-            hasRu={hasRu}
-            currentLanguage="georgian"
-            />
-          )}
+          <ArticleLanguageSwitcher
+            slug={urlSlug}
+            current={ORIGINAL}
+            published={publishedTranslations}
+          />
         </div>
 
         <h1 className="font-alk-tall-mtavruli text-[32px] sm:text-[64px] font-light leading-none text-[#474F7A] mt-[24px] mb-5">
@@ -322,14 +191,7 @@ const ArticlePage = async ({ params }) => {
           dangerouslySetInnerHTML={{ __html: sanitizedContent }}
         ></div>
 
-       <DynamicClientComponents
-          id={id}
-          title={article.title.rendered}
-          showLanguageDropdown={false}
-          hasEng={hasEng}
-          hasRu={hasRu}
-          currentLanguage="georgian"
-          />
+        <DynamicClientComponents id={id} title={article.title.rendered} />
         <ReadingTracker ticket={readingTicket} />
       </div>
       <footer className="h-[100px]"></footer>

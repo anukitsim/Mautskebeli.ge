@@ -34,4 +34,10 @@ export function readPeriod(searchParams) {
   return PERIODS[key] ? key : DEFAULT_PERIOD;
 }
 
-export const LANG_LABELS = { ka: 'ქართული', en: 'English', ru: 'Русский' };
+export const LANG_LABELS = {
+  ka: 'ქართული',
+  en: 'English',
+  ru: 'Русский',
+  hy: 'Հայերեն',
+  az: 'Azərbaycanca',
+};

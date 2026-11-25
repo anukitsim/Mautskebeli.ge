@@ -5270,3 +5270,138 @@ add_filter('wp_insert_post_data', function ($data, $postarr) {
 
     return $data;
 }, 10, 2);
+
+
+// ─────────────────────────────────────────────────────────────────────
+// Article translations box: English, Russian, Armenian, Azerbaijani
+//
+// One box ("თარგმანები") with a tab per language. Every language uses
+// the same field-name pattern, which is what the Next.js site reads:
+//   languageN            on/off: show this translation in the switcher
+//   languageN_title      title          (required for the page to exist)
+//   languageN_sub_title  subtitle
+//   languageN_ავტორი      author line
+//   languageN_image      cover image (optional, falls back to main image)
+//   languageN_main_text  article text
+// language1 = English, language2 = Russian, language3 = Armenian,
+// language4 = Azerbaijani.
+// Frontend: app/all-articles/[id]/translations.js and [lang]/page.jsx
+//
+// English and Russian were first created by hand in the ACF admin (in the
+// main article box). Their tabs here use the SAME field names, so they
+// show and save the same stored data; the old copies in the main box are
+// hidden on articles by the filter below so nothing is shown twice.
+// ─────────────────────────────────────────────────────────────────────
+define('MSB_TRANSLATIONS_GROUP', 'group_article_translations_hy_az');
+
+add_action('acf/init', function () {
+    if (!function_exists('acf_add_local_field_group')) return;
+
+    $languages = array(
+        'language1' => array('label' => 'ინგლისური / English',          'url' => 'ENG'),
+        'language2' => array('label' => 'რუსული / Русский',             'url' => 'RU'),
+        'language3' => array('label' => 'სომხური / Հայերեն',            'url' => 'HY'),
+        'language4' => array('label' => 'აზერბაიჯანული / Azərbaycanca', 'url' => 'AZ'),
+    );
+
+    $fields = array();
+    foreach ($languages as $name => $lang) {
+        $label = $lang['label'];
+        $fields[] = array(
+            'key'   => "field_article_{$name}_tab",
+            'label' => $label,
+            'name'  => '',
+            'type'  => 'tab',
+            'placement' => 'top',
+        );
+        $fields[] = array(
+            'key'   => "field_article_{$name}",
+            'label' => "{$label}: ჩართვა",
+            'name'  => $name,
+            'type'  => 'true_false',
+            'ui'    => 1,
+            'default_value' => 0,
+            'instructions' => "ჩართეთ, როცა თარგმანი მზადაა. სტატიაზე გამოჩნდება ენის ღილაკი. სტატიის მისამართს ბოლოში დაემატება /{$lang['url']}",
+        );
+        $fields[] = array(
+            'key'   => "field_article_{$name}_title",
+            'label' => 'სათაური',
+            'name'  => "{$name}_title",
+            'type'  => 'text',
+            'instructions' => 'სავალდებულოა: სათაურის გარეშე თარგმანი არ გამოჩნდება.',
+        );
+        $fields[] = array(
+            'key'   => "field_article_{$name}_sub_title",
+            'label' => 'ქვესათაური',
+            'name'  => "{$name}_sub_title",
+            'type'  => 'text',
+        );
+        $fields[] = array(
+            'key'   => "field_article_{$name}_author",
+            'label' => 'ავტორი',
+            'name'  => "{$name}_ავტორი",
+            'type'  => 'text',
+        );
+        $fields[] = array(
+            'key'   => "field_article_{$name}_image",
+            'label' => 'სურათი',
+            'name'  => "{$name}_image",
+            'type'  => 'image',
+            'return_format' => 'url',
+            'preview_size'  => 'medium',
+            'instructions'  => 'არასავალდებულო. ცარიელის შემთხვევაში გამოჩნდება მთავარი სურათი.',
+        );
+        $fields[] = array(
+            'key'   => "field_article_{$name}_main_text",
+            'label' => 'ტექსტი',
+            'name'  => "{$name}_main_text",
+            'type'  => 'wysiwyg',
+            'tabs'  => 'all',
+            'toolbar' => 'full',
+            'media_upload' => 1,
+        );
+    }
+
+    acf_add_local_field_group(array(
+        'key'      => MSB_TRANSLATIONS_GROUP,
+        'title'    => 'თარგმანები',
+        'fields'   => $fields,
+        'location' => array(
+            array(
+                array('param' => 'post_type', 'operator' => '==', 'value' => 'article'),
+            ),
+        ),
+        'menu_order'   => 50,
+        'position'     => 'normal',
+        'style'        => 'default',
+        'active'       => true,
+        'show_in_rest' => 1,
+    ));
+});
+
+
+// Hide the OLD English/Russian fields (from the main article box) on the
+// article edit screen, because the translations box above now shows the
+// same data. Hidden fields are not sent when saving, so they can't
+// overwrite anything. Free columns keep their own fields as they are.
+add_filter('acf/prepare_field', function ($field) {
+    // By now ACF has turned 'name' into an input name like acf[field_abc];
+    // the real field name (language1_title …) is kept in '_name'.
+    $name = isset($field['_name']) ? $field['_name'] : '';
+    if ($name === '' || !preg_match('/^language[12](?:_.+)?$/u', $name)) {
+        return $field;
+    }
+
+    // Our own translations box: always show.
+    if (isset($field['parent']) && $field['parent'] === MSB_TRANSLATIONS_GROUP) {
+        return $field;
+    }
+
+    $screen = function_exists('get_current_screen') ? get_current_screen() : null;
+    $post_type = $screen && !empty($screen->post_type) ? $screen->post_type : get_post_type();
+    if ($post_type !== 'article') {
+        return $field;
+    }
+
+    return false; // old copy on an article: don't show it
+});
