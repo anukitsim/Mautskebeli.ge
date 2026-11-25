@@ -5311,7 +5311,7 @@ add_action('acf/init', function () {
             'type'  => 'true_false',
             'ui'    => 1,
             'default_value' => 0,
-            'instructions' => "ჩართეთ, როცა თარგმანი მზადაა. სტატიაზე გამოჩნდება ენის ღილაკი. მისამართი: /all-articles/<slug>/{$lang['url']}",
+            'instructions' => "ჩართეთ, როცა თარგმანი მზადაა. სტატიაზე გამოჩნდება ენის ღილაკი. სტატიის მისამართს ბოლოში დაემატება /{$lang['url']}",
         );
         $fields[] = array(
             'key'   => "field_article_{$name}_title",
@@ -5377,7 +5377,10 @@ add_action('acf/init', function () {
 // saved data and the website stay exactly the same.
 // ─────────────────────────────────────────────────────────────────────
 add_filter('acf/prepare_field', function ($field) {
-    if (empty($field['name']) || !preg_match('/^language([12])(?:_(.+))?$/u', $field['name'], $m)) {
+    // By now ACF has turned 'name' into an input name like acf[field_abc];
+    // the real field name (language1_title …) is kept in '_name'.
+    $name = isset($field['_name']) ? $field['_name'] : '';
+    if ($name === '' || !preg_match('/^language([12])(?:_(.+))?$/u', $name, $m)) {
         return $field;
     }
 
@@ -5410,7 +5413,7 @@ add_filter('acf/prepare_field', function ($field) {
     $field['label'] = $lang['label'] . ': ' . $labels[$part];
 
     if ($part === '') {
-        $field['instructions'] = "ჩართეთ, როცა თარგმანი მზადაა. სტატიაზე გამოჩნდება ენის ღილაკი. მისამართი: /all-articles/<slug>/{$lang['url']}";
+        $field['instructions'] = "ჩართეთ, როცა თარგმანი მზადაა. სტატიაზე გამოჩნდება ენის ღილაკი. სტატიის მისამართს ბოლოში დაემატება /{$lang['url']}";
     } elseif ($part === 'title') {
         $field['instructions'] = 'სავალდებულოა: სათაურის გარეშე თარგმანი არ გამოჩნდება.';
     } elseif ($part === 'image') {
